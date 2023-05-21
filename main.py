@@ -6,6 +6,8 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, Callb
 import openai
 from env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY
 
+week_ago = datetime.datetime.utcnow() - datetime.timedelta(days=7)
+
 logger = logging.getLogger(__name__)
 
 # Store bot screaming status
@@ -47,6 +49,7 @@ def echo(update: Update, context: CallbackContext) -> None:
         )
     else:
         # This is equivalent to forwarding, without the sender's name
+        print(update)
         update.message.copy(update.message.chat_id)
 
 
@@ -68,13 +71,19 @@ def whisper(update: Update, context: CallbackContext) -> None:
     screaming = False
 
 
-def menu(update: Update, context: CallbackContext) -> None:
+def start(update: Update, context: CallbackContext) -> None:
     """
     This handler sends a menu with the inline buttons we pre-assigned above
+    update.message.chat_id,
+            update.message.text.upper(),
+            # To preserve the markdown, we attach entities (bold, italic...)
+            entities=update.message.entities
     """
 
+    print(update)
+
     context.bot.send_message(
-        update.message.from_user.id,
+        update.message.chat_id,
         FIRST_MENU,
         parse_mode=ParseMode.HTML,
         reply_markup=FIRST_MENU_MARKUP
@@ -119,7 +128,7 @@ def main() -> None:
     # Register commands
     dispatcher.add_handler(CommandHandler("scream", scream))
     dispatcher.add_handler(CommandHandler("whisper", whisper))
-    dispatcher.add_handler(CommandHandler("menu", menu))
+    dispatcher.add_handler(CommandHandler("start", start))
 
     # Register handler for inline buttons
     dispatcher.add_handler(CallbackQueryHandler(button_tap))
@@ -132,6 +141,7 @@ def main() -> None:
     updater.start_polling()
 
     # Run the bot until you press Ctrl-C
+    # Cron job to talk to bot
     updater.idle()
 
 
