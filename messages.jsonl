@@ -1,17 +1,12 @@
-{"text": "ok \u2014 good news, bad news", "from": "bryan", "date": "2023-05-26T00:18:29+00:00"}
-{"text": "good news: we can do this", "from": "bryan", "date": "2023-05-26T00:18:57+00:00"}
-{"text": "bad news: the bot can\u2019t read retroactively", "from": "bryan", "date": "2023-05-26T00:19:09+00:00"}
-{"text": "it also cannot (in real time) gather past messages", "from": "bryan", "date": "2023-05-26T00:19:23+00:00"}
-{"text": "we have to add it to the group, give it admin privileges and then every message going forward it can read, but then we need to save it to a file or DB of some kind", "from": "bryan", "date": "2023-05-26T00:19:53+00:00"}
-{"text": "Bitcoin ipsum dolor sit amet. Roller coaster, cryptocurrency stacking sats price action hodl satoshis when lambo, electronic cash. Pizza proof-of-work, outputs blockchain sats mempool roller coaster outputs. Price action soft fork, space citadel, key pair private key address, satoshis, digital signature. Difficulty, Satoshi Nakamoto proof-of-work?", "from": "bryan", "date": "2023-05-26T00:47:27+00:00"}
-{"text": "Proof-of-work peer-to-peer private key money printer go brrrrr mining, whitepaper, bitcoin hashrate. Soft fork hard fork mining public key mining whitepaper Merkle Tree halvening freefall together. To the moon peer-to-peer outputs miner blocksize, I'm in it for the tech, transaction segwit key pair! Halvening pizza?", "from": "bryan", "date": "2023-05-26T00:47:31+00:00"}
-{"text": "Satoshi Nakamoto space citadel electronic cash sats proof-of-work hyperbitcoinization, Bitcoin Improvement Proposal cryptocurrency. Block height bitcoin mempool satoshis cryptocurrency blocksize address. Money printer go brrrrr price action peer-to-peer hash hyperbitcoinization deflationary monetary policy difficulty. Key pair, satoshis miner, block height digital signature, soft fork?", "from": "bryan", "date": "2023-05-26T00:47:35+00:00"}
-{"text": "Fee market double-spend problem halvening Satoshi Nakamoto whitepaper few understand this sats hashrate? Proof-of-work blockchain soft fork when lambo nonce, satoshis hyperbitcoinization pizza. Inputs roller coaster hard fork, key pair miner stacking sats space citadel I'm in it for the tech satoshis. When lambo digital signature decentralized blocksize, blockchain miner bitcoin fee market.", "from": "bryan", "date": "2023-05-26T00:47:37+00:00"}
-{"text": "Deflationary monetary policy space citadel volatility mempool, roller coaster bitcoin money printer go brrrrr mempool. Peer-to-peer sats to the moon address mempool, cryptocurrency, timestamp server! Stacking sats genesis block decentralized I'm in it for the tech SHA-256 proof-of-work roller coaster blocksize. Inputs genesis block key pair, when lambo pizza few understand this transaction, hyperbitcoinization. Deflationary monetary policy, wallet.", "from": "bryan", "date": "2023-05-26T00:47:39+00:00"}
-{"text": "I\u2019ve created a new protocol that will be better than Lightning network", "from": "bryan", "date": "2023-05-26T00:48:03+00:00"}
-{"text": "It\u2019s called the motherfucker network", "from": "bryan", "date": "2023-05-26T00:48:07+00:00"}
-{"text": "Its a brand new Layer 2", "from": "bryan", "date": "2023-05-26T00:48:12+00:00"}
-{"text": "Uses trustless ZK rollups", "from": "bryan", "date": "2023-05-26T00:48:16+00:00"}
-{"text": "To take funda off bitcoin, create a private place for people to buy beef jerky, and then roll up all these payments into an ordinal", "from": "bryan", "date": "2023-05-26T00:48:26+00:00"}
-{"text": "And the ordinal inscription is a picture of my cat", "from": "bryan", "date": "2023-05-26T00:48:32+00:00"}
-{"text": "Check out my whitepaper at https://catjerky.network", "from": "bryan", "date": "2023-05-26T00:48:37+00:00"}
+{"text": "This is crazy! Alex just launched this Last Pay Wins thing https://www.lastpaywins.com/", "from": "Stephen", "date": "2023-05-26T14:40:11+00:00"}
+{"text": "Basically, there is a timer...you pay a lightning invoice, and it resets the timer", "from": "Stephen", "date": "2023-05-26T14:40:22+00:00"}
+{"text": "Last person to pay after timer hits zero wins the jackpot", "from": "Stephen", "date": "2023-05-26T14:40:38+00:00"}
+{"text": "Its basically like a game of chicken, but with bitcoin", "from": "Stephen", "date": "2023-05-26T14:40:49+00:00"}
+{"text": "I've been helping extend liquidity to it with my lightning node dlntr1, and Nitesh is extending liquidity with his NodeRunner node", "from": "Stephen", "date": "2023-05-26T14:41:36+00:00"}
+{"text": "Gambling is a team sport in Atlanta lol", "from": "Stephen", "date": "2023-05-26T14:41:47+00:00"}
+{"text": null, "from": "Stephen", "date": "2023-05-26T14:41:57+00:00"}
+{"text": "Sorry", "from": "bryan", "date": "2023-05-26T14:58:38+00:00"}
+{"text": "It\u2019s not running", "from": "bryan", "date": "2023-05-26T14:58:41+00:00"}
+{"text": "One sec", "from": "bryan", "date": "2023-05-26T14:58:43+00:00"}
+{"text": "ok retry", "from": "bryan", "date": "2023-05-26T14:59:00+00:00"}
+{"text": "ok wait", "from": "bryan", "date": "2023-05-26T14:59:12+00:00"}
