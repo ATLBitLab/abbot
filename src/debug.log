@@ -78,3 +78,142 @@
     "total_tokens": 1852
   }
 }
+[2023-05-26 11:36:42.159413] ATL BitLab Bot: Starting!
+[2023-05-26 11:36:42.159515] ATL BitLab Bot: Init Bot
+[2023-05-26 11:36:42.187815] ATL BitLab Bot: Polling!
+[2023-05-26 11:36:48.642558] ATL BitLab Bot: /start executed
+[2023-05-26 11:36:52.166788] ATL BitLab Bot: Summarizing!
+[2023-05-26 11:36:52.167414] ATL BitLab Bot: Prompt Summarize the following messages including who the sender was, what they said and all relevant details such as urls, images or videos sent in the message:
+[2023-05-26 00:18:29] bryan: ok — good news, bad news
+[2023-05-26 00:18:57] bryan: good news: we can do this
+[2023-05-26 00:19:09] bryan: bad news: the bot can’t read retroactively
+[2023-05-26 00:19:23] bryan: it also cannot (in real time) gather past messages
+[2023-05-26 00:19:53] bryan: we have to add it to the group, give it admin privileges and then every message going forward it can read, but then we need to save it to a file or DB of some kind
+[2023-05-26 00:47:27] bryan: Bitcoin ipsum dolor sit amet. Roller coaster, cryptocurrency stacking sats price action hodl satoshis when lambo, electronic cash. Pizza proof-of-work, outputs blockchain sats mempool roller coaster outputs. Price action soft fork, space citadel, key pair private key address, satoshis, digital signature. Difficulty, Satoshi Nakamoto proof-of-work?
+[2023-05-26 00:47:31] bryan: Proof-of-work peer-to-peer private key money printer go brrrrr mining, whitepaper, bitcoin hashrate. Soft fork hard fork mining public key mining whitepaper Merkle Tree halvening freefall together. To the moon peer-to-peer outputs miner blocksize, I'm in it for the tech, transaction segwit key pair! Halvening pizza?
+[2023-05-26 00:47:35] bryan: Satoshi Nakamoto space citadel electronic cash sats proof-of-work hyperbitcoinization, Bitcoin Improvement Proposal cryptocurrency. Block height bitcoin mempool satoshis cryptocurrency blocksize address. Money printer go brrrrr price action peer-to-peer hash hyperbitcoinization deflationary monetary policy difficulty. Key pair, satoshis miner, block height digital signature, soft fork?
+[2023-05-26 00:47:37] bryan: Fee market double-spend problem halvening Satoshi Nakamoto whitepaper few understand this sats hashrate? Proof-of-work blockchain soft fork when lambo nonce, satoshis hyperbitcoinization pizza. Inputs roller coaster hard fork, key pair miner stacking sats space citadel I'm in it for the tech satoshis. When lambo digital signature decentralized blocksize, blockchain miner bitcoin fee market.
+[2023-05-26 00:47:39] bryan: Deflationary monetary policy space citadel volatility mempool, roller coaster bitcoin money printer go brrrrr mempool. Peer-to-peer sats to the moon address mempool, cryptocurrency, timestamp server! Stacking sats genesis block decentralized I'm in it for the tech SHA-256 proof-of-work roller coaster blocksize. Inputs genesis block key pair, when lambo pizza few understand this transaction, hyperbitcoinization. Deflationary monetary policy, wallet.
+[2023-05-26 00:48:03] bryan: I’ve created a new protocol that will be better than Lightning network
+[2023-05-26 00:48:07] bryan: It’s called the motherfucker network
+[2023-05-26 00:48:12] bryan: Its a brand new Layer 2
+[2023-05-26 00:48:16] bryan: Uses trustless ZK rollups
+[2023-05-26 00:48:26] bryan: To take funda off bitcoin, create a private place for people to buy beef jerky, and then roll up all these payments into an ordinal
+[2023-05-26 00:48:32] bryan: And the ordinal inscription is a picture of my cat
+[2023-05-26 00:48:37] bryan: Check out my whitepaper at https://catjerky.network
+[2023-05-26 13:01:10] bryan: Hello
+[2023-05-26 13:02:27] bryan: Hello
+[2023-05-26 13:03:07] bryan: Hello
+[2023-05-26 13:07:05] bryan: alksdfj
+[2023-05-26 13:11:56] bryan: asldgfkn
+[2023-05-26 13:16:57] bryan: test
+[2023-05-26 13:17:07] bryan: gtes
+[2023-05-26 13:18:35] bryan: /summarize
+[2023-05-26 13:19:06] bryan: ping
+[2023-05-26 13:19:13] bryan: ping
+[2023-05-26 13:20:11] bryan: Hello!
+[2023-05-26 13:21:29] bryan: test
+[2023-05-26 13:33:52] bryan: Testing
+[2023-05-26 13:33:57] bryan: Hello BitLab Bot
+[2023-05-26 13:34:02] bryan: Hello Vietnam
+[2023-05-26 13:34:07] bryan: 1,2,3 is this thing on?
+[2023-05-26 13:35:50] bryan: asldkgjhasl;dgkja
+[2023-05-26 13:35:50] bryan: asdl;gkjasdg
+[2023-05-26 13:35:51] bryan: as;dkgjasdg;k
+[2023-05-26 13:37:00] bryan: lol
+[2023-05-26 13:55:19] bryan: /summmarize
+[2023-05-26 13:57:54] bryan: Fuck yeah
+[2023-05-26 14:40:11] Stephen: This is crazy! Alex just launched this Last Pay Wins thing https://www.lastpaywins.com/
+[2023-05-26 14:40:22] Stephen: Basically, there is a timer...you pay a lightning invoice, and it resets the timer
+[2023-05-26 14:40:38] Stephen: Last person to pay after timer hits zero wins the jackpot
+[2023-05-26 14:40:49] Stephen: Its basically like a game of chicken, but with bitcoin
+[2023-05-26 14:41:36] Stephen: I've been helping extend liquidity to it with my lightning node dlntr1, and Nitesh is extending liquidity with his NodeRunner node
+[2023-05-26 14:41:47] Stephen: Gambling is a team sport in Atlanta lol
+[2023-05-26 14:41:57] Stephen: None
+[2023-05-26 14:58:38] bryan: Sorry
+[2023-05-26 14:58:41] bryan: It’s not running
+[2023-05-26 14:58:43] bryan: One sec
+[2023-05-26 14:59:00] bryan: ok retry
+[2023-05-26 14:59:12] bryan: ok wait
+[2023-05-26 15:32:03] bryan: test
+[2023-05-26 15:33:09] Stephen: Thanks BitLab bot, you're the best
+
+[2023-05-26 11:37:07.540064] ATL BitLab Bot: OpenAI Respone {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "\nSender Bryan said that there is good news and bad news. The good news is that they can do the task, but the bad news is that the bot can't read retroactively and can't gather past messages in real time. To make it work, they have to add it to the group, give it admin privileges and then save the messages to a file or database. Bryan then talked about Bitcoin and a new protocol he created called the Motherfucker Network, a brand new Layer 2 that uses trustless ZK rollups. He provided a link to his whitepaper at https://catjerky.network. Stephen then shared a link to Last Pay Wins, a game of chicken but with Bitcoin. He mentioned that he and Nitesh have been extending liquidity to it with their lightning nodes. Bryan then did a few tests and Stephen thanked the BitLab bot."
+    }
+  ],
+  "created": 1685115412,
+  "id": "cmpl-7KTmmudNGeo0a7VtSuwGfVlCWrmWd",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 178,
+    "prompt_tokens": 1728,
+    "total_tokens": 1906
+  }
+}
+[2023-05-26 11:37:45.832240] ATL BitLab Bot: Starting!
+[2023-05-26 11:37:45.832350] ATL BitLab Bot: Init Bot
+[2023-05-26 11:37:45.861973] ATL BitLab Bot: Polling!
+[2023-05-26 11:37:52.789491] ATL BitLab Bot: Summarizing!
+[2023-05-26 11:37:52.808151] ATL BitLab Bot: Prompt Summarize the following messages including who the sender was, what they said and all relevant details such as urls, images or videos sent in the message:
+[2023-05-26 00:18:29] bryan: ok — good news, bad news
+[2023-05-26 00:18:57] bryan: good news: we can do this
+[2023-05-26 00:19:09] bryan: bad news: the bot can’t read retroactively
+[2023-05-26 00:19:23] bryan: it also cannot (in real time) gather past messages
+[2023-05-26 00:19:53] bryan: we have to add it to the group, give it admin privileges and then every message going forward it can read, but then we need to save it to a file or DB of some kind
+[2023-05-26 00:47:27] bryan: Bitcoin ipsum dolor sit amet. Roller coaster, cryptocurrency stacking sats price action hodl satoshis when lambo, electronic cash. Pizza proof-of-work, outputs blockchain sats mempool roller coaster outputs. Price action soft fork, space citadel, key pair private key address, satoshis, digital signature. Difficulty, Satoshi Nakamoto proof-of-work?
+[2023-05-26 00:47:31] bryan: Proof-of-work peer-to-peer private key money printer go brrrrr mining, whitepaper, bitcoin hashrate. Soft fork hard fork mining public key mining whitepaper Merkle Tree halvening freefall together. To the moon peer-to-peer outputs miner blocksize, I'm in it for the tech, transaction segwit key pair! Halvening pizza?
+[2023-05-26 00:47:35] bryan: Satoshi Nakamoto space citadel electronic cash sats proof-of-work hyperbitcoinization, Bitcoin Improvement Proposal cryptocurrency. Block height bitcoin mempool satoshis cryptocurrency blocksize address. Money printer go brrrrr price action peer-to-peer hash hyperbitcoinization deflationary monetary policy difficulty. Key pair, satoshis miner, block height digital signature, soft fork?
+[2023-05-26 00:47:37] bryan: Fee market double-spend problem halvening Satoshi Nakamoto whitepaper few understand this sats hashrate? Proof-of-work blockchain soft fork when lambo nonce, satoshis hyperbitcoinization pizza. Inputs roller coaster hard fork, key pair miner stacking sats space citadel I'm in it for the tech satoshis. When lambo digital signature decentralized blocksize, blockchain miner bitcoin fee market.
+[2023-05-26 00:47:39] bryan: Deflationary monetary policy space citadel volatility mempool, roller coaster bitcoin money printer go brrrrr mempool. Peer-to-peer sats to the moon address mempool, cryptocurrency, timestamp server! Stacking sats genesis block decentralized I'm in it for the tech SHA-256 proof-of-work roller coaster blocksize. Inputs genesis block key pair, when lambo pizza few understand this transaction, hyperbitcoinization. Deflationary monetary policy, wallet.
+[2023-05-26 00:48:03] bryan: I’ve created a new protocol that will be better than Lightning network
+[2023-05-26 00:48:07] bryan: It’s called the motherfucker network
+[2023-05-26 00:48:12] bryan: Its a brand new Layer 2
+[2023-05-26 00:48:16] bryan: Uses trustless ZK rollups
+[2023-05-26 00:48:26] bryan: To take funda off bitcoin, create a private place for people to buy beef jerky, and then roll up all these payments into an ordinal
+[2023-05-26 00:48:32] bryan: And the ordinal inscription is a picture of my cat
+[2023-05-26 00:48:37] bryan: Check out my whitepaper at https://catjerky.network
+[2023-05-26 13:01:10] bryan: Hello
+[2023-05-26 13:02:27] bryan: Hello
+[2023-05-26 13:03:07] bryan: Hello
+[2023-05-26 13:07:05] bryan: alksdfj
+[2023-05-26 13:11:56] bryan: asldgfkn
+[2023-05-26 13:16:57] bryan: test
+[2023-05-26 13:17:07] bryan: gtes
+[2023-05-26 13:18:35] bryan: /summarize
+[2023-05-26 13:19:06] bryan: ping
+[2023-05-26 13:19:13] bryan: ping
+[2023-05-26 13:20:11] bryan: Hello!
+[2023-05-26 13:21:29] bryan: test
+[2023-05-26 13:33:52] bryan: Testing
+[2023-05-26 13:33:57] bryan: Hello BitLab Bot
+[2023-05-26 13:34:02] bryan: Hello Vietnam
+[2023-05-26 13:34:07] bryan: 1,2,3 is this thing on?
+[2023-05-26 13:35:50] bryan: asldkgjhasl;dgkja
+[2023-05-26 13:35:50] bryan: asdl;gkjasdg
+[2023-05-26 13:35:51] bryan: as;dkgjasdg;k
+[2023-05-26 13:37:00] bryan: lol
+[2023-05-26 13:55:19] bryan: /summmarize
+[2023-05-26 13:57:54] bryan: Fuck yeah
+[2023-05-26 14:40:11] Stephen: This is crazy! Alex just launched this Last Pay Wins thing https://www.lastpaywins.com/
+[2023-05-26 14:40:22] Stephen: Basically, there is a timer...you pay a lightning invoice, and it resets the timer
+[2023-05-26 14:40:38] Stephen: Last person to pay after timer hits zero wins the jackpot
+[2023-05-26 14:40:49] Stephen: Its basically like a game of chicken, but with bitcoin
+[2023-05-26 14:41:36] Stephen: I've been helping extend liquidity to it with my lightning node dlntr1, and Nitesh is extending liquidity with his NodeRunner node
+[2023-05-26 14:41:47] Stephen: Gambling is a team sport in Atlanta lol
+[2023-05-26 14:41:57] Stephen: None
+[2023-05-26 14:58:38] bryan: Sorry
+[2023-05-26 14:58:41] bryan: It’s not running
+[2023-05-26 14:58:43] bryan: One sec
+[2023-05-26 14:59:00] bryan: ok retry
+[2023-05-26 14:59:12] bryan: ok wait
+[2023-05-26 15:32:03] bryan: test
+[2023-05-26 15:33:09] Stephen: Thanks BitLab bot, you're the best
+[2023-05-26 15:37:25] bryan: @sbddesign Trying to get it to include ALL links
+
