@@ -1,7 +1,7 @@
 import json
 import openai
 
-from env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY, MESSAGE_LOG_FILE
+from lib.env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY, MESSAGE_LOG_FILE
 from datetime import datetime, timedelta
 from pytz import UTC
 

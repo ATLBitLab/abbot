@@ -1,9 +1,9 @@
-from lib.logger import logger, debug
 import json
 import openai
-from lib.utils import get_now
 
-from env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY, MESSAGE_LOG_FILE, PROGRAM
+from lib.logger import logger, debug
+from lib.utils import get_now
+from lib.env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY, MESSAGE_LOG_FILE, PROGRAM
 from datetime import datetime, timedelta
 
 from telegram import Update

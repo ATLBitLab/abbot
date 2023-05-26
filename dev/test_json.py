@@ -1,5 +1,5 @@
 import json
-from env import MESSAGE_LOG_FILE
+from lib.env import MESSAGE_LOG_FILE
 
 f = open(MESSAGE_LOG_FILE, "r")
 for line in f.readlines():

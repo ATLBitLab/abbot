@@ -4,7 +4,7 @@ import time
 from telegram import Update, ForceReply, InlineKeyboardMarkup, InlineKeyboardButton, ParseMode, MessageEntity
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext, CallbackQueryHandler
 import openai
-from env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY
+from lib.env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY
 
 week_ago = datetime.datetime.utcnow() - datetime.timedelta(days=7)
 
