@@ -39,7 +39,7 @@ async def summarize_past_week():
 
     # Read message log and select messages from past week
     # Summary, key points, 
-    prompt = "Summarize the following messages including who the sender was, what they said and all relevant details such as urls, images or videos sent in the message:\n"
+    prompt = "Summarize the following text. Include details like who sent the message, what did they say, any key points from the message and all relevant details such as links:\n"
     f = open(MESSAGE_LOG_FILE, "r")
     for line in f.readlines():
         message_json = json.loads(line)
@@ -54,7 +54,7 @@ async def summarize_past_week():
     response = openai.Completion.create(
         model="text-davinci-003",
         prompt=prompt,
-        max_tokens=1814,
+        max_tokens=4097-len(prompt),
         n=1,
         stop=None,
         temperature=0.5,
