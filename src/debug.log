@@ -217,3 +217,311 @@
 [2023-05-26 15:33:09] Stephen: Thanks BitLab bot, you're the best
 [2023-05-26 15:37:25] bryan: @sbddesign Trying to get it to include ALL links
 
+[2023-05-26 11:38:13.995064] ATL BitLab Bot: OpenAI Respone {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "\nSender Bryan said that there is good news and bad news regarding a bot. The good news is that it can be added to the group and given admin privileges so that it can read messages going forward. The bad news is that it cannot read retroactively and cannot gather past messages in real time. Bryan then proceeded to describe a new protocol he created called the Motherfucker Network, which is a Layer 2 that uses trustless ZK rollups to take funds off Bitcoin, create a private place for people to buy beef jerky, and roll up all payments into an ordinal. He provided a link to a whitepaper at https://catjerky.network. Sender Stephen shared that Alex just launched a Last Pay Wins thing (https://www.lastpaywins.com/) which is a game of chicken but with Bitcoin. Stephen and Nitesh are extending liquidity to the game with their lightning nodes. Bryan then tested the bot and Stephen thanked the bot."
+    }
+  ],
+  "created": 1685115473,
+  "id": "cmpl-7KTnlL8jqvFnisfM80KlakCeJ5gx3",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 199,
+    "prompt_tokens": 1758,
+    "total_tokens": 1957
+  }
+}
+[2023-05-26 19:13:53.977780] ATL BitLab Bot: Starting!
+[2023-05-26 19:13:53.977944] ATL BitLab Bot: Init Bot
+[2023-05-26 19:13:54.014359] ATL BitLab Bot: Polling!
+[2023-05-26 18:15:08.990598] ATL BitLab Bot: /start executed
+[2023-05-26 18:15:13.599930] ATL BitLab Bot: Summarizing!
+[2023-05-26 18:15:13.600612] ATL BitLab Bot: Prompt Summarize the following messages including who the sender was, what they said and all relevant details such as urls, images or videos sent in the message:
+[2023-05-26 00:18:29] bryan: ok — good news, bad news
+[2023-05-26 00:18:57] bryan: good news: we can do this
+[2023-05-26 00:19:09] bryan: bad news: the bot can’t read retroactively
+[2023-05-26 00:19:23] bryan: it also cannot (in real time) gather past messages
+[2023-05-26 00:19:53] bryan: we have to add it to the group, give it admin privileges and then every message going forward it can read, but then we need to save it to a file or DB of some kind
+[2023-05-26 00:47:27] bryan: Bitcoin ipsum dolor sit amet. Roller coaster, cryptocurrency stacking sats price action hodl satoshis when lambo, electronic cash. Pizza proof-of-work, outputs blockchain sats mempool roller coaster outputs. Price action soft fork, space citadel, key pair private key address, satoshis, digital signature. Difficulty, Satoshi Nakamoto proof-of-work?
+[2023-05-26 00:47:31] bryan: Proof-of-work peer-to-peer private key money printer go brrrrr mining, whitepaper, bitcoin hashrate. Soft fork hard fork mining public key mining whitepaper Merkle Tree halvening freefall together. To the moon peer-to-peer outputs miner blocksize, I'm in it for the tech, transaction segwit key pair! Halvening pizza?
+[2023-05-26 00:47:35] bryan: Satoshi Nakamoto space citadel electronic cash sats proof-of-work hyperbitcoinization, Bitcoin Improvement Proposal cryptocurrency. Block height bitcoin mempool satoshis cryptocurrency blocksize address. Money printer go brrrrr price action peer-to-peer hash hyperbitcoinization deflationary monetary policy difficulty. Key pair, satoshis miner, block height digital signature, soft fork?
+[2023-05-26 00:47:37] bryan: Fee market double-spend problem halvening Satoshi Nakamoto whitepaper few understand this sats hashrate? Proof-of-work blockchain soft fork when lambo nonce, satoshis hyperbitcoinization pizza. Inputs roller coaster hard fork, key pair miner stacking sats space citadel I'm in it for the tech satoshis. When lambo digital signature decentralized blocksize, blockchain miner bitcoin fee market.
+[2023-05-26 00:47:39] bryan: Deflationary monetary policy space citadel volatility mempool, roller coaster bitcoin money printer go brrrrr mempool. Peer-to-peer sats to the moon address mempool, cryptocurrency, timestamp server! Stacking sats genesis block decentralized I'm in it for the tech SHA-256 proof-of-work roller coaster blocksize. Inputs genesis block key pair, when lambo pizza few understand this transaction, hyperbitcoinization. Deflationary monetary policy, wallet.
+[2023-05-26 00:48:03] bryan: I’ve created a new protocol that will be better than Lightning network
+[2023-05-26 00:48:07] bryan: It’s called the motherfucker network
+[2023-05-26 00:48:12] bryan: Its a brand new Layer 2
+[2023-05-26 00:48:16] bryan: Uses trustless ZK rollups
+[2023-05-26 00:48:26] bryan: To take funda off bitcoin, create a private place for people to buy beef jerky, and then roll up all these payments into an ordinal
+[2023-05-26 00:48:32] bryan: And the ordinal inscription is a picture of my cat
+[2023-05-26 00:48:37] bryan: Check out my whitepaper at https://catjerky.network
+[2023-05-26 13:01:10] bryan: Hello
+[2023-05-26 13:02:27] bryan: Hello
+[2023-05-26 13:03:07] bryan: Hello
+[2023-05-26 13:07:05] bryan: alksdfj
+[2023-05-26 13:11:56] bryan: asldgfkn
+[2023-05-26 13:16:57] bryan: test
+[2023-05-26 13:17:07] bryan: gtes
+[2023-05-26 13:18:35] bryan: /summarize
+[2023-05-26 13:19:06] bryan: ping
+[2023-05-26 13:19:13] bryan: ping
+[2023-05-26 13:20:11] bryan: Hello!
+[2023-05-26 13:21:29] bryan: test
+[2023-05-26 13:33:52] bryan: Testing
+[2023-05-26 13:33:57] bryan: Hello BitLab Bot
+[2023-05-26 13:34:02] bryan: Hello Vietnam
+[2023-05-26 13:34:07] bryan: 1,2,3 is this thing on?
+[2023-05-26 13:35:50] bryan: asldkgjhasl;dgkja
+[2023-05-26 13:35:50] bryan: asdl;gkjasdg
+[2023-05-26 13:35:51] bryan: as;dkgjasdg;k
+[2023-05-26 13:37:00] bryan: lol
+[2023-05-26 13:55:19] bryan: /summmarize
+[2023-05-26 13:57:54] bryan: Fuck yeah
+[2023-05-26 14:40:11] Stephen: This is crazy! Alex just launched this Last Pay Wins thing https://www.lastpaywins.com/
+[2023-05-26 14:40:22] Stephen: Basically, there is a timer...you pay a lightning invoice, and it resets the timer
+[2023-05-26 14:40:38] Stephen: Last person to pay after timer hits zero wins the jackpot
+[2023-05-26 14:40:49] Stephen: Its basically like a game of chicken, but with bitcoin
+[2023-05-26 14:41:36] Stephen: I've been helping extend liquidity to it with my lightning node dlntr1, and Nitesh is extending liquidity with his NodeRunner node
+[2023-05-26 14:41:47] Stephen: Gambling is a team sport in Atlanta lol
+[2023-05-26 14:41:57] Stephen: None
+[2023-05-26 14:58:38] bryan: Sorry
+[2023-05-26 14:58:41] bryan: It’s not running
+[2023-05-26 14:58:43] bryan: One sec
+[2023-05-26 14:59:00] bryan: ok retry
+[2023-05-26 14:59:12] bryan: ok wait
+[2023-05-26 15:32:03] bryan: test
+[2023-05-26 15:33:09] Stephen: Thanks BitLab bot, you're the best
+[2023-05-26 15:37:25] bryan: @sbddesign Trying to get it to include ALL links
+[2023-05-26 15:38:17] bryan: there we go
+[2023-05-26 15:38:28] bryan: gotta play with the “max tokens”
+[2023-05-26 15:38:32] bryan: response = openai.Completion.create(
+        model="text-davinci-003",
+        prompt=prompt,
+        max_tokens=1500,
+        n=1,
+        stop=None,
+        temperature=0.5,
+    )
+[2023-05-26 16:08:13] bryan: And Need to play with the prompt yo get it to do what we want, so I may need your help with that
+[2023-05-26 16:10:13] bryan: Possible solution could be to tell it to summarize what was said and by who, then do another prompt to have it summarize all links and who sent it and then give it both of those summaries and have it find matches between who said what and who send links ?
+[2023-05-26 16:10:54] bryan: None
+[2023-05-26 16:12:30] bryan: None
+[2023-05-26 16:12:50] bryan: @alex_lewin check out our telegram / GPT bot
+[2023-05-26 17:38:36] bryan: @sbddesign what if we turned this bot into a service on our website accessible to members
+[2023-05-26 17:38:52] bryan: bot.atlbitlab.com
+[2023-05-26 23:14:12] bryan: Hello from FL
+[2023-05-26 23:14:18] bryan: My name is Bryan
+[2023-05-26 23:14:22] bryan: I am a nerd
+[2023-05-26 23:15:06] bryan: Once upon a time, there was a man named Micah and he met a woman named Kaley and they lived happily ever after. The ENd.
+
+[2023-05-26 18:15:27.783644] ATL BitLab Bot: OpenAI Respone {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "\nOn 2023-05-26, Bryan sent multiple messages. He first discussed the capabilities of a bot, stating that it can only read messages going forward and admin privileges are needed to save them to a file or database. He then mentioned a new protocol he created called the \"Motherfucker Network\" which is a Layer 2 and uses trustless ZK rollups. He provided a whitepaper link for the protocol. Bryan then sent a few test messages and asked BitLab Bot to summarize the conversation. He then shared a link to a new website called Last Pay Wins, which is a game of chicken with Bitcoin. Bryan then suggested turning the bot into a service on the website accessible to members. He concluded with a story about Micah and Kaley."
+    }
+  ],
+  "created": 1685142914,
+  "id": "cmpl-7KawMoyDK9ciHRidyNcFKRTD93T6d",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 155,
+    "prompt_tokens": 2234,
+    "total_tokens": 2389
+  }
+}
+[2023-05-26 18:26:51.966977] ATL BitLab Bot: Starting!
+[2023-05-26 18:26:51.967158] ATL BitLab Bot: Init Bot
+[2023-05-26 18:26:52.003044] ATL BitLab Bot: Polling!
+[2023-05-26 18:37:33.146227] ATL BitLab Bot: Starting!
+[2023-05-26 18:37:33.161207] ATL BitLab Bot: Init Bot
+[2023-05-26 18:37:33.198368] ATL BitLab Bot: Polling!
+[2023-05-26 18:37:37.002897] ATL BitLab Bot: Summarizing!
+[2023-05-26 18:37:37.004486] ATL BitLab Bot: Prompt Summarize the following messages including who the sender was, what they said and all relevant details such as urls, images or videos sent in the message:
+[2023-05-26 00:18:29] bryan: ok — good news, bad news
+[2023-05-26 00:18:57] bryan: good news: we can do this
+[2023-05-26 00:19:09] bryan: bad news: the bot can’t read retroactively
+[2023-05-26 00:19:23] bryan: it also cannot (in real time) gather past messages
+[2023-05-26 00:19:53] bryan: we have to add it to the group, give it admin privileges and then every message going forward it can read, but then we need to save it to a file or DB of some kind
+[2023-05-26 00:47:27] bryan: Bitcoin ipsum dolor sit amet. Roller coaster, cryptocurrency stacking sats price action hodl satoshis when lambo, electronic cash. Pizza proof-of-work, outputs blockchain sats mempool roller coaster outputs. Price action soft fork, space citadel, key pair private key address, satoshis, digital signature. Difficulty, Satoshi Nakamoto proof-of-work?
+[2023-05-26 00:47:31] bryan: Proof-of-work peer-to-peer private key money printer go brrrrr mining, whitepaper, bitcoin hashrate. Soft fork hard fork mining public key mining whitepaper Merkle Tree halvening freefall together. To the moon peer-to-peer outputs miner blocksize, I'm in it for the tech, transaction segwit key pair! Halvening pizza?
+[2023-05-26 00:47:35] bryan: Satoshi Nakamoto space citadel electronic cash sats proof-of-work hyperbitcoinization, Bitcoin Improvement Proposal cryptocurrency. Block height bitcoin mempool satoshis cryptocurrency blocksize address. Money printer go brrrrr price action peer-to-peer hash hyperbitcoinization deflationary monetary policy difficulty. Key pair, satoshis miner, block height digital signature, soft fork?
+[2023-05-26 00:47:37] bryan: Fee market double-spend problem halvening Satoshi Nakamoto whitepaper few understand this sats hashrate? Proof-of-work blockchain soft fork when lambo nonce, satoshis hyperbitcoinization pizza. Inputs roller coaster hard fork, key pair miner stacking sats space citadel I'm in it for the tech satoshis. When lambo digital signature decentralized blocksize, blockchain miner bitcoin fee market.
+[2023-05-26 00:47:39] bryan: Deflationary monetary policy space citadel volatility mempool, roller coaster bitcoin money printer go brrrrr mempool. Peer-to-peer sats to the moon address mempool, cryptocurrency, timestamp server! Stacking sats genesis block decentralized I'm in it for the tech SHA-256 proof-of-work roller coaster blocksize. Inputs genesis block key pair, when lambo pizza few understand this transaction, hyperbitcoinization. Deflationary monetary policy, wallet.
+[2023-05-26 00:48:03] bryan: I’ve created a new protocol that will be better than Lightning network
+[2023-05-26 00:48:07] bryan: It’s called the motherfucker network
+[2023-05-26 00:48:12] bryan: Its a brand new Layer 2
+[2023-05-26 00:48:16] bryan: Uses trustless ZK rollups
+[2023-05-26 00:48:26] bryan: To take funda off bitcoin, create a private place for people to buy beef jerky, and then roll up all these payments into an ordinal
+[2023-05-26 00:48:32] bryan: And the ordinal inscription is a picture of my cat
+[2023-05-26 00:48:37] bryan: Check out my whitepaper at https://catjerky.network
+[2023-05-26 13:01:10] bryan: Hello
+[2023-05-26 13:02:27] bryan: Hello
+[2023-05-26 13:03:07] bryan: Hello
+[2023-05-26 13:07:05] bryan: alksdfj
+[2023-05-26 13:11:56] bryan: asldgfkn
+[2023-05-26 13:16:57] bryan: test
+[2023-05-26 13:17:07] bryan: gtes
+[2023-05-26 13:18:35] bryan: /summarize
+[2023-05-26 13:19:06] bryan: ping
+[2023-05-26 13:19:13] bryan: ping
+[2023-05-26 13:20:11] bryan: Hello!
+[2023-05-26 13:21:29] bryan: test
+[2023-05-26 13:33:52] bryan: Testing
+[2023-05-26 13:33:57] bryan: Hello BitLab Bot
+[2023-05-26 13:34:02] bryan: Hello Vietnam
+[2023-05-26 13:34:07] bryan: 1,2,3 is this thing on?
+[2023-05-26 13:35:50] bryan: asldkgjhasl;dgkja
+[2023-05-26 13:35:50] bryan: asdl;gkjasdg
+[2023-05-26 13:35:51] bryan: as;dkgjasdg;k
+[2023-05-26 13:37:00] bryan: lol
+[2023-05-26 13:55:19] bryan: /summmarize
+[2023-05-26 13:57:54] bryan: Fuck yeah
+[2023-05-26 14:40:11] Stephen: This is crazy! Alex just launched this Last Pay Wins thing https://www.lastpaywins.com/
+[2023-05-26 14:40:22] Stephen: Basically, there is a timer...you pay a lightning invoice, and it resets the timer
+[2023-05-26 14:40:38] Stephen: Last person to pay after timer hits zero wins the jackpot
+[2023-05-26 14:40:49] Stephen: Its basically like a game of chicken, but with bitcoin
+[2023-05-26 14:41:36] Stephen: I've been helping extend liquidity to it with my lightning node dlntr1, and Nitesh is extending liquidity with his NodeRunner node
+[2023-05-26 14:41:47] Stephen: Gambling is a team sport in Atlanta lol
+[2023-05-26 14:41:57] Stephen: None
+[2023-05-26 14:58:38] bryan: Sorry
+[2023-05-26 14:58:41] bryan: It’s not running
+[2023-05-26 14:58:43] bryan: One sec
+[2023-05-26 14:59:00] bryan: ok retry
+[2023-05-26 14:59:12] bryan: ok wait
+[2023-05-26 15:32:03] bryan: test
+[2023-05-26 15:33:09] Stephen: Thanks BitLab bot, you're the best
+[2023-05-26 15:37:25] bryan: @sbddesign Trying to get it to include ALL links
+[2023-05-26 15:38:17] bryan: there we go
+[2023-05-26 15:38:28] bryan: gotta play with the “max tokens”
+[2023-05-26 15:38:32] bryan: response = openai.Completion.create(
+        model="text-davinci-003",
+        prompt=prompt,
+        max_tokens=1500,
+        n=1,
+        stop=None,
+        temperature=0.5,
+    )
+[2023-05-26 16:08:13] bryan: And Need to play with the prompt yo get it to do what we want, so I may need your help with that
+[2023-05-26 16:10:13] bryan: Possible solution could be to tell it to summarize what was said and by who, then do another prompt to have it summarize all links and who sent it and then give it both of those summaries and have it find matches between who said what and who send links ?
+[2023-05-26 16:10:54] bryan: None
+[2023-05-26 16:12:30] bryan: None
+[2023-05-26 16:12:50] bryan: @alex_lewin check out our telegram / GPT bot
+[2023-05-26 17:38:36] bryan: @sbddesign what if we turned this bot into a service on our website accessible to members
+[2023-05-26 17:38:52] bryan: bot.atlbitlab.com
+[2023-05-26 23:14:12] bryan: Hello from FL
+[2023-05-26 23:14:18] bryan: My name is Bryan
+[2023-05-26 23:14:22] bryan: I am a nerd
+[2023-05-26 23:15:06] bryan: Once upon a time, there was a man named Micah and he met a woman named Kaley and they lived happily ever after. The ENd.
+[2023-05-26 23:26:30] bryan: Testing. motherfucker, 1-2-3!
+[2023-05-26 23:26:45] bryan: Testing again bitch
+
+[2023-05-26 18:38:17.977375] ATL BitLab Bot: Starting!
+[2023-05-26 18:38:17.977556] ATL BitLab Bot: Init Bot
+[2023-05-26 18:38:18.015495] ATL BitLab Bot: Polling!
+[2023-05-26 18:38:34.077189] ATL BitLab Bot: Summarizing!
+[2023-05-26 18:38:34.079310] ATL BitLab Bot: Prompt Summarize the following messages including who the sender was, what they said and all relevant details such as urls, images or videos sent in the message:
+[2023-05-26 00:18:29] bryan: ok — good news, bad news
+[2023-05-26 00:18:57] bryan: good news: we can do this
+[2023-05-26 00:19:09] bryan: bad news: the bot can’t read retroactively
+[2023-05-26 00:19:23] bryan: it also cannot (in real time) gather past messages
+[2023-05-26 00:19:53] bryan: we have to add it to the group, give it admin privileges and then every message going forward it can read, but then we need to save it to a file or DB of some kind
+[2023-05-26 00:47:27] bryan: Bitcoin ipsum dolor sit amet. Roller coaster, cryptocurrency stacking sats price action hodl satoshis when lambo, electronic cash. Pizza proof-of-work, outputs blockchain sats mempool roller coaster outputs. Price action soft fork, space citadel, key pair private key address, satoshis, digital signature. Difficulty, Satoshi Nakamoto proof-of-work?
+[2023-05-26 00:47:31] bryan: Proof-of-work peer-to-peer private key money printer go brrrrr mining, whitepaper, bitcoin hashrate. Soft fork hard fork mining public key mining whitepaper Merkle Tree halvening freefall together. To the moon peer-to-peer outputs miner blocksize, I'm in it for the tech, transaction segwit key pair! Halvening pizza?
+[2023-05-26 00:47:35] bryan: Satoshi Nakamoto space citadel electronic cash sats proof-of-work hyperbitcoinization, Bitcoin Improvement Proposal cryptocurrency. Block height bitcoin mempool satoshis cryptocurrency blocksize address. Money printer go brrrrr price action peer-to-peer hash hyperbitcoinization deflationary monetary policy difficulty. Key pair, satoshis miner, block height digital signature, soft fork?
+[2023-05-26 00:47:37] bryan: Fee market double-spend problem halvening Satoshi Nakamoto whitepaper few understand this sats hashrate? Proof-of-work blockchain soft fork when lambo nonce, satoshis hyperbitcoinization pizza. Inputs roller coaster hard fork, key pair miner stacking sats space citadel I'm in it for the tech satoshis. When lambo digital signature decentralized blocksize, blockchain miner bitcoin fee market.
+[2023-05-26 00:47:39] bryan: Deflationary monetary policy space citadel volatility mempool, roller coaster bitcoin money printer go brrrrr mempool. Peer-to-peer sats to the moon address mempool, cryptocurrency, timestamp server! Stacking sats genesis block decentralized I'm in it for the tech SHA-256 proof-of-work roller coaster blocksize. Inputs genesis block key pair, when lambo pizza few understand this transaction, hyperbitcoinization. Deflationary monetary policy, wallet.
+[2023-05-26 00:48:03] bryan: I’ve created a new protocol that will be better than Lightning network
+[2023-05-26 00:48:07] bryan: It’s called the motherfucker network
+[2023-05-26 00:48:12] bryan: Its a brand new Layer 2
+[2023-05-26 00:48:16] bryan: Uses trustless ZK rollups
+[2023-05-26 00:48:26] bryan: To take funda off bitcoin, create a private place for people to buy beef jerky, and then roll up all these payments into an ordinal
+[2023-05-26 00:48:32] bryan: And the ordinal inscription is a picture of my cat
+[2023-05-26 00:48:37] bryan: Check out my whitepaper at https://catjerky.network
+[2023-05-26 13:01:10] bryan: Hello
+[2023-05-26 13:02:27] bryan: Hello
+[2023-05-26 13:03:07] bryan: Hello
+[2023-05-26 13:07:05] bryan: alksdfj
+[2023-05-26 13:11:56] bryan: asldgfkn
+[2023-05-26 13:16:57] bryan: test
+[2023-05-26 13:17:07] bryan: gtes
+[2023-05-26 13:18:35] bryan: /summarize
+[2023-05-26 13:19:06] bryan: ping
+[2023-05-26 13:19:13] bryan: ping
+[2023-05-26 13:20:11] bryan: Hello!
+[2023-05-26 13:21:29] bryan: test
+[2023-05-26 13:33:52] bryan: Testing
+[2023-05-26 13:33:57] bryan: Hello BitLab Bot
+[2023-05-26 13:34:02] bryan: Hello Vietnam
+[2023-05-26 13:34:07] bryan: 1,2,3 is this thing on?
+[2023-05-26 13:35:50] bryan: asldkgjhasl;dgkja
+[2023-05-26 13:35:50] bryan: asdl;gkjasdg
+[2023-05-26 13:35:51] bryan: as;dkgjasdg;k
+[2023-05-26 13:37:00] bryan: lol
+[2023-05-26 13:55:19] bryan: /summmarize
+[2023-05-26 13:57:54] bryan: Fuck yeah
+[2023-05-26 14:40:11] Stephen: This is crazy! Alex just launched this Last Pay Wins thing https://www.lastpaywins.com/
+[2023-05-26 14:40:22] Stephen: Basically, there is a timer...you pay a lightning invoice, and it resets the timer
+[2023-05-26 14:40:38] Stephen: Last person to pay after timer hits zero wins the jackpot
+[2023-05-26 14:40:49] Stephen: Its basically like a game of chicken, but with bitcoin
+[2023-05-26 14:41:36] Stephen: I've been helping extend liquidity to it with my lightning node dlntr1, and Nitesh is extending liquidity with his NodeRunner node
+[2023-05-26 14:41:47] Stephen: Gambling is a team sport in Atlanta lol
+[2023-05-26 14:41:57] Stephen: None
+[2023-05-26 14:58:38] bryan: Sorry
+[2023-05-26 14:58:41] bryan: It’s not running
+[2023-05-26 14:58:43] bryan: One sec
+[2023-05-26 14:59:00] bryan: ok retry
+[2023-05-26 14:59:12] bryan: ok wait
+[2023-05-26 15:32:03] bryan: test
+[2023-05-26 15:33:09] Stephen: Thanks BitLab bot, you're the best
+[2023-05-26 15:37:25] bryan: @sbddesign Trying to get it to include ALL links
+[2023-05-26 15:38:17] bryan: there we go
+[2023-05-26 15:38:28] bryan: gotta play with the “max tokens”
+[2023-05-26 15:38:32] bryan: response = openai.Completion.create(
+        model="text-davinci-003",
+        prompt=prompt,
+        max_tokens=1500,
+        n=1,
+        stop=None,
+        temperature=0.5,
+    )
+[2023-05-26 16:08:13] bryan: And Need to play with the prompt yo get it to do what we want, so I may need your help with that
+[2023-05-26 16:10:13] bryan: Possible solution could be to tell it to summarize what was said and by who, then do another prompt to have it summarize all links and who sent it and then give it both of those summaries and have it find matches between who said what and who send links ?
+[2023-05-26 16:10:54] bryan: None
+[2023-05-26 16:12:30] bryan: None
+[2023-05-26 16:12:50] bryan: @alex_lewin check out our telegram / GPT bot
+[2023-05-26 17:38:36] bryan: @sbddesign what if we turned this bot into a service on our website accessible to members
+[2023-05-26 17:38:52] bryan: bot.atlbitlab.com
+[2023-05-26 23:14:12] bryan: Hello from FL
+[2023-05-26 23:14:18] bryan: My name is Bryan
+[2023-05-26 23:14:22] bryan: I am a nerd
+[2023-05-26 23:15:06] bryan: Once upon a time, there was a man named Micah and he met a woman named Kaley and they lived happily ever after. The ENd.
+[2023-05-26 23:26:30] bryan: Testing. motherfucker, 1-2-3!
+[2023-05-26 23:26:45] bryan: Testing again bitch
+
+[2023-05-26 18:38:43.185495] ATL BitLab Bot: OpenAI Respone {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "\nOn May 26th, 2023, Bryan sent multiple messages discussing good and bad news regarding a bot, Bitcoin-related topics, a new protocol called the Motherfucker Network with a whitepaper at https://catjerky.network, and Alex Lewin's Last Pay Wins game. He also sent messages about extending liquidity with his lightning node and Nitesh's NodeRunner node, playing with the \"max tokens\" and \"prompt\" to get the bot to do what they want, and turning the bot into a service on their website. Lastly, he sent messages testing and introducing himself."
+    }
+  ],
+  "created": 1685144314,
+  "id": "cmpl-7KbIwRBQL5eoiz8kMbQu2hh4DVXrK",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 123,
+    "prompt_tokens": 2283,
+    "total_tokens": 2406
+  }
+}
