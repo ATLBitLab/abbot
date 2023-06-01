@@ -5,6 +5,9 @@ from lib.logger import logger, debug
 from lib.utils import get_now
 from lib.env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY, MESSAGE_LOG_FILE, PROGRAM
 from datetime import datetime, timedelta
+import pytz
+utc = pytz.UTC
+edt = pytz.timezone('America/New_York')
 
 from telegram import Update
 from telegram.ext import (
@@ -20,10 +23,11 @@ openai.api_key = OPENAI_API_KEY
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.effective_message
-    debug(f"[{get_now()}] {PROGRAM}: handle_message - Raw message {prompt}")
+    debug(f"[{get_now()}] {PROGRAM}: handle_message - Raw message {message}")
+    # edt_datetime = message.date.astimezone(edt)
     message_dumps = json.dumps(
         {
-            "text": message.text,
+            "text": message.text or message.caption,
             "from": message.from_user.first_name,
             "date": message.date.isoformat(),
         }
@@ -48,7 +52,7 @@ def summarize_past_week():
         message = json.loads(line)
         text = message["text"]
         sender = message["from"]
-        date = datetime.fromisoformat(message["date"].split("+")[0])
+        date = datetime.fromisoformat(message["date"][:-6])
         if date >= one_week_ago:
             context = f"[{date}] {sender}: {text}\n"
             prompt += context
