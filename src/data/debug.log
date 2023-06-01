@@ -531,3 +531,942 @@
 [2023-06-01 09:10:19.497350] ATL BitLab Bot: Starting!
 [2023-06-01 09:10:19.497739] ATL BitLab Bot: Init Bot
 [2023-06-01 09:10:19.525260] ATL BitLab Bot: Polling!
+[2023-06-01 10:55:42.134262] ATL BitLab Bot: Summarizing!
+[2023-06-01 10:55:42.138001] ATL BitLab Bot: Prompt Summarize the following text. Include details like who sent the message, what did they say, any key points from the message and all relevant details such as links:
+[2023-05-26 00:14:35.070000] Grant: Have you ever wanted to DCA every second?😆 
+[2023-05-26 00:14:35.080000] Grant: https://snort.social/e/nevent1qqsyxu06dce5vcgwfdgh9jwdsnlmsrle00ewypcvjkteq9l35za76rqpzpmhxue69uhkummnw3ezuamfdejsygrqf6twpxvndggy3qu43vzqk3m89c8sfryc43un7dllunrjqfu7kgpsgqqqqqqszles2a
+[2023-05-26 00:14:35.090000] Grant: https://github.com/SamSamskies/strike-dca
+[2023-05-26 00:14:56.370000] Nitesh ₿⚡️: Lol wow
+[2023-05-27 00:12:02.190000] bryan: Bitcoin Core v25.0 Freshly Released https://github.com/bitcoin/bitcoin/releases/tag/v25.0
+[2023-05-27 00:13:09.480000] Atlanta BitDevs: ₿R33 🗝 joined the group via invite link
+[2023-05-27 00:13:10.480000] ₿R33 🗝: 🧡 hey everyone, hey there familiar faces! woo hope all is well & happy saturday
+[2023-05-27 00:20:38.340000] Elwood HODL Barbarian: DM to Atlanta BitPlebs Twitter account today from Bitcoin Bay
+[2023-05-27 00:20:38.340000] Bitcoin Bay (@bitcoinbaytpa): Hey, Idk if you've heard, but BitBlockBoom has been disqualified from the Bitcoin Games since they weren't a local grassroots meetup. Since we came in 2nd, the coin is coming to us. In the spirit of the games, we're going to be putting together a twitter competition BitCombine, to distribute half of the coin amongst the other finalists. We're still working on the specifics but I wanted to update y'all and make sure these are the best accounts to communicate through
+[2023-05-27 00:20:38.340000] Elwood HODL Barbarian: Ill share more details as I have them
+[2023-05-27 00:21:42.100000] Nitesh ₿⚡️: This is very interesting: https://twitter.com/fiatjaf/status/1663356144599855105
+[2023-05-27 00:21:42.100000] fiatjaf: So unless Udi, Eric and others are being paid by this entity, they are working for free as they promote their scam 24/7? https://t.co/RTeHPrCNtO
+[2023-05-27 00:22:39.200000] ₿en F 🚗⛓💻✈️: They are selling the ordinals I thought?
+[2023-05-30 00:06:40.270000] Jordan Bravo: They published a correction: this tweet clarifies that while all these inscriptions are produced by Unisat.io using Unisats single private key, they are actually owned by various Unisat users.
+[2023-05-30 00:06:40.270000] mononaut (@mononautical): a substack post going around at the moment claims that a single entity owns 64% of all inscriptions created since early March, paying an eye-watering 1056 BTC for the privilege its not true. https://block21m.substack.com/p/most-bitcoin-inscriptions-belong-d6d
+[2023-05-30 00:08:14.420000] Nitesh ₿⚡️: Ahh ok
+[2023-05-30 00:19:17.510000] Stephen DeLorme: Its been a wild month, everyone. Topics for Socratic Seminar #18, hot off the press. See you tomorrow night at NCR! https://atlantabitdevs.org/2023/05/30/bitcoin-socratic-seminar-18/
+[2023-05-30 00:19:17.510000] Atlanta BitDevs: Bitcoin Socratic Seminar 18 - Atlanta BitDevs: Its almost time for Bitcoin Socratic Seminar 18! What is a Socratic Seminar? Inspired by other BitDevs meetups around the US, our Socratic Seminar events are formatted to foster debate, information sharing and lively discussion. Discussion topics are provided ahead of the event The event moderator(s) leads the audience through the topics Raise your hand to… Continue reading Bitcoin Socratic Seminar 18
+[2023-05-30 00:19:49.440000] Giii: Spring street and west peachtree have been closed this last week due to the crane accident between 10th and 12th street - route accordingly!😅
+[2023-05-30 00:19:52.130000] bryan: On that note: parking instructions for NCR building. https://atlantabitdevs.org/parking-instructions-for-ncr/
+[2023-05-30 00:19:17.510000] Atlanta BitDevs: Parking Instructions for NCR - Atlanta BitDevs. Here are instructions for getting to NCR for Atlanta BitDevs Socratic Seminars. Rideshare or Public Transit If you are taking rideshare or public transit, then you can use the main building address to navigate there. NCR Global Headquarters, 864 Spring St NW, Atlanta, GA 30308 Use the entrance on the Spring St side of the… Continue reading Parking Instructions for NCR
+[2023-05-30 00:21:26.120000] Will Long: Hi. I am Will. I am an ATL bitcoiner. Sup?
+[2023-05-30 00:21:31.310000] Grant: Welcome Will! Great to have you here!
+[2023-05-30 00:21:31.410000] Will Long: Glad to be here. I had been wondering if I were the only maxi around this town.
+[2023-05-30 00:21:31.410000] Will Long: You heard of PayJoin?
+[2023-05-30 00:21:34.230000] Jordan Bravo: Welcome. Yes, I have heard of PayJoins. Samourai wallet has them, though I havent had a chance to use them yet.  Id love to try it out with someone
+[2023-05-30 00:21:34.170000] Elwood HODL Barbarian: Come to the Socratic Seminar tomorrow night and meet ATL BitDevs
+[2023-05-30 00:21:34.210000] Will Long: Ive only orangepilled one business around here. Do you know of any businesses in ATL that accept bitcoin besides Ginos barber shop??
+[2023-05-30 00:21:35.040000] Elwood HODL Barbarian: I helped Ginos set up their Lightning node.
+[2023-05-30 00:21:34.210000] Will Long: My contributions so far to the community are a DIY hww built from an esp32 that prints burner wallets en masse on thermal paper… and a vending machine controller that runs on Strike, Bitcoin Core and Liquid Core.
+[2023-05-30 00:21:34.210000] Will Long: Btcpayserver invoices make these fairly easy.
+[2023-05-30 00:21:34.210000] Will Long: Anyways. I am probably overly chatty for a newbie. Hope you all have a good night. Thanks for the warm welcome
+[2023-05-30 00:22:59.110000] Rich Lassiter: Sorry to miss Wed mtg @ NCR. I feel like Im going through pleb withdrawal after overdosing when we were in MIA!
+[2023-05-30 00:19:52.130000] bryan: Welcome Will! Thanks for the input. Looking forward to meeting you tonight and hearing all about the work you've done in the past. We could use some of this innovation to help onboard more businesses in ATL!!
+[2023-05-31 00:11:31.300000] Will Long: I think I will hold off on coming to the meeting this week. Still trying to figure out if you are feds. 😆
+[2023-05-31 00:13:06.100000] Peter Rehm: 'Fed suspicion' — Oh man, does that mean I cant attend  tonight??
+[2023-05-31 00:14:07.340000] bryan: @channel if youre attending tonights socratic at NCR, please go RSVP now so I can get a head count: https://www.meetup.com/atlantabitdevs/events/293790513/ Thanks!
+[2023-05-31 00:14:11.050000] Peter Rehm: Bryan, do you have a list of what might be discussed this evening?
+[2023-05-31 00:14:30.060000] Stephen DeLorme: Its pinned in this chat
+[2023-05-31 00:14:43.080000] Grant: 😥https://www.nobsbitcoin.com/blixt-wallet-has-been-suspended-from-google-play-store/
+[2023-05-31 00:14:44.080000] Grant: Blixt Wallet and Tesnet App Suspended From Google Play Store: Blixt Wallet uses the Lightning Network client lnd and the Bitcoin SPV client Neutrino under the hood, directly on the phone, respecting users privacy.
+[2023-05-31 00:14:45.080000] Grant: Such a stupid justification for suspension.... Feel like they didn't actually review the features/function...
+[2023-05-31 00:14:43.460000] ₿en F 🚗⛓💻✈️: @Will - Maxis exist only on the internet
+[2023-05-31 00:15:41.300000] Will Long: I am the worst kind. The JW Weatherman kind
+[2023-05-31 00:15:41.550000] ₿en F 🚗⛓💻✈️: Oh snap man I know him. We gotta talk. Im coming to Atlanta next month been out for a while
+[2023-05-31 00:15:59.040000] Will Long: Sure thing…
+[2023-05-31 00:16:04.030000] ₿en F 🚗⛓💻✈️: I hope your not using his yeti thing.
+[2023-05-31 00:16:11.170000] Will Long: Heh. No I have my own process. A 39/1789 multisig. 🤣
+[2023-05-31 00:16:11.170000] Will Long: I am the only person in my anonymity set
+[2023-05-31 00:16:12.540000] ₿en F 🚗⛓💻✈️: The issue I had with it was that Will weatherman cant spell
+[2023-05-31 00:16:14.010000] Will Long: You're*
+[2023-05-31 00:16:14.180000] ₿en F 🚗⛓💻✈️: Your sure about that?
+[2023-05-31 00:16:14.540000] ₿en F 🚗⛓💻✈️: I think you should check you're grammar
+[2023-05-31 00:16:15.220000] Stephen DeLorme: Gentleman, this is Atlanta. We win hackathons, not splling bees.
+[2023-05-31 00:16:17.040000] Will Long: Anyone here doing anything with Liquid BTC yet?
+[2023-05-31 00:16:19.040000] Will Long: Killed that convo real quick
+[2023-05-31 00:16:20.250000] ₿en F 🚗⛓💻✈️: One time I used it, sideswap, I think it's good if iou want to send money to people without then seeing your utxos. 0.1 percent fee to go in and to.swap out but it's Custodial garbage @JcCrown ask him about liquid
+[2023-05-31 00:16:21.050000] Stephen DeLorme: Will probably take this thing for a whirl one day if I'm bored https://liquid.boltz.exchange/: Boltz is a privacy first, account-free Bitcoin Exchange and Lightning Service Provider.
+[2023-05-31 00:16:25.240000] Will Long: Would be nice if Strike used it for its USDt rails. Instead of using eth.
+[2023-05-31 00:16:44.590000] Elwood HODL Barbarian: https://twitter.com/bitcoinbaytpa/status/1664005838527135745: Bitcoin Bay - ANNOUNCEMENT THREAD - We're excited to announce that Bitcoin Bay has been declared winner of the #BitcoinGames hosted at #Bitcoin2023. In the spirit of the games, we want to donate half of the coin to the other semi finalists @Bitcoin_CLT @atlantabitplebs @DenverBitDevs @MKEbtc
+[2023-05-31 00:17:57.110000] Elwood HODL Barbarian: https://twitter.com/bitcoinbaytpa/status/1664005843791011843: But its not going to just be that easy. Were going to have some fun with this. Were throwing the first BIT-COMBINE for teams to compete for their share of the sats. Heres what theyll have to do.
+[2023-05-31 00:17:57.110000] Elwood HODL Barbarian: I'm thinking 3 million sats for doing nothing does not sound that bad.
+[2023-05-31 00:18:15.360000] Tidwell: We are outside waiting to get in
+[2023-05-31 00:18:15.510000] bryan: coming
+[2023-05-31 00:18:16.010000] Tidwell: Is it usually locked?
+[2023-05-31 00:18:22.330000] Gavin Green: In case of FEDs
+[2023-05-31 00:18:24] JF: Can someone let me in too? 🙏
+[2023-05-31 00:18:24.220000] bryan: Ya
+[2023-05-31 00:18:30.440000] ₿en F 🚗⛓💻✈️: Stupid door design. Should be a push bar, a panic bar
+[2023-05-31 00:19:53.500000] Will Long: PlebLabs has a lightning powered lock they are devving
+[2023-05-31 00:21:25.590000] Mike Casey: Oh my God.  They are re-inventing Slockit.  I feel like it's 8 years ago.
+[2023-05-31 00:21:27.520000] Jc Crown: There's nothing new under the sun. - THE BOOK OF ECCLESIASTES,  430 BCE
+[2023-05-31 00:21:34.330000] Will Long: I think they are using a wrist band with a Sats Card chip. I mean… I got a bag of servos too
+[2023-06-01 13:47:23] bryan: Thanks for everyone who came last night! It was a great meetup. See you all soon!
+[2023-06-01 13:50:23] packetprotector: /tip 1000 thanks for helping lead the discussion last night! A lot of great and informative stuff!
+[2023-06-01 13:52:28] packetprotector: /send 1000 @sbddesign you too Stephen! Great job! Thanks for all the hard work researching and learning about these various topics!
+
+[2023-06-01 10:56:04.904156] ATL BitLab Bot: Summarizing!
+[2023-06-01 10:56:04.904753] ATL BitLab Bot: Prompt Summarize the following text. Include details like who sent the message, what did they say, any key points from the message and all relevant details such as links:
+[2023-05-26 00:14:35.070000] Grant: Have you ever wanted to DCA every second?😆 
+[2023-05-26 00:14:35.080000] Grant: https://snort.social/e/nevent1qqsyxu06dce5vcgwfdgh9jwdsnlmsrle00ewypcvjkteq9l35za76rqpzpmhxue69uhkummnw3ezuamfdejsygrqf6twpxvndggy3qu43vzqk3m89c8sfryc43un7dllunrjqfu7kgpsgqqqqqqszles2a
+[2023-05-26 00:14:35.090000] Grant: https://github.com/SamSamskies/strike-dca
+[2023-05-26 00:14:56.370000] Nitesh ₿⚡️: Lol wow
+[2023-05-27 00:12:02.190000] bryan: Bitcoin Core v25.0 Freshly Released https://github.com/bitcoin/bitcoin/releases/tag/v25.0
+[2023-05-27 00:13:09.480000] Atlanta BitDevs: ₿R33 🗝 joined the group via invite link
+[2023-05-27 00:13:10.480000] ₿R33 🗝: 🧡 hey everyone, hey there familiar faces! woo hope all is well & happy saturday
+[2023-05-27 00:20:38.340000] Elwood HODL Barbarian: DM to Atlanta BitPlebs Twitter account today from Bitcoin Bay
+[2023-05-27 00:20:38.340000] Bitcoin Bay (@bitcoinbaytpa): Hey, Idk if you've heard, but BitBlockBoom has been disqualified from the Bitcoin Games since they weren't a local grassroots meetup. Since we came in 2nd, the coin is coming to us. In the spirit of the games, we're going to be putting together a twitter competition BitCombine, to distribute half of the coin amongst the other finalists. We're still working on the specifics but I wanted to update y'all and make sure these are the best accounts to communicate through
+[2023-05-27 00:20:38.340000] Elwood HODL Barbarian: Ill share more details as I have them
+[2023-05-27 00:21:42.100000] Nitesh ₿⚡️: This is very interesting: https://twitter.com/fiatjaf/status/1663356144599855105
+[2023-05-27 00:21:42.100000] fiatjaf: So unless Udi, Eric and others are being paid by this entity, they are working for free as they promote their scam 24/7? https://t.co/RTeHPrCNtO
+[2023-05-27 00:22:39.200000] ₿en F 🚗⛓💻✈️: They are selling the ordinals I thought?
+[2023-05-30 00:06:40.270000] Jordan Bravo: They published a correction: this tweet clarifies that while all these inscriptions are produced by Unisat.io using Unisats single private key, they are actually owned by various Unisat users.
+[2023-05-30 00:06:40.270000] mononaut (@mononautical): a substack post going around at the moment claims that a single entity owns 64% of all inscriptions created since early March, paying an eye-watering 1056 BTC for the privilege its not true. https://block21m.substack.com/p/most-bitcoin-inscriptions-belong-d6d
+[2023-05-30 00:08:14.420000] Nitesh ₿⚡️: Ahh ok
+[2023-05-30 00:19:17.510000] Stephen DeLorme: Its been a wild month, everyone. Topics for Socratic Seminar #18, hot off the press. See you tomorrow night at NCR! https://atlantabitdevs.org/2023/05/30/bitcoin-socratic-seminar-18/
+[2023-05-30 00:19:17.510000] Atlanta BitDevs: Bitcoin Socratic Seminar 18 - Atlanta BitDevs: Its almost time for Bitcoin Socratic Seminar 18! What is a Socratic Seminar? Inspired by other BitDevs meetups around the US, our Socratic Seminar events are formatted to foster debate, information sharing and lively discussion. Discussion topics are provided ahead of the event The event moderator(s) leads the audience through the topics Raise your hand to… Continue reading Bitcoin Socratic Seminar 18
+[2023-05-30 00:19:49.440000] Giii: Spring street and west peachtree have been closed this last week due to the crane accident between 10th and 12th street - route accordingly!😅
+[2023-05-30 00:19:52.130000] bryan: On that note: parking instructions for NCR building. https://atlantabitdevs.org/parking-instructions-for-ncr/
+[2023-05-30 00:19:17.510000] Atlanta BitDevs: Parking Instructions for NCR - Atlanta BitDevs. Here are instructions for getting to NCR for Atlanta BitDevs Socratic Seminars. Rideshare or Public Transit If you are taking rideshare or public transit, then you can use the main building address to navigate there. NCR Global Headquarters, 864 Spring St NW, Atlanta, GA 30308 Use the entrance on the Spring St side of the… Continue reading Parking Instructions for NCR
+[2023-05-30 00:21:26.120000] Will Long: Hi. I am Will. I am an ATL bitcoiner. Sup?
+[2023-05-30 00:21:31.310000] Grant: Welcome Will! Great to have you here!
+[2023-05-30 00:21:31.410000] Will Long: Glad to be here. I had been wondering if I were the only maxi around this town.
+[2023-05-30 00:21:31.410000] Will Long: You heard of PayJoin?
+[2023-05-30 00:21:34.230000] Jordan Bravo: Welcome. Yes, I have heard of PayJoins. Samourai wallet has them, though I havent had a chance to use them yet.  Id love to try it out with someone
+[2023-05-30 00:21:34.170000] Elwood HODL Barbarian: Come to the Socratic Seminar tomorrow night and meet ATL BitDevs
+[2023-05-30 00:21:34.210000] Will Long: Ive only orangepilled one business around here. Do you know of any businesses in ATL that accept bitcoin besides Ginos barber shop??
+[2023-05-30 00:21:35.040000] Elwood HODL Barbarian: I helped Ginos set up their Lightning node.
+[2023-05-30 00:21:34.210000] Will Long: My contributions so far to the community are a DIY hww built from an esp32 that prints burner wallets en masse on thermal paper… and a vending machine controller that runs on Strike, Bitcoin Core and Liquid Core.
+[2023-05-30 00:21:34.210000] Will Long: Btcpayserver invoices make these fairly easy.
+[2023-05-30 00:21:34.210000] Will Long: Anyways. I am probably overly chatty for a newbie. Hope you all have a good night. Thanks for the warm welcome
+[2023-05-30 00:22:59.110000] Rich Lassiter: Sorry to miss Wed mtg @ NCR. I feel like Im going through pleb withdrawal after overdosing when we were in MIA!
+[2023-05-30 00:19:52.130000] bryan: Welcome Will! Thanks for the input. Looking forward to meeting you tonight and hearing all about the work you've done in the past. We could use some of this innovation to help onboard more businesses in ATL!!
+[2023-05-31 00:11:31.300000] Will Long: I think I will hold off on coming to the meeting this week. Still trying to figure out if you are feds. 😆
+[2023-05-31 00:13:06.100000] Peter Rehm: 'Fed suspicion' — Oh man, does that mean I cant attend  tonight??
+[2023-05-31 00:14:07.340000] bryan: @channel if youre attending tonights socratic at NCR, please go RSVP now so I can get a head count: https://www.meetup.com/atlantabitdevs/events/293790513/ Thanks!
+[2023-05-31 00:14:11.050000] Peter Rehm: Bryan, do you have a list of what might be discussed this evening?
+[2023-05-31 00:14:30.060000] Stephen DeLorme: Its pinned in this chat
+[2023-05-31 00:14:43.080000] Grant: 😥https://www.nobsbitcoin.com/blixt-wallet-has-been-suspended-from-google-play-store/
+[2023-05-31 00:14:44.080000] Grant: Blixt Wallet and Tesnet App Suspended From Google Play Store: Blixt Wallet uses the Lightning Network client lnd and the Bitcoin SPV client Neutrino under the hood, directly on the phone, respecting users privacy.
+[2023-05-31 00:14:45.080000] Grant: Such a stupid justification for suspension.... Feel like they didn't actually review the features/function...
+[2023-05-31 00:14:43.460000] ₿en F 🚗⛓💻✈️: @Will - Maxis exist only on the internet
+[2023-05-31 00:15:41.300000] Will Long: I am the worst kind. The JW Weatherman kind
+[2023-05-31 00:15:41.550000] ₿en F 🚗⛓💻✈️: Oh snap man I know him. We gotta talk. Im coming to Atlanta next month been out for a while
+[2023-05-31 00:15:59.040000] Will Long: Sure thing…
+[2023-05-31 00:16:04.030000] ₿en F 🚗⛓💻✈️: I hope your not using his yeti thing.
+[2023-05-31 00:16:11.170000] Will Long: Heh. No I have my own process. A 39/1789 multisig. 🤣
+[2023-05-31 00:16:11.170000] Will Long: I am the only person in my anonymity set
+[2023-05-31 00:16:12.540000] ₿en F 🚗⛓💻✈️: The issue I had with it was that Will weatherman cant spell
+[2023-05-31 00:16:14.010000] Will Long: You're*
+[2023-05-31 00:16:14.180000] ₿en F 🚗⛓💻✈️: Your sure about that?
+[2023-05-31 00:16:14.540000] ₿en F 🚗⛓💻✈️: I think you should check you're grammar
+[2023-05-31 00:16:15.220000] Stephen DeLorme: Gentleman, this is Atlanta. We win hackathons, not splling bees.
+[2023-05-31 00:16:17.040000] Will Long: Anyone here doing anything with Liquid BTC yet?
+[2023-05-31 00:16:19.040000] Will Long: Killed that convo real quick
+[2023-05-31 00:16:20.250000] ₿en F 🚗⛓💻✈️: One time I used it, sideswap, I think it's good if iou want to send money to people without then seeing your utxos. 0.1 percent fee to go in and to.swap out but it's Custodial garbage @JcCrown ask him about liquid
+[2023-05-31 00:16:21.050000] Stephen DeLorme: Will probably take this thing for a whirl one day if I'm bored https://liquid.boltz.exchange/: Boltz is a privacy first, account-free Bitcoin Exchange and Lightning Service Provider.
+[2023-05-31 00:16:25.240000] Will Long: Would be nice if Strike used it for its USDt rails. Instead of using eth.
+[2023-05-31 00:16:44.590000] Elwood HODL Barbarian: https://twitter.com/bitcoinbaytpa/status/1664005838527135745: Bitcoin Bay - ANNOUNCEMENT THREAD - We're excited to announce that Bitcoin Bay has been declared winner of the #BitcoinGames hosted at #Bitcoin2023. In the spirit of the games, we want to donate half of the coin to the other semi finalists @Bitcoin_CLT @atlantabitplebs @DenverBitDevs @MKEbtc
+[2023-05-31 00:17:57.110000] Elwood HODL Barbarian: https://twitter.com/bitcoinbaytpa/status/1664005843791011843: But its not going to just be that easy. Were going to have some fun with this. Were throwing the first BIT-COMBINE for teams to compete for their share of the sats. Heres what theyll have to do.
+[2023-05-31 00:17:57.110000] Elwood HODL Barbarian: I'm thinking 3 million sats for doing nothing does not sound that bad.
+[2023-05-31 00:18:15.360000] Tidwell: We are outside waiting to get in
+[2023-05-31 00:18:15.510000] bryan: coming
+[2023-05-31 00:18:16.010000] Tidwell: Is it usually locked?
+[2023-05-31 00:18:22.330000] Gavin Green: In case of FEDs
+[2023-05-31 00:18:24] JF: Can someone let me in too? 🙏
+[2023-05-31 00:18:24.220000] bryan: Ya
+[2023-05-31 00:18:30.440000] ₿en F 🚗⛓💻✈️: Stupid door design. Should be a push bar, a panic bar
+[2023-05-31 00:19:53.500000] Will Long: PlebLabs has a lightning powered lock they are devving
+[2023-05-31 00:21:25.590000] Mike Casey: Oh my God.  They are re-inventing Slockit.  I feel like it's 8 years ago.
+[2023-05-31 00:21:27.520000] Jc Crown: There's nothing new under the sun. - THE BOOK OF ECCLESIASTES,  430 BCE
+[2023-05-31 00:21:34.330000] Will Long: I think they are using a wrist band with a Sats Card chip. I mean… I got a bag of servos too
+[2023-06-01 13:47:23] bryan: Thanks for everyone who came last night! It was a great meetup. See you all soon!
+[2023-06-01 13:50:23] packetprotector: /tip 1000 thanks for helping lead the discussion last night! A lot of great and informative stuff!
+[2023-06-01 13:52:28] packetprotector: /send 1000 @sbddesign you too Stephen! Great job! Thanks for all the hard work researching and learning about these various topics!
+
+[2023-06-01 10:56:43.974932] ATL BitLab Bot: Summarizing!
+[2023-06-01 10:56:43.975541] ATL BitLab Bot: Prompt Summarize the following text. Include details like who sent the message, what did they say, any key points from the message and all relevant details such as links:
+[2023-05-26 00:14:35.070000] Grant: Have you ever wanted to DCA every second?😆 
+[2023-05-26 00:14:35.080000] Grant: https://snort.social/e/nevent1qqsyxu06dce5vcgwfdgh9jwdsnlmsrle00ewypcvjkteq9l35za76rqpzpmhxue69uhkummnw3ezuamfdejsygrqf6twpxvndggy3qu43vzqk3m89c8sfryc43un7dllunrjqfu7kgpsgqqqqqqszles2a
+[2023-05-26 00:14:35.090000] Grant: https://github.com/SamSamskies/strike-dca
+[2023-05-26 00:14:56.370000] Nitesh ₿⚡️: Lol wow
+[2023-05-27 00:12:02.190000] bryan: Bitcoin Core v25.0 Freshly Released https://github.com/bitcoin/bitcoin/releases/tag/v25.0
+[2023-05-27 00:13:09.480000] Atlanta BitDevs: ₿R33 🗝 joined the group via invite link
+[2023-05-27 00:13:10.480000] ₿R33 🗝: 🧡 hey everyone, hey there familiar faces! woo hope all is well & happy saturday
+[2023-05-27 00:20:38.340000] Elwood HODL Barbarian: DM to Atlanta BitPlebs Twitter account today from Bitcoin Bay
+[2023-05-27 00:20:38.340000] Bitcoin Bay (@bitcoinbaytpa): Hey, Idk if you've heard, but BitBlockBoom has been disqualified from the Bitcoin Games since they weren't a local grassroots meetup. Since we came in 2nd, the coin is coming to us. In the spirit of the games, we're going to be putting together a twitter competition BitCombine, to distribute half of the coin amongst the other finalists. We're still working on the specifics but I wanted to update y'all and make sure these are the best accounts to communicate through
+[2023-05-27 00:20:38.340000] Elwood HODL Barbarian: Ill share more details as I have them
+[2023-05-27 00:21:42.100000] Nitesh ₿⚡️: This is very interesting: https://twitter.com/fiatjaf/status/1663356144599855105
+[2023-05-27 00:21:42.100000] fiatjaf: So unless Udi, Eric and others are being paid by this entity, they are working for free as they promote their scam 24/7? https://t.co/RTeHPrCNtO
+[2023-05-27 00:22:39.200000] ₿en F 🚗⛓💻✈️: They are selling the ordinals I thought?
+[2023-05-30 00:06:40.270000] Jordan Bravo: They published a correction: this tweet clarifies that while all these inscriptions are produced by Unisat.io using Unisats single private key, they are actually owned by various Unisat users.
+[2023-05-30 00:06:40.270000] mononaut (@mononautical): a substack post going around at the moment claims that a single entity owns 64% of all inscriptions created since early March, paying an eye-watering 1056 BTC for the privilege its not true. https://block21m.substack.com/p/most-bitcoin-inscriptions-belong-d6d
+[2023-05-30 00:08:14.420000] Nitesh ₿⚡️: Ahh ok
+[2023-05-30 00:19:17.510000] Stephen DeLorme: Its been a wild month, everyone. Topics for Socratic Seminar #18, hot off the press. See you tomorrow night at NCR! https://atlantabitdevs.org/2023/05/30/bitcoin-socratic-seminar-18/
+[2023-05-30 00:19:17.510000] Atlanta BitDevs: Bitcoin Socratic Seminar 18 - Atlanta BitDevs: Its almost time for Bitcoin Socratic Seminar 18! What is a Socratic Seminar? Inspired by other BitDevs meetups around the US, our Socratic Seminar events are formatted to foster debate, information sharing and lively discussion. Discussion topics are provided ahead of the event The event moderator(s) leads the audience through the topics Raise your hand to… Continue reading Bitcoin Socratic Seminar 18
+[2023-05-30 00:19:49.440000] Giii: Spring street and west peachtree have been closed this last week due to the crane accident between 10th and 12th street - route accordingly!😅
+[2023-05-30 00:19:52.130000] bryan: On that note: parking instructions for NCR building. https://atlantabitdevs.org/parking-instructions-for-ncr/
+[2023-05-30 00:19:17.510000] Atlanta BitDevs: Parking Instructions for NCR - Atlanta BitDevs. Here are instructions for getting to NCR for Atlanta BitDevs Socratic Seminars. Rideshare or Public Transit If you are taking rideshare or public transit, then you can use the main building address to navigate there. NCR Global Headquarters, 864 Spring St NW, Atlanta, GA 30308 Use the entrance on the Spring St side of the… Continue reading Parking Instructions for NCR
+[2023-05-30 00:21:26.120000] Will Long: Hi. I am Will. I am an ATL bitcoiner. Sup?
+[2023-05-30 00:21:31.310000] Grant: Welcome Will! Great to have you here!
+[2023-05-30 00:21:31.410000] Will Long: Glad to be here. I had been wondering if I were the only maxi around this town.
+[2023-05-30 00:21:31.410000] Will Long: You heard of PayJoin?
+[2023-05-30 00:21:34.230000] Jordan Bravo: Welcome. Yes, I have heard of PayJoins. Samourai wallet has them, though I havent had a chance to use them yet.  Id love to try it out with someone
+[2023-05-30 00:21:34.170000] Elwood HODL Barbarian: Come to the Socratic Seminar tomorrow night and meet ATL BitDevs
+[2023-05-30 00:21:34.210000] Will Long: Ive only orangepilled one business around here. Do you know of any businesses in ATL that accept bitcoin besides Ginos barber shop??
+[2023-05-30 00:21:35.040000] Elwood HODL Barbarian: I helped Ginos set up their Lightning node.
+[2023-05-30 00:21:34.210000] Will Long: My contributions so far to the community are a DIY hww built from an esp32 that prints burner wallets en masse on thermal paper… and a vending machine controller that runs on Strike, Bitcoin Core and Liquid Core.
+[2023-05-30 00:21:34.210000] Will Long: Btcpayserver invoices make these fairly easy.
+[2023-05-30 00:21:34.210000] Will Long: Anyways. I am probably overly chatty for a newbie. Hope you all have a good night. Thanks for the warm welcome
+[2023-05-30 00:22:59.110000] Rich Lassiter: Sorry to miss Wed mtg @ NCR. I feel like Im going through pleb withdrawal after overdosing when we were in MIA!
+[2023-05-30 00:19:52.130000] bryan: Welcome Will! Thanks for the input. Looking forward to meeting you tonight and hearing all about the work you've done in the past. We could use some of this innovation to help onboard more businesses in ATL!!
+[2023-05-31 00:11:31.300000] Will Long: I think I will hold off on coming to the meeting this week. Still trying to figure out if you are feds. 😆
+[2023-05-31 00:13:06.100000] Peter Rehm: 'Fed suspicion' — Oh man, does that mean I cant attend  tonight??
+[2023-05-31 00:14:07.340000] bryan: @channel if youre attending tonights socratic at NCR, please go RSVP now so I can get a head count: https://www.meetup.com/atlantabitdevs/events/293790513/ Thanks!
+[2023-05-31 00:14:11.050000] Peter Rehm: Bryan, do you have a list of what might be discussed this evening?
+[2023-05-31 00:14:30.060000] Stephen DeLorme: Its pinned in this chat
+[2023-05-31 00:14:43.080000] Grant: 😥https://www.nobsbitcoin.com/blixt-wallet-has-been-suspended-from-google-play-store/
+[2023-05-31 00:14:44.080000] Grant: Blixt Wallet and Tesnet App Suspended From Google Play Store: Blixt Wallet uses the Lightning Network client lnd and the Bitcoin SPV client Neutrino under the hood, directly on the phone, respecting users privacy.
+[2023-05-31 00:14:45.080000] Grant: Such a stupid justification for suspension.... Feel like they didn't actually review the features/function...
+[2023-05-31 00:14:43.460000] ₿en F 🚗⛓💻✈️: @Will - Maxis exist only on the internet
+[2023-05-31 00:15:41.300000] Will Long: I am the worst kind. The JW Weatherman kind
+[2023-05-31 00:15:41.550000] ₿en F 🚗⛓💻✈️: Oh snap man I know him. We gotta talk. Im coming to Atlanta next month been out for a while
+[2023-05-31 00:15:59.040000] Will Long: Sure thing…
+[2023-05-31 00:16:04.030000] ₿en F 🚗⛓💻✈️: I hope your not using his yeti thing.
+[2023-05-31 00:16:11.170000] Will Long: Heh. No I have my own process. A 39/1789 multisig. 🤣
+[2023-05-31 00:16:11.170000] Will Long: I am the only person in my anonymity set
+[2023-05-31 00:16:12.540000] ₿en F 🚗⛓💻✈️: The issue I had with it was that Will weatherman cant spell
+[2023-05-31 00:16:14.010000] Will Long: You're*
+[2023-05-31 00:16:14.180000] ₿en F 🚗⛓💻✈️: Your sure about that?
+[2023-05-31 00:16:14.540000] ₿en F 🚗⛓💻✈️: I think you should check you're grammar
+[2023-05-31 00:16:15.220000] Stephen DeLorme: Gentleman, this is Atlanta. We win hackathons, not splling bees.
+[2023-05-31 00:16:17.040000] Will Long: Anyone here doing anything with Liquid BTC yet?
+[2023-05-31 00:16:19.040000] Will Long: Killed that convo real quick
+[2023-05-31 00:16:20.250000] ₿en F 🚗⛓💻✈️: One time I used it, sideswap, I think it's good if iou want to send money to people without then seeing your utxos. 0.1 percent fee to go in and to.swap out but it's Custodial garbage @JcCrown ask him about liquid
+[2023-05-31 00:16:21.050000] Stephen DeLorme: Will probably take this thing for a whirl one day if I'm bored https://liquid.boltz.exchange/: Boltz is a privacy first, account-free Bitcoin Exchange and Lightning Service Provider.
+[2023-05-31 00:16:25.240000] Will Long: Would be nice if Strike used it for its USDt rails. Instead of using eth.
+[2023-05-31 00:16:44.590000] Elwood HODL Barbarian: https://twitter.com/bitcoinbaytpa/status/1664005838527135745: Bitcoin Bay - ANNOUNCEMENT THREAD - We're excited to announce that Bitcoin Bay has been declared winner of the #BitcoinGames hosted at #Bitcoin2023. In the spirit of the games, we want to donate half of the coin to the other semi finalists @Bitcoin_CLT @atlantabitplebs @DenverBitDevs @MKEbtc
+[2023-05-31 00:17:57.110000] Elwood HODL Barbarian: https://twitter.com/bitcoinbaytpa/status/1664005843791011843: But its not going to just be that easy. Were going to have some fun with this. Were throwing the first BIT-COMBINE for teams to compete for their share of the sats. Heres what theyll have to do.
+[2023-05-31 00:17:57.110000] Elwood HODL Barbarian: I'm thinking 3 million sats for doing nothing does not sound that bad.
+[2023-05-31 00:18:15.360000] Tidwell: We are outside waiting to get in
+[2023-05-31 00:18:15.510000] bryan: coming
+[2023-05-31 00:18:16.010000] Tidwell: Is it usually locked?
+[2023-05-31 00:18:22.330000] Gavin Green: In case of FEDs
+[2023-05-31 00:18:24] JF: Can someone let me in too? 🙏
+[2023-05-31 00:18:24.220000] bryan: Ya
+[2023-05-31 00:18:30.440000] ₿en F 🚗⛓💻✈️: Stupid door design. Should be a push bar, a panic bar
+[2023-05-31 00:19:53.500000] Will Long: PlebLabs has a lightning powered lock they are devving
+[2023-05-31 00:21:25.590000] Mike Casey: Oh my God.  They are re-inventing Slockit.  I feel like it's 8 years ago.
+[2023-05-31 00:21:27.520000] Jc Crown: There's nothing new under the sun. - THE BOOK OF ECCLESIASTES,  430 BCE
+[2023-05-31 00:21:34.330000] Will Long: I think they are using a wrist band with a Sats Card chip. I mean… I got a bag of servos too
+[2023-06-01 13:47:23] bryan: Thanks for everyone who came last night! It was a great meetup. See you all soon!
+[2023-06-01 13:50:23] packetprotector: /tip 1000 thanks for helping lead the discussion last night! A lot of great and informative stuff!
+[2023-06-01 13:52:28] packetprotector: /send 1000 @sbddesign you too Stephen! Great job! Thanks for all the hard work researching and learning about these various topics!
+
+[2023-06-01 10:56:47.941699] ATL BitLab Bot: OpenAI Respone {
+  "choices": [
+    {
+      "finish_reason": "length",
+      "index": 0,
+      "logprobs": null,
+      "text": "\nGrant sent a message on 2023-05-26 about wanting to DC"
+    }
+  ],
+  "created": 1685631404,
+  "id": "cmpl-7Me1EbSTfXqWEJhe0HKakZfDQmuWa",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 16,
+    "prompt_tokens": 3756,
+    "total_tokens": 3772
+  }
+}
+[2023-06-01 10:57:38.704726] ATL BitLab Bot: Summarizing!
+[2023-06-01 10:57:38.705430] ATL BitLab Bot: Prompt Summarize the following text. Include details like who sent the message, what did they say, any key points from the message and all relevant details such as links:
+[2023-05-26 00:14:35.070000] Grant: Have you ever wanted to DCA every second?😆 
+[2023-05-26 00:14:35.080000] Grant: https://snort.social/e/nevent1qqsyxu06dce5vcgwfdgh9jwdsnlmsrle00ewypcvjkteq9l35za76rqpzpmhxue69uhkummnw3ezuamfdejsygrqf6twpxvndggy3qu43vzqk3m89c8sfryc43un7dllunrjqfu7kgpsgqqqqqqszles2a
+[2023-05-26 00:14:35.090000] Grant: https://github.com/SamSamskies/strike-dca
+[2023-05-26 00:14:56.370000] Nitesh ₿⚡️: Lol wow
+[2023-05-27 00:12:02.190000] bryan: Bitcoin Core v25.0 Freshly Released https://github.com/bitcoin/bitcoin/releases/tag/v25.0
+[2023-05-27 00:13:09.480000] Atlanta BitDevs: ₿R33 🗝 joined the group via invite link
+[2023-05-27 00:13:10.480000] ₿R33 🗝: 🧡 hey everyone, hey there familiar faces! woo hope all is well & happy saturday
+[2023-05-27 00:20:38.340000] Elwood HODL Barbarian: DM to Atlanta BitPlebs Twitter account today from Bitcoin Bay
+[2023-05-27 00:20:38.340000] Bitcoin Bay (@bitcoinbaytpa): Hey, Idk if you've heard, but BitBlockBoom has been disqualified from the Bitcoin Games since they weren't a local grassroots meetup. Since we came in 2nd, the coin is coming to us. In the spirit of the games, we're going to be putting together a twitter competition BitCombine, to distribute half of the coin amongst the other finalists. We're still working on the specifics but I wanted to update y'all and make sure these are the best accounts to communicate through
+[2023-05-27 00:20:38.340000] Elwood HODL Barbarian: Ill share more details as I have them
+[2023-05-27 00:21:42.100000] Nitesh ₿⚡️: This is very interesting: https://twitter.com/fiatjaf/status/1663356144599855105
+[2023-05-27 00:21:42.100000] fiatjaf: So unless Udi, Eric and others are being paid by this entity, they are working for free as they promote their scam 24/7? https://t.co/RTeHPrCNtO
+[2023-05-27 00:22:39.200000] ₿en F 🚗⛓💻✈️: They are selling the ordinals I thought?
+[2023-05-30 00:06:40.270000] Jordan Bravo: They published a correction: this tweet clarifies that while all these inscriptions are produced by Unisat.io using Unisats single private key, they are actually owned by various Unisat users.
+[2023-05-30 00:06:40.270000] mononaut (@mononautical): a substack post going around at the moment claims that a single entity owns 64% of all inscriptions created since early March, paying an eye-watering 1056 BTC for the privilege its not true. https://block21m.substack.com/p/most-bitcoin-inscriptions-belong-d6d
+[2023-05-30 00:08:14.420000] Nitesh ₿⚡️: Ahh ok
+[2023-05-30 00:19:17.510000] Stephen DeLorme: Its been a wild month, everyone. Topics for Socratic Seminar #18, hot off the press. See you tomorrow night at NCR! https://atlantabitdevs.org/2023/05/30/bitcoin-socratic-seminar-18/
+[2023-05-30 00:19:17.510000] Atlanta BitDevs: Bitcoin Socratic Seminar 18 - Atlanta BitDevs: Its almost time for Bitcoin Socratic Seminar 18! What is a Socratic Seminar? Inspired by other BitDevs meetups around the US, our Socratic Seminar events are formatted to foster debate, information sharing and lively discussion. Discussion topics are provided ahead of the event The event moderator(s) leads the audience through the topics Raise your hand to… Continue reading Bitcoin Socratic Seminar 18
+[2023-05-30 00:19:49.440000] Giii: Spring street and west peachtree have been closed this last week due to the crane accident between 10th and 12th street - route accordingly!😅
+[2023-05-30 00:19:52.130000] bryan: On that note: parking instructions for NCR building. https://atlantabitdevs.org/parking-instructions-for-ncr/
+[2023-05-30 00:19:17.510000] Atlanta BitDevs: Parking Instructions for NCR - Atlanta BitDevs. Here are instructions for getting to NCR for Atlanta BitDevs Socratic Seminars. Rideshare or Public Transit If you are taking rideshare or public transit, then you can use the main building address to navigate there. NCR Global Headquarters, 864 Spring St NW, Atlanta, GA 30308 Use the entrance on the Spring St side of the… Continue reading Parking Instructions for NCR
+[2023-05-30 00:21:26.120000] Will Long: Hi. I am Will. I am an ATL bitcoiner. Sup?
+[2023-05-30 00:21:31.310000] Grant: Welcome Will! Great to have you here!
+[2023-05-30 00:21:31.410000] Will Long: Glad to be here. I had been wondering if I were the only maxi around this town.
+[2023-05-30 00:21:31.410000] Will Long: You heard of PayJoin?
+[2023-05-30 00:21:34.230000] Jordan Bravo: Welcome. Yes, I have heard of PayJoins. Samourai wallet has them, though I havent had a chance to use them yet.  Id love to try it out with someone
+[2023-05-30 00:21:34.170000] Elwood HODL Barbarian: Come to the Socratic Seminar tomorrow night and meet ATL BitDevs
+[2023-05-30 00:21:34.210000] Will Long: Ive only orangepilled one business around here. Do you know of any businesses in ATL that accept bitcoin besides Ginos barber shop??
+[2023-05-30 00:21:35.040000] Elwood HODL Barbarian: I helped Ginos set up their Lightning node.
+[2023-05-30 00:21:34.210000] Will Long: My contributions so far to the community are a DIY hww built from an esp32 that prints burner wallets en masse on thermal paper… and a vending machine controller that runs on Strike, Bitcoin Core and Liquid Core.
+[2023-05-30 00:21:34.210000] Will Long: Btcpayserver invoices make these fairly easy.
+[2023-05-30 00:21:34.210000] Will Long: Anyways. I am probably overly chatty for a newbie. Hope you all have a good night. Thanks for the warm welcome
+[2023-05-30 00:22:59.110000] Rich Lassiter: Sorry to miss Wed mtg @ NCR. I feel like Im going through pleb withdrawal after overdosing when we were in MIA!
+[2023-05-30 00:19:52.130000] bryan: Welcome Will! Thanks for the input. Looking forward to meeting you tonight and hearing all about the work you've done in the past. We could use some of this innovation to help onboard more businesses in ATL!!
+[2023-05-31 00:11:31.300000] Will Long: I think I will hold off on coming to the meeting this week. Still trying to figure out if you are feds. 😆
+[2023-05-31 00:13:06.100000] Peter Rehm: 'Fed suspicion' — Oh man, does that mean I cant attend  tonight??
+[2023-05-31 00:14:07.340000] bryan: @channel if youre attending tonights socratic at NCR, please go RSVP now so I can get a head count: https://www.meetup.com/atlantabitdevs/events/293790513/ Thanks!
+[2023-05-31 00:14:11.050000] Peter Rehm: Bryan, do you have a list of what might be discussed this evening?
+[2023-05-31 00:14:30.060000] Stephen DeLorme: Its pinned in this chat
+[2023-05-31 00:14:43.080000] Grant: 😥https://www.nobsbitcoin.com/blixt-wallet-has-been-suspended-from-google-play-store/
+[2023-05-31 00:14:44.080000] Grant: Blixt Wallet and Tesnet App Suspended From Google Play Store: Blixt Wallet uses the Lightning Network client lnd and the Bitcoin SPV client Neutrino under the hood, directly on the phone, respecting users privacy.
+[2023-05-31 00:14:45.080000] Grant: Such a stupid justification for suspension.... Feel like they didn't actually review the features/function...
+[2023-05-31 00:14:43.460000] ₿en F 🚗⛓💻✈️: @Will - Maxis exist only on the internet
+[2023-05-31 00:15:41.300000] Will Long: I am the worst kind. The JW Weatherman kind
+[2023-05-31 00:15:41.550000] ₿en F 🚗⛓💻✈️: Oh snap man I know him. We gotta talk. Im coming to Atlanta next month been out for a while
+[2023-05-31 00:15:59.040000] Will Long: Sure thing…
+[2023-05-31 00:16:04.030000] ₿en F 🚗⛓💻✈️: I hope your not using his yeti thing.
+[2023-05-31 00:16:11.170000] Will Long: Heh. No I have my own process. A 39/1789 multisig. 🤣
+[2023-05-31 00:16:11.170000] Will Long: I am the only person in my anonymity set
+[2023-05-31 00:16:12.540000] ₿en F 🚗⛓💻✈️: The issue I had with it was that Will weatherman cant spell
+[2023-05-31 00:16:14.010000] Will Long: You're*
+[2023-05-31 00:16:14.180000] ₿en F 🚗⛓💻✈️: Your sure about that?
+[2023-05-31 00:16:14.540000] ₿en F 🚗⛓💻✈️: I think you should check you're grammar
+[2023-05-31 00:16:15.220000] Stephen DeLorme: Gentleman, this is Atlanta. We win hackathons, not splling bees.
+[2023-05-31 00:16:17.040000] Will Long: Anyone here doing anything with Liquid BTC yet?
+[2023-05-31 00:16:19.040000] Will Long: Killed that convo real quick
+[2023-05-31 00:16:20.250000] ₿en F 🚗⛓💻✈️: One time I used it, sideswap, I think it's good if iou want to send money to people without then seeing your utxos. 0.1 percent fee to go in and to.swap out but it's Custodial garbage @JcCrown ask him about liquid
+[2023-05-31 00:16:21.050000] Stephen DeLorme: Will probably take this thing for a whirl one day if I'm bored https://liquid.boltz.exchange/: Boltz is a privacy first, account-free Bitcoin Exchange and Lightning Service Provider.
+[2023-05-31 00:16:25.240000] Will Long: Would be nice if Strike used it for its USDt rails. Instead of using eth.
+[2023-05-31 00:16:44.590000] Elwood HODL Barbarian: https://twitter.com/bitcoinbaytpa/status/1664005838527135745: Bitcoin Bay - ANNOUNCEMENT THREAD - We're excited to announce that Bitcoin Bay has been declared winner of the #BitcoinGames hosted at #Bitcoin2023. In the spirit of the games, we want to donate half of the coin to the other semi finalists @Bitcoin_CLT @atlantabitplebs @DenverBitDevs @MKEbtc
+[2023-05-31 00:17:57.110000] Elwood HODL Barbarian: https://twitter.com/bitcoinbaytpa/status/1664005843791011843: But its not going to just be that easy. Were going to have some fun with this. Were throwing the first BIT-COMBINE for teams to compete for their share of the sats. Heres what theyll have to do.
+[2023-05-31 00:17:57.110000] Elwood HODL Barbarian: I'm thinking 3 million sats for doing nothing does not sound that bad.
+[2023-05-31 00:18:15.360000] Tidwell: We are outside waiting to get in
+[2023-05-31 00:18:15.510000] bryan: coming
+[2023-05-31 00:18:16.010000] Tidwell: Is it usually locked?
+[2023-05-31 00:18:22.330000] Gavin Green: In case of FEDs
+[2023-05-31 00:18:24] JF: Can someone let me in too? 🙏
+[2023-05-31 00:18:24.220000] bryan: Ya
+[2023-05-31 00:18:30.440000] ₿en F 🚗⛓💻✈️: Stupid door design. Should be a push bar, a panic bar
+[2023-05-31 00:19:53.500000] Will Long: PlebLabs has a lightning powered lock they are devving
+[2023-05-31 00:21:25.590000] Mike Casey: Oh my God.  They are re-inventing Slockit.  I feel like it's 8 years ago.
+[2023-05-31 00:21:27.520000] Jc Crown: There's nothing new under the sun. - THE BOOK OF ECCLESIASTES,  430 BCE
+[2023-05-31 00:21:34.330000] Will Long: I think they are using a wrist band with a Sats Card chip. I mean… I got a bag of servos too
+[2023-06-01 13:47:23] bryan: Thanks for everyone who came last night! It was a great meetup. See you all soon!
+[2023-06-01 13:50:23] packetprotector: /tip 1000 thanks for helping lead the discussion last night! A lot of great and informative stuff!
+[2023-06-01 13:52:28] packetprotector: /send 1000 @sbddesign you too Stephen! Great job! Thanks for all the hard work researching and learning about these various topics!
+
+[2023-06-01 10:58:12.176626] ATL BitLab Bot: Summarizing!
+[2023-06-01 10:58:12.177216] ATL BitLab Bot: Prompt Summarize the following text. Include details like who sent the message, what did they say, any key points from the message and all relevant details such as links:
+[2023-05-26 00:14:35.070000] Grant: Have you ever wanted to DCA every second?😆 
+[2023-05-26 00:14:35.080000] Grant: https://snort.social/e/nevent1qqsyxu06dce5vcgwfdgh9jwdsnlmsrle00ewypcvjkteq9l35za76rqpzpmhxue69uhkummnw3ezuamfdejsygrqf6twpxvndggy3qu43vzqk3m89c8sfryc43un7dllunrjqfu7kgpsgqqqqqqszles2a
+[2023-05-26 00:14:35.090000] Grant: https://github.com/SamSamskies/strike-dca
+[2023-05-26 00:14:56.370000] Nitesh ₿⚡️: Lol wow
+[2023-05-27 00:12:02.190000] bryan: Bitcoin Core v25.0 Freshly Released https://github.com/bitcoin/bitcoin/releases/tag/v25.0
+[2023-05-27 00:13:09.480000] Atlanta BitDevs: ₿R33 🗝 joined the group via invite link
+[2023-05-27 00:13:10.480000] ₿R33 🗝: 🧡 hey everyone, hey there familiar faces! woo hope all is well & happy saturday
+[2023-05-27 00:20:38.340000] Elwood HODL Barbarian: DM to Atlanta BitPlebs Twitter account today from Bitcoin Bay
+[2023-05-27 00:20:38.340000] Bitcoin Bay (@bitcoinbaytpa): Hey, Idk if you've heard, but BitBlockBoom has been disqualified from the Bitcoin Games since they weren't a local grassroots meetup. Since we came in 2nd, the coin is coming to us. In the spirit of the games, we're going to be putting together a twitter competition BitCombine, to distribute half of the coin amongst the other finalists. We're still working on the specifics but I wanted to update y'all and make sure these are the best accounts to communicate through
+[2023-05-27 00:20:38.340000] Elwood HODL Barbarian: Ill share more details as I have them
+[2023-05-27 00:21:42.100000] Nitesh ₿⚡️: This is very interesting: https://twitter.com/fiatjaf/status/1663356144599855105
+[2023-05-27 00:21:42.100000] fiatjaf: So unless Udi, Eric and others are being paid by this entity, they are working for free as they promote their scam 24/7? https://t.co/RTeHPrCNtO
+[2023-05-27 00:22:39.200000] ₿en F 🚗⛓💻✈️: They are selling the ordinals I thought?
+[2023-05-30 00:06:40.270000] Jordan Bravo: They published a correction: this tweet clarifies that while all these inscriptions are produced by Unisat.io using Unisats single private key, they are actually owned by various Unisat users.
+[2023-05-30 00:06:40.270000] mononaut (@mononautical): a substack post going around at the moment claims that a single entity owns 64% of all inscriptions created since early March, paying an eye-watering 1056 BTC for the privilege its not true. https://block21m.substack.com/p/most-bitcoin-inscriptions-belong-d6d
+[2023-05-30 00:08:14.420000] Nitesh ₿⚡️: Ahh ok
+[2023-05-30 00:19:17.510000] Stephen DeLorme: Its been a wild month, everyone. Topics for Socratic Seminar #18, hot off the press. See you tomorrow night at NCR! https://atlantabitdevs.org/2023/05/30/bitcoin-socratic-seminar-18/
+[2023-05-30 00:19:17.510000] Atlanta BitDevs: Bitcoin Socratic Seminar 18 - Atlanta BitDevs: Its almost time for Bitcoin Socratic Seminar 18! What is a Socratic Seminar? Inspired by other BitDevs meetups around the US, our Socratic Seminar events are formatted to foster debate, information sharing and lively discussion. Discussion topics are provided ahead of the event The event moderator(s) leads the audience through the topics Raise your hand to… Continue reading Bitcoin Socratic Seminar 18
+[2023-05-30 00:19:49.440000] Giii: Spring street and west peachtree have been closed this last week due to the crane accident between 10th and 12th street - route accordingly!😅
+[2023-05-30 00:19:52.130000] bryan: On that note: parking instructions for NCR building. https://atlantabitdevs.org/parking-instructions-for-ncr/
+[2023-05-30 00:19:17.510000] Atlanta BitDevs: Parking Instructions for NCR - Atlanta BitDevs. Here are instructions for getting to NCR for Atlanta BitDevs Socratic Seminars. Rideshare or Public Transit If you are taking rideshare or public transit, then you can use the main building address to navigate there. NCR Global Headquarters, 864 Spring St NW, Atlanta, GA 30308 Use the entrance on the Spring St side of the… Continue reading Parking Instructions for NCR
+[2023-05-30 00:21:26.120000] Will Long: Hi. I am Will. I am an ATL bitcoiner. Sup?
+[2023-05-30 00:21:31.310000] Grant: Welcome Will! Great to have you here!
+[2023-05-30 00:21:31.410000] Will Long: Glad to be here. I had been wondering if I were the only maxi around this town.
+[2023-05-30 00:21:31.410000] Will Long: You heard of PayJoin?
+[2023-05-30 00:21:34.230000] Jordan Bravo: Welcome. Yes, I have heard of PayJoins. Samourai wallet has them, though I havent had a chance to use them yet.  Id love to try it out with someone
+[2023-05-30 00:21:34.170000] Elwood HODL Barbarian: Come to the Socratic Seminar tomorrow night and meet ATL BitDevs
+[2023-05-30 00:21:34.210000] Will Long: Ive only orangepilled one business around here. Do you know of any businesses in ATL that accept bitcoin besides Ginos barber shop??
+[2023-05-30 00:21:35.040000] Elwood HODL Barbarian: I helped Ginos set up their Lightning node.
+[2023-05-30 00:21:34.210000] Will Long: My contributions so far to the community are a DIY hww built from an esp32 that prints burner wallets en masse on thermal paper… and a vending machine controller that runs on Strike, Bitcoin Core and Liquid Core.
+[2023-05-30 00:21:34.210000] Will Long: Btcpayserver invoices make these fairly easy.
+[2023-05-30 00:21:34.210000] Will Long: Anyways. I am probably overly chatty for a newbie. Hope you all have a good night. Thanks for the warm welcome
+[2023-05-30 00:22:59.110000] Rich Lassiter: Sorry to miss Wed mtg @ NCR. I feel like Im going through pleb withdrawal after overdosing when we were in MIA!
+[2023-05-30 00:19:52.130000] bryan: Welcome Will! Thanks for the input. Looking forward to meeting you tonight and hearing all about the work you've done in the past. We could use some of this innovation to help onboard more businesses in ATL!!
+[2023-05-31 00:11:31.300000] Will Long: I think I will hold off on coming to the meeting this week. Still trying to figure out if you are feds. 😆
+[2023-05-31 00:13:06.100000] Peter Rehm: 'Fed suspicion' — Oh man, does that mean I cant attend  tonight??
+[2023-05-31 00:14:07.340000] bryan: @channel if youre attending tonights socratic at NCR, please go RSVP now so I can get a head count: https://www.meetup.com/atlantabitdevs/events/293790513/ Thanks!
+[2023-05-31 00:14:11.050000] Peter Rehm: Bryan, do you have a list of what might be discussed this evening?
+[2023-05-31 00:14:30.060000] Stephen DeLorme: Its pinned in this chat
+[2023-05-31 00:14:43.080000] Grant: 😥https://www.nobsbitcoin.com/blixt-wallet-has-been-suspended-from-google-play-store/
+[2023-05-31 00:14:44.080000] Grant: Blixt Wallet and Tesnet App Suspended From Google Play Store: Blixt Wallet uses the Lightning Network client lnd and the Bitcoin SPV client Neutrino under the hood, directly on the phone, respecting users privacy.
+[2023-05-31 00:14:45.080000] Grant: Such a stupid justification for suspension.... Feel like they didn't actually review the features/function...
+[2023-05-31 00:14:43.460000] ₿en F 🚗⛓💻✈️: @Will - Maxis exist only on the internet
+[2023-05-31 00:15:41.300000] Will Long: I am the worst kind. The JW Weatherman kind
+[2023-05-31 00:15:41.550000] ₿en F 🚗⛓💻✈️: Oh snap man I know him. We gotta talk. Im coming to Atlanta next month been out for a while
+[2023-05-31 00:15:59.040000] Will Long: Sure thing…
+[2023-05-31 00:16:04.030000] ₿en F 🚗⛓💻✈️: I hope your not using his yeti thing.
+[2023-05-31 00:16:11.170000] Will Long: Heh. No I have my own process. A 39/1789 multisig. 🤣
+[2023-05-31 00:16:11.170000] Will Long: I am the only person in my anonymity set
+[2023-05-31 00:16:12.540000] ₿en F 🚗⛓💻✈️: The issue I had with it was that Will weatherman cant spell
+[2023-05-31 00:16:14.010000] Will Long: You're*
+[2023-05-31 00:16:14.180000] ₿en F 🚗⛓💻✈️: Your sure about that?
+[2023-05-31 00:16:14.540000] ₿en F 🚗⛓💻✈️: I think you should check you're grammar
+[2023-05-31 00:16:15.220000] Stephen DeLorme: Gentleman, this is Atlanta. We win hackathons, not splling bees.
+[2023-05-31 00:16:17.040000] Will Long: Anyone here doing anything with Liquid BTC yet?
+[2023-05-31 00:16:19.040000] Will Long: Killed that convo real quick
+[2023-05-31 00:16:20.250000] ₿en F 🚗⛓💻✈️: One time I used it, sideswap, I think it's good if iou want to send money to people without then seeing your utxos. 0.1 percent fee to go in and to.swap out but it's Custodial garbage @JcCrown ask him about liquid
+[2023-05-31 00:16:21.050000] Stephen DeLorme: Will probably take this thing for a whirl one day if I'm bored https://liquid.boltz.exchange/: Boltz is a privacy first, account-free Bitcoin Exchange and Lightning Service Provider.
+[2023-05-31 00:16:25.240000] Will Long: Would be nice if Strike used it for its USDt rails. Instead of using eth.
+[2023-05-31 00:16:44.590000] Elwood HODL Barbarian: https://twitter.com/bitcoinbaytpa/status/1664005838527135745: Bitcoin Bay - ANNOUNCEMENT THREAD - We're excited to announce that Bitcoin Bay has been declared winner of the #BitcoinGames hosted at #Bitcoin2023. In the spirit of the games, we want to donate half of the coin to the other semi finalists @Bitcoin_CLT @atlantabitplebs @DenverBitDevs @MKEbtc
+[2023-05-31 00:17:57.110000] Elwood HODL Barbarian: https://twitter.com/bitcoinbaytpa/status/1664005843791011843: But its not going to just be that easy. Were going to have some fun with this. Were throwing the first BIT-COMBINE for teams to compete for their share of the sats. Heres what theyll have to do.
+[2023-05-31 00:17:57.110000] Elwood HODL Barbarian: I'm thinking 3 million sats for doing nothing does not sound that bad.
+[2023-05-31 00:18:15.360000] Tidwell: We are outside waiting to get in
+[2023-05-31 00:18:15.510000] bryan: coming
+[2023-05-31 00:18:16.010000] Tidwell: Is it usually locked?
+[2023-05-31 00:18:22.330000] Gavin Green: In case of FEDs
+[2023-05-31 00:18:24] JF: Can someone let me in too? 🙏
+[2023-05-31 00:18:24.220000] bryan: Ya
+[2023-05-31 00:18:30.440000] ₿en F 🚗⛓💻✈️: Stupid door design. Should be a push bar, a panic bar
+[2023-05-31 00:19:53.500000] Will Long: PlebLabs has a lightning powered lock they are devving
+[2023-05-31 00:21:25.590000] Mike Casey: Oh my God.  They are re-inventing Slockit.  I feel like it's 8 years ago.
+[2023-05-31 00:21:27.520000] Jc Crown: There's nothing new under the sun. - THE BOOK OF ECCLESIASTES,  430 BCE
+[2023-05-31 00:21:34.330000] Will Long: I think they are using a wrist band with a Sats Card chip. I mean… I got a bag of servos too
+[2023-06-01 13:47:23] bryan: Thanks for everyone who came last night! It was a great meetup. See you all soon!
+[2023-06-01 13:50:23] packetprotector: /tip 1000 thanks for helping lead the discussion last night! A lot of great and informative stuff!
+[2023-06-01 13:52:28] packetprotector: /send 1000 @sbddesign you too Stephen! Great job! Thanks for all the hard work researching and learning about these various topics!
+
+[2023-06-01 11:00:18.300944] ATL BitLab Bot: Summarizing!
+[2023-06-01 11:00:18.301584] ATL BitLab Bot: Prompt Summarize the following text include sender, text and urls:
+[2023-05-26 00:14:35.070000] Grant: Have you ever wanted to DCA every second?😆 
+[2023-05-26 00:14:35.080000] Grant: https://snort.social/e/nevent1qqsyxu06dce5vcgwfdgh9jwdsnlmsrle00ewypcvjkteq9l35za76rqpzpmhxue69uhkummnw3ezuamfdejsygrqf6twpxvndggy3qu43vzqk3m89c8sfryc43un7dllunrjqfu7kgpsgqqqqqqszles2a
+[2023-05-26 00:14:35.090000] Grant: https://github.com/SamSamskies/strike-dca
+[2023-05-26 00:14:56.370000] Nitesh ₿⚡️: Lol wow
+[2023-05-27 00:12:02.190000] bryan: Bitcoin Core v25.0 Freshly Released https://github.com/bitcoin/bitcoin/releases/tag/v25.0
+[2023-05-27 00:13:09.480000] Atlanta BitDevs: ₿R33 🗝 joined the group via invite link
+[2023-05-27 00:13:10.480000] ₿R33 🗝: 🧡 hey everyone, hey there familiar faces! woo hope all is well & happy saturday
+[2023-05-27 00:20:38.340000] Elwood HODL Barbarian: DM to Atlanta BitPlebs Twitter account today from Bitcoin Bay
+[2023-05-27 00:20:38.340000] Bitcoin Bay (@bitcoinbaytpa): Hey, Idk if you've heard, but BitBlockBoom has been disqualified from the Bitcoin Games since they weren't a local grassroots meetup. Since we came in 2nd, the coin is coming to us. In the spirit of the games, we're going to be putting together a twitter competition BitCombine, to distribute half of the coin amongst the other finalists. We're still working on the specifics but I wanted to update y'all and make sure these are the best accounts to communicate through
+[2023-05-27 00:20:38.340000] Elwood HODL Barbarian: Ill share more details as I have them
+[2023-05-27 00:21:42.100000] Nitesh ₿⚡️: This is very interesting: https://twitter.com/fiatjaf/status/1663356144599855105
+[2023-05-27 00:21:42.100000] fiatjaf: So unless Udi, Eric and others are being paid by this entity, they are working for free as they promote their scam 24/7? https://t.co/RTeHPrCNtO
+[2023-05-27 00:22:39.200000] ₿en F 🚗⛓💻✈️: They are selling the ordinals I thought?
+[2023-05-30 00:06:40.270000] Jordan Bravo: They published a correction: this tweet clarifies that while all these inscriptions are produced by Unisat.io using Unisats single private key, they are actually owned by various Unisat users.
+[2023-05-30 00:06:40.270000] mononaut (@mononautical): a substack post going around at the moment claims that a single entity owns 64% of all inscriptions created since early March, paying an eye-watering 1056 BTC for the privilege its not true. https://block21m.substack.com/p/most-bitcoin-inscriptions-belong-d6d
+[2023-05-30 00:08:14.420000] Nitesh ₿⚡️: Ahh ok
+[2023-05-30 00:19:17.510000] Stephen DeLorme: Its been a wild month, everyone. Topics for Socratic Seminar #18, hot off the press. See you tomorrow night at NCR! https://atlantabitdevs.org/2023/05/30/bitcoin-socratic-seminar-18/
+[2023-05-30 00:19:17.510000] Atlanta BitDevs: Bitcoin Socratic Seminar 18 - Atlanta BitDevs: Its almost time for Bitcoin Socratic Seminar 18! What is a Socratic Seminar? Inspired by other BitDevs meetups around the US, our Socratic Seminar events are formatted to foster debate, information sharing and lively discussion. Discussion topics are provided ahead of the event The event moderator(s) leads the audience through the topics Raise your hand to… Continue reading Bitcoin Socratic Seminar 18
+[2023-05-30 00:19:49.440000] Giii: Spring street and west peachtree have been closed this last week due to the crane accident between 10th and 12th street - route accordingly!😅
+[2023-05-30 00:19:52.130000] bryan: On that note: parking instructions for NCR building. https://atlantabitdevs.org/parking-instructions-for-ncr/
+[2023-05-30 00:19:17.510000] Atlanta BitDevs: Parking Instructions for NCR - Atlanta BitDevs. Here are instructions for getting to NCR for Atlanta BitDevs Socratic Seminars. Rideshare or Public Transit If you are taking rideshare or public transit, then you can use the main building address to navigate there. NCR Global Headquarters, 864 Spring St NW, Atlanta, GA 30308 Use the entrance on the Spring St side of the… Continue reading Parking Instructions for NCR
+[2023-05-30 00:21:26.120000] Will Long: Hi. I am Will. I am an ATL bitcoiner. Sup?
+[2023-05-30 00:21:31.310000] Grant: Welcome Will! Great to have you here!
+[2023-05-30 00:21:31.410000] Will Long: Glad to be here. I had been wondering if I were the only maxi around this town.
+[2023-05-30 00:21:31.410000] Will Long: You heard of PayJoin?
+[2023-05-30 00:21:34.230000] Jordan Bravo: Welcome. Yes, I have heard of PayJoins. Samourai wallet has them, though I havent had a chance to use them yet.  Id love to try it out with someone
+[2023-05-30 00:21:34.170000] Elwood HODL Barbarian: Come to the Socratic Seminar tomorrow night and meet ATL BitDevs
+[2023-05-30 00:21:34.210000] Will Long: Ive only orangepilled one business around here. Do you know of any businesses in ATL that accept bitcoin besides Ginos barber shop??
+[2023-05-30 00:21:35.040000] Elwood HODL Barbarian: I helped Ginos set up their Lightning node.
+[2023-05-30 00:21:34.210000] Will Long: My contributions so far to the community are a DIY hww built from an esp32 that prints burner wallets en masse on thermal paper… and a vending machine controller that runs on Strike, Bitcoin Core and Liquid Core.
+[2023-05-30 00:21:34.210000] Will Long: Btcpayserver invoices make these fairly easy.
+[2023-05-30 00:21:34.210000] Will Long: Anyways. I am probably overly chatty for a newbie. Hope you all have a good night. Thanks for the warm welcome
+[2023-05-30 00:22:59.110000] Rich Lassiter: Sorry to miss Wed mtg @ NCR. I feel like Im going through pleb withdrawal after overdosing when we were in MIA!
+[2023-05-30 00:19:52.130000] bryan: Welcome Will! Thanks for the input. Looking forward to meeting you tonight and hearing all about the work you've done in the past. We could use some of this innovation to help onboard more businesses in ATL!!
+[2023-05-31 00:11:31.300000] Will Long: I think I will hold off on coming to the meeting this week. Still trying to figure out if you are feds. 😆
+[2023-05-31 00:13:06.100000] Peter Rehm: 'Fed suspicion' — Oh man, does that mean I cant attend  tonight??
+[2023-05-31 00:14:07.340000] bryan: @channel if youre attending tonights socratic at NCR, please go RSVP now so I can get a head count: https://www.meetup.com/atlantabitdevs/events/293790513/ Thanks!
+[2023-05-31 00:14:11.050000] Peter Rehm: Bryan, do you have a list of what might be discussed this evening?
+[2023-05-31 00:14:30.060000] Stephen DeLorme: Its pinned in this chat
+[2023-05-31 00:14:43.080000] Grant: 😥https://www.nobsbitcoin.com/blixt-wallet-has-been-suspended-from-google-play-store/
+[2023-05-31 00:14:44.080000] Grant: Blixt Wallet and Tesnet App Suspended From Google Play Store: Blixt Wallet uses the Lightning Network client lnd and the Bitcoin SPV client Neutrino under the hood, directly on the phone, respecting users privacy.
+[2023-05-31 00:14:45.080000] Grant: Such a stupid justification for suspension.... Feel like they didn't actually review the features/function...
+[2023-05-31 00:14:43.460000] ₿en F 🚗⛓💻✈️: @Will - Maxis exist only on the internet
+[2023-05-31 00:15:41.300000] Will Long: I am the worst kind. The JW Weatherman kind
+[2023-05-31 00:15:41.550000] ₿en F 🚗⛓💻✈️: Oh snap man I know him. We gotta talk. Im coming to Atlanta next month been out for a while
+[2023-05-31 00:15:59.040000] Will Long: Sure thing…
+[2023-05-31 00:16:04.030000] ₿en F 🚗⛓💻✈️: I hope your not using his yeti thing.
+[2023-05-31 00:16:11.170000] Will Long: Heh. No I have my own process. A 39/1789 multisig. 🤣
+[2023-05-31 00:16:11.170000] Will Long: I am the only person in my anonymity set
+[2023-05-31 00:16:12.540000] ₿en F 🚗⛓💻✈️: The issue I had with it was that Will weatherman cant spell
+[2023-05-31 00:16:14.010000] Will Long: You're*
+[2023-05-31 00:16:14.180000] ₿en F 🚗⛓💻✈️: Your sure about that?
+[2023-05-31 00:16:14.540000] ₿en F 🚗⛓💻✈️: I think you should check you're grammar
+[2023-05-31 00:16:15.220000] Stephen DeLorme: Gentleman, this is Atlanta. We win hackathons, not splling bees.
+[2023-05-31 00:16:17.040000] Will Long: Anyone here doing anything with Liquid BTC yet?
+[2023-05-31 00:16:19.040000] Will Long: Killed that convo real quick
+[2023-05-31 00:16:20.250000] ₿en F 🚗⛓💻✈️: One time I used it, sideswap, I think it's good if iou want to send money to people without then seeing your utxos. 0.1 percent fee to go in and to.swap out but it's Custodial garbage @JcCrown ask him about liquid
+[2023-05-31 00:16:21.050000] Stephen DeLorme: Will probably take this thing for a whirl one day if I'm bored https://liquid.boltz.exchange/: Boltz is a privacy first, account-free Bitcoin Exchange and Lightning Service Provider.
+[2023-05-31 00:16:25.240000] Will Long: Would be nice if Strike used it for its USDt rails. Instead of using eth.
+[2023-05-31 00:16:44.590000] Elwood HODL Barbarian: https://twitter.com/bitcoinbaytpa/status/1664005838527135745: Bitcoin Bay - ANNOUNCEMENT THREAD - We're excited to announce that Bitcoin Bay has been declared winner of the #BitcoinGames hosted at #Bitcoin2023. In the spirit of the games, we want to donate half of the coin to the other semi finalists @Bitcoin_CLT @atlantabitplebs @DenverBitDevs @MKEbtc
+[2023-05-31 00:17:57.110000] Elwood HODL Barbarian: https://twitter.com/bitcoinbaytpa/status/1664005843791011843: But its not going to just be that easy. Were going to have some fun with this. Were throwing the first BIT-COMBINE for teams to compete for their share of the sats. Heres what theyll have to do.
+[2023-05-31 00:17:57.110000] Elwood HODL Barbarian: I'm thinking 3 million sats for doing nothing does not sound that bad.
+[2023-05-31 00:18:15.360000] Tidwell: We are outside waiting to get in
+[2023-05-31 00:18:15.510000] bryan: coming
+[2023-05-31 00:18:16.010000] Tidwell: Is it usually locked?
+[2023-05-31 00:18:22.330000] Gavin Green: In case of FEDs
+[2023-05-31 00:18:24] JF: Can someone let me in too? 🙏
+[2023-05-31 00:18:24.220000] bryan: Ya
+[2023-05-31 00:18:30.440000] ₿en F 🚗⛓💻✈️: Stupid door design. Should be a push bar, a panic bar
+[2023-05-31 00:19:53.500000] Will Long: PlebLabs has a lightning powered lock they are devving
+[2023-05-31 00:21:25.590000] Mike Casey: Oh my God.  They are re-inventing Slockit.  I feel like it's 8 years ago.
+[2023-05-31 00:21:27.520000] Jc Crown: There's nothing new under the sun. - THE BOOK OF ECCLESIASTES,  430 BCE
+[2023-05-31 00:21:34.330000] Will Long: I think they are using a wrist band with a Sats Card chip. I mean… I got a bag of servos too
+[2023-06-01 13:47:23] bryan: Thanks for everyone who came last night! It was a great meetup. See you all soon!
+[2023-06-01 13:50:23] packetprotector: /tip 1000 thanks for helping lead the discussion last night! A lot of great and informative stuff!
+[2023-06-01 13:52:28] packetprotector: /send 1000 @sbddesign you too Stephen! Great job! Thanks for all the hard work researching and learning about these various topics!
+
+[2023-06-01 11:12:26.748786] ATL BitLab Bot: Summarizing!
+[2023-06-01 11:12:26.750375] ATL BitLab Bot: Prompt Summarize the following text include sender, text and urls:
+Grant: Have you ever wanted to DCA every second?😆 
+Grant: https://snort.social/e/nevent1qqsyxu06dce5vcgwfdgh9jwdsnlmsrle00ewypcvjkteq9l35za76rqpzpmhxue69uhkummnw3ezuamfdejsygrqf6twpxvndggy3qu43vzqk3m89c8sfryc43un7dllunrjqfu7kgpsgqqqqqqszles2a
+Grant: https://github.com/SamSamskies/strike-dca
+Nitesh ₿⚡️: Lol wow
+bryan: Bitcoin Core v25.0 Freshly Released https://github.com/bitcoin/bitcoin/releases/tag/v25.0
+Atlanta BitDevs: ₿R33 🗝 joined the group via invite link
+₿R33 🗝: 🧡 hey everyone, hey there familiar faces! woo hope all is well & happy saturday
+Elwood HODL Barbarian: DM to Atlanta BitPlebs Twitter account today from Bitcoin Bay
+Bitcoin Bay (@bitcoinbaytpa): Hey, Idk if you've heard, but BitBlockBoom has been disqualified from the Bitcoin Games since they weren't a local grassroots meetup. Since we came in 2nd, the coin is coming to us. In the spirit of the games, we're going to be putting together a twitter competition BitCombine, to distribute half of the coin amongst the other finalists. We're still working on the specifics but I wanted to update y'all and make sure these are the best accounts to communicate through
+Elwood HODL Barbarian: Ill share more details as I have them
+Nitesh ₿⚡️: This is very interesting: https://twitter.com/fiatjaf/status/1663356144599855105
+fiatjaf: So unless Udi, Eric and others are being paid by this entity, they are working for free as they promote their scam 24/7? https://t.co/RTeHPrCNtO
+₿en F 🚗⛓💻✈️: They are selling the ordinals I thought?
+Jordan Bravo: They published a correction: this tweet clarifies that while all these inscriptions are produced by Unisat.io using Unisats single private key, they are actually owned by various Unisat users.
+mononaut (@mononautical): a substack post going around at the moment claims that a single entity owns 64% of all inscriptions created since early March, paying an eye-watering 1056 BTC for the privilege its not true. https://block21m.substack.com/p/most-bitcoin-inscriptions-belong-d6d
+Nitesh ₿⚡️: Ahh ok
+Stephen DeLorme: Its been a wild month, everyone. Topics for Socratic Seminar #18, hot off the press. See you tomorrow night at NCR! https://atlantabitdevs.org/2023/05/30/bitcoin-socratic-seminar-18/
+Atlanta BitDevs: Bitcoin Socratic Seminar 18 - Atlanta BitDevs: Its almost time for Bitcoin Socratic Seminar 18! What is a Socratic Seminar? Inspired by other BitDevs meetups around the US, our Socratic Seminar events are formatted to foster debate, information sharing and lively discussion. Discussion topics are provided ahead of the event The event moderator(s) leads the audience through the topics Raise your hand to… Continue reading Bitcoin Socratic Seminar 18
+Giii: Spring street and west peachtree have been closed this last week due to the crane accident between 10th and 12th street - route accordingly!😅
+bryan: On that note: parking instructions for NCR building. https://atlantabitdevs.org/parking-instructions-for-ncr/
+Atlanta BitDevs: Parking Instructions for NCR - Atlanta BitDevs. Here are instructions for getting to NCR for Atlanta BitDevs Socratic Seminars. Rideshare or Public Transit If you are taking rideshare or public transit, then you can use the main building address to navigate there. NCR Global Headquarters, 864 Spring St NW, Atlanta, GA 30308 Use the entrance on the Spring St side of the… Continue reading Parking Instructions for NCR
+Will Long: Hi. I am Will. I am an ATL bitcoiner. Sup?
+Grant: Welcome Will! Great to have you here!
+Will Long: Glad to be here. I had been wondering if I were the only maxi around this town.
+Will Long: You heard of PayJoin?
+Jordan Bravo: Welcome. Yes, I have heard of PayJoins. Samourai wallet has them, though I havent had a chance to use them yet.  Id love to try it out with someone
+Elwood HODL Barbarian: Come to the Socratic Seminar tomorrow night and meet ATL BitDevs
+Will Long: Ive only orangepilled one business around here. Do you know of any businesses in ATL that accept bitcoin besides Ginos barber shop??
+Elwood HODL Barbarian: I helped Ginos set up their Lightning node.
+Will Long: My contributions so far to the community are a DIY hww built from an esp32 that prints burner wallets en masse on thermal paper… and a vending machine controller that runs on Strike, Bitcoin Core and Liquid Core.
+Will Long: Btcpayserver invoices make these fairly easy.
+Will Long: Anyways. I am probably overly chatty for a newbie. Hope you all have a good night. Thanks for the warm welcome
+Rich Lassiter: Sorry to miss Wed mtg @ NCR. I feel like Im going through pleb withdrawal after overdosing when we were in MIA!
+bryan: Welcome Will! Thanks for the input. Looking forward to meeting you tonight and hearing all about the work you've done in the past. We could use some of this innovation to help onboard more businesses in ATL!!
+Will Long: I think I will hold off on coming to the meeting this week. Still trying to figure out if you are feds. 😆
+Peter Rehm: 'Fed suspicion' — Oh man, does that mean I cant attend  tonight??
+bryan: @channel if youre attending tonights socratic at NCR, please go RSVP now so I can get a head count: https://www.meetup.com/atlantabitdevs/events/293790513/ Thanks!
+Peter Rehm: Bryan, do you have a list of what might be discussed this evening?
+Stephen DeLorme: Its pinned in this chat
+Grant: 😥https://www.nobsbitcoin.com/blixt-wallet-has-been-suspended-from-google-play-store/
+Grant: Blixt Wallet and Tesnet App Suspended From Google Play Store: Blixt Wallet uses the Lightning Network client lnd and the Bitcoin SPV client Neutrino under the hood, directly on the phone, respecting users privacy.
+Grant: Such a stupid justification for suspension.... Feel like they didn't actually review the features/function...
+₿en F 🚗⛓💻✈️: @Will - Maxis exist only on the internet
+Will Long: I am the worst kind. The JW Weatherman kind
+₿en F 🚗⛓💻✈️: Oh snap man I know him. We gotta talk. Im coming to Atlanta next month been out for a while
+Will Long: Sure thing…
+₿en F 🚗⛓💻✈️: I hope your not using his yeti thing.
+Will Long: Heh. No I have my own process. A 39/1789 multisig. 🤣
+Will Long: I am the only person in my anonymity set
+₿en F 🚗⛓💻✈️: The issue I had with it was that Will weatherman cant spell
+Will Long: You're*
+₿en F 🚗⛓💻✈️: Your sure about that?
+₿en F 🚗⛓💻✈️: I think you should check you're grammar
+Stephen DeLorme: Gentleman, this is Atlanta. We win hackathons, not splling bees.
+Will Long: Anyone here doing anything with Liquid BTC yet?
+Will Long: Killed that convo real quick
+₿en F 🚗⛓💻✈️: One time I used it, sideswap, I think it's good if iou want to send money to people without then seeing your utxos. 0.1 percent fee to go in and to.swap out but it's Custodial garbage @JcCrown ask him about liquid
+Stephen DeLorme: Will probably take this thing for a whirl one day if I'm bored https://liquid.boltz.exchange/: Boltz is a privacy first, account-free Bitcoin Exchange and Lightning Service Provider.
+Will Long: Would be nice if Strike used it for its USDt rails. Instead of using eth.
+Elwood HODL Barbarian: https://twitter.com/bitcoinbaytpa/status/1664005838527135745: Bitcoin Bay - ANNOUNCEMENT THREAD - We're excited to announce that Bitcoin Bay has been declared winner of the #BitcoinGames hosted at #Bitcoin2023. In the spirit of the games, we want to donate half of the coin to the other semi finalists @Bitcoin_CLT @atlantabitplebs @DenverBitDevs @MKEbtc
+Elwood HODL Barbarian: https://twitter.com/bitcoinbaytpa/status/1664005843791011843: But its not going to just be that easy. Were going to have some fun with this. Were throwing the first BIT-COMBINE for teams to compete for their share of the sats. Heres what theyll have to do.
+Elwood HODL Barbarian: I'm thinking 3 million sats for doing nothing does not sound that bad.
+Tidwell: We are outside waiting to get in
+bryan: coming
+Tidwell: Is it usually locked?
+Gavin Green: In case of FEDs
+JF: Can someone let me in too? 🙏
+bryan: Ya
+₿en F 🚗⛓💻✈️: Stupid door design. Should be a push bar, a panic bar
+Will Long: PlebLabs has a lightning powered lock they are devving
+Mike Casey: Oh my God.  They are re-inventing Slockit.  I feel like it's 8 years ago.
+Jc Crown: There's nothing new under the sun. - THE BOOK OF ECCLESIASTES,  430 BCE
+Will Long: I think they are using a wrist band with a Sats Card chip. I mean… I got a bag of servos too
+bryan: Thanks for everyone who came last night! It was a great meetup. See you all soon!
+packetprotector: /tip 1000 thanks for helping lead the discussion last night! A lot of great and informative stuff!
+packetprotector: /send 1000 @sbddesign you too Stephen! Great job! Thanks for all the hard work researching and learning about these various topics!
+
+[2023-06-01 11:13:08.439791] ATL BitLab Bot: Summarizing!
+[2023-06-01 11:13:08.440287] ATL BitLab Bot: Prompt Summarize the following text include sender, text and urls:
+Grant: Have you ever wanted to DCA every second?😆 
+Grant: https://snort.social/e/nevent1qqsyxu06dce5vcgwfdgh9jwdsnlmsrle00ewypcvjkteq9l35za76rqpzpmhxue69uhkummnw3ezuamfdejsygrqf6twpxvndggy3qu43vzqk3m89c8sfryc43un7dllunrjqfu7kgpsgqqqqqqszles2a
+Grant: https://github.com/SamSamskies/strike-dca
+Nitesh ₿⚡️: Lol wow
+bryan: Bitcoin Core v25.0 Freshly Released https://github.com/bitcoin/bitcoin/releases/tag/v25.0
+Atlanta BitDevs: ₿R33 🗝 joined the group via invite link
+₿R33 🗝: 🧡 hey everyone, hey there familiar faces! woo hope all is well & happy saturday
+Elwood HODL Barbarian: DM to Atlanta BitPlebs Twitter account today from Bitcoin Bay
+Bitcoin Bay (@bitcoinbaytpa): Hey, Idk if you've heard, but BitBlockBoom has been disqualified from the Bitcoin Games since they weren't a local grassroots meetup. Since we came in 2nd, the coin is coming to us. In the spirit of the games, we're going to be putting together a twitter competition BitCombine, to distribute half of the coin amongst the other finalists. We're still working on the specifics but I wanted to update y'all and make sure these are the best accounts to communicate through
+Elwood HODL Barbarian: Ill share more details as I have them
+Nitesh ₿⚡️: This is very interesting: https://twitter.com/fiatjaf/status/1663356144599855105
+fiatjaf: So unless Udi, Eric and others are being paid by this entity, they are working for free as they promote their scam 24/7? https://t.co/RTeHPrCNtO
+₿en F 🚗⛓💻✈️: They are selling the ordinals I thought?
+Jordan Bravo: They published a correction: this tweet clarifies that while all these inscriptions are produced by Unisat.io using Unisats single private key, they are actually owned by various Unisat users.
+mononaut (@mononautical): a substack post going around at the moment claims that a single entity owns 64% of all inscriptions created since early March, paying an eye-watering 1056 BTC for the privilege its not true. https://block21m.substack.com/p/most-bitcoin-inscriptions-belong-d6d
+Nitesh ₿⚡️: Ahh ok
+Stephen DeLorme: Its been a wild month, everyone. Topics for Socratic Seminar #18, hot off the press. See you tomorrow night at NCR! https://atlantabitdevs.org/2023/05/30/bitcoin-socratic-seminar-18/
+Atlanta BitDevs: Bitcoin Socratic Seminar 18 - Atlanta BitDevs: Its almost time for Bitcoin Socratic Seminar 18! What is a Socratic Seminar? Inspired by other BitDevs meetups around the US, our Socratic Seminar events are formatted to foster debate, information sharing and lively discussion. Discussion topics are provided ahead of the event The event moderator(s) leads the audience through the topics Raise your hand to… Continue reading Bitcoin Socratic Seminar 18
+Giii: Spring street and west peachtree have been closed this last week due to the crane accident between 10th and 12th street - route accordingly!😅
+bryan: On that note: parking instructions for NCR building. https://atlantabitdevs.org/parking-instructions-for-ncr/
+Atlanta BitDevs: Parking Instructions for NCR - Atlanta BitDevs. Here are instructions for getting to NCR for Atlanta BitDevs Socratic Seminars. Rideshare or Public Transit If you are taking rideshare or public transit, then you can use the main building address to navigate there. NCR Global Headquarters, 864 Spring St NW, Atlanta, GA 30308 Use the entrance on the Spring St side of the… Continue reading Parking Instructions for NCR
+Will Long: Hi. I am Will. I am an ATL bitcoiner. Sup?
+Grant: Welcome Will! Great to have you here!
+Will Long: Glad to be here. I had been wondering if I were the only maxi around this town.
+Will Long: You heard of PayJoin?
+Jordan Bravo: Welcome. Yes, I have heard of PayJoins. Samourai wallet has them, though I havent had a chance to use them yet.  Id love to try it out with someone
+Elwood HODL Barbarian: Come to the Socratic Seminar tomorrow night and meet ATL BitDevs
+Will Long: Ive only orangepilled one business around here. Do you know of any businesses in ATL that accept bitcoin besides Ginos barber shop??
+Elwood HODL Barbarian: I helped Ginos set up their Lightning node.
+Will Long: My contributions so far to the community are a DIY hww built from an esp32 that prints burner wallets en masse on thermal paper… and a vending machine controller that runs on Strike, Bitcoin Core and Liquid Core.
+Will Long: Btcpayserver invoices make these fairly easy.
+Will Long: Anyways. I am probably overly chatty for a newbie. Hope you all have a good night. Thanks for the warm welcome
+Rich Lassiter: Sorry to miss Wed mtg @ NCR. I feel like Im going through pleb withdrawal after overdosing when we were in MIA!
+bryan: Welcome Will! Thanks for the input. Looking forward to meeting you tonight and hearing all about the work you've done in the past. We could use some of this innovation to help onboard more businesses in ATL!!
+Will Long: I think I will hold off on coming to the meeting this week. Still trying to figure out if you are feds. 😆
+Peter Rehm: 'Fed suspicion' — Oh man, does that mean I cant attend  tonight??
+bryan: @channel if youre attending tonights socratic at NCR, please go RSVP now so I can get a head count: https://www.meetup.com/atlantabitdevs/events/293790513/ Thanks!
+Peter Rehm: Bryan, do you have a list of what might be discussed this evening?
+Stephen DeLorme: Its pinned in this chat
+Grant: 😥https://www.nobsbitcoin.com/blixt-wallet-has-been-suspended-from-google-play-store/
+Grant: Blixt Wallet and Tesnet App Suspended From Google Play Store: Blixt Wallet uses the Lightning Network client lnd and the Bitcoin SPV client Neutrino under the hood, directly on the phone, respecting users privacy.
+Grant: Such a stupid justification for suspension.... Feel like they didn't actually review the features/function...
+₿en F 🚗⛓💻✈️: @Will - Maxis exist only on the internet
+Will Long: I am the worst kind. The JW Weatherman kind
+₿en F 🚗⛓💻✈️: Oh snap man I know him. We gotta talk. Im coming to Atlanta next month been out for a while
+Will Long: Sure thing…
+₿en F 🚗⛓💻✈️: I hope your not using his yeti thing.
+Will Long: Heh. No I have my own process. A 39/1789 multisig. 🤣
+Will Long: I am the only person in my anonymity set
+₿en F 🚗⛓💻✈️: The issue I had with it was that Will weatherman cant spell
+Will Long: You're*
+₿en F 🚗⛓💻✈️: Your sure about that?
+₿en F 🚗⛓💻✈️: I think you should check you're grammar
+Stephen DeLorme: Gentleman, this is Atlanta. We win hackathons, not splling bees.
+Will Long: Anyone here doing anything with Liquid BTC yet?
+Will Long: Killed that convo real quick
+₿en F 🚗⛓💻✈️: One time I used it, sideswap, I think it's good if iou want to send money to people without then seeing your utxos. 0.1 percent fee to go in and to.swap out but it's Custodial garbage @JcCrown ask him about liquid
+Stephen DeLorme: Will probably take this thing for a whirl one day if I'm bored https://liquid.boltz.exchange/: Boltz is a privacy first, account-free Bitcoin Exchange and Lightning Service Provider.
+Will Long: Would be nice if Strike used it for its USDt rails. Instead of using eth.
+Elwood HODL Barbarian: https://twitter.com/bitcoinbaytpa/status/1664005838527135745: Bitcoin Bay - ANNOUNCEMENT THREAD - We're excited to announce that Bitcoin Bay has been declared winner of the #BitcoinGames hosted at #Bitcoin2023. In the spirit of the games, we want to donate half of the coin to the other semi finalists @Bitcoin_CLT @atlantabitplebs @DenverBitDevs @MKEbtc
+Elwood HODL Barbarian: https://twitter.com/bitcoinbaytpa/status/1664005843791011843: But its not going to just be that easy. Were going to have some fun with this. Were throwing the first BIT-COMBINE for teams to compete for their share of the sats. Heres what theyll have to do.
+Elwood HODL Barbarian: I'm thinking 3 million sats for doing nothing does not sound that bad.
+Tidwell: We are outside waiting to get in
+bryan: coming
+Tidwell: Is it usually locked?
+Gavin Green: In case of FEDs
+JF: Can someone let me in too? 🙏
+bryan: Ya
+₿en F 🚗⛓💻✈️: Stupid door design. Should be a push bar, a panic bar
+Will Long: PlebLabs has a lightning powered lock they are devving
+Mike Casey: Oh my God.  They are re-inventing Slockit.  I feel like it's 8 years ago.
+Jc Crown: There's nothing new under the sun. - THE BOOK OF ECCLESIASTES,  430 BCE
+Will Long: I think they are using a wrist band with a Sats Card chip. I mean… I got a bag of servos too
+bryan: Thanks for everyone who came last night! It was a great meetup. See you all soon!
+packetprotector: /tip 1000 thanks for helping lead the discussion last night! A lot of great and informative stuff!
+packetprotector: /send 1000 @sbddesign you too Stephen! Great job! Thanks for all the hard work researching and learning about these various topics!
+
+[2023-06-01 11:13:22.849056] ATL BitLab Bot: Summarizing!
+[2023-06-01 11:13:22.849551] ATL BitLab Bot: Prompt Summarize the following text include sender, text and urls:
+Grant: Have you ever wanted to DCA every second?😆 
+Grant: https://snort.social/e/nevent1qqsyxu06dce5vcgwfdgh9jwdsnlmsrle00ewypcvjkteq9l35za76rqpzpmhxue69uhkummnw3ezuamfdejsygrqf6twpxvndggy3qu43vzqk3m89c8sfryc43un7dllunrjqfu7kgpsgqqqqqqszles2a
+Grant: https://github.com/SamSamskies/strike-dca
+Nitesh ₿⚡️: Lol wow
+bryan: Bitcoin Core v25.0 Freshly Released https://github.com/bitcoin/bitcoin/releases/tag/v25.0
+Atlanta BitDevs: ₿R33 🗝 joined the group via invite link
+₿R33 🗝: 🧡 hey everyone, hey there familiar faces! woo hope all is well & happy saturday
+Elwood HODL Barbarian: DM to Atlanta BitPlebs Twitter account today from Bitcoin Bay
+Bitcoin Bay (@bitcoinbaytpa): Hey, Idk if you've heard, but BitBlockBoom has been disqualified from the Bitcoin Games since they weren't a local grassroots meetup. Since we came in 2nd, the coin is coming to us. In the spirit of the games, we're going to be putting together a twitter competition BitCombine, to distribute half of the coin amongst the other finalists. We're still working on the specifics but I wanted to update y'all and make sure these are the best accounts to communicate through
+Elwood HODL Barbarian: Ill share more details as I have them
+Nitesh ₿⚡️: This is very interesting: https://twitter.com/fiatjaf/status/1663356144599855105
+fiatjaf: So unless Udi, Eric and others are being paid by this entity, they are working for free as they promote their scam 24/7? https://t.co/RTeHPrCNtO
+₿en F 🚗⛓💻✈️: They are selling the ordinals I thought?
+Jordan Bravo: They published a correction: this tweet clarifies that while all these inscriptions are produced by Unisat.io using Unisats single private key, they are actually owned by various Unisat users.
+mononaut (@mononautical): a substack post going around at the moment claims that a single entity owns 64% of all inscriptions created since early March, paying an eye-watering 1056 BTC for the privilege its not true. https://block21m.substack.com/p/most-bitcoin-inscriptions-belong-d6d
+Nitesh ₿⚡️: Ahh ok
+Stephen DeLorme: Its been a wild month, everyone. Topics for Socratic Seminar #18, hot off the press. See you tomorrow night at NCR! https://atlantabitdevs.org/2023/05/30/bitcoin-socratic-seminar-18/
+Atlanta BitDevs: Bitcoin Socratic Seminar 18 - Atlanta BitDevs: Its almost time for Bitcoin Socratic Seminar 18! What is a Socratic Seminar? Inspired by other BitDevs meetups around the US, our Socratic Seminar events are formatted to foster debate, information sharing and lively discussion. Discussion topics are provided ahead of the event The event moderator(s) leads the audience through the topics Raise your hand to… Continue reading Bitcoin Socratic Seminar 18
+Giii: Spring street and west peachtree have been closed this last week due to the crane accident between 10th and 12th street - route accordingly!😅
+bryan: On that note: parking instructions for NCR building. https://atlantabitdevs.org/parking-instructions-for-ncr/
+Atlanta BitDevs: Parking Instructions for NCR - Atlanta BitDevs. Here are instructions for getting to NCR for Atlanta BitDevs Socratic Seminars. Rideshare or Public Transit If you are taking rideshare or public transit, then you can use the main building address to navigate there. NCR Global Headquarters, 864 Spring St NW, Atlanta, GA 30308 Use the entrance on the Spring St side of the… Continue reading Parking Instructions for NCR
+Will Long: Hi. I am Will. I am an ATL bitcoiner. Sup?
+Grant: Welcome Will! Great to have you here!
+Will Long: Glad to be here. I had been wondering if I were the only maxi around this town.
+Will Long: You heard of PayJoin?
+Jordan Bravo: Welcome. Yes, I have heard of PayJoins. Samourai wallet has them, though I havent had a chance to use them yet.  Id love to try it out with someone
+Elwood HODL Barbarian: Come to the Socratic Seminar tomorrow night and meet ATL BitDevs
+Will Long: Ive only orangepilled one business around here. Do you know of any businesses in ATL that accept bitcoin besides Ginos barber shop??
+Elwood HODL Barbarian: I helped Ginos set up their Lightning node.
+Will Long: My contributions so far to the community are a DIY hww built from an esp32 that prints burner wallets en masse on thermal paper… and a vending machine controller that runs on Strike, Bitcoin Core and Liquid Core.
+Will Long: Btcpayserver invoices make these fairly easy.
+Will Long: Anyways. I am probably overly chatty for a newbie. Hope you all have a good night. Thanks for the warm welcome
+Rich Lassiter: Sorry to miss Wed mtg @ NCR. I feel like Im going through pleb withdrawal after overdosing when we were in MIA!
+bryan: Welcome Will! Thanks for the input. Looking forward to meeting you tonight and hearing all about the work you've done in the past. We could use some of this innovation to help onboard more businesses in ATL!!
+Will Long: I think I will hold off on coming to the meeting this week. Still trying to figure out if you are feds. 😆
+Peter Rehm: 'Fed suspicion' — Oh man, does that mean I cant attend  tonight??
+bryan: @channel if youre attending tonights socratic at NCR, please go RSVP now so I can get a head count: https://www.meetup.com/atlantabitdevs/events/293790513/ Thanks!
+Peter Rehm: Bryan, do you have a list of what might be discussed this evening?
+Stephen DeLorme: Its pinned in this chat
+Grant: 😥https://www.nobsbitcoin.com/blixt-wallet-has-been-suspended-from-google-play-store/
+Grant: Blixt Wallet and Tesnet App Suspended From Google Play Store: Blixt Wallet uses the Lightning Network client lnd and the Bitcoin SPV client Neutrino under the hood, directly on the phone, respecting users privacy.
+Grant: Such a stupid justification for suspension.... Feel like they didn't actually review the features/function...
+₿en F 🚗⛓💻✈️: @Will - Maxis exist only on the internet
+Will Long: I am the worst kind. The JW Weatherman kind
+₿en F 🚗⛓💻✈️: Oh snap man I know him. We gotta talk. Im coming to Atlanta next month been out for a while
+Will Long: Sure thing…
+₿en F 🚗⛓💻✈️: I hope your not using his yeti thing.
+Will Long: Heh. No I have my own process. A 39/1789 multisig. 🤣
+Will Long: I am the only person in my anonymity set
+₿en F 🚗⛓💻✈️: The issue I had with it was that Will weatherman cant spell
+Will Long: You're*
+₿en F 🚗⛓💻✈️: Your sure about that?
+₿en F 🚗⛓💻✈️: I think you should check you're grammar
+Stephen DeLorme: Gentleman, this is Atlanta. We win hackathons, not splling bees.
+Will Long: Anyone here doing anything with Liquid BTC yet?
+Will Long: Killed that convo real quick
+₿en F 🚗⛓💻✈️: One time I used it, sideswap, I think it's good if iou want to send money to people without then seeing your utxos. 0.1 percent fee to go in and to.swap out but it's Custodial garbage @JcCrown ask him about liquid
+Stephen DeLorme: Will probably take this thing for a whirl one day if I'm bored https://liquid.boltz.exchange/: Boltz is a privacy first, account-free Bitcoin Exchange and Lightning Service Provider.
+Will Long: Would be nice if Strike used it for its USDt rails. Instead of using eth.
+Elwood HODL Barbarian: https://twitter.com/bitcoinbaytpa/status/1664005838527135745: Bitcoin Bay - ANNOUNCEMENT THREAD - We're excited to announce that Bitcoin Bay has been declared winner of the #BitcoinGames hosted at #Bitcoin2023. In the spirit of the games, we want to donate half of the coin to the other semi finalists @Bitcoin_CLT @atlantabitplebs @DenverBitDevs @MKEbtc
+Elwood HODL Barbarian: https://twitter.com/bitcoinbaytpa/status/1664005843791011843: But its not going to just be that easy. Were going to have some fun with this. Were throwing the first BIT-COMBINE for teams to compete for their share of the sats. Heres what theyll have to do.
+Elwood HODL Barbarian: I'm thinking 3 million sats for doing nothing does not sound that bad.
+Tidwell: We are outside waiting to get in
+bryan: coming
+Tidwell: Is it usually locked?
+Gavin Green: In case of FEDs
+JF: Can someone let me in too? 🙏
+bryan: Ya
+₿en F 🚗⛓💻✈️: Stupid door design. Should be a push bar, a panic bar
+Will Long: PlebLabs has a lightning powered lock they are devving
+Mike Casey: Oh my God.  They are re-inventing Slockit.  I feel like it's 8 years ago.
+Jc Crown: There's nothing new under the sun. - THE BOOK OF ECCLESIASTES,  430 BCE
+Will Long: I think they are using a wrist band with a Sats Card chip. I mean… I got a bag of servos too
+bryan: Thanks for everyone who came last night! It was a great meetup. See you all soon!
+packetprotector: /tip 1000 thanks for helping lead the discussion last night! A lot of great and informative stuff!
+packetprotector: /send 1000 @sbddesign you too Stephen! Great job! Thanks for all the hard work researching and learning about these various topics!
+
+[2023-06-01 11:25:02.693404] ATL BitLab Bot: Summarizing!
+[2023-06-01 11:25:02.693937] ATL BitLab Bot: Prompt Summarize the following text include sender, text and urls:
+Grant: Have you ever wanted to DCA every second?😆 
+Grant: https://snort.social/e/nevent1qqsyxu06dce5vcgwfdgh9jwdsnlmsrle00ewypcvjkteq9l35za76rqpzpmhxue69uhkummnw3ezuamfdejsygrqf6twpxvndggy3qu43vzqk3m89c8sfryc43un7dllunrjqfu7kgpsgqqqqqqszles2a
+Grant: https://github.com/SamSamskies/strike-dca
+Nitesh ₿⚡️: Lol wow
+bryan: Bitcoin Core v25.0 Freshly Released https://github.com/bitcoin/bitcoin/releases/tag/v25.0
+Atlanta BitDevs: ₿R33 🗝 joined the group via invite link
+₿R33 🗝: 🧡 hey everyone, hey there familiar faces! woo hope all is well & happy saturday
+Elwood HODL Barbarian: DM to Atlanta BitPlebs Twitter account today from Bitcoin Bay
+Bitcoin Bay (@bitcoinbaytpa): Hey, Idk if you've heard, but BitBlockBoom has been disqualified from the Bitcoin Games since they weren't a local grassroots meetup. Since we came in 2nd, the coin is coming to us. In the spirit of the games, we're going to be putting together a twitter competition BitCombine, to distribute half of the coin amongst the other finalists. We're still working on the specifics but I wanted to update y'all and make sure these are the best accounts to communicate through
+Elwood HODL Barbarian: Ill share more details as I have them
+Nitesh ₿⚡️: This is very interesting: https://twitter.com/fiatjaf/status/1663356144599855105
+fiatjaf: So unless Udi, Eric and others are being paid by this entity, they are working for free as they promote their scam 24/7? https://t.co/RTeHPrCNtO
+₿en F 🚗⛓💻✈️: They are selling the ordinals I thought?
+Jordan Bravo: They published a correction: this tweet clarifies that while all these inscriptions are produced by Unisat.io using Unisats single private key, they are actually owned by various Unisat users.
+mononaut (@mononautical): a substack post going around at the moment claims that a single entity owns 64% of all inscriptions created since early March, paying an eye-watering 1056 BTC for the privilege its not true. https://block21m.substack.com/p/most-bitcoin-inscriptions-belong-d6d
+Nitesh ₿⚡️: Ahh ok
+
+[2023-06-01 11:25:54.391845] ATL BitLab Bot: OpenAI Respone {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "\nSender: Grant, Nitesh \u20bf\u26a1\ufe0f, bryan, Atlanta BitDevs, \u20bfR33 \ud83d\udddd, Elwood HODL Barbarian, Bitcoin Bay (@bitcoinbaytpa), fiatjaf, \u20bfen F \ud83d\ude97\u26d3\ud83d\udcbb\u2708\ufe0f, Jordan Bravo, mononaut (@mononautical)\nText: Grant asked if anyone wanted to DCA every second and provided two URLs. Nitesh \u20bf\u26a1\ufe0f expressed amusement. Bryan shared a link about Bitcoin Core v25.0. Atlanta BitDevs shared an invite link. \u20bfR33 \ud83d\udddd greeted everyone and expressed happiness. Elwood HODL Barbarian shared that he had sent a DM to the Atlanta BitPlebs Twitter account. Bitcoin Bay shared that BitBlockBoom had been disqualified from the Bitcoin Games and they would be putting together a twitter competition BitCombine to distribute half of the coin amongst the other finalists. Fiatjaf shared a tweet about an entity paying 24/7 to promote a scam. \u20bfen F clarified that they were selling the ordinals. Jordan Bravo shared a correction. Mononaut shared a substack post about a single entity owning 64% of all inscriptions created since early March. Nitesh \u20bf\u26a1\ufe0f acknowledged.\nURLs: https://snort.social/e/nevent1qqsyxu06dce5vcgwfdgh9jwdsnlmsrle00ewypcvjkteq9l35za76rqpzpmhxue69uhkummnw3ezuamfdejsygrqf6twpxvndggy3qu43vzqk3m89c8sfryc43un7dllunrjqfu7kgpsgqqqqqqszles2a, https://github.com/SamSamskies/strike-dca, https://github.com/bitcoin/bitcoin/releases/tag/v25.0, https://twitter.com/fiatjaf/status/1663356144599855105, https://block21m.substack.com/p/most-bitcoin-inscriptions-belong-d6d"
+    }
+  ],
+  "created": 1685633102,
+  "id": "cmpl-7MeScT3KEPTo2SDX0rUzr8c0RBD3i",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 485,
+    "prompt_tokens": 662,
+    "total_tokens": 1147
+  }
+}
+[2023-06-01 11:25:54.392340] ATL BitLab Bot: Prompt Summarize the following text include sender, text and urls:
+Stephen DeLorme: Its been a wild month, everyone. Topics for Socratic Seminar #18, hot off the press. See you tomorrow night at NCR! https://atlantabitdevs.org/2023/05/30/bitcoin-socratic-seminar-18/
+Atlanta BitDevs: Bitcoin Socratic Seminar 18 - Atlanta BitDevs: Its almost time for Bitcoin Socratic Seminar 18! What is a Socratic Seminar? Inspired by other BitDevs meetups around the US, our Socratic Seminar events are formatted to foster debate, information sharing and lively discussion. Discussion topics are provided ahead of the event The event moderator(s) leads the audience through the topics Raise your hand to… Continue reading Bitcoin Socratic Seminar 18
+Giii: Spring street and west peachtree have been closed this last week due to the crane accident between 10th and 12th street - route accordingly!😅
+bryan: On that note: parking instructions for NCR building. https://atlantabitdevs.org/parking-instructions-for-ncr/
+Atlanta BitDevs: Parking Instructions for NCR - Atlanta BitDevs. Here are instructions for getting to NCR for Atlanta BitDevs Socratic Seminars. Rideshare or Public Transit If you are taking rideshare or public transit, then you can use the main building address to navigate there. NCR Global Headquarters, 864 Spring St NW, Atlanta, GA 30308 Use the entrance on the Spring St side of the… Continue reading Parking Instructions for NCR
+Will Long: Hi. I am Will. I am an ATL bitcoiner. Sup?
+Grant: Welcome Will! Great to have you here!
+Will Long: Glad to be here. I had been wondering if I were the only maxi around this town.
+Will Long: You heard of PayJoin?
+Jordan Bravo: Welcome. Yes, I have heard of PayJoins. Samourai wallet has them, though I havent had a chance to use them yet.  Id love to try it out with someone
+Elwood HODL Barbarian: Come to the Socratic Seminar tomorrow night and meet ATL BitDevs
+Will Long: Ive only orangepilled one business around here. Do you know of any businesses in ATL that accept bitcoin besides Ginos barber shop??
+Elwood HODL Barbarian: I helped Ginos set up their Lightning node.
+
+[2023-06-01 11:27:03.719838] ATL BitLab Bot: Summarizing!
+[2023-06-01 11:27:03.721942] ATL BitLab Bot: Prompt Summarize the following text include sender, text and urls:
+Grant: Have you ever wanted to DCA every second?😆 
+Grant: https://snort.social/e/nevent1qqsyxu06dce5vcgwfdgh9jwdsnlmsrle00ewypcvjkteq9l35za76rqpzpmhxue69uhkummnw3ezuamfdejsygrqf6twpxvndggy3qu43vzqk3m89c8sfryc43un7dllunrjqfu7kgpsgqqqqqqszles2a
+Grant: https://github.com/SamSamskies/strike-dca
+Nitesh ₿⚡️: Lol wow
+bryan: Bitcoin Core v25.0 Freshly Released https://github.com/bitcoin/bitcoin/releases/tag/v25.0
+Atlanta BitDevs: ₿R33 🗝 joined the group via invite link
+₿R33 🗝: 🧡 hey everyone, hey there familiar faces! woo hope all is well & happy saturday
+Elwood HODL Barbarian: DM to Atlanta BitPlebs Twitter account today from Bitcoin Bay
+Bitcoin Bay (@bitcoinbaytpa): Hey, Idk if you've heard, but BitBlockBoom has been disqualified from the Bitcoin Games since they weren't a local grassroots meetup. Since we came in 2nd, the coin is coming to us. In the spirit of the games, we're going to be putting together a twitter competition BitCombine, to distribute half of the coin amongst the other finalists. We're still working on the specifics but I wanted to update y'all and make sure these are the best accounts to communicate through
+Elwood HODL Barbarian: Ill share more details as I have them
+Nitesh ₿⚡️: This is very interesting: https://twitter.com/fiatjaf/status/1663356144599855105
+fiatjaf: So unless Udi, Eric and others are being paid by this entity, they are working for free as they promote their scam 24/7? https://t.co/RTeHPrCNtO
+₿en F 🚗⛓💻✈️: They are selling the ordinals I thought?
+Jordan Bravo: They published a correction: this tweet clarifies that while all these inscriptions are produced by Unisat.io using Unisats single private key, they are actually owned by various Unisat users.
+mononaut (@mononautical): a substack post going around at the moment claims that a single entity owns 64% of all inscriptions created since early March, paying an eye-watering 1056 BTC for the privilege its not true. https://block21m.substack.com/p/most-bitcoin-inscriptions-belong-d6d
+Nitesh ₿⚡️: Ahh ok
+
+[2023-06-01 11:27:12.918372] ATL BitLab Bot: OpenAI Respone {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "\nSender: Grant\nText: Grant asked if anyone has ever wanted to DCA every second, and shared two URLs - one to a social media post and one to a GitHub page. Nitesh shared a link to a tweet, \u20bfen F shared that they thought the entity was selling ordinals, Jordan Bravo shared a correction to a tweet, and mononaut shared a link to a Substack post."
+    }
+  ],
+  "created": 1685633223,
+  "id": "cmpl-7MeUZrXW6wWqC1iDOvMmh51WwpSBE",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 87,
+    "prompt_tokens": 662,
+    "total_tokens": 749
+  }
+}
+[2023-06-01 11:27:12.918732] ATL BitLab Bot: Prompt Summarize the following text include sender, text and urls:
+Stephen DeLorme: Its been a wild month, everyone. Topics for Socratic Seminar #18, hot off the press. See you tomorrow night at NCR! https://atlantabitdevs.org/2023/05/30/bitcoin-socratic-seminar-18/
+Atlanta BitDevs: Bitcoin Socratic Seminar 18 - Atlanta BitDevs: Its almost time for Bitcoin Socratic Seminar 18! What is a Socratic Seminar? Inspired by other BitDevs meetups around the US, our Socratic Seminar events are formatted to foster debate, information sharing and lively discussion. Discussion topics are provided ahead of the event The event moderator(s) leads the audience through the topics Raise your hand to… Continue reading Bitcoin Socratic Seminar 18
+Giii: Spring street and west peachtree have been closed this last week due to the crane accident between 10th and 12th street - route accordingly!😅
+bryan: On that note: parking instructions for NCR building. https://atlantabitdevs.org/parking-instructions-for-ncr/
+Atlanta BitDevs: Parking Instructions for NCR - Atlanta BitDevs. Here are instructions for getting to NCR for Atlanta BitDevs Socratic Seminars. Rideshare or Public Transit If you are taking rideshare or public transit, then you can use the main building address to navigate there. NCR Global Headquarters, 864 Spring St NW, Atlanta, GA 30308 Use the entrance on the Spring St side of the… Continue reading Parking Instructions for NCR
+Will Long: Hi. I am Will. I am an ATL bitcoiner. Sup?
+Grant: Welcome Will! Great to have you here!
+Will Long: Glad to be here. I had been wondering if I were the only maxi around this town.
+Will Long: You heard of PayJoin?
+Jordan Bravo: Welcome. Yes, I have heard of PayJoins. Samourai wallet has them, though I havent had a chance to use them yet.  Id love to try it out with someone
+Elwood HODL Barbarian: Come to the Socratic Seminar tomorrow night and meet ATL BitDevs
+Will Long: Ive only orangepilled one business around here. Do you know of any businesses in ATL that accept bitcoin besides Ginos barber shop??
+Elwood HODL Barbarian: I helped Ginos set up their Lightning node.
+
+[2023-06-01 11:27:57.577919] ATL BitLab Bot: OpenAI Respone {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "\nSender: Stephen DeLorme\nText: It's been a wild month, everyone! Topics for Socratic Seminar #18 are hot off the press. See you tomorrow night at NCR! https://atlantabitdevs.org/2023/05/30/bitcoin-socratic-seminar-18/\nSender: Giii\nText: Spring street and west peachtree have been closed this last week due to the crane accident between 10th and 12th street - route accordingly!\ud83d\ude05\nSender: Bryan\nText: Parking instructions for NCR building. https://atlantabitdevs.org/parking-instructions-for-ncr/\nSender: Will Long\nText: Hi. I am Will. I am an ATL bitcoiner. Sup?\nSender: Grant\nText: Welcome Will! Great to have you here!\nSender: Will Long\nText: Glad to be here. I had been wondering if I were the only maxi around this town. You heard of PayJoin?\nSender: Jordan Bravo\nText: Welcome. Yes, I have heard of PayJoins. Samourai wallet has them, though I havent had a chance to use them yet. Id love to try it out with someone\nSender: Elwood HODL Barbarian\nText: Come to the Socratic Seminar tomorrow night and meet ATL BitDevs\nSender: Will Long\nText: Ive only orangepilled one business around here. Do you know of any businesses in ATL that accept bitcoin besides Ginos barber shop??\nSender: Elwood HODL Barbarian\nText: I helped Ginos set up their Lightning node."
+    }
+  ],
+  "created": 1685633232,
+  "id": "cmpl-7MeUi8i9ArGa3ckSfOuhOJQCjyl2A",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 361,
+    "prompt_tokens": 532,
+    "total_tokens": 893
+  }
+}
+[2023-06-01 11:27:57.578354] ATL BitLab Bot: Prompt Summarize the following text include sender, text and urls:
+Will Long: My contributions so far to the community are a DIY hww built from an esp32 that prints burner wallets en masse on thermal paper… and a vending machine controller that runs on Strike, Bitcoin Core and Liquid Core.
+Will Long: Btcpayserver invoices make these fairly easy.
+Will Long: Anyways. I am probably overly chatty for a newbie. Hope you all have a good night. Thanks for the warm welcome
+Rich Lassiter: Sorry to miss Wed mtg @ NCR. I feel like Im going through pleb withdrawal after overdosing when we were in MIA!
+bryan: Welcome Will! Thanks for the input. Looking forward to meeting you tonight and hearing all about the work you've done in the past. We could use some of this innovation to help onboard more businesses in ATL!!
+Will Long: I think I will hold off on coming to the meeting this week. Still trying to figure out if you are feds. 😆
+Peter Rehm: 'Fed suspicion' — Oh man, does that mean I cant attend  tonight??
+bryan: @channel if youre attending tonights socratic at NCR, please go RSVP now so I can get a head count: https://www.meetup.com/atlantabitdevs/events/293790513/ Thanks!
+Peter Rehm: Bryan, do you have a list of what might be discussed this evening?
+Stephen DeLorme: Its pinned in this chat
+Grant: 😥https://www.nobsbitcoin.com/blixt-wallet-has-been-suspended-from-google-play-store/
+Grant: Blixt Wallet and Tesnet App Suspended From Google Play Store: Blixt Wallet uses the Lightning Network client lnd and the Bitcoin SPV client Neutrino under the hood, directly on the phone, respecting users privacy.
+Grant: Such a stupid justification for suspension.... Feel like they didn't actually review the features/function...
+₿en F 🚗⛓💻✈️: @Will - Maxis exist only on the internet
+Will Long: I am the worst kind. The JW Weatherman kind
+₿en F 🚗⛓💻✈️: Oh snap man I know him. We gotta talk. Im coming to Atlanta next month been out for a while
+Will Long: Sure thing…
+₿en F 🚗⛓💻✈️: I hope your not using his yeti thing.
+Will Long: Heh. No I have my own process. A 39/1789 multisig. 🤣
+
+[2023-06-01 11:28:28.914345] ATL BitLab Bot: OpenAI Respone {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "\nWill Long: Summarized: Will Long introduced his contributions to the community, such as a DIY hww built from an esp32 that prints burner wallets en masse on thermal paper and a vending machine controller that runs on Strike, Bitcoin Core and Liquid Core. He mentioned Btcpayserver invoices make these fairly easy. Rich Lassiter mentioned missing a meeting at NCR. Bryan welcomed Will and mentioned he could use his innovation to help onboard more businesses in ATL. Will expressed suspicion about Bryan being a fed. Peter Rehm asked Bryan for a list of what would be discussed at the meeting and Stephen DeLorme mentioned it was pinned in the chat. Grant shared a link about Blixt Wallet and Tesnet App being suspended from Google Play Store and \u20bfen F \ud83d\ude97\u26d3\ud83d\udcbb\u2708\ufe0f asked Will if he was using JW Weatherman's yeti thing, to which Will replied he had his own process. URLs: https://www.meetup.com/atlantabitdevs/events/293790513/, https://www.nobsbitcoin.com/blixt-wallet-has-been-suspended-from-google-play-store/."
+    }
+  ],
+  "created": 1685633277,
+  "id": "cmpl-7MeVR4nL45vlmYQlGNIP6QXUiswOJ",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 251,
+    "prompt_tokens": 584,
+    "total_tokens": 835
+  }
+}
+[2023-06-01 11:28:28.914640] ATL BitLab Bot: Prompt Summarize the following text include sender, text and urls:
+Will Long: I am the only person in my anonymity set
+₿en F 🚗⛓💻✈️: The issue I had with it was that Will weatherman cant spell
+Will Long: You're*
+₿en F 🚗⛓💻✈️: Your sure about that?
+₿en F 🚗⛓💻✈️: I think you should check you're grammar
+Stephen DeLorme: Gentleman, this is Atlanta. We win hackathons, not splling bees.
+Will Long: Anyone here doing anything with Liquid BTC yet?
+Will Long: Killed that convo real quick
+₿en F 🚗⛓💻✈️: One time I used it, sideswap, I think it's good if iou want to send money to people without then seeing your utxos. 0.1 percent fee to go in and to.swap out but it's Custodial garbage @JcCrown ask him about liquid
+Stephen DeLorme: Will probably take this thing for a whirl one day if I'm bored https://liquid.boltz.exchange/: Boltz is a privacy first, account-free Bitcoin Exchange and Lightning Service Provider.
+Will Long: Would be nice if Strike used it for its USDt rails. Instead of using eth.
+Elwood HODL Barbarian: https://twitter.com/bitcoinbaytpa/status/1664005838527135745: Bitcoin Bay - ANNOUNCEMENT THREAD - We're excited to announce that Bitcoin Bay has been declared winner of the #BitcoinGames hosted at #Bitcoin2023. In the spirit of the games, we want to donate half of the coin to the other semi finalists @Bitcoin_CLT @atlantabitplebs @DenverBitDevs @MKEbtc
+Elwood HODL Barbarian: https://twitter.com/bitcoinbaytpa/status/1664005843791011843: But its not going to just be that easy. Were going to have some fun with this. Were throwing the first BIT-COMBINE for teams to compete for their share of the sats. Heres what theyll have to do.
+Elwood HODL Barbarian: I'm thinking 3 million sats for doing nothing does not sound that bad.
+Tidwell: We are outside waiting to get in
+bryan: coming
+Tidwell: Is it usually locked?
+Gavin Green: In case of FEDs
+JF: Can someone let me in too? 🙏
+bryan: Ya
+₿en F 🚗⛓💻✈️: Stupid door design. Should be a push bar, a panic bar
+Will Long: PlebLabs has a lightning powered lock they are devving
+Mike Casey: Oh my God.  They are re-inventing Slockit.  I feel like it's 8 years ago.
+
+[2023-06-01 11:28:52.479680] ATL BitLab Bot: OpenAI Respone {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "\nWill Long: Asked if anyone is doing anything with Liquid BTC yet; mentioned that it would be nice if Strike used it for its USDt rails instead of using eth; shared a link to Boltz, a privacy first, account-free Bitcoin Exchange and Lightning Service Provider. \nElwood HODL Barbarian: Shared two links to Bitcoin Bay's Twitter page announcing that they won the Bitcoin Games and the details of the Bit-Combine. Suggested that 3 million sats for doing nothing does not sound bad.\nTidwell: Asked if the door is usually locked.\nbryan: Offered to let people in.\nGavin Green: Joked about the door being locked in case of FEDs.\nJF: Asked to be let in.\n\u20bfen F \ud83d\ude97\u26d3\ud83d\udcbb\u2708\ufe0f: Criticized the door design.\nWill Long: Mentioned that PlebLabs has a lightning powered lock they are devving.\nMike Casey: Joked about them re-inventing Slockit."
+    }
+  ],
+  "created": 1685633309,
+  "id": "cmpl-7MeVxhcOcZx4piGIQOVbuCBWQJLPw",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 224,
+    "prompt_tokens": 662,
+    "total_tokens": 886
+  }
+}

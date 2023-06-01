@@ -20,6 +20,7 @@ openai.api_key = OPENAI_API_KEY
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.effective_message
+    debug(f"[{get_now()}] {PROGRAM}: handle_message - Raw message {prompt}")
     message_dumps = json.dumps(
         {
             "text": message.text,
@@ -32,35 +33,48 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     f.write("\n")
 
 
-async def summarize_past_week():
-    logger.debug(f"[{get_now()}] {PROGRAM}: Summarizing!")
+def summarize_past_week():
+    logger.debug(f"[{get_now()}] {PROGRAM}: summarize_past_week - Summarizing!")
     now = get_now()
     one_week_ago = now - timedelta(weeks=1)
 
     # Read message log and select messages from past week
-    # Summary, key points, 
-    prompt = "Summarize the following text. Include details like who sent the message, what did they say, any key points from the message and all relevant details such as links:\n"
+    # Summary, key points,
+    prompt = ""
+    prompts = []
+    max_len = 2000
     f = open(MESSAGE_LOG_FILE, "r")
     for line in f.readlines():
-        message_json = json.loads(line)
-        message_text = message_json["text"]
-        message_sender = message_json["from"]
-        message_date = datetime.fromisoformat(message_json["date"].split("+")[0])
-        if message_date >= one_week_ago:
-            context_message = f"[{message_date}] {message_sender}: {message_text}\n"
-            prompt += context_message
-
-    debug(f"[{get_now()}] {PROGRAM}: Prompt {prompt}")
-    response = openai.Completion.create(
-        model="text-davinci-003",
-        prompt=prompt,
-        max_tokens=4097-len(prompt),
-        n=1,
-        stop=None,
-        temperature=0.5,
-    )
-    debug(f"[{get_now()}] {PROGRAM}: OpenAI Respone {response}")
-    return f"Summary from {one_week_ago} to {now}:\n{response.choices[0].text.strip()}"
+        message = json.loads(line)
+        text = message["text"]
+        sender = message["from"]
+        date = datetime.fromisoformat(message["date"].split("+")[0])
+        if date >= one_week_ago:
+            context = f"[{date}] {sender}: {text}\n"
+            prompt += context
+            prompt_len = len(prompt)
+            if prompt_len >= max_len:
+                prompts.append(prompt)
+                prompt = ""
+    print("prompts", prompts)
+    prompt_statement = "Summarize the following text include sender, text and urls:\n"
+    summaries = []
+    for prompt in prompts:
+        prompt = prompt_statement + prompt
+        debug(f"[{get_now()}] {PROGRAM}: Prompt {prompt}")
+        response = openai.Completion.create(
+            model="text-davinci-003",
+            prompt=prompt,
+            max_tokens=4000 - len(prompt),
+            n=1,
+            stop=None,
+            temperature=0.5,
+        )
+        debug(f"[{get_now()}] {PROGRAM}: OpenAI Respone {response}")
+        summaries.append(
+            f"Summary from {one_week_ago} to {now}:\n{response.choices[0].text.strip()}"
+        )
+    return summaries
 
 
 async def summarize(update: Update, context: ContextTypes.DEFAULT_TYPE):
