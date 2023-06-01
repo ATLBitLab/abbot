@@ -1,3 +1,77 @@
+// Testing channel
+{"text": "ok \u2014 good news, bad news", "from": "bryan", "date": "2023-05-26T00:18:29+00:00"}
+{"text": "good news: we can do this", "from": "bryan", "date": "2023-05-26T00:18:57+00:00"}
+{"text": "bad news: the bot can\u2019t read retroactively", "from": "bryan", "date": "2023-05-26T00:19:09+00:00"}
+{"text": "it also cannot (in real time) gather past messages", "from": "bryan", "date": "2023-05-26T00:19:23+00:00"}
+{"text": "we have to add it to the group, give it admin privileges and then every message going forward it can read, but then we need to save it to a file or DB of some kind", "from": "bryan", "date": "2023-05-26T00:19:53+00:00"}
+{"text": "Bitcoin ipsum dolor sit amet. Roller coaster, cryptocurrency stacking sats price action hodl satoshis when lambo, electronic cash. Pizza proof-of-work, outputs blockchain sats mempool roller coaster outputs. Price action soft fork, space citadel, key pair private key address, satoshis, digital signature. Difficulty, Satoshi Nakamoto proof-of-work?", "from": "bryan", "date": "2023-05-26T00:47:27+00:00"}
+{"text": "Proof-of-work peer-to-peer private key money printer go brrrrr mining, whitepaper, bitcoin hashrate. Soft fork hard fork mining public key mining whitepaper Merkle Tree halvening freefall together. To the moon peer-to-peer outputs miner blocksize, I'm in it for the tech, transaction segwit key pair! Halvening pizza?", "from": "bryan", "date": "2023-05-26T00:47:31+00:00"}
+{"text": "Satoshi Nakamoto space citadel electronic cash sats proof-of-work hyperbitcoinization, Bitcoin Improvement Proposal cryptocurrency. Block height bitcoin mempool satoshis cryptocurrency blocksize address. Money printer go brrrrr price action peer-to-peer hash hyperbitcoinization deflationary monetary policy difficulty. Key pair, satoshis miner, block height digital signature, soft fork?", "from": "bryan", "date": "2023-05-26T00:47:35+00:00"}
+{"text": "Fee market double-spend problem halvening Satoshi Nakamoto whitepaper few understand this sats hashrate? Proof-of-work blockchain soft fork when lambo nonce, satoshis hyperbitcoinization pizza. Inputs roller coaster hard fork, key pair miner stacking sats space citadel I'm in it for the tech satoshis. When lambo digital signature decentralized blocksize, blockchain miner bitcoin fee market.", "from": "bryan", "date": "2023-05-26T00:47:37+00:00"}
+{"text": "Deflationary monetary policy space citadel volatility mempool, roller coaster bitcoin money printer go brrrrr mempool. Peer-to-peer sats to the moon address mempool, cryptocurrency, timestamp server! Stacking sats genesis block decentralized I'm in it for the tech SHA-256 proof-of-work roller coaster blocksize. Inputs genesis block key pair, when lambo pizza few understand this transaction, hyperbitcoinization. Deflationary monetary policy, wallet.", "from": "bryan", "date": "2023-05-26T00:47:39+00:00"}
+{"text": "I\u2019ve created a new protocol that will be better than Lightning network", "from": "bryan", "date": "2023-05-26T00:48:03+00:00"}
+{"text": "It\u2019s called the motherfucker network", "from": "bryan", "date": "2023-05-26T00:48:07+00:00"}
+{"text": "Its a brand new Layer 2", "from": "bryan", "date": "2023-05-26T00:48:12+00:00"}
+{"text": "Uses trustless ZK rollups", "from": "bryan", "date": "2023-05-26T00:48:16+00:00"}
+{"text": "To take funda off bitcoin, create a private place for people to buy beef jerky, and then roll up all these payments into an ordinal", "from": "bryan", "date": "2023-05-26T00:48:26+00:00"}
+{"text": "And the ordinal inscription is a picture of my cat", "from": "bryan", "date": "2023-05-26T00:48:32+00:00"}
+{"text": "Check out my whitepaper at https://catjerky.network", "from": "bryan", "date": "2023-05-26T00:48:37+00:00"}
+{"text": "Hello", "from": "bryan", "date": "2023-05-26T13:01:10+00:00"}
+{"text": "Hello", "from": "bryan", "date": "2023-05-26T13:02:27+00:00"}
+{"text": "Hello", "from": "bryan", "date": "2023-05-26T13:03:07+00:00"}
+{"text": "alksdfj", "from": "bryan", "date": "2023-05-26T13:07:05+00:00"}
+{"text": "asldgfkn", "from": "bryan", "date": "2023-05-26T13:11:56+00:00"}
+{"text": "test", "from": "bryan", "date": "2023-05-26T13:16:57+00:00"}
+{"text": "gtes", "from": "bryan", "date": "2023-05-26T13:17:07+00:00"}
+{"text": "/summarize", "from": "bryan", "date": "2023-05-26T13:18:35+00:00"}
+{"text": "ping", "from": "bryan", "date": "2023-05-26T13:19:06+00:00"}
+{"text": "ping", "from": "bryan", "date": "2023-05-26T13:19:13+00:00"}
+{"text": "Hello!", "from": "bryan", "date": "2023-05-26T13:20:11+00:00"}
+{"text": "test", "from": "bryan", "date": "2023-05-26T13:21:29+00:00"}
+{"text": "Testing", "from": "bryan", "date": "2023-05-26T13:33:52+00:00"}
+{"text": "Hello BitLab Bot", "from": "bryan", "date": "2023-05-26T13:33:57+00:00"}
+{"text": "Hello Vietnam", "from": "bryan", "date": "2023-05-26T13:34:02+00:00"}
+{"text": "1,2,3 is this thing on?", "from": "bryan", "date": "2023-05-26T13:34:07+00:00"}
+{"text": "asldkgjhasl;dgkja", "from": "bryan", "date": "2023-05-26T13:35:50+00:00"}
+{"text": "asdl;gkjasdg", "from": "bryan", "date": "2023-05-26T13:35:50+00:00"}
+{"text": "as;dkgjasdg;k", "from": "bryan", "date": "2023-05-26T13:35:51+00:00"}
+{"text": "lol", "from": "bryan", "date": "2023-05-26T13:37:00+00:00"}
+{"text": "/summmarize", "from": "bryan", "date": "2023-05-26T13:55:19+00:00"}
+{"text": "Fuck yeah", "from": "bryan", "date": "2023-05-26T13:57:54+00:00"}
+{"text": "This is crazy! Alex just launched this Last Pay Wins thing https://www.lastpaywins.com/", "from": "Stephen", "date": "2023-05-26T14:40:11+00:00"}
+{"text": "Basically, there is a timer...you pay a lightning invoice, and it resets the timer", "from": "Stephen", "date": "2023-05-26T14:40:22+00:00"}
+{"text": "Last person to pay after timer hits zero wins the jackpot", "from": "Stephen", "date": "2023-05-26T14:40:38+00:00"}
+{"text": "Its basically like a game of chicken, but with bitcoin", "from": "Stephen", "date": "2023-05-26T14:40:49+00:00"}
+{"text": "I've been helping extend liquidity to it with my lightning node dlntr1, and Nitesh is extending liquidity with his NodeRunner node", "from": "Stephen", "date": "2023-05-26T14:41:36+00:00"}
+{"text": "Gambling is a team sport in Atlanta lol", "from": "Stephen", "date": "2023-05-26T14:41:47+00:00"}
+{"text": null, "from": "Stephen", "date": "2023-05-26T14:41:57+00:00"}
+{"text": "Sorry", "from": "bryan", "date": "2023-05-26T14:58:38+00:00"}
+{"text": "It\u2019s not running", "from": "bryan", "date": "2023-05-26T14:58:41+00:00"}
+{"text": "One sec", "from": "bryan", "date": "2023-05-26T14:58:43+00:00"}
+{"text": "ok retry", "from": "bryan", "date": "2023-05-26T14:59:00+00:00"}
+{"text": "ok wait", "from": "bryan", "date": "2023-05-26T14:59:12+00:00"}
+{"text": "test", "from": "bryan", "date": "2023-05-26T15:32:03+00:00"}
+{"text": "Thanks BitLab bot, you're the best", "from": "Stephen", "date": "2023-05-26T15:33:09+00:00"}
+{"text": "@sbddesign Trying to get it to include ALL links", "from": "bryan", "date": "2023-05-26T15:37:25+00:00"}
+{"text": "there we go", "from": "bryan", "date": "2023-05-26T15:38:17+00:00"}
+{"text": "gotta play with the \u201cmax tokens\u201d", "from": "bryan", "date": "2023-05-26T15:38:28+00:00"}
+{"text": "response = openai.Completion.create(\n        model=\"text-davinci-003\",\n        prompt=prompt,\n        max_tokens=1500,\n        n=1,\n        stop=None,\n        temperature=0.5,\n    )", "from": "bryan", "date": "2023-05-26T15:38:32+00:00"}
+{"text": "And Need to play with the prompt yo get it to do what we want, so I may need your help with that", "from": "bryan", "date": "2023-05-26T16:08:13+00:00"}
+{"text": "Possible solution could be to tell it to summarize what was said and by who, then do another prompt to have it summarize all links and who sent it and then give it both of those summaries and have it find matches between who said what and who send links ?", "from": "bryan", "date": "2023-05-26T16:10:13+00:00"}
+{"text": null, "from": "bryan", "date": "2023-05-26T16:10:54+00:00"}
+{"text": null, "from": "bryan", "date": "2023-05-26T16:12:30+00:00"}
+{"text": "@alex_lewin check out our telegram / GPT bot", "from": "bryan", "date": "2023-05-26T16:12:50+00:00"}
+{"text": "@sbddesign what if we turned this bot into a service on our website accessible to members", "from": "bryan", "date": "2023-05-26T17:38:36+00:00"}
+{"text": "bot.atlbitlab.com", "from": "bryan", "date": "2023-05-26T17:38:52+00:00"}
+{"text": "Hello from FL", "from": "bryan", "date": "2023-05-26T23:14:12+00:00"}
+{"text": "My name is Bryan", "from": "bryan", "date": "2023-05-26T23:14:18+00:00"}
+{"text": "I am a nerd", "from": "bryan", "date": "2023-05-26T23:14:22+00:00"}
+{"text": "Once upon a time, there was a man named Micah and he met a woman named Kaley and they lived happily ever after. The ENd.", "from": "bryan", "date": "2023-05-26T23:15:06+00:00"}
+{"text": "Testing. motherfucker, 1-2-3!", "from": "bryan", "date": "2023-05-26T23:26:30+00:00"}
+{"text": "Testing again bitch", "from": "bryan", "date": "2023-05-26T23:26:45+00:00"}
+{"text": null, "from": "\u20bfR33", "date": "2023-05-27T17:08:20+00:00"}
+{"text": "testing", "from": "bryan", "date": "2023-06-01T13:48:05+00:00"}
+// Atlanta BitDevs channel
 {"from": "Grant", "date": "2023-05-26T00:14:35:07+00:00", "text": "Have you ever wanted to DCA every second?😆 "}
 {"from": "Grant", "date": "2023-05-26T00:14:35:08+00:00", "text": "https://snort.social/e/nevent1qqsyxu06dce5vcgwfdgh9jwdsnlmsrle00ewypcvjkteq9l35za76rqpzpmhxue69uhkummnw3ezuamfdejsygrqf6twpxvndggy3qu43vzqk3m89c8sfryc43un7dllunrjqfu7kgpsgqqqqqqszles2a"}
 {"from": "Grant", "date": "2023-05-26T00:14:35:09+00:00", "text": "https://github.com/SamSamskies/strike-dca"}
@@ -71,6 +145,3 @@
 {"from": "Mike Casey", "date": "2023-05-31T00:21:25:59+00:00", "text": "Oh my God.  They are re-inventing Slockit.  I feel like it's 8 years ago."}
 {"from": "Jc Crown", "date": "2023-05-31T00:21:27:52+00:00", "text": "There's nothing new under the sun. - THE BOOK OF ECCLESIASTES,  430 BCE"}
 {"from": "Will Long", "date": "2023-05-31T00:21:34:33+00:00", "text": "I think they are using a wrist band with a Sats Card chip. I mean… I got a bag of servos too"}
-{"text": "Thanks for everyone who came last night! It was a great meetup. See you all soon!", "from": "bryan", "date": "2023-06-01T13:47:23+00:00"}
-{"text": "/tip 1000 thanks for helping lead the discussion last night! A lot of great and informative stuff!", "from": "packetprotector", "date": "2023-06-01T13:50:23+00:00"}
-{"text": "/send 1000 @sbddesign you too Stephen! Great job! Thanks for all the hard work researching and learning about these various topics!", "from": "packetprotector", "date": "2023-06-01T13:52:28+00:00"}
