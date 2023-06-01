@@ -531,6 +531,7 @@
 [2023-06-01 09:10:19.497350] ATL BitLab Bot: Starting!
 [2023-06-01 09:10:19.497739] ATL BitLab Bot: Init Bot
 [2023-06-01 09:10:19.525260] ATL BitLab Bot: Polling!
+<<<<<<< Updated upstream
 [2023-06-01 10:55:42.134262] ATL BitLab Bot: Summarizing!
 [2023-06-01 10:55:42.138001] ATL BitLab Bot: Prompt Summarize the following text. Include details like who sent the message, what did they say, any key points from the message and all relevant details such as links:
 [2023-05-26 00:14:35.070000] Grant: Have you ever wanted to DCA every second?😆 
@@ -1470,3 +1471,11 @@ Mike Casey: Oh my God.  They are re-inventing Slockit.  I feel like it's 8 years
     "total_tokens": 886
   }
 }
+=======
+[2023-06-01 14:25:27.321490] ATL BitLab Bot: Starting!
+[2023-06-01 14:25:27.322186] ATL BitLab Bot: Init Bot
+[2023-06-01 14:25:27.342331] ATL BitLab Bot: Polling!
+[2023-06-01 14:25:39.228695] ATL BitLab Bot: Starting!
+[2023-06-01 14:25:39.229091] ATL BitLab Bot: Init Bot
+[2023-06-01 14:25:39.247893] ATL BitLab Bot: Polling!
+>>>>>>> Stashed changes
