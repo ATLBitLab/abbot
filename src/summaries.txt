@@ -1,1 +1,42 @@
-['Summary from 2023-05-25 11:27:03.719932 to 2023-06-01 11:27:03.719932:\nSender: Grant\nText: Grant asked if anyone has ever wanted to DCA every second, and shared two URLs - one to a social media post and one to a GitHub page. Nitesh shared a link to a tweet, ₿en F shared that they thought the entity was selling ordinals, Jordan Bravo shared a correction to a tweet, and mononaut shared a link to a Substack post.', "Summary from 2023-05-25 11:27:03.719932 to 2023-06-01 11:27:03.719932:\nSender: Stephen DeLorme\nText: It's been a wild month, everyone! Topics for Socratic Seminar #18 are hot off the press. See you tomorrow night at NCR! https://atlantabitdevs.org/2023/05/30/bitcoin-socratic-seminar-18/\nSender: Giii\nText: Spring street and west peachtree have been closed this last week due to the crane accident between 10th and 12th street - route accordingly!😅\nSender: Bryan\nText: Parking instructions for NCR building. https://atlantabitdevs.org/parking-instructions-for-ncr/\nSender: Will Long\nText: Hi. I am Will. I am an ATL bitcoiner. Sup?\nSender: Grant\nText: Welcome Will! Great to have you here!\nSender: Will Long\nText: Glad to be here. I had been wondering if I were the only maxi around this town. You heard of PayJoin?\nSender: Jordan Bravo\nText: Welcome. Yes, I have heard of PayJoins. Samourai wallet has them, though I havent had a chance to use them yet. Id love to try it out with someone\nSender: Elwood HODL Barbarian\nText: Come to the Socratic Seminar tomorrow night and meet ATL BitDevs\nSender: Will Long\nText: Ive only orangepilled one business around here. Do you know of any businesses in ATL that accept bitcoin besides Ginos barber shop??\nSender: Elwood HODL Barbarian\nText: I helped Ginos set up their Lightning node.", "Summary from 2023-05-25 11:27:03.719932 to 2023-06-01 11:27:03.719932:\nWill Long: Summarized: Will Long introduced his contributions to the community, such as a DIY hww built from an esp32 that prints burner wallets en masse on thermal paper and a vending machine controller that runs on Strike, Bitcoin Core and Liquid Core. He mentioned Btcpayserver invoices make these fairly easy. Rich Lassiter mentioned missing a meeting at NCR. Bryan welcomed Will and mentioned he could use his innovation to help onboard more businesses in ATL. Will expressed suspicion about Bryan being a fed. Peter Rehm asked Bryan for a list of what would be discussed at the meeting and Stephen DeLorme mentioned it was pinned in the chat. Grant shared a link about Blixt Wallet and Tesnet App being suspended from Google Play Store and ₿en F 🚗⛓💻✈️ asked Will if he was using JW Weatherman's yeti thing, to which Will replied he had his own process. URLs: https://www.meetup.com/atlantabitdevs/events/293790513/, https://www.nobsbitcoin.com/blixt-wallet-has-been-suspended-from-google-play-store/.", "Summary from 2023-05-25 11:27:03.719932 to 2023-06-01 11:27:03.719932:\nWill Long: Asked if anyone is doing anything with Liquid BTC yet; mentioned that it would be nice if Strike used it for its USDt rails instead of using eth; shared a link to Boltz, a privacy first, account-free Bitcoin Exchange and Lightning Service Provider. \nElwood HODL Barbarian: Shared two links to Bitcoin Bay's Twitter page announcing that they won the Bitcoin Games and the details of the Bit-Combine. Suggested that 3 million sats for doing nothing does not sound bad.\nTidwell: Asked if the door is usually locked.\nbryan: Offered to let people in.\nGavin Green: Joked about the door being locked in case of FEDs.\nJF: Asked to be let in.\n₿en F 🚗⛓💻✈️: Criticized the door design.\nWill Long: Mentioned that PlebLabs has a lightning powered lock they are devving.\nMike Casey: Joked about them re-inventing Slockit."]
+Summary from 2023-05-25 11:27:03.719932 to 2023-06-01 11:27:03.719932:
+Sender: Grant
+Text: Grant asked if anyone has ever wanted to DCA every second, and shared two URLs - one to a social media post and one to a GitHub page. Nitesh shared a link to a tweet, ₿en F shared that they thought the entity was selling ordinals, Jordan Bravo shared a correction to a tweet, and mononaut shared a link to a Substack post.', 
+
+
+"Summary from 2023-05-25 11:27:03.719932 to 2023-06-01 11:27:03.719932:
+Sender: Stephen DeLorme
+Text: It's been a wild month, everyone! Topics for Socratic Seminar #18 are hot off the press. See you tomorrow night at NCR! https://atlantabitdevs.org/2023/05/30/bitcoin-socratic-seminar-18/
+Sender: Giii
+Text: Spring street and west peachtree have been closed this last week due to the crane accident between 10th and 12th street - route accordingly!😅
+Sender: Bryan
+Text: Parking instructions for NCR building. https://atlantabitdevs.org/parking-instructions-for-ncr/
+Sender: Will Long
+Text: Hi. I am Will. I am an ATL bitcoiner. Sup?
+Sender: Grant
+Text: Welcome Will! Great to have you here!
+Sender: Will Long
+Text: Glad to be here. I had been wondering if I were the only maxi around this town. You heard of PayJoin?
+Sender: Jordan Bravo
+Text: Welcome. Yes, I have heard of PayJoins. Samourai wallet has them, though I havent had a chance to use them yet. Id love to try it out with someone
+Sender: Elwood HODL Barbarian
+Text: Come to the Socratic Seminar tomorrow night and meet ATL BitDevs
+Sender: Will Long
+Text: Ive only orangepilled one business around here. Do you know of any businesses in ATL that accept bitcoin besides Ginos barber shop??
+Sender: Elwood HODL Barbarian
+Text: I helped Ginos set up their Lightning node.", 
+
+
+"Summary from 2023-05-25 11:27:03.719932 to 2023-06-01 11:27:03.719932:
+Will Long: Summarized: Will Long introduced his contributions to the community, such as a DIY hww built from an esp32 that prints burner wallets en masse on thermal paper and a vending machine controller that runs on Strike, Bitcoin Core and Liquid Core. He mentioned Btcpayserver invoices make these fairly easy. Rich Lassiter mentioned missing a meeting at NCR. Bryan welcomed Will and mentioned he could use his innovation to help onboard more businesses in ATL. Will expressed suspicion about Bryan being a fed. Peter Rehm asked Bryan for a list of what would be discussed at the meeting and Stephen DeLorme mentioned it was pinned in the chat. Grant shared a link about Blixt Wallet and Tesnet App being suspended from Google Play Store and ₿en F 🚗⛓💻✈️ asked Will if he was using JW Weatherman's yeti thing, to which Will replied he had his own process. URLs: https://www.meetup.com/atlantabitdevs/events/293790513/, https://www.nobsbitcoin.com/blixt-wallet-has-been-suspended-from-google-play-store/.", 
+
+
+"Summary from 2023-05-25 11:27:03.719932 to 2023-06-01 11:27:03.719932:
+Will Long: Asked if anyone is doing anything with Liquid BTC yet; mentioned that it would be nice if Strike used it for its USDt rails instead of using eth; shared a link to Boltz, a privacy first, account-free Bitcoin Exchange and Lightning Service Provider. 
+Elwood HODL Barbarian: Shared two links to Bitcoin Bay's Twitter page announcing that they won the Bitcoin Games and the details of the Bit-Combine. Suggested that 3 million sats for doing nothing does not sound bad.
+Tidwell: Asked if the door is usually locked.
+bryan: Offered to let people in.
+Gavin Green: Joked about the door being locked in case of FEDs.
+JF: Asked to be let in.
+₿en F 🚗⛓💻✈️: Criticized the door design.
+Will Long: Mentioned that PlebLabs has a lightning powered lock they are devving.
+Mike Casey: Joked about them re-inventing Slockit."
