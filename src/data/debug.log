@@ -1533,3 +1533,18 @@ Mike Casey: Oh my God.  They are re-inventing Slockit.  I feel like it's 8 years
 [2023-06-02 15:30:08.599821] ATL BitLab Bot: Init Bot
 [2023-06-02 15:30:08.629332] ATL BitLab Bot: Polling!
 [2023-06-02 15:30:09.242161] ATL BitLab Bot: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(id=-1001204119993, title='Atlanta BitDevs Discussion', type=<ChatType.SUPERGROUP>), date=datetime.datetime(2023, 6, 2, 15, 29, 26, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='Will', id=5110819019, is_bot=False, last_name='Long'), group_chat_created=False, message_id=8799, supergroup_chat_created=False, text='What does this gallery think about GrapheneOS for android?')
+[2023-06-03 16:54:41.125064] ATL BitLab Bot: Starting!
+[2023-06-03 16:54:41.125594] ATL BitLab Bot: Init Bot
+[2023-06-03 16:54:41.159388] ATL BitLab Bot: Polling!
+[2023-06-03 16:55:31.236212] ATL BitLab Bot: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(id=-1001980721880, title='ATL BitLab Bot Testing', type=<ChatType.SUPERGROUP>), date=datetime.datetime(2023, 6, 3, 20, 55, 31, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=170, supergroup_chat_created=False, text='Bitcoin ipsum dolor sit amet')
+[2023-06-03 16:57:27.862867] ATL BitLab Bot: Starting!
+[2023-06-03 16:57:27.863034] ATL BitLab Bot: Init Bot
+[2023-06-03 16:57:27.896554] ATL BitLab Bot: Polling!
+[2023-06-03 16:59:09.103403] ATL BitLab Bot: Starting!
+[2023-06-03 16:59:09.103569] ATL BitLab Bot: Init Bot
+[2023-06-03 16:59:09.136353] ATL BitLab Bot: Polling!
+[2023-06-03 16:59:23.162087] ATL BitLab Bot: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(id=-1001980721880, title='ATL BitLab Bot Testing', type=<ChatType.SUPERGROUP>), date=datetime.datetime(2023, 6, 3, 20, 59, 23, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=172, supergroup_chat_created=False, text='Satoshi Nakamoto wallet hash wallet double-spend problem, hash consensus.')
+[2023-06-03 17:00:17.956916] ATL BitLab Bot: Starting!
+[2023-06-03 17:00:17.957121] ATL BitLab Bot: Init Bot
+[2023-06-03 17:00:17.988939] ATL BitLab Bot: Polling!
+[2023-06-03 17:00:26.188939] ATL BitLab Bot: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(id=-1001980721880, title='ATL BitLab Bot Testing', type=<ChatType.SUPERGROUP>), date=datetime.datetime(2023, 6, 3, 21, 0, 26, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=173, supergroup_chat_created=False, text="I'm in it for the tech!")

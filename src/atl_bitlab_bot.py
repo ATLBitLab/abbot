@@ -3,7 +3,7 @@ import openai
 
 from lib.logger import logger, debug
 from lib.utils import get_now
-from lib.env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY, MESSAGE_LOG_FILE, PROGRAM
+from lib.env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY, MESSAGE_LOG_FILE, UPDATE_LOG_FILE, PROGRAM
 from datetime import datetime, timedelta
 import pytz
 utc = pytz.UTC
@@ -22,9 +22,11 @@ openai.api_key = OPENAI_API_KEY
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    f = open('messages.py', "a")
+    f.write(update.to_json())
+    f.write("\n")
     message = update.effective_message
     debug(f"[{get_now()}] {PROGRAM}: handle_message - Raw message {message}")
-    # edt_datetime = message.date.astimezone(edt)
     message_dumps = json.dumps(
         {
             "text": message.text or message.caption,
