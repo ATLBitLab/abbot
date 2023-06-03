@@ -1529,3 +1529,7 @@ Mike Casey: Oh my God.  They are re-inventing Slockit.  I feel like it's 8 years
 [2023-06-02 15:29:05.345005] ATL BitLab Bot: Init Bot
 [2023-06-02 15:29:05.368684] ATL BitLab Bot: Polling!
 >>>>>>> Stashed changes
+[2023-06-02 15:30:08.598710] ATL BitLab Bot: Starting!
+[2023-06-02 15:30:08.599821] ATL BitLab Bot: Init Bot
+[2023-06-02 15:30:08.629332] ATL BitLab Bot: Polling!
+[2023-06-02 15:30:09.242161] ATL BitLab Bot: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(id=-1001204119993, title='Atlanta BitDevs Discussion', type=<ChatType.SUPERGROUP>), date=datetime.datetime(2023, 6, 2, 15, 29, 26, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='Will', id=5110819019, is_bot=False, last_name='Long'), group_chat_created=False, message_id=8799, supergroup_chat_created=False, text='What does this gallery think about GrapheneOS for android?')
