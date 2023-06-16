@@ -1,9 +1,11 @@
+import os
+
 PROGRAM = "ATL BitLab Bot"
-RAW_MESSAGE_JL_FILE = "data/raw_messages.jsonl"
-MESSAGES_JL_FILE = "data/messages.jsonl"
-SUMMARY_LOG_FILE = "data/summaries.txt"
-MESSAGES_PY_FILE = "data/backup/messages.py"
-PROMPTS_BY_DAY_FILE = "data/backup/prompts_by_day.py"
+RAW_MESSAGE_JL_FILE = os.path.abspath("data/raw_messages.jsonl")
+MESSAGES_JL_FILE = os.path.abspath("data/messages.jsonl")
+SUMMARY_LOG_FILE = os.path.abspath("data/summaries.txt")
+MESSAGES_PY_FILE = os.path.abspath("data/backup/messages.py")
+PROMPTS_BY_DAY_FILE = os.path.abspath("data/backup/prompts_by_day.py")
 
 import json
 import openai
