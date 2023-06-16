@@ -1,4 +1,11 @@
 env.py
-.atl_bitlab_bot/
 __pycache__
 *.log
+src/data/backup/
+src/data/messages.jsonl
+src/data/raw_messages.jsonl
+src/data/test/data.jsonl
+src/data/test/prompts_by_day.py
+src/data/test/summaries.txt
+src/data/test/summaries_test.txt
+src/data/test/updates.jsonl
