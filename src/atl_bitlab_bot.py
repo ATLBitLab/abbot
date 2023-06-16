@@ -2,12 +2,12 @@ import json
 import openai
 
 from lib.logger import logger, debug
-from lib.utils import get_now
+from lib.utils import get_now_date, get_now
 from lib.env import (
     TELEGRAM_BOT_TOKEN,
     OPENAI_API_KEY,
     MESSAGE_LOG_FILE,
-    SUMMARY,
+    SUMMARY_LOG_FILE,
     PROGRAM,
 )
 from datetime import datetime, timedelta
@@ -27,6 +27,7 @@ from telegram.ext.filters import BaseFilter
 
 openai.api_key = OPENAI_API_KEY
 
+now = get_now()
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     f = open("messages.py", "a")
@@ -46,55 +47,48 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     f.write("\n")
 
 
-def summarize_past_week():
-    logger.debug(f"[{get_now()}] {PROGRAM}: summarize_past_week - Summarizing!")
-    now = get_now()
-    one_day_ago = now - timedelta(days=1)
-
-    # Read message log and select messages from past week
-    # Summary, key points,
-    prompt = ""
-    prompts = []
-    max_len = 3000
-    f = open(MESSAGE_LOG_FILE, "r")
-    for line in f.readlines():
-        message = json.loads(line)
-        text = message["text"]
-        sender = message["from"]
-        date = datetime.fromisoformat(message["date"][:-6])
-        if date >= one_day_ago:
-            context = f"[{date}] {sender}: {text}\n"
-            prompt += context
-            prompt_len = len(prompt)
-            if prompt_len >= max_len:
-                prompts.append(prompt)
-                prompt = ""
-    prompt_statement = "Summarize the following text include sender, text and urls:\n"
+def summarize_messages():
+    now_date = get_now_date()
+    one_week = 8
+    days = [now_date - timedelta(days=i - 1) for i in range(one_week, 0, -1)]
     summaries = []
-    for prompt in prompts:
-        prompt = prompt_statement + prompt
-        debug(f"[{get_now()}] {PROGRAM}: Prompt = {prompt}")
+    for day in days:
+        logger.debug(f"[{now}] {PROGRAM}: summarize - Summarizing for {day}!")
+        # Read message log and select messages from past week
+        # Summary, key points,
+        prompt = ""
+        f = open(MESSAGE_LOG_FILE, "r")
+        for line in f.readlines():
+            message = json.loads(line)
+            date = datetime.fromisoformat(message["date"]).date()
+            if day == date:
+                text = message["text"]
+                sender = message["from"]
+                prompt += f"Summarize the following messages into bullets including who sent it, what was said and any urls:\n[{date}] {sender}: {text}\n"
+        
+        debug(f"[{now}] {PROGRAM}: Prompt = {prompt}")
         response = openai.Completion.create(
             model="text-davinci-003",
             prompt=prompt,
             max_tokens=4000 - len(prompt),
             n=1,
             stop=None,
-            temperature=0.5,
+            temperature=0.1,
+            # top_p=0.1
         )
-        debug(f"[{get_now()}] {PROGRAM}: OpenAI Respone {response}")
-        summaries.append(
-            f"Summary from {one_day_ago} to {now}:\n{response.choices[0].text.strip()}"
+        debug(f"[{now}] {PROGRAM}: OpenAI Response = {response}")
+        summary = f"Summary for {day}:\n{response.choices[0].text.strip()}"
+        f = open(SUMMARY_LOG_FILE, "a")
+        f.write(summary)
+        f.write(
+            "\n----------------------------------------------------------------\n\n"
         )
+        summaries.append(summary)
     return summaries
 
 
 async def summarize(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    summaries = await summarize_past_week()
-    f = open(SUMMARY, "a")
-    for summary in summaries:
-        f.write(summary)
-        f.write("\n----------------------------------------------------------------\n")
+    summaries = await summarize_messages()
     await context.bot.send_message(chat_id=update.effective_chat.id, text=summaries)
 
 
