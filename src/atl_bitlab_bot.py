@@ -47,7 +47,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     rm_jl.write(message_dumps)
     rm_jl.write("\n")
     rm_jl.close()
-    clean_jsonl_data()
 
 
 def clean_jsonl_data():
@@ -81,6 +80,7 @@ def clean_jsonl_data():
 
 
 def summarize_messages():
+    clean_jsonl_data()
     print("~~~~~~~~~~~~~ START ~~~~~~~~~~~~~~~~~~\n\n\n")
     max_len = 3000
     summaries = []
