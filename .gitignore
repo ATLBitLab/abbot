@@ -1,4 +1,4 @@
 env.py
-.atl_bitlab_bot/
 __pycache__
 *.log
+src/data/test
