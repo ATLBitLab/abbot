@@ -854,3 +854,152 @@
 {"text": "I aspire to have to combat scammer copycat accounts some day. The one true hallmark of impact in today\u2019s world \ud83d\ude02", "from": "JF", "date": "2023-06-23"}
 {"text": "https://lightningdevkit.org/blog/announcing-ldk-node/", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-06-23"}
 {"text": "ATL BitLab weekly update is out: https://twitter.com/atlbitlab/status/1672302567110352919", "from": "Stephen", "date": "2023-06-23"}
+{"text": "As @jordan_bravo will probably bring up here shortly... You should look into NixOS. (https://nixos.org/)\n\nI am working on a DeskPi build and will be trying it out before switching over on my personal laptop.\n\nEquipment wise, might be worth it to checkout purism. (https://puri.sm/)", "from": "packetprotector", "date": "2023-06-23"}
+{"text": "ATL BitLab weekly update is out: https://twitter.com/atlbitlab/status/1672302567110352919", "from": "Stephen", "date": "2023-06-23"}
+{"text": "For those attending tomorrow's workshop, we will be learning how CoinJoin with Whirlpool, and how to set it up on our Bitcoin node.\n\nMake sure to do the following beforehand so you'll be ready for the workshop:\n\n1. Install a Whirlpool-compatible wallet:\n - Desktop: Sparrow\n - Android: Samourai\n - iOS: Bitcoin Keeper\n\n2. Send some Bitcoin to that wallet. During the workshop you will learn how to CoinJoin that Bitcoin using Whirlpool.\n\n3. If you have a personal node, make sure you can access it remotely through SSH.  Alternatively, bring your node to the workshop and we can help you set it up.\n\nIf you have any questions, feel free to DM me or @packetprotector", "from": "Jordan", "date": "2023-06-23"}
+{"text": "For those that use Umbrel, make sure to enable \"Remote Tor Access\" before coming and copy your auto-generated URL.\n\nOnce done, I can show you how to install Tailscale (VPN) on your node during the workshop so you can remotely SSH into your node.", "from": "packetprotector", "date": "2023-06-23"}
+{"text": "For those that use Umbrel, make sure to enable \"Remote Tor Access\" in Settings before coming and copy your auto-generated URL.\n\nOnce done, I can show you how to install Tailscale (VPN) on your node during the workshop so you can remotely SSH into your node.", "from": "packetprotector", "date": "2023-06-23"}
+{"text": null, "from": "Stephen", "date": "2023-06-23"}
+{"text": "OT: Linux question. Was it Slackware Distro that encouraged users to compile everything locally? After machine setup/install.\n\nDo people still compile from source?", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-06-23"}
+{"text": "Congrats @arshmolu \n\nhttps://twitter.com/gladstein/status/1672303531825729536", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-06-23"}
+{"text": "Are you thinking of Gentoo?", "from": "Robert", "date": "2023-06-23"}
+{"text": "If so then it is simply https://www.gentoo.org/", "from": "Robert", "date": "2023-06-23"}
+{"text": "/send 1000 @arshmolu congrats!!!", "from": "packetprotector", "date": "2023-06-23"}
+{"text": "Yes! TY, that\u2019s right, had forgotten that name.", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-06-23"}
+{"text": "Glad to be of service", "from": "Robert", "date": "2023-06-23"}
+{"text": "I don't know much about Slackware but Gentoo is the distro where you compile everything from source", "from": "Jordan", "date": "2023-06-24"}
+{"text": "Are you thinking of Gentoo?", "from": "Robert", "date": "2023-06-23"}
+{"text": "\ud83e\udec2", "from": "Arsh", "date": "2023-06-24"}
+{"text": "Hey guys, I'm at front door", "from": "gratten", "date": "2023-06-24"}
+{"text": "Lol I just realized it's at 3pm. See y'all this afternoon", "from": "gratten", "date": "2023-06-24"}
+{"text": "Guess I was onto something...\ud83d\ude06 They are using a refurbished Dell Optiplex Micro or a Lenovo Thinkcentre Mini... (https://www.nobsbitcoin.com/ministry-of-nodes-nodebox/)", "from": "packetprotector", "date": "2023-06-24"}
+{"text": "Interesting, we did ours for about half that cost", "from": "Brandon", "date": "2023-06-24"}
+{"text": "Has it paid for itself?", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-06-24"}
+{"text": "Lightning routing no, but for self-sovereignty yes \ud83d\udcaa", "from": "Brandon", "date": "2023-06-24"}
+{"text": "/send 1337 @arshmolu congratulations!", "from": "Stephen", "date": "2023-06-24"}
+{"text": "\ud83d\ude98 For anyone attending the Privacy workshop today, factor in extra time for parking. As always, parking can be a little tight here on the weekends since it's a popular spot.", "from": "Stephen", "date": "2023-06-24"}
+{"text": "Apologies guys I'm still in Marietta and won't be able to get down to BitLab in time", "from": "Elwood", "date": "2023-06-24"}
+{"text": "So please proceed without me", "from": "Elwood", "date": "2023-06-24"}
+{"text": "Regarding todays workshop. When you return back to your hardware wallet after mixing do you recommend using a new account in your derivation path? To keep kyc and non kyc utxo separate on same wallet.", "from": "Brandon", "date": "2023-06-24"}
+{"text": "We're having similar discussions here in the workshop. I think @jordan_bravo is recommending that you don't mix the premix and postmix funds. Theoretically, you could be super careful and be sleective about which UTXOs you spend, but you're likely to mess something up on accident and mix them. So better to have them in separate wallets. IMHO, I think using the account feature in derivation path might be sufficient for that.", "from": "Stephen", "date": "2023-06-24"}
+{"text": "Strange Q: does anyone know of a teaching song or filk song about Crypto or BTC?", "from": "Robert", "date": "2023-06-24"}
+{"text": "https://youtu.be/fZfg1Gtcg08", "from": "Mike", "date": "2023-06-25"}
+{"text": "Might not be what you want, but here is another one... https://youtu.be/0XSG_m8YQIM", "from": "packetprotector", "date": "2023-06-25"}
+{"text": "If wanting to share something educational/fun, try checking out the Tuttle Twins episode on Bitcoin.\n\nhttps://m.youtube.com/watch?v=_ekzsZZGfsk&t=141s", "from": "packetprotector", "date": "2023-06-25"}
+{"text": "Just use the classic \ud83e\udd37\ud83c\udffb\u200d\u2642\ufe0f\n\nhttps://youtu.be/-0kcet4aPpQ", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-06-25"}
+{"text": "Can you pls show me next time how we use the account feature in the derivation path", "from": "Lipsi", "date": "2023-06-25"}
+{"text": "After the meetup yesterday I was able to do one whirlpool transaction.  Any idea how long it takes for additional transactions to happen?  I have one utxo in postmix that I'm expecting to continue mixing but havent seen any updates for several hours.", "from": "James", "date": "2023-06-25"}
+{"text": "The 100,000 sat pool could take some time. I have left my funds in for over a month to get 5 mixes. If you set your mix threshold to 3 and specify a \"Mix to\" address, it will probably take 2-3 weeks for the 100,000 pool.\n\n5,000,000 is quicker... Maybe 1 week for 3 mixes?", "from": "packetprotector", "date": "2023-06-25"}
+{"text": "You can also just immediately withdraw after 1 mix. Your anonymity set is lower... But you are still in possession of your funds and can jump out at anytime.\n\nNow that I think about it, since they now allow 8 participants it probably has increased the anonymity set.... So maybe just 2 mixes would be sufficient? Would have to check...", "from": "packetprotector", "date": "2023-06-25"}
+{"text": "good to know, thanks!", "from": "James", "date": "2023-06-25"}
+{"text": "https://youtu.be/fZfg1Gtcg08", "from": "Mike", "date": "2023-06-25"}
+{"text": "Might not be what you want, but here is another one... https://youtu.be/0XSG_m8YQIM", "from": "packetprotector", "date": "2023-06-25"}
+{"text": "If wanting to share something educational/fun, try checking out the Tuttle Twins episode on Bitcoin.\n\nhttps://m.youtube.com/watch?v=_ekzsZZGfsk&t=141s", "from": "packetprotector", "date": "2023-06-25"}
+{"text": "Just use the classic \ud83e\udd37\ud83c\udffb\u200d\u2642\ufe0f\n\nhttps://youtu.be/-0kcet4aPpQ", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-06-25"}
+{"text": "This may work for one of our pre-rolls especially economic ones.", "from": "Robert", "date": "2023-06-25"}
+{"text": "Gotta find a shorter or acoustic, but yes it is iconic", "from": "Robert", "date": "2023-06-25"}
+{"text": "This could be great for the children\u2019s track", "from": "Robert", "date": "2023-06-25"}
+{"text": "https://t.me/+EDP8RlCE8TI5MWEx", "from": "Robert", "date": "2023-06-25"}
+{"text": "I don't want to spam people not interested so I started a new spot anyone interested in helping out is more than welcome", "from": "Robert", "date": "2023-06-25"}
+{"text": "As I understand it, if we run our own lightning node at the convention, we can balance and everything over a day and only submit changes at the EoD which would result in 1 transaction fee per vendor, but we would need enough BTC in the wallet to be able to float the entire amount. Is that correct?", "from": "Robert", "date": "2023-06-25"}
+{"text": "Can you pls show me next time how we use the account feature in the derivation path", "from": "Lipsi", "date": "2023-06-25"}
+{"text": "It depends on the software. With Sparrow, I think the only way to do it is by changing the derivation path when importing the key. For example, if the derivation is m/84'/0'/0', then you would change it to m/84'/0'/1' to make a sub-account. If using Blockstream Green, I believe you can tap the cog to open up \"Wallet Preferences\" and then tap the \"Create Account\" button. I can demonstrate it sometime.", "from": "Stephen", "date": "2023-06-25"}
+{"text": "Not necessarily. The basic gist is this:\n  \nFirst, start a lightning node. We can host lightning nodes in the cloud for you at Voltage, or you could set it up yourself using your own cloud provider, or you could even set it up on your own physical device.\n  \nNext, you need inbound liquidity to start receiving payments. You can easily pay a small fee to have somebody open a channel to you, or a local pleb would probably open a channel to your node just to help you out.\n  \nThat's all IF you want to run your own infrastructure. You could also just download something like Breez wallet and start accepting lightning payments with that. It even has a little built-in POS terminal.", "from": "Stephen", "date": "2023-06-25"}
+{"text": null, "from": "Stephen", "date": "2023-06-25"}
+{"text": "Thanks for the great workshop yesterday @jordan_bravo and @packetprotector! We are the most private people.", "from": "Stephen", "date": "2023-06-25"}
+{"text": "/send 2002 @jordan_bravo", "from": "Stephen", "date": "2023-06-25"}
+{"text": "/send 2002 @packetprotector", "from": "Stephen", "date": "2023-06-25"}
+{"text": "Is there an ebay like app that lighting/nostr native?", "from": "Giii", "date": "2023-06-25"}
+{"text": "\ud83e\udd14 when is the next hackathon?", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-06-25"}
+{"text": "It depends on the software. With Sparrow, I think the only way to do it is by changing the derivation path when importing the key. For example, if the derivation is m/84'/0'/0', then you would change it to m/84'/0'/1' to make a sub-account. If using Blockstream Green, I believe you can tap the cog to open up \"Wallet Preferences\" and then tap the \"Create Account\" button. I can demonstrate it sometime.", "from": "Stephen", "date": "2023-06-25"}
+{"text": "I had someone pretend to be steven the other day. Chose a diff profile pic, which is weird.", "from": "Rich", "date": "2023-06-26"}
+{"text": "It now says deleted account. I had just ignored it bc that wasn\u2019t his MO", "from": "Rich", "date": "2023-06-26"}
+{"text": "Guess I was onto something...\ud83d\ude06 They are using a refurbished Dell Optiplex Micro or a Lenovo Thinkcentre Mini... (https://www.nobsbitcoin.com/ministry-of-nodes-nodebox/)", "from": "packetprotector", "date": "2023-06-24"}
+{"text": "In my case it had even the same pic so we have to be very careful", "from": "Aida", "date": "2023-06-26"}
+{"text": "Cloned accounts are TG\u2019s greatest weakness and annoyance. I just \u201cBlock & Delete\u201d them. So far that amounts to 594 \ud83e\udd37\ud83c\udffb\u200d\u2642\ufe0f\ud83d\ude44", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-06-26"}
+{"text": "Those of you who attended the Whirlpool workshop on Saturday might remember me saying Bitcoin Keeper didn't support Whirlpool on Android yet.  They just released it", "from": "Jordan", "date": "2023-06-26"}
+{"text": "@jordan_bravo did you mention something about a server that can do the whirlpool? I dont really like having to leave my laptop on all day/night while waiting for it complete", "from": "James", "date": "2023-06-26"}
+{"text": "Yes, if people are interested, we can do another workshop and set up Whirlpool on our home nodes so it can run in the background 24/7", "from": "Jordan", "date": "2023-06-26"}
+{"text": "that would be really cool!", "from": "James", "date": "2023-06-26"}
+{"text": "Gm", "from": "Stephen", "date": "2023-06-26"}
+{"text": "Yes, if people are interested, we can do another workshop and set up Whirlpool on our home nodes so it can run in the background 24/7", "from": "Jordan", "date": "2023-06-26"}
+{"text": "Oy, did y\u2019all know about this? Last Wednesday?\n\nAlso SAP is integrating USDC for B2B payments, especially cross boarder payments. \ud83e\udd14\ud83e\udd37\ud83c\udffb\u200d\u2642\ufe0f\n\nBuckle up boys and girl(s)\n\nhttps://www.crowdfundinsider.com/2023/06/209307-blockchain-adoption-jp-morgan-begins-euro-denominated-dlt-based-payments-for-corporates/", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-06-26"}
+{"text": "Just curious. Is there a place where I can see the events scheduled ahead of time? By the time I see them pinned on here, I\u2019m often already busy. I don\u2019t notice anything upcoming on Meet-Up either", "from": "Garrett", "date": "2023-06-26"}
+{"text": "https://www.meetup.com/atlantabitdevs/events/293790580/", "from": "Elwood", "date": "2023-06-26"}
+{"text": "We generally try to have something scheduled every Wednesday, with the occasional Saturday or other day of the week.", "from": "Elwood", "date": "2023-06-26"}
+{"text": "We probably need to get some placeholders out there on Meetup for the next few months worth of Wednesdays", "from": "Elwood", "date": "2023-06-26"}
+{"text": "But guys is the TacoMac Hallal? Just joking Google maps has a giant pin in Hallal guys immediately to the north of NCR", "from": "Robert", "date": "2023-06-26"}
+{"text": "Gotcha, cool thnx", "from": "Garrett", "date": "2023-06-26"}
+{"text": null, "from": "Elwood", "date": "2023-06-26"}
+{"text": "Those of you who attended the Whirlpool workshop on Saturday might remember me saying Bitcoin Keeper didn't support Whirlpool on Android yet.  They just released it", "from": "Jordan", "date": "2023-06-26"}
+{"text": "@packetprotector strike lightning address doesn't work with any wallet for lnurl pay?", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-06-27"}
+{"text": "Oy, did y\u2019all know about this? Last Wednesday?\n\nAlso SAP is integrating USDC for B2B payments, especially cross boarder payments. \ud83e\udd14\ud83e\udd37\ud83c\udffb\u200d\u2642\ufe0f\n\nBuckle up boys and girl(s)\n\nhttps://www.crowdfundinsider.com/2023/06/209307-blockchain-adoption-jp-morgan-begins-euro-denominated-dlt-based-payments-for-corporates/", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-06-26"}
+{"text": "Cyprus pint and plate popular pub with locals here in midtown.", "from": "Giii", "date": "2023-06-27"}
+{"text": "Hmmm... I didn't know lnurl pay handles LN address payments differently? What happened to your payment? Did it just fail?\n\nIf you want to use LNURL with your strike account, I have used strike.army in the past. Can just use username@strike.army and it should work.", "from": "packetprotector", "date": "2023-06-27"}
+{"text": "But I'll ask. I'm sure they know it doesn't work, but I will clarify...", "from": "packetprotector", "date": "2023-06-27"}
+{"text": "username@strike.army doesn't work", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-06-27"}
+{"text": "It crashes wallets lol", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-06-27"}
+{"text": "I can second this \ud83d\ude4c\ud83c\udffc\ud83e\udd47", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-06-27"}
+{"text": "Cyprus pint and plate popular pub with locals here in midtown.", "from": "Giii", "date": "2023-06-27"}
+{"text": "Did you go to the site and \"generate\" a strike.army LN address? Also which wallets don't work?", "from": "packetprotector", "date": "2023-06-27"}
+{"text": "didn't know i had to do that", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-06-27"}
+{"text": "trying now", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-06-27"}
+{"text": "Apologies to the young people who don\u2019t remember this \ud83e\udd37\ud83c\udffb\u200d\u2642\ufe0f\n\nhttps://youtu.be/Erf2iFHG44M", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-06-27"}
+{"text": "\u201cWhat\u2019s the difference between the Cub Scouts and the military?\u201d \ud83e\udd23", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-06-27"}
+{"text": "Gm", "from": "Stephen", "date": "2023-06-27"}
+{"text": "I love Cypress Pint and Plate, but last time we tried to take a group there after a Socratic, it was slammed and they couldn't accomodate everyone all at the same table", "from": "Stephen", "date": "2023-06-27"}
+{"text": "But definitely no more Taco Mac...at least need an extended break from that =)", "from": "Stephen", "date": "2023-06-27"}
+{"text": "There\u2019s a spot in the Coda food hall that also serves alcohol. I think they\u2019re open until 9:30pm", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-06-27"}
+{"text": "I think the food spots close around 9pm so should be enough time? \ud83e\udd37\ud83c\udffb\u200d\u2642\ufe0f", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-06-27"}
+{"text": "Gm", "from": "Stephen", "date": "2023-06-27"}
+{"text": "@packetprotector I went to strike.army\nIt said login with strike and I did that. \nNow it's just a blank screen.", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-06-27"}
+{"text": "You should just be able to go to the site and type in your username and click \"generate\" to create an LN address for username@strike.army.\n\nIf you login, you can create a LNURL withdrawal qr or code. If the page isn't loading, try a different browser. It works for me on Chrome.", "from": "packetprotector", "date": "2023-06-27"}
+{"text": "@nitesh_btc You should just be able to go to the site and type in your username and click \"generate\" to create an LN address for username@strike.army.\n\nIf you login, you can create a LNURL withdrawal qr or code. If the page isn't loading, try a different browser. It works for me on Chrome.", "from": "packetprotector", "date": "2023-06-27"}
+{"text": "It says no profile found.", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-06-27"}
+{"text": "Is your profile private?", "from": "packetprotector", "date": "2023-06-27"}
+{"text": "Ahh. Yeah.", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-06-27"}
+{"text": "Ok changing that fixed it.", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-06-27"}
+{"text": "Thanks!", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-06-27"}
+{"text": "Changing that might even fix the username@strike.mr LN address issue...", "from": "packetprotector", "date": "2023-06-27"}
+{"text": "Changing that might even fix the username@strike.me LN address issue...", "from": "packetprotector", "date": "2023-06-27"}
+{"text": "What's the difference between strike.me and strike.army?", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-06-27"}
+{"text": "About 4 characters", "from": "Robert", "date": "2023-06-27"}
+{"text": "Lol", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-06-27"}
+{"text": "Both work.", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-06-27"}
+{"text": "strike.me is the official Strike provided LN address, strike.army is a solution made by one of our former devs. \n\nstrike.army was built a year ago and was how people could get LNURL functionality with their Strike account.\n\nAs of last month, Strike has started supporting LN addresses natively.", "from": "packetprotector", "date": "2023-06-27"}
+{"text": "Strike official doesn't allow you to create LNURL withdrawal. Still have to use strike.army for that.", "from": "packetprotector", "date": "2023-06-27"}
+{"text": "Understood. Thank you!", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-06-27"}
+{"text": "Why people ask me about crypto IDK, but today I was asked: Should I do regular transactions with \u201cMonero and fund it to liquidity out of butcoin\u201d\n\nI think they are asking if they should keep some amount of Monero (given the individual probably 3-5k USD equivalent) and then store things in Bitcoin (yes they typed butcoin) for long term storage and gain.\n\nI said I have no clue but said I would ask around.\n\nI assume this individual desires the privacy offered by Monero, as they have a record of shall we say\u2026 short term relationships which could result in legal garnishment.", "from": "Robert", "date": "2023-06-27"}
+{"text": "They could use lightning. Why monero.", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-06-27"}
+{"text": "Because thats what they asked? Again I assume its due to anonymity and a presumption that they can run a set of parallel funds, but I learned a ling time ago that some people you simply do not ask. (I was an IT forensics tech and analyst in the early 2000\u2019s for a PI, thats where I know this individual from their parent was one of our clients 20 years ago)", "from": "Robert", "date": "2023-06-27"}
+{"text": "Err long", "from": "Robert", "date": "2023-06-27"}
+{"text": "https://twitter.com/tier10k/status/1673743351785439251?s=20", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-06-27"}
+{"text": "What's the impact to Strike & Swan customers?", "from": "Elwood", "date": "2023-06-27"}
+{"text": "\"PDK is here to make Payjoin a drop in upgrade for all software touching Bitcoin. \"\n\nhttps://payjoindevkit.org/blog/pdk-an-sdk-for-payjoin-transactions/", "from": "Jordan", "date": "2023-06-27"}
+{"text": "Adding payjoin functionality to BDK-CLI now", "from": "Will", "date": "2023-06-27"}
+{"text": "?", "from": "Jordan", "date": "2023-06-27"}
+{"text": "Like", "from": "Will", "date": "2023-06-27"}
+{"text": "I\u2019m currently implementing payjoin functionality on the bitcoin dev kit cli wallet", "from": "Will", "date": "2023-06-27"}
+{"text": "https://twitter.com/moneyball/status/1670856010997833728?s=46&t=LhbSwnNrOlRHFLM2Ewslog", "from": "Will", "date": "2023-06-27"}
+{"text": "Hopefully will make it much easier for other wallets to adopt", "from": "Will", "date": "2023-06-27"}
+{"text": "https://twitter.com/tier10k/status/1673743351785439251?s=20", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-06-27"}
+{"text": "Topics for tomorrow night's Socratic Seminar. Looking forward to seeing you tomorrow night! https://atlantabitdevs.org/2023/06/27/bitcoin-socratic-seminar-19/", "from": "Stephen", "date": "2023-06-27"}
+{"text": null, "from": "Stephen", "date": "2023-06-27"}
+{"text": "Nice! Looking forward to this", "from": "Jordan", "date": "2023-06-27"}
+{"text": "Topics for tomorrow night's Socratic Seminar. Looking forward to seeing you tomorrow night! https://atlantabitdevs.org/2023/06/27/bitcoin-socratic-seminar-19/", "from": "Stephen", "date": "2023-06-27"}
+{"text": "Gm", "from": "Stephen", "date": "2023-06-28"}
+{"text": "Be careful, Garrett I keep missing events when they appear on  Tuesdays\u2026", "from": "Rich", "date": "2023-06-28"}
+{"text": "Hopefully that is a non-issue going forward. Supposedly Manuel's has a regular Wednesday for us starting next month.", "from": "Elwood", "date": "2023-06-28"}
+{"text": "This is cool: https://vls.tech/posts/vls-beta/", "from": "Stephen", "date": "2023-06-28"}
+{"text": null, "from": "Stephen", "date": "2023-06-28"}
+{"text": "\ud83d\ude98 How to park your car: bitcoiner style.\nhttps://atlantabitdevs.org/parking-instructions-for-ncr/", "from": "Stephen", "date": "2023-06-28"}
+{"text": null, "from": "Stephen", "date": "2023-06-28"}
+{"text": "Thanks! When Elwood sent that message, I realized I was only in the bitplebs group and not the bitdevs group on meetup, so I at least know where to look now haha", "from": "Garrett", "date": "2023-06-28"}
+{"text": "Also get in the ATL BitLab group and collect the whole trifecta", "from": "Elwood", "date": "2023-06-28"}
+{"text": "ATL BitLab (Atlanta, GA) | Meetup\nhttps://www.meetup.com/atlbitlab/", "from": "Elwood", "date": "2023-06-28"}
+{"text": "Damn, Stephen I was just gonna ask this question \ud83e\udd37\ud83c\udffb\u200d\u2642\ufe0f", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-06-28"}
+{"text": "Yes. Pls follow these directions for entering the building whether or not you\u2019re driving. This is the preferred entrance since it avoids me having to run around to different doors letting ppl in. \n\nAlso, if you don\u2019t come in this way, it\u2019s important that you DO NOT use the call button at the entry point. That\u2019ll cause me a bunch of issues. Simply tag me here or DM me and I\u2019ll come get you. Thanks.", "from": "bryan", "date": "2023-06-28"}
+{"text": "Yes. Pls follow these directions for entering the building whether or not you\u2019re driving. This is the preferred entrance since it avoids me having to run around to different doors letting ppl in and it avoids security being up my ass about people trying to enter the building. \n\nIf you don\u2019t come in this way, it\u2019s important that you DO NOT use the call button at the entry point. That\u2019ll cause me a bunch of issues. Simply tag me here or DM me and I\u2019ll come get you. Thanks.", "from": "bryan", "date": "2023-06-28"}
+{"text": "Yes. Pls follow these directions for entering the building whether or not you\u2019re driving. This is the preferred entrance since it avoids me having to run around to different doors letting ppl in and it avoids security being up my ass about people trying to enter the building. \n\nIf you don\u2019t come in this way, it\u2019s important that you DO NOT use the call button at whatever entry point you\u2019re at. That\u2019ll cause me a bunch of issues. Simply tag me here or DM me and I\u2019ll come get you. Thanks.", "from": "bryan", "date": "2023-06-28"}
+{"text": "Use these coordinates in a map app to get to the right entrance for parking and otherwise: 33.77874091163421, -84.39047826390204", "from": "bryan", "date": "2023-06-28"}
+{"text": "Use these coordinates in a map app to get to the right entrance for parking and otherwise: \n\n33.77874091163421, -84.39047826390204", "from": "bryan", "date": "2023-06-28"}
