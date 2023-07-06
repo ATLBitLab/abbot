@@ -1087,3 +1087,4 @@
 {"text": "TG allows posting pictures", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-06"}
 {"text": "TG allows posting pictures \ud83e\udd23\ud83d\ude44", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-06"}
 {"text": "Little tidbit for my fellow physics stans: Seth Lloyd https://youtu.be/XirbbUxOxiU", "from": "Giii", "date": "2023-07-06"}
+{"text": "I found the code i wrote back in 2019 to build the neural net I mentioned last night. If anyone is interested in what the code for constructing a LSTM neural net using tensorflow, checkout main.py starting on line 81 for code examples of how a neural net can be constructed https://github.com/bnonni/LSTM/blob/master/src/main.py\n\nspecifically, line 83 is the input layer followed by multiple hidden layers each with 200 input nodes (the blue circles last night).", "from": "bryan", "date": "2023-07-06"}
