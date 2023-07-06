@@ -72,6 +72,10 @@ def clean_jsonl_data():
                     obj["date"] = obj_date.split("+")[0]
                 elif t_in_date:
                     obj["date"] = obj_date.split("T")[0]
+                obj_text = obj.get("text")
+                apos_in_text = "'" in obj_text
+                if apos_in_text:
+                    obj["text"] = obj_text.replace("'", "")
                 outfile.write(json.dumps(obj))
                 outfile.write("\n")
     infile.close()
@@ -80,61 +84,49 @@ def clean_jsonl_data():
 
 
 def summarize_messages():
-    clean_jsonl_data()
-    print("~~~~~~~~~~~~~ START ~~~~~~~~~~~~~~~~~~\n\n\n")
-    max_len = 3000
     summaries = []
     yesterday = (datetime.now() - timedelta(days=1)).date()
     one_week = 7
-    days = [yesterday - timedelta(days=i - 1) for i in range(one_week, 0, -1)]
-    prompts_by_day = {k.isoformat(): [] for k in days}
-    prompts = []
+    days = [(yesterday - timedelta(days=i - 1)).isoformat() for i in range(one_week, 0, -1)]
+    prompts_by_day = {k: "" for k in days}
     for day in days:
         prompt = ""
-        mf = open(MESSAGES_JL_FILE, "r")
-        for line in mf.readlines():
+        messages_file = open(MESSAGES_JL_FILE, "r")
+        for line in messages_file.readlines():
             message = json.loads(line)
-            date = datetime.fromisoformat(message["date"]).date()
-            if day == date:
+            message_date = message["date"]
+            if day == message_date:
                 text = message["text"]
                 sender = message["from"]
-                message = f"{sender}: {text}\n"
-                if len(prompt) >= max_len:
-                    # print(f"max len reached!")
-                    # print(f"prompt: {prompt}")
-                    prompts_by_day[day.isoformat()].append(prompt)
-                    prompt = message
-                    # print(f"prompts: {prompts}")
-                else:
-                    prompt += message
-            else:
+                message = f"{sender} said {text} on {message_date}\n"
+                prompt += message
                 print(f"day: {day}")
-                print(f"message date: {date}")
-                print(f"day == message date: {day == date}")
-    mf.close()
-    pbdf = open(PROMPTS_BY_DAY_FILE, "w")
-    pbdf.write(json.dumps(prompts_by_day))
-    pbdf.close()
-    # prompt = "Summarize the following text include sender, text and urls:\n" + prompt
-    # debug(f"[{now}] {PROGRAM}: Prompt = {prompt}")
-    #     response = openai.Completion.create(
-    #         model="text-davinci-003",
-    #         prompt=prompt,
-    #         max_tokens=4000 - len(prompt),
-    #         n=1,
-    #         stop=None,
-    #         temperature=0.1,
-    #         # top_p=0.1
-    #     )
-    #     debug(f"[{now}] {PROGRAM}: OpenAI Response = {response}")
-    #     summary = f"Summary for {day}:\n{response.choices[0].text.strip()}"
-    #     f = open(SUMMARY_LOG_FILE, "a")
-    #     f.write(summary)
-    #     f.write(
-    #         "\n----------------------------------------------------------------\n\n"
-    #     )
-    #     summaries.append(summary)
-    # return summaries
+                print(f"message date: {message_date}")
+                print(f"day == message date: {day == message_date}")
+        final_prompt = ("Summarize the following messages including sender name, date and any urls if present:\n" + prompt)
+        prompts_by_day[day] = final_prompt
+    messages_file.close()
+    prompts_by_day_file = open(PROMPTS_BY_DAY_FILE, "w")
+    prompts_by_day_dump = json.dumps(prompts_by_day)
+    prompts_by_day_file.write(prompts_by_day_dump)
+    prompts_by_day_file.close()
+    debug(f"[{now}] {PROGRAM}: Prompts by day = {prompts_by_day_dump}")
+    summary_file = open(SUMMARY_LOG_FILE, "a")
+    for day, prompt in prompts_by_day.items():
+        response = openai.Completion.create(
+            model="text-davinci-003",
+            prompt=prompt,
+            max_tokens=4000 - len(prompt),
+            n=1,
+            stop=None,
+            temperature=0.1,
+        )
+        debug(f"[{now}] {PROGRAM}: OpenAI Response = {response}")
+        summary = f"Summary for {day}:\n{response.choices[0].text.strip()}"
+        summary_file.write(f"{summary}\n----------------------------------------------------------------\n\n")
+        summaries.append(summary)
+    summary_file.close()
+    return summaries
 
 
 async def summarize(update: Update, context: ContextTypes.DEFAULT_TYPE):
