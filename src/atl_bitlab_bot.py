@@ -133,8 +133,10 @@ async def summarize(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         await context.bot.send_message(chat_id=update.effective_chat.id, text="Generating summary ... please wait")
         summaries = summarize_messages()
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=summaries)
+        for summary in summaries:
+            await context.bot.send_message(chat_id=update.effective_chat.id, text=summary)
     except Exception as e:
+        debug(f"[{get_now()}] {PROGRAM}: summarize error {e}")
         await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Error: {e}")
 
 
