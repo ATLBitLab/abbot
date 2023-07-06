@@ -130,7 +130,7 @@ def summarize_messages():
 
 
 async def summarize(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    summaries = await summarize_messages()
+    summaries = summarize_messages()
     await context.bot.send_message(chat_id=update.effective_chat.id, text=summaries)
 
 
