@@ -6,6 +6,7 @@ MESSAGES_JL_FILE = os.path.abspath("data/messages.jsonl")
 SUMMARY_LOG_FILE = os.path.abspath("data/summaries.txt")
 MESSAGES_PY_FILE = os.path.abspath("data/backup/messages.py")
 PROMPTS_BY_DAY_FILE = os.path.abspath("data/backup/prompts_by_day.py")
+CHATS_TO_IGNORE = [-911601159]
 
 import json
 import openai
@@ -31,11 +32,12 @@ application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_chat.id in CHATS_TO_IGNORE:
+        return
     mpy = open(MESSAGES_PY_FILE, "a")
     mpy.write(update.to_json())
     mpy.write("\n")
     mpy.close()
-
     message = update.effective_message
     debug(f"[{get_now()}] {PROGRAM}: handle_message - Raw message {message}")
     message_dumps = json.dumps(
@@ -85,14 +87,11 @@ def clean_jsonl_data():
     debug(f"[{get_now()}] {PROGRAM}: clean_jsonl_data - Deduping done")
     return "Cleaning done!"
 
+def get_dates():
+    return [((datetime.now() - timedelta(days=1)).date() - timedelta(days=i - 1)).isoformat() for i in range(7, 0, -1)]
 
-def summarize_messages():
+def summarize_messages(days):
     summaries = []
-    yesterday = (datetime.now() - timedelta(days=1)).date()
-    one_week = 7
-    days = [
-        (yesterday - timedelta(days=i - 1)).isoformat() for i in range(one_week, 0, -1)
-    ]
     prompts_by_day = {k: "" for k in days}
     for day in days:
         prompt = ""
@@ -140,18 +139,35 @@ def summarize_messages():
 
 
 async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    debug(f"[{get_now()}] {PROGRAM}: /clean executed")
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, text="Cleaning ... please wait"
+    )
     await context.bot.send_message(
         chat_id=update.effective_chat.id, text=clean_jsonl_data()
     )
 
 
+async def both(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    debug(f"[{get_now()}] {PROGRAM}: /both executed")
+    await clean()
+    await summary()
+
+
 async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    message = "Generating summary"
-    args = context.args
-    if len(args) > 0:
-        message = f"{message} for {args}"
+    debug(f"[{get_now()}] {PROGRAM}: /summary executed")
+    args = context.args or get_dates()
+    arg_len = len(args)
+    if arg_len > 2:
+        return await update.message.reply_text("Too many args")
+    if 0 < arg_len < 3:
+        if arg_len == 1:
+            message = f"Generating for {args}"
+        else:
+            args = ' '.join(args)
+            message = f"Generating for {args}"
     await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
-    summaries = summarize_messages()
+    summaries = summarize_messages(args)
     for summary in summaries:
         try:
             await context.bot.send_message(
@@ -164,8 +180,14 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
 
-async def prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def gptPrompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    debug(f"[{get_now()}] {PROGRAM}: /prompt executed")
+    await context.bot.send_message(
+            chat_id=update.effective_chat.id, text="GPT is working ... please wait"
+        )
     args = context.args
+    debug(f"[{get_now()}] {PROGRAM}: args{args}")
+
     if len(args) > 0:
         prompt_input = " ".join(args)
         await context.bot.send_message(
@@ -199,45 +221,32 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text="Run /start to start listening for messages and access the following available commands\n\
-             /summary produce daily summaries\n\
-                \t\default ⇒ produce daily summaries for the past 7 days\n\
-                \t<date> ⇒ produce summary for <date>\n\
-                    \t\te.g. 2023-07-05\n\
-                \t<start> <end> ⇒ produce daily summaries from start to end\n\
-                    \t\te.g 2023-07-02 2023-07-05\n\
-                \t<start> <# of days> ⇒ produce daily summaries from start + # days (0-index)\n\
-                    \t\te.g. 2023-07-02 2 ⇒ 2023-07-02 to 2023-07-04\n\
-            /clean dedupe and remove bad chars from the raw messages\n\
-                \tNote: recommended to use /clean then /summary or /both to ensure best output\n\
-            /both run clean and summary; args for /summary apply\n\
-            /prompt \n\
-                \t<gpt-prompt> ⇒ send gpt-prompt to gpt\n\
-            /help show this menu",
+        text="Run /start to start listening for messages. Available commands:\n\n\
+        /summary produce daily summaries\n\
+            default ⇒ produce daily summaries for the past 7 days\n\
+            <date> ⇒ produce summary for <date>\n\
+                e.g. 2023-07-05\n\
+            <start> <end> ⇒ produce daily summaries from start to end\n\
+                e.g 2023-07-02 2023-07-05\n\
+            <start> <# of days> ⇒ produce daily summaries from start + # days (0-index)\n\
+                e.g. 2023-07-02 2 ⇒ 2023-07-02 to 2023-07-04\n\
+        /clean dedupe and remove bad chars from the raw messages\n\
+            Note: recommended to use /clean then /summary or /both to ensure best output\n\
+        /both run clean and summary; args for /summary apply\n\
+        /prompt\n\
+            <gpt-prompt> ⇒ send gpt-prompt to gpt\n\
+        /help show help menu",
     )
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    debug(f"[{get_now()}] {PROGRAM}: /start executed")
+    debug(f"[{get_now()}] {PROGRAM}: Bot /start")
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text="Bot started. Run /help for usage guide",
     )
-
     message_handler = MessageHandler(BaseFilter(), handle_message)
     application.add_handler(message_handler)
-
-    summary_handler = CommandHandler("summary", summary)
-    application.add_handler(summary_handler)
-
-    prompt_handler = CommandHandler("prompt", prompt)
-    application.add_handler(prompt_handler)
-
-    clean_handler = CommandHandler("clean", prompt)
-    application.add_handler(clean_handler)
-
-    clean_summary_handler = CommandHandler("both", prompt)
-    application.add_handler(clean_summary_handler)
 
 
 def main():
@@ -248,5 +257,13 @@ def main():
     application.add_handler(start_handler)
     stop_handler = CommandHandler("stop", stop)
     application.add_handler(stop_handler)
+    summary_handler = CommandHandler("summary", summary)
+    application.add_handler(summary_handler)
+    prompt_handler = CommandHandler("prompt", gptPrompt)
+    application.add_handler(prompt_handler)
+    clean_handler = CommandHandler("clean", clean)
+    application.add_handler(clean_handler)
+    clean_summary_handler = CommandHandler("both", both)
+    application.add_handler(clean_summary_handler)
     debug(f"[{get_now()}] {PROGRAM}: Polling!")
     application.run_polling()

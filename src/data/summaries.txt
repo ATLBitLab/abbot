@@ -243,3 +243,11 @@ Giii said Little tidbit for my fellow physics stans: Seth Lloyd https://youtu.be
 bryan said I found the code i wrote back in 2019 to build the neural net I mentioned last night. If anyone is interested in what the code for constructing a LSTM neural net using tensorflow, checkout main.py starting on line 81 for code examples of how a neural net can be constructed https://github.com/bnonni/LSTM/blob/master/src/main.py specifically, line 83 is the input layer followed by multiple hidden layers each with 200 input nodes (the blue circles last night). on 2023-07-06 by bryan.
 ----------------------------------------------------------------
 
+Summary for 2023-07-06:
+1. Giii said Great evening and good big picture thinking! on 2023-07-06
+2. Citizen 🇺🇸 said TG allows posting pictures on 2023-07-06
+3. Citizen 🇺🇸 said TG allows posting pictures 🤣🙄 on 2023-07-06
+4. Giii said Little tidbit for my fellow physics stans: Seth Lloyd https://youtu.be/XirbbUxOxiU on 2023-07-06
+5. Bryan said I found the code I wrote back in 2019 to build the neural net I mentioned last night. If anyone is interested in what the code for constructing a LSTM neural net using tensorflow, checkout main.py starting on line 81 for code examples of how a neural net can be constructed https://github.com/bnonni/LSTM/blob/master/src/main.py specifically, line 83 is the input layer followed by multiple hidden layers each with 200 input nodes (the blue circles last night). on 2023-07-06
+----------------------------------------------------------------
+
