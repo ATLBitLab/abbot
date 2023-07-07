@@ -155,20 +155,25 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 chat_id=update.effective_chat.id, text=f"Error: {e}"
             )
 
+
 async def prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     args = context.args
     if len(args) > 0:
+        prompt_input = ' '.join(args)
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Prompt: {prompt_input}")
         response = openai.Completion.create(
             model="text-davinci-003",
-            prompt=args[0],
-            max_tokens=4000 - len(args[0]),
+            prompt=prompt_input,
+            max_tokens=4000 - len(prompt_input),
             n=1,
             stop=None,
             temperature=0.1,
         )
+        answer = response.choices[0].text.strip()
     else:
-        update.message.reply_text("You didn't provide any arguments.")
-    context.bot.send_message(chat_id=update.effective_chat.id, text=response.choices[0].text.strip())
+        return await update.message.reply_text("You didn't provide any arguments.")
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"GPT says: {answer}")
+
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     debug(f"[{get_now()}] {PROGRAM}: /stop executed")
@@ -185,14 +190,19 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id=update.effective_chat.id,
         text="Bot started. Commands available\n/summary",
     )
-    debug(f"[{get_now()}] {PROGRAM}: Init Bot")
-    start_handler = CommandHandler("start", start)
-    stop_handler = CommandHandler("stop", stop)
     summarize_handler = CommandHandler("summary", summary)
     message_handler = MessageHandler(BaseFilter(), handle_message)
-    application.add_handler(start_handler)
-    application.add_handler(stop_handler)
+    message_handler = CommandHandler("prompt", prompt)
     application.add_handler(summarize_handler)
     application.add_handler(message_handler)
+    application.add_handler(message_handler)
+
+
+def main():
+    debug(f"[{get_now()}] {PROGRAM}: Init Bot")
+    start_handler = CommandHandler("start", start)
+    application.add_handler(start_handler)
+    stop_handler = CommandHandler("stop", stop)
+    application.add_handler(stop_handler)
     debug(f"[{get_now()}] {PROGRAM}: Polling!")
     application.run_polling()
