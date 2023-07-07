@@ -8,13 +8,14 @@ MESSAGES_PY_FILE = os.path.abspath("data/backup/messages.py")
 PROMPTS_BY_DAY_FILE = os.path.abspath("data/backup/prompts_by_day.py")
 CHATS_TO_IGNORE = [-911601159]
 
+import re
 import json
 import openai
 
 from lib.logger import debug
 from lib.utils import get_now
 from lib.env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 
 from telegram import Update
 from telegram.ext import (
@@ -87,10 +88,17 @@ def clean_jsonl_data():
     debug(f"[{get_now()}] {PROGRAM}: clean_jsonl_data - Deduping done")
     return "Cleaning done!"
 
-def get_dates():
-    return [((datetime.now() - timedelta(days=1)).date() - timedelta(days=i - 1)).isoformat() for i in range(7, 0, -1)]
 
-def summarize_messages(days):
+def get_dates(lookback=7):
+    return [
+        (
+            (datetime.now() - timedelta(days=1)).date() - timedelta(days=i - 1)
+        ).isoformat()
+        for i in range(lookback, 0, -1)
+    ]
+
+
+def summarize_messages(days=None):
     summaries = []
     prompts_by_day = {k: "" for k in days}
     for day in days:
@@ -148,24 +156,32 @@ async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def both(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def both():
     debug(f"[{get_now()}] {PROGRAM}: /both executed")
     await clean()
     await summary()
+    return "Messages cleaned. Summaries:"
 
 
 async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
     debug(f"[{get_now()}] {PROGRAM}: /summary executed")
     args = context.args or get_dates()
     arg_len = len(args)
-    if arg_len > 2:
+    if arg_len > 0 and arg_len > 2:
         return await update.message.reply_text("Too many args")
-    if 0 < arg_len < 3:
-        if arg_len == 1:
-            message = f"Generating for {args}"
-        else:
-            args = ' '.join(args)
-            message = f"Generating for {args}"
+    elif arg_len == 1:
+        message = f"Generating summary for day {''.join(args)}"
+    elif arg_len == 2:
+        for arg in args:
+            if not re.search("^\d{4}-\d{2}-\d{2}$", arg):
+                return await update.message.reply_text(
+                    f"Malformed date: expecting form YYYY-MM-DD"
+                )
+            try:
+                datetime.strptime(arg, "%Y-%m-%d").date()
+            except Exception as e:
+                return await update.message.reply_text(f"Error while parsing date: {e}")
+        message = f"Generating summary for each day between {' and '.join(args)}"
     await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
     summaries = summarize_messages(args)
     for summary in summaries:
@@ -183,8 +199,8 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def gptPrompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     debug(f"[{get_now()}] {PROGRAM}: /prompt executed")
     await context.bot.send_message(
-            chat_id=update.effective_chat.id, text="GPT is working ... please wait"
-        )
+        chat_id=update.effective_chat.id, text="GPT is working ... please wait"
+    )
     args = context.args
     debug(f"[{get_now()}] {PROGRAM}: args{args}")
 
