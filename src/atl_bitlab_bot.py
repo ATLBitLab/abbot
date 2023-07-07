@@ -27,6 +27,7 @@ from telegram.ext.filters import BaseFilter
 openai.api_key = OPENAI_API_KEY
 now = get_now()
 
+application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     mpy = open(MESSAGES_PY_FILE, "a")
@@ -87,7 +88,9 @@ def summarize_messages():
     summaries = []
     yesterday = (datetime.now() - timedelta(days=1)).date()
     one_week = 7
-    days = [(yesterday - timedelta(days=i - 1)).isoformat() for i in range(one_week, 0, -1)]
+    days = [
+        (yesterday - timedelta(days=i - 1)).isoformat() for i in range(one_week, 0, -1)
+    ]
     prompts_by_day = {k: "" for k in days}
     for day in days:
         prompt = ""
@@ -103,7 +106,10 @@ def summarize_messages():
                 print(f"day: {day}")
                 print(f"message date: {message_date}")
                 print(f"day == message date: {day == message_date}")
-        final_prompt = ("Summarize the following messages including sender name, date and any urls if present:\n" + prompt)
+        final_prompt = (
+            "Summarize the following messages including sender name, date and any urls if present:\n"
+            + prompt
+        )
         prompts_by_day[day] = final_prompt
     messages_file.close()
     prompts_by_day_file = open(PROMPTS_BY_DAY_FILE, "w")
@@ -123,22 +129,46 @@ def summarize_messages():
         )
         debug(f"[{now}] {PROGRAM}: OpenAI Response = {response}")
         summary = f"Summary for {day}:\n{response.choices[0].text.strip()}"
-        summary_file.write(f"{summary}\n----------------------------------------------------------------\n\n")
+        summary_file.write(
+            f"{summary}\n----------------------------------------------------------------\n\n"
+        )
         summaries.append(summary)
     summary_file.close()
     return summaries
 
 
-async def summarize(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    try:
-        await context.bot.send_message(chat_id=update.effective_chat.id, text="Generating summary ... please wait")
-        summaries = summarize_messages()
-        for summary in summaries:
-            await context.bot.send_message(chat_id=update.effective_chat.id, text=summary)
-    except Exception as e:
-        debug(f"[{get_now()}] {PROGRAM}: summarize error {e}")
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Error: {e}")
+async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    message = "Generating summary"
+    args = context.args
+    if len(args) > 0:
+        message = f"{message} for {args}"
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
+    summaries = summarize_messages()
+    for summary in summaries:
+        try:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id, text=summary
+            )
+        except Exception as e:
+            debug(f"[{get_now()}] {PROGRAM}: summarize error {e}")
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id, text=f"Error: {e}"
+            )
 
+async def prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    args = context.args
+    if len(args) > 0:
+        response = openai.Completion.create(
+            model="text-davinci-003",
+            prompt=args[0],
+            max_tokens=4000 - len(args[0]),
+            n=1,
+            stop=None,
+            temperature=0.1,
+        )
+    else:
+        update.message.reply_text("You didn't provide any arguments.")
+    context.bot.send_message(chat_id=update.effective_chat.id, text=response.choices[0].text.strip())
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     debug(f"[{get_now()}] {PROGRAM}: /stop executed")
@@ -153,16 +183,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     debug(f"[{get_now()}] {PROGRAM}: /start executed")
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text="Bot started. Use /summarize to generate a summary of the past week's messages.",
+        text="Bot started. Commands available\n/summary",
     )
-
-
-def init():
     debug(f"[{get_now()}] {PROGRAM}: Init Bot")
-    application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
     start_handler = CommandHandler("start", start)
     stop_handler = CommandHandler("stop", stop)
-    summarize_handler = CommandHandler("summarize", summarize)
+    summarize_handler = CommandHandler("summary", summary)
     message_handler = MessageHandler(BaseFilter(), handle_message)
     application.add_handler(start_handler)
     application.add_handler(stop_handler)

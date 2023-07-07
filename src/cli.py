@@ -1,6 +1,5 @@
 from sys import argv
-
-from atl_bitlab_bot import clean_jsonl_data, summarize_messages, init
+from atl_bitlab_bot import clean_jsonl_data, summarize_messages, main
 
 ARGS = argv[1:]
 CLEAN = "-c" in ARGS or "--clean" in ARGS
@@ -18,4 +17,4 @@ elif CLEAN_SUMMARY:
     summarize_messages()
 
 else:
-    init()
+    main()
