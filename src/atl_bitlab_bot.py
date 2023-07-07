@@ -29,6 +29,7 @@ now = get_now()
 
 application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
 
+
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     mpy = open(MESSAGES_PY_FILE, "a")
     mpy.write(update.to_json())
@@ -82,6 +83,7 @@ def clean_jsonl_data():
     infile.close()
     outfile.close()
     debug(f"[{get_now()}] {PROGRAM}: clean_jsonl_data - Deduping done")
+    return "Cleaning done!"
 
 
 def summarize_messages():
@@ -137,6 +139,12 @@ def summarize_messages():
     return summaries
 
 
+async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, text=clean_jsonl_data()
+    )
+
+
 async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = "Generating summary"
     args = context.args
@@ -159,8 +167,10 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     args = context.args
     if len(args) > 0:
-        prompt_input = ' '.join(args)
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Prompt: {prompt_input}")
+        prompt_input = " ".join(args)
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id, text=f"Prompt: {prompt_input}"
+        )
         response = openai.Completion.create(
             model="text-davinci-003",
             prompt=prompt_input,
@@ -172,7 +182,9 @@ async def prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         answer = response.choices[0].text.strip()
     else:
         return await update.message.reply_text("You didn't provide any arguments.")
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"GPT says: {answer}")
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, text=f"GPT says: {answer}"
+    )
 
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -188,14 +200,23 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     debug(f"[{get_now()}] {PROGRAM}: /start executed")
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text="Bot started. Commands available\n/summary",
+        text="Bot started. Commands available\n/summary\n/prompt\n/clean\n/clean-summary",
     )
-    summarize_handler = CommandHandler("summary", summary)
+
     message_handler = MessageHandler(BaseFilter(), handle_message)
-    message_handler = CommandHandler("prompt", prompt)
-    application.add_handler(summarize_handler)
     application.add_handler(message_handler)
-    application.add_handler(message_handler)
+
+    summary_handler = CommandHandler("summary", summary)
+    application.add_handler(summary_handler)
+
+    prompt_handler = CommandHandler("prompt", prompt)
+    application.add_handler(prompt_handler)
+
+    clean_handler = CommandHandler("clean", prompt)
+    application.add_handler(clean_handler)
+
+    clean_summary_handler = CommandHandler("clean-summary", prompt)
+    application.add_handler(clean_summary_handler)
 
 
 def main():
