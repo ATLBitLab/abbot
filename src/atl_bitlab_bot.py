@@ -196,21 +196,32 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
+async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text="Commands available\n\
+             /summary produce daily summaries\n\
+                \t\default ⇒ produce daily summaries for the past 7 days\n\
+                \t<date> ⇒ produce summary for <date>\n\
+                    \t\te.g. 2023-07-05\n\
+                \t<start> <end> ⇒ produce daily summaries from start to end\n\
+                    \t\te.g 2023-07-02 2023-07-05\n\
+                \t<start> <# of days> ⇒ produce daily summaries from start + # days (0-index)\n\
+                    \t\te.g. 2023-07-02 2 ⇒ 2023-07-02 to 2023-07-04\n\
+            /clean dedupe and remove bad chars from the raw messages\n\
+                \tNote: recommended to use /clean then /summary or /both to ensure best output\n\
+            /both run clean and summary; args for /summary apply\n\
+            /prompt \n\
+                \t<gpt-prompt> ⇒ send gpt-prompt to gpt\n\
+            /help show this menu",
+    )
+
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     debug(f"[{get_now()}] {PROGRAM}: /start executed")
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text="Bot started. Commands available\n\
-             /summary : produce a chat gpt summary of messages\n\
-                \tno arg ⇒ produce summary for each day of the past 7 days\n\
-                \t<date> ⇒ produce summary for that date; date format: 2023-07-05\n\
-                \t<start-date> <end-date> ⇒ produce summary from start to end: 2023-07-02 2023-07-05\n\
-                \t<start-date> <# of days> ⇒ produce summary for dates from start plus # of days (0-indexed): 2023-07-02 2 ⇒ 2023-07-02 to 2023-07-04\n\
-            /clean : clean up the raw messages - dedupe, remove bad chars\n\
-            /both : run clean and summary; args for /summary apply\n\
-            /prompt\n\
-                \t<gpt-prompt> ⇒ send gpt-prompt to gpt\n\
-            /help : show this menu",
+        text="Bot started. Run /help for usage guide",
     )
 
     message_handler = MessageHandler(BaseFilter(), handle_message)
