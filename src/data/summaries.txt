@@ -251,3 +251,7 @@ Summary for 2023-07-06:
 5. Bryan said I found the code I wrote back in 2019 to build the neural net I mentioned last night. If anyone is interested in what the code for constructing a LSTM neural net using tensorflow, checkout main.py starting on line 81 for code examples of how a neural net can be constructed https://github.com/bnonni/LSTM/blob/master/src/main.py specifically, line 83 is the input layer followed by multiple hidden layers each with 200 input nodes (the blue circles last night). on 2023-07-06
 ----------------------------------------------------------------
 
+Summary for 2023-07-04:
+On 2023-07-04, Bryan said anyone in the Peachtree Road Race was running that morning and Citizen 🇺🇸 said they did it once but didn't make the 40 minute cutoff and shared a video filmed in one day on Mitchell Street in Downtown ATL (https://youtu.be/SvvJbxl4Vmk). Elwood said "Separated at birth?" and Dalton asked if Bryan won. Bryan replied that they finished, if that counts as winning, and Robert said the race got called due to lightning. Bryan said they finished before the lightning and Robert said it was ironic. Stephen and Jordan both wished everyone a Happy Independence Day.
+----------------------------------------------------------------
+
