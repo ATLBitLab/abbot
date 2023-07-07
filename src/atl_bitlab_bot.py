@@ -199,7 +199,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text="Commands available\n\
+        text="Run /start to start listening for messages and access the following available commands\n\
              /summary produce daily summaries\n\
                 \t\default ⇒ produce daily summaries for the past 7 days\n\
                 \t<date> ⇒ produce summary for <date>\n\
@@ -242,6 +242,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def main():
     debug(f"[{get_now()}] {PROGRAM}: Init Bot")
+    help_handler = CommandHandler("help", help)
+    application.add_handler(help_handler)
     start_handler = CommandHandler("start", start)
     application.add_handler(start_handler)
     stop_handler = CommandHandler("stop", stop)
