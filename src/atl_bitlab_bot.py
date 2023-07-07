@@ -237,9 +237,9 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text="Run /start to start listening for messages. Available commands:\n\n\
-        /summary\
-            Summary: produce daily summaries\n\
+        text="Run `/start` to start listening for messages. Available commands:\n\n\
+        `/summary`\
+            Produce daily summaries\n\
             Args:\
                 default ⇒ produce daily summaries for the past 7 days\n\
                 date ⇒ produce summary for date\n\
@@ -248,10 +248,11 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     e.g 2023-07-02 2023-07-05\n\
                 start number ⇒ produce daily summaries from start + numbers of days (0-index)\n\
                     e.g. 2023-07-02 2 ⇒ 2023-07-02 to 2023-07-04\n\
-        /clean dedupe and remove bad chars from the raw messages\n\
-            Note: recommended to use /clean then /summary or /both to ensure best output\n\
-        /both run clean and summary; args for /summary apply\n\
-        /prompt\n\
+        `/clean`\
+            Dedupe and remove bad chars from the raw messages\n\
+            Recommend using `/clean` then `/summary` or `/both` to ensure best output\n\
+        `/both` run clean and summary; args for /summary apply\n\
+        `/prompt`\n\
             gpt-prompt ⇒ send gpt-prompt to gpt\n\
         /help show help menu",
     )
