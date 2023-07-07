@@ -7,16 +7,20 @@ SUMMARY_LOG_FILE = os.path.abspath("data/summaries.txt")
 MESSAGES_PY_FILE = os.path.abspath("data/backup/messages.py")
 PROMPTS_BY_DAY_FILE = os.path.abspath("data/backup/prompts_by_day.py")
 CHATS_TO_IGNORE = [-911601159]
+ADMINS = ["nonni_io", "sbddesign"]
+CHEEKY_RESPONSE = [
+    "Ah ah ah, you didnt say the magic word ...",
+    "Simon says ... no",
+    "Access Denied!",
+    "Mutombo says no no no",
+    "What do we say to the god of ATL BitLab? Not today",
+]
 
 import re
 import json
+from random import randrange
+
 import openai
-
-from lib.logger import debug
-from lib.utils import get_now
-from lib.env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY
-from datetime import datetime, timedelta, date
-
 from telegram import Update
 from telegram.ext import (
     ApplicationBuilder,
@@ -25,6 +29,11 @@ from telegram.ext import (
     MessageHandler,
 )
 from telegram.ext.filters import BaseFilter
+
+from lib.logger import debug
+from lib.utils import get_now
+from lib.env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY
+from datetime import datetime, timedelta
 
 openai.api_key = OPENAI_API_KEY
 now = get_now()
@@ -147,6 +156,11 @@ def summarize_messages(days=None):
 
 
 async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_message.from_user.username not in ADMINS:
+        return context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=CHEEKY_RESPONSE[randrange(len(CHEEKY_RESPONSE))],
+        )
     debug(f"[{get_now()}] {PROGRAM}: /clean executed")
     await context.bot.send_message(
         chat_id=update.effective_chat.id, text="Cleaning ... please wait"
@@ -164,6 +178,11 @@ async def both():
 
 
 async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_message.from_user.username not in ADMINS:
+        return context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=CHEEKY_RESPONSE[randrange(len(CHEEKY_RESPONSE))],
+        )
     debug(f"[{get_now()}] {PROGRAM}: /summary executed")
     args = context.args or get_dates()
     arg_len = len(args)
@@ -197,6 +216,11 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def gptPrompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_message.from_user.username not in ADMINS:
+        return context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=CHEEKY_RESPONSE[randrange(len(CHEEKY_RESPONSE))],
+        )
     debug(f"[{get_now()}] {PROGRAM}: /prompt executed")
     await context.bot.send_message(
         chat_id=update.effective_chat.id, text="GPT is working ... please wait"
@@ -226,6 +250,11 @@ async def gptPrompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_message.from_user.username not in ADMINS:
+        return context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=CHEEKY_RESPONSE[randrange(len(CHEEKY_RESPONSE))],
+        )
     debug(f"[{get_now()}] {PROGRAM}: /stop executed")
     await context.bot.stop_poll(
         chat_id=update.effective_chat.id,
@@ -259,6 +288,11 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.effective_message.from_user.username not in ADMINS:
+        return context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=CHEEKY_RESPONSE[randrange(len(CHEEKY_RESPONSE))],
+        )
     debug(f"[{get_now()}] {PROGRAM}: Bot /start")
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
