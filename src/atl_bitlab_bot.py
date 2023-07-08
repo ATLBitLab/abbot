@@ -256,7 +256,6 @@ async def gpt_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             invoice = response.json()
             invoice_id = invoice.get("invoiceId")
-
             response = http_request("POST", f"invoices/{invoice_id}/quote")
             quote = response.json()
             ln_invoice = quote.get("lnInvoice")
@@ -267,7 +266,7 @@ async def gpt_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await context.bot.send_photo(
                 chat_id=update.effective_chat.id,
                 photo=bio,
-                caption=f'To get the response to your prompt: "{prompt}"\nPlease pay the invoice:\n{ln_invoice}',
+                caption=f'To get the response to your prompt: \"{prompt}\"\nPlease pay the invoice:\n{ln_invoice}',
             )
             paid = False
             timer = quote.get("expirationInSec")
