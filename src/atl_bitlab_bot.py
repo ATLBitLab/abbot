@@ -218,7 +218,7 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
 
-async def gpt_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         prompter = update.effective_message.from_user.username
         if prompter not in WHITELIST:
@@ -228,7 +228,7 @@ async def gpt_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         debug(f"[{get_now()}] {PROGRAM}: /prompt executed")
         await context.bot.send_message(
-            chat_id=update.effective_chat.id, text="GPT is working ... please wait"
+            chat_id=update.effective_chat.id, text="ATL BitLab Bot is working ... please wait"
         )
         args = context.args
         debug(f"[{get_now()}] {PROGRAM}: args{args}")
@@ -298,7 +298,7 @@ async def gpt_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         answer = response.choices[0].text.strip()
         await context.bot.send_message(
-            chat_id=update.effective_chat.id, text=f"GPT says: {answer}"
+            chat_id=update.effective_chat.id, text=f"ATL BLB says:\n\n{answer}"
         )
     except Exception as e:
         return await update.message.reply_text(f"Error: {e}")
@@ -351,7 +351,7 @@ def main():
     application.add_handler(stop_handler)
     summary_handler = CommandHandler("summary", summary)
     application.add_handler(summary_handler)
-    prompt_handler = CommandHandler("prompt", gpt_prompt)
+    prompt_handler = CommandHandler("prompt", atl_bitlab_bot)
     application.add_handler(prompt_handler)
     clean_handler = CommandHandler("clean", clean)
     application.add_handler(clean_handler)
