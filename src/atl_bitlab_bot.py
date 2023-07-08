@@ -15,29 +15,31 @@ CHEEKY_RESPONSE = [
     "Mutombo says no no no",
     "What do we say to the god of ATL BitLab? Not today",
 ]
-
+import time
 import re
 import json
+from uuid import uuid4
 from random import randrange
+from datetime import datetime, timedelta
 
 import openai
+
+openai.api_key = OPENAI_API_KEY
+
 from telegram import Update
+from telegram.ext.filters import BaseFilter
 from telegram.ext import (
     ApplicationBuilder,
     ContextTypes,
     CommandHandler,
     MessageHandler,
 )
-from telegram.ext.filters import BaseFilter
 
 from lib.logger import debug
-from lib.utils import get_now
+from lib.utils import get_now, http_request
 from lib.env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY
-from datetime import datetime, timedelta
 
-openai.api_key = OPENAI_API_KEY
 now = get_now()
-
 application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
 
 
@@ -230,9 +232,35 @@ async def gptPrompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if len(args) > 0:
         prompt_input = " ".join(args)
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id, text=f"Prompt: {prompt_input}"
+        invoice = http_request(
+            "POST",
+            "invoices",
+            {
+                "correlationId": str(uuid4()),
+                "description": f"ATL BitLab Bot Prompt {prompt_input}",
+                "amount": {"amount": "1.00", "currency": "USD"},
+            },
         )
+        invoice_id = invoice.invoiceId
+        quote = http_request("POST", f"invoices/{invoice_id}/quote")
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=f"Prompt: {prompt_input}\nInvoice: {quote.lnInvoice}",
+        )
+        paid = False
+        timer = quote.expirationInSec
+        while timer > 0:
+            check = http_request("GET", f"invoices/{invoice_id}")
+            paid = check.state
+            if paid:
+                break
+            timer -= 1
+            time.sleep(1)
+        if not paid:
+            return await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text=f"Invoice expired!",
+            )
         response = openai.Completion.create(
             model="text-davinci-003",
             prompt=prompt_input,
