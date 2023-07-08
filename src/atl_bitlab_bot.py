@@ -238,8 +238,10 @@ async def gpt_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         prompt = " ".join(args)
         prompt_len = len(prompt)
         if len(prompt) >= 3095:
-            return await update.message.reply_text("Error: Prompt too long. Max token len = 3095")
-        prompt = prompt[:prompt_len - 22] if prompt_len >= 184 else prompt
+            return await update.message.reply_text(
+                "Error: Prompt too long. Max token len = 3095"
+            )
+        prompt = prompt[: prompt_len - 22] if prompt_len >= 184 else prompt
         if prompter not in ADMINS:
             response = http_request(
                 "POST",
