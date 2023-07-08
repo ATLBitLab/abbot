@@ -48,19 +48,20 @@ application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    message = update.effective_message
     if update.effective_chat.id in CHATS_TO_IGNORE:
         return
+    # if message.
     mpy = open(MESSAGES_PY_FILE, "a")
     mpy.write(update.to_json())
     mpy.write("\n")
     mpy.close()
-    message = update.effective_message
     debug(f"[{get_now()}] {PROGRAM}: handle_message - Raw message {message}")
     message_dumps = json.dumps(
         {
-            "text": message.text or message.caption,
             "from": message.from_user.first_name,
             "date": message.date.isoformat().split("+")[0].split("T")[0],
+            **message,
         }
     )
     rm_jl = open(RAW_MESSAGE_JL_FILE, "a")
