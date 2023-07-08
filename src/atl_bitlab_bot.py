@@ -22,10 +22,6 @@ from uuid import uuid4
 from random import randrange
 from datetime import datetime, timedelta
 
-import openai
-
-openai.api_key = OPENAI_API_KEY
-
 from telegram import Update
 from telegram.ext.filters import BaseFilter
 from telegram.ext import (
@@ -38,6 +34,9 @@ from telegram.ext import (
 from lib.logger import debug
 from lib.utils import get_now, http_request
 from lib.env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY
+import openai
+
+openai.api_key = OPENAI_API_KEY
 
 now = get_now()
 application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
