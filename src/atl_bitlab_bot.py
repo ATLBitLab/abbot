@@ -1,5 +1,7 @@
 import os
 
+from lib.reqs import do_strike_logic
+
 PROGRAM = "ATL BitLab Bot"
 RAW_MESSAGE_JL_FILE = os.path.abspath("data/raw_messages.jsonl")
 MESSAGES_JL_FILE = os.path.abspath("data/messages.jsonl")
@@ -14,6 +16,7 @@ CHEEKY_RESPONSE = [
     "Access Denied!",
     "Mutombo says no no no",
     "What do we say to the god of ATL BitLab? Not today",
+    "Do not pass go, do not collect $200",
 ]
 import time
 import re
@@ -218,7 +221,7 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
 
-async def gptPrompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def atl_bitlab_bot_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_message.from_user.username not in ADMINS:
         return context.bot.send_message(
             chat_id=update.effective_chat.id,
@@ -230,57 +233,9 @@ async def gptPrompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     args = context.args
     debug(f"[{get_now()}] {PROGRAM}: args{args}")
-
     if len(args) > 0:
         prompt_input = " ".join(args)
-        try:
-            response = http_request(
-                "POST",
-                "invoices",
-                {
-                    "correlationId": str(uuid4()),
-                    "description": f"ATL BitLab Bot Prompt {prompt_input}",
-                    "amount": {"amount": "1.00", "currency": "USD"},
-                },
-            )
-            invoice = response.json()
-            invoice_id = invoice.get("invoiceId")
-
-            response = http_request("POST", f"invoices/{invoice_id}/quote")
-            quote = response.json()
-            ln_invoice = quote.get("lnInvoice")
-            qr = qrcode.make(ln_invoice)
-            bio = BytesIO()
-            qr.save(bio, "PNG")
-            bio.seek(0)
-            await context.bot.send_photo(
-                chat_id=update.effective_chat.id,
-                photo=bio,
-                caption=f'To get the response to your prompt: "{prompt_input}"\nPlease pay the invoice:\n{ln_invoice}',
-            )
-        except Exception as e:
-            print(e)
-        paid = False
-        timer = quote.get("expirationInSec")
-        while timer > 0:
-            response = http_request("GET", f"invoices/{invoice_id}")
-            check = response.json()
-            paid = check.get("state") == "PAID"
-            if paid:
-                break
-            timer -= 1
-            time.sleep(1)
-        if not paid:
-            try:
-                response = http_request("PATCH", f"invoices/${invoice_id}/cancel")
-                data = response.json()
-                state = data.state
-                return await context.bot.send_message(
-                    chat_id=update.effective_chat.id,
-                    text=f"Invoice Expired / {state}!",
-                )
-            except Exception as e:
-                print(e)
+        response = do_strike_logic()
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=f"Thanks for your payment! Generating response ... please wait!",
@@ -297,7 +252,7 @@ async def gptPrompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         return await update.message.reply_text("You didn't provide any arguments.")
     await context.bot.send_message(
-        chat_id=update.effective_chat.id, text=f"GPT says: {answer}"
+        chat_id=update.effective_chat.id, text=f"ATL BitLab Bot says:\n{answer}"
     )
 
 
@@ -364,7 +319,7 @@ def main():
     application.add_handler(stop_handler)
     summary_handler = CommandHandler("summary", summary)
     application.add_handler(summary_handler)
-    prompt_handler = CommandHandler("prompt", gptPrompt)
+    prompt_handler = CommandHandler("prompt", atl_bitlab_bot_prompt)
     application.add_handler(prompt_handler)
     clean_handler = CommandHandler("clean", clean)
     application.add_handler(clean_handler)

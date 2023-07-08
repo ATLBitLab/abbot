@@ -1,12 +1,3 @@
-from lib.env import STRIKE_API_KEY
-
-STRIKE_BASE_URL = "https://api.strike.me/v1"
-STRIKE_HEADERS = {
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-    "Authorization": f"Bearer {STRIKE_API_KEY}",
-}
-
 from requests import request
 from datetime import datetime
 
@@ -19,10 +10,20 @@ def get_now_date():
     return datetime.now().date()
 
 
-def http_request(method, path, json=None):
+def http_request(headers, method, url, path, json=None):
     return request(
+        headers=headers,
         method=method,
-        url=f"{STRIKE_BASE_URL}/{path}",
+        url=f"{url}/{path}",
         json=json,
-        headers=STRIKE_HEADERS,
-    )
+    ).json()
+
+
+"""
+TODO:
+- [ ] abstract the payment method for FOSS users
+      allow users to plug in any number of LN / BTC payment methods
+      e.g home node (LND, CLN, etc)
+      cloud node (voltage, aws, etc)
+      LSPs (stike, opennode, etc.)
+"""
