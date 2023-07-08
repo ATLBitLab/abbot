@@ -21,6 +21,8 @@ import json
 from uuid import uuid4
 from random import randrange
 from datetime import datetime, timedelta
+import qrcode
+from io import BytesIO
 
 from telegram import Update
 from telegram.ext.filters import BaseFilter
@@ -231,35 +233,58 @@ async def gptPrompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if len(args) > 0:
         prompt_input = " ".join(args)
-        invoice = http_request(
-            "POST",
-            "invoices",
-            {
-                "correlationId": str(uuid4()),
-                "description": f"ATL BitLab Bot Prompt {prompt_input}",
-                "amount": {"amount": "1.00", "currency": "USD"},
-            },
-        )
-        invoice_id = invoice.invoiceId
-        quote = http_request("POST", f"invoices/{invoice_id}/quote")
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text=f"Prompt: {prompt_input}\nInvoice: {quote.lnInvoice}",
-        )
+        try:
+            response = http_request(
+                "POST",
+                "invoices",
+                {
+                    "correlationId": str(uuid4()),
+                    "description": f"ATL BitLab Bot Prompt {prompt_input}",
+                    "amount": {"amount": "1.00", "currency": "USD"},
+                },
+            )
+            invoice = response.json()
+            invoice_id = invoice.get("invoiceId")
+
+            response = http_request("POST", f"invoices/{invoice_id}/quote")
+            quote = response.json()
+            ln_invoice = quote.get("lnInvoice")
+            qr = qrcode.make(ln_invoice)
+            bio = BytesIO()
+            qr.save(bio, "PNG")
+            bio.seek(0)
+            await context.bot.send_photo(
+                chat_id=update.effective_chat.id,
+                photo=bio,
+                caption=f'To get the response to your prompt: "{prompt_input}"\nPlease pay the invoice:\n{ln_invoice}',
+            )
+        except Exception as e:
+            print(e)
         paid = False
-        timer = quote.expirationInSec
+        timer = quote.get("expirationInSec")
         while timer > 0:
-            check = http_request("GET", f"invoices/{invoice_id}")
-            paid = check.state
+            response = http_request("GET", f"invoices/{invoice_id}")
+            check = response.json()
+            paid = check.get("state") == "PAID"
             if paid:
                 break
             timer -= 1
             time.sleep(1)
         if not paid:
-            return await context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text=f"Invoice expired!",
-            )
+            try:
+                response = http_request("PATCH", f"invoices/${invoice_id}/cancel")
+                data = response.json()
+                state = data.state
+                return await context.bot.send_message(
+                    chat_id=update.effective_chat.id,
+                    text=f"Invoice Expired / {state}!",
+                )
+            except Exception as e:
+                print(e)
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=f"Thanks for your payment! Generating response ... please wait!",
+        )
         response = openai.Completion.create(
             model="text-davinci-003",
             prompt=prompt_input,

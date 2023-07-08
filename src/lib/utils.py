@@ -19,10 +19,10 @@ def get_now_date():
     return datetime.now().date()
 
 
-def http_request(method, path, data=None):
+def http_request(method, path, json=None):
     return request(
         method=method,
         url=f"{STRIKE_BASE_URL}/{path}",
-        data=data,
+        json=json,
         headers=STRIKE_HEADERS,
     )
