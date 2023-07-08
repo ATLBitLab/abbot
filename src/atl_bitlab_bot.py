@@ -8,6 +8,8 @@ MESSAGES_PY_FILE = os.path.abspath("data/backup/messages.py")
 PROMPTS_BY_DAY_FILE = os.path.abspath("data/backup/prompts_by_day.py")
 CHATS_TO_IGNORE = [-911601159]
 ADMINS = ["nonni_io", "sbddesign"]
+MEMBERS = ["alex_lewin"]
+WHITELIST = ADMINS + MEMBERS
 CHEEKY_RESPONSE = [
     "Ah ah ah, you didnt say the magic word ...",
     "Simon says ... no",
@@ -218,48 +220,52 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
 
-async def gptPrompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.effective_message.from_user.username not in ADMINS:
-        return context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text=CHEEKY_RESPONSE[randrange(len(CHEEKY_RESPONSE))],
-        )
-    debug(f"[{get_now()}] {PROGRAM}: /prompt executed")
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id, text="GPT is working ... please wait"
-    )
-    args = context.args
-    debug(f"[{get_now()}] {PROGRAM}: args{args}")
-
-    if len(args) > 0:
-        prompt_input = " ".join(args)
-        try:
-            response = http_request(
-                "POST",
-                "invoices",
-                {
-                    "correlationId": str(uuid4()),
-                    "description": f"ATL BitLab Bot Prompt {prompt_input}",
-                    "amount": {"amount": "1.00", "currency": "USD"},
-                },
-            )
-            invoice = response.json()
-            invoice_id = invoice.get("invoiceId")
-
-            response = http_request("POST", f"invoices/{invoice_id}/quote")
-            quote = response.json()
-            ln_invoice = quote.get("lnInvoice")
-            qr = qrcode.make(ln_invoice)
-            bio = BytesIO()
-            qr.save(bio, "PNG")
-            bio.seek(0)
-            await context.bot.send_photo(
+async def gpt_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        prompter = update.effective_message.from_user.username
+        if prompter not in WHITELIST:
+            return context.bot.send_message(
                 chat_id=update.effective_chat.id,
-                photo=bio,
-                caption=f'To get the response to your prompt: "{prompt_input}"\nPlease pay the invoice:\n{ln_invoice}',
+                text=CHEEKY_RESPONSE[randrange(len(CHEEKY_RESPONSE))],
             )
-        except Exception as e:
-            print(e)
+        debug(f"[{get_now()}] {PROGRAM}: /prompt executed")
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id, text="GPT is working ... please wait"
+        )
+        args = context.args
+        debug(f"[{get_now()}] {PROGRAM}: args{args}")
+
+        if len(args) <= 0:
+            return await update.message.reply_text("Error: You didn't provide a prompt")
+        prompt = " ".join(args)
+        prompt_len = len(prompt)
+        if len(prompt) >= 3095:
+            return await update.message.reply_text("Error: Prompt too long. Max token len = 3095")
+        prompt = prompt[:prompt_len - 22] if prompt_len >= 184 else prompt
+        response = http_request(
+            "POST",
+            "invoices",
+            {
+                "correlationId": str(uuid4()),
+                "description": f"ATL BitLab Bot: Payer - {prompter}, Prompt - {prompt}",
+                "amount": {"amount": "1.00", "currency": "USD"},
+            },
+        )
+        invoice = response.json()
+        invoice_id = invoice.get("invoiceId")
+
+        response = http_request("POST", f"invoices/{invoice_id}/quote")
+        quote = response.json()
+        ln_invoice = quote.get("lnInvoice")
+        qr = qrcode.make(ln_invoice)
+        bio = BytesIO()
+        qr.save(bio, "PNG")
+        bio.seek(0)
+        await context.bot.send_photo(
+            chat_id=update.effective_chat.id,
+            photo=bio,
+            caption=f'To get the response to your prompt: "{prompt}"\nPlease pay the invoice:\n{ln_invoice}',
+        )
         paid = False
         timer = quote.get("expirationInSec")
         while timer > 0:
@@ -271,34 +277,31 @@ async def gptPrompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
             timer -= 1
             time.sleep(1)
         if not paid:
-            try:
-                response = http_request("PATCH", f"invoices/${invoice_id}/cancel")
-                data = response.json()
-                state = data.state
-                return await context.bot.send_message(
-                    chat_id=update.effective_chat.id,
-                    text=f"Invoice Expired / {state}!",
-                )
-            except Exception as e:
-                print(e)
+            response = http_request("PATCH", f"invoices/${invoice_id}/cancel")
+            data = response.json()
+            state = data.state
+            return await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text=f"Invoice Expired / {state}!",
+            )
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=f"Thanks for your payment! Generating response ... please wait!",
         )
         response = openai.Completion.create(
             model="text-davinci-003",
-            prompt=prompt_input,
-            max_tokens=4000 - len(prompt_input),
+            prompt=prompt,
+            max_tokens=4095 - len(prompt),
             n=1,
             stop=None,
             temperature=0.1,
         )
         answer = response.choices[0].text.strip()
-    else:
-        return await update.message.reply_text("You didn't provide any arguments.")
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id, text=f"GPT says: {answer}"
-    )
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id, text=f"GPT says: {answer}"
+        )
+    except Exception as e:
+        return await update.message.reply_text(f"Error: {e}")
 
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -364,7 +367,7 @@ def main():
     application.add_handler(stop_handler)
     summary_handler = CommandHandler("summary", summary)
     application.add_handler(summary_handler)
-    prompt_handler = CommandHandler("prompt", gptPrompt)
+    prompt_handler = CommandHandler("prompt", gpt_prompt)
     application.add_handler(prompt_handler)
     clean_handler = CommandHandler("clean", clean)
     application.add_handler(clean_handler)
