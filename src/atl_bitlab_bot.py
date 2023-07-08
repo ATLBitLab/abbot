@@ -222,7 +222,7 @@ async def gpt_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         prompter = update.effective_message.from_user.username
         if prompter not in WHITELIST:
-            return context.bot.send_message(
+            return await context.bot.send_message(
                 chat_id=update.effective_chat.id,
                 text=CHEEKY_RESPONSE[randrange(len(CHEEKY_RESPONSE))],
             )
