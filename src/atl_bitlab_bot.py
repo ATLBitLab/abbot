@@ -240,52 +240,53 @@ async def gpt_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if len(prompt) >= 3095:
             return await update.message.reply_text("Error: Prompt too long. Max token len = 3095")
         prompt = prompt[:prompt_len - 22] if prompt_len >= 184 else prompt
-        response = http_request(
-            "POST",
-            "invoices",
-            {
-                "correlationId": str(uuid4()),
-                "description": f"ATL BitLab Bot: Payer - {prompter}, Prompt - {prompt}",
-                "amount": {"amount": "1.00", "currency": "USD"},
-            },
-        )
-        invoice = response.json()
-        invoice_id = invoice.get("invoiceId")
-
-        response = http_request("POST", f"invoices/{invoice_id}/quote")
-        quote = response.json()
-        ln_invoice = quote.get("lnInvoice")
-        qr = qrcode.make(ln_invoice)
-        bio = BytesIO()
-        qr.save(bio, "PNG")
-        bio.seek(0)
-        await context.bot.send_photo(
-            chat_id=update.effective_chat.id,
-            photo=bio,
-            caption=f'To get the response to your prompt: "{prompt}"\nPlease pay the invoice:\n{ln_invoice}',
-        )
-        paid = False
-        timer = quote.get("expirationInSec")
-        while timer > 0:
-            response = http_request("GET", f"invoices/{invoice_id}")
-            check = response.json()
-            paid = check.get("state") == "PAID"
-            if paid:
-                break
-            timer -= 1
-            time.sleep(1)
-        if not paid:
-            response = http_request("PATCH", f"invoices/${invoice_id}/cancel")
-            data = response.json()
-            state = data.state
-            return await context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text=f"Invoice Expired / {state}!",
+        if prompter not in ADMINS:
+            response = http_request(
+                "POST",
+                "invoices",
+                {
+                    "correlationId": str(uuid4()),
+                    "description": f"ATL BitLab Bot: Payer - {prompter}, Prompt - {prompt}",
+                    "amount": {"amount": "1.00", "currency": "USD"},
+                },
             )
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text=f"Thanks for your payment! Generating response ... please wait!",
-        )
+            invoice = response.json()
+            invoice_id = invoice.get("invoiceId")
+
+            response = http_request("POST", f"invoices/{invoice_id}/quote")
+            quote = response.json()
+            ln_invoice = quote.get("lnInvoice")
+            qr = qrcode.make(ln_invoice)
+            bio = BytesIO()
+            qr.save(bio, "PNG")
+            bio.seek(0)
+            await context.bot.send_photo(
+                chat_id=update.effective_chat.id,
+                photo=bio,
+                caption=f'To get the response to your prompt: "{prompt}"\nPlease pay the invoice:\n{ln_invoice}',
+            )
+            paid = False
+            timer = quote.get("expirationInSec")
+            while timer > 0:
+                response = http_request("GET", f"invoices/{invoice_id}")
+                check = response.json()
+                paid = check.get("state") == "PAID"
+                if paid:
+                    break
+                timer -= 1
+                time.sleep(1)
+            if not paid:
+                response = http_request("PATCH", f"invoices/${invoice_id}/cancel")
+                data = response.json()
+                state = data.state
+                return await context.bot.send_message(
+                    chat_id=update.effective_chat.id,
+                    text=f"Invoice Expired / {state}!",
+                )
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text=f"Thanks for your payment! Generating response ... please wait!",
+            )
         response = openai.Completion.create(
             model="text-davinci-003",
             prompt=prompt,
