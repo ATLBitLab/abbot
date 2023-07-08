@@ -134,7 +134,7 @@ def summarize_messages(days=None):
                 print(f"message date: {message_date}")
                 print(f"day == message date: {day == message_date}")
         final_prompt = (
-            "Summarize the following messages including sender name, date and any urls if present:\n"
+            "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n"
             + prompt
         )
         prompts_by_day[day] = final_prompt
@@ -166,7 +166,7 @@ def summarize_messages(days=None):
 
 async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_message.from_user.username not in ADMINS:
-        return context.bot.send_message(
+        return await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=CHEEKY_RESPONSE[randrange(len(CHEEKY_RESPONSE))],
         )
@@ -188,7 +188,7 @@ async def both():
 
 async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_message.from_user.username not in ADMINS:
-        return context.bot.send_message(
+        return await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=CHEEKY_RESPONSE[randrange(len(CHEEKY_RESPONSE))],
         )
@@ -261,7 +261,7 @@ async def atl_bitlab_bot_prompt(update: Update, context: ContextTypes.DEFAULT_TY
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_message.from_user.username not in ADMINS:
-        return context.bot.send_message(
+        return await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=CHEEKY_RESPONSE[randrange(len(CHEEKY_RESPONSE))],
         )
@@ -299,7 +299,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.effective_message.from_user.username not in ADMINS:
-        return context.bot.send_message(
+        return await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=CHEEKY_RESPONSE[randrange(len(CHEEKY_RESPONSE))],
         )
