@@ -1,5 +1,23 @@
 from requests import request
 from datetime import datetime
+import qrcode
+
+
+def try_get(obj, *fields, **kwargs):
+    default = kwargs.pop("default", None)
+    if kwargs:
+        raise TypeError(
+            "try_get() received unexpected keyword argument", kwargs[kwargs.keys()[0]]
+        )
+    for field in fields:
+        try:
+            obj = obj[field]
+        except (AttributeError, KeyError, TypeError, IndexError):
+            try:
+                obj = getattr(obj, field)
+            except Exception:
+                return default
+    return obj
 
 
 def get_now():

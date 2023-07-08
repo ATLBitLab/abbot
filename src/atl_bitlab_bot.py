@@ -1,4 +1,5 @@
 import os
+from lib.payment import strike_invoice_id, strike_quote
 
 from lib.reqs import do_strike_logic
 
@@ -23,11 +24,9 @@ CHEEKY_RESPONSE = [
 import time
 import re
 import json
-from uuid import uuid4
+from io import BytesIO
 from random import randrange
 from datetime import datetime, timedelta
-import qrcode
-from io import BytesIO
 
 from telegram import Update
 from telegram.ext.filters import BaseFilter
@@ -39,7 +38,7 @@ from telegram.ext import (
 )
 
 from lib.logger import debug
-from lib.utils import get_now, http_request
+from lib.utils import get_now, get_qr_code, http_request
 from lib.env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY
 import openai
 
@@ -277,7 +276,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text="Run /start to start listening for messages. Available commands:\n\n\/summary Produce daily summaries in a time frame\n\nArgs:\ndefault ⇒ produce daily summaries for the past 7 days\ndate ⇒ produce summary for date\ne.g. 2023-07-05\nstart end ⇒ produce daily summaries from start to end\ne.g 2023-07-02 2023-07-05\nstart number ⇒ produce daily summaries from start + numbers of days (0-index)\ne.g. 2023-07-02 2 ⇒ 2023-07-02 to 2023-07-04\n/clean\
-            Dedupe and remove bad chars from the raw messages\nRecommend using /clean then /summary or /both to ensure best output\n/both run clean and summary; args for /summary apply\n/prompt\ngpt-prompt ⇒ send gpt-prompt to gpt\n/help show help menu",
+            Dedupe and remove bad chars from the raw messages\nRecommend using /clean then /summary or /both to ensure best output\n/both run clean and summary; args for /summary apply\n/prompt\nstatement or questino ⇒ send a statement or question prompt to gpt 3\n/help show help menu",
     )
 
 
