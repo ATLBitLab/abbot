@@ -10,6 +10,8 @@ MESSAGES_PY_FILE = os.path.abspath("data/backup/messages.py")
 PROMPTS_BY_DAY_FILE = os.path.abspath("data/backup/prompts_by_day.py")
 CHATS_TO_IGNORE = [-911601159]
 ADMINS = ["nonni_io", "sbddesign"]
+MEMBERS = ["alex_lewin"]
+WHITELIST = ADMINS + MEMBERS
 CHEEKY_RESPONSE = [
     "Ah ah ah, you didnt say the magic word ...",
     "Simon says ... no",
@@ -243,8 +245,8 @@ async def atl_bitlab_bot_prompt(update: Update, context: ContextTypes.DEFAULT_TY
         )
         response = openai.Completion.create(
             model="text-davinci-003",
-            prompt=prompt_input,
-            max_tokens=4000 - len(prompt_input),
+            prompt=prompt,
+            max_tokens=4095 - len(prompt),
             n=1,
             stop=None,
             temperature=0.1,
