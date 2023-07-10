@@ -34,7 +34,7 @@ def do_strike_logic(method, url, path, json=None, headers=STRIKE_HEADERS):
         qr.save(bio, "PNG")
         bio.seek(0)
     except Exception as e:
-        print(e)
+        return e
 
 
 """

@@ -1,5 +1,4 @@
 import os
-from lib.payment import strike_invoice_id, strike_quote
 
 from lib.reqs import do_strike_logic
 
@@ -24,8 +23,8 @@ CHEEKY_RESPONSE = [
 import time
 import re
 import json
-from io import BytesIO
 from random import randrange
+from uuid import uuid4
 from datetime import datetime, timedelta
 
 from telegram import Update
@@ -38,8 +37,9 @@ from telegram.ext import (
 )
 
 from lib.logger import debug
-from lib.utils import get_now, get_qr_code, http_request
+from lib.utils import get_now, get_qr_code
 from lib.env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY
+from lib.api.strike import Strike
 import openai
 
 openai.api_key = OPENAI_API_KEY
@@ -129,9 +129,6 @@ def summarize_messages(days=None):
                 sender = message["from"]
                 message = f"{sender} said {text} on {message_date}\n"
                 prompt += message
-                print(f"day: {day}")
-                print(f"message date: {message_date}")
-                print(f"day == message date: {day == message_date}")
         final_prompt = (
             "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n"
             + prompt
@@ -146,12 +143,10 @@ def summarize_messages(days=None):
     summary_file = open(SUMMARY_LOG_FILE, "a")
     for day, prompt in prompts_by_day.items():
         response = openai.Completion.create(
-            model="text-davinci-003",
+            model="gpt-3.5-turbo-16k-0613",
             prompt=prompt,
             max_tokens=4000 - len(prompt),
-            n=1,
-            stop=None,
-            temperature=0.1,
+            temperature=0,
         )
         debug(f"[{now}] {PROGRAM}: OpenAI Response = {response}")
         summary = f"Summary for {day}:\n{response.choices[0].text.strip()}"

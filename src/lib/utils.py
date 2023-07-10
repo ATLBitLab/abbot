@@ -1,6 +1,7 @@
 from requests import request
 from datetime import datetime
 import qrcode
+from io import BytesIO
 
 
 def try_get(obj, *fields, **kwargs):
