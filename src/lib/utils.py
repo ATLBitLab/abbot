@@ -29,11 +29,11 @@ def get_now_date():
     return datetime.now().date()
 
 
-def http_request(headers, method, url, path, json=None):
+def http_request(headers, method, url, json=None):
     return request(
         headers=headers,
         method=method,
-        url=f"{url}/{path}",
+        url=url,
         json=json,
     ).json()
 

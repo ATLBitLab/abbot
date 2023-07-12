@@ -1,6 +1,12 @@
+from lib.env import STRIKE_API_KEY
 from lib.utils import try_get
-from reqs import strike
-
+from reqs import http_request
+STRIKE_BASE_URL = "https://api.strike.me/v1"
+STRIKE_HEADERS = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+    "Authorization": f"Bearer {STRIKE_API_KEY}",
+}
 
 class Strike:
     def __init__(self, correlation_id, description, invoice_id):
@@ -9,9 +15,9 @@ class Strike:
         self.invoice_id = invoice_id
 
     def invoice(self):
-        response = strike(
+        response = http_request(
             "POST",
-            "invoices",
+            f"{STRIKE_BASE_URL}/invoices",
             {
                 "correlationId": self.correlation_id,
                 "description": self.description,
@@ -22,14 +28,14 @@ class Strike:
         return self.invoice_id, False
 
     def quote(self):
-        response = strike("POST", f"invoices/{self.invoice_id}/quote")
+        response = http_request("POST", f"invoices/{self.invoice_id}/quote")
         return (
             try_get(response, "lnInvoice"),
             try_get(response, "expirationInSec"),
         )
 
     def paid(self):
-        check = strike("GET", f"invoices/{self.invoice_id}")
+        check = http_request("GET", f"invoices/{self.invoice_id}")
         return try_get(check, "state") == "PAID"
 
     def expire_invoice(self):
