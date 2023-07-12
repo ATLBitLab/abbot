@@ -8,8 +8,9 @@ MESSAGES_PY_FILE = os.path.abspath("data/backup/messages.py")
 PROMPTS_BY_DAY_FILE = os.path.abspath("data/backup/prompts_by_day.py")
 CHATS_TO_IGNORE = [-911601159, -1001608254734]
 ADMINS = ["nonni_io", "sbddesign"]
-MEMBERS = ["alex_lewin"]
-WHITELIST = ADMINS + MEMBERS
+DEDICATED_DESKS = ["alex_lewin"]
+MEMBERS = []
+WHITELIST = ADMINS + DEDICATED_DESKS
 CHEEKY_RESPONSE = [
     "Ah ah ah, you didnt say the magic word ...",
     "Simon says ... no",
@@ -142,7 +143,7 @@ def summarize_messages(days=None):
     summary_file = open(SUMMARY_LOG_FILE, "a")
     for day, prompt in prompts_by_day.items():
         response = openai.Completion.create(
-            model="gpt-3.5-turbo-16k-0613",
+            model="text-davinci-003",
             prompt=prompt,
             max_tokens=4000 - len(prompt),
             temperature=0,
@@ -223,13 +224,13 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         sender = update.effective_message.from_user.username
-        debug(f"[{now}] {PROGRAM}: /stop executed by {sender}")
-        if sender not in WHITELIST:
-            return await context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text=CHEEKY_RESPONSE[randrange(len(CHEEKY_RESPONSE))],
-            )
-        debug(f"[{now}] {PROGRAM}: /prompt executed")
+        # debug(f"[{now}] {PROGRAM}: /prompt executed by {sender}")
+        # if sender not in WHITELIST:
+        #     return await context.bot.send_message(
+        #         chat_id=update.effective_chat.id,
+        #         text=CHEEKY_RESPONSE[randrange(len(CHEEKY_RESPONSE))],
+        #     )
+        # debug(f"[{now}] {PROGRAM}: /prompt executed")
         await context.bot.send_message(
             chat_id=update.effective_chat.id, text="Working on your request"
         )
@@ -245,7 +246,7 @@ async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "Error: Prompt too long. Max token len = 3095"
             )
         prompt = prompt[: prompt_len - 22] if prompt_len >= 184 else prompt
-        if sender not in ADMINS:
+        if sender not in DEDICATED_DESKS:
             strike = Strike(str(uuid4()), f"ATL BitLab Bot: Payer - {sender}, Prompt - {prompt}", None)
             paid = strike.invoice()
             ln_invoice, timer = strike.quote()
@@ -278,7 +279,7 @@ async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 text=f"Thank you for supporting ATL BitLab. Generating your answer.",
             )
         response = openai.Completion.create(
-            model="gpt-4",
+            model="text-davinci-003",
             prompt=prompt,
             max_tokens=4095 - len(prompt),
             temperature=0,
