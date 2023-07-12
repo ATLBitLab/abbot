@@ -37,7 +37,7 @@ from telegram.ext import (
 )
 
 from lib.logger import debug
-from lib.utils import get_now, get_qr_code
+from lib.utils import get_now, get_qr_code, http_request
 from lib.env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY
 from lib.api.strike import Strike
 import openai
