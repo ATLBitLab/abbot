@@ -1,6 +1,6 @@
 from lib.env import STRIKE_API_KEY
 from lib.utils import try_get
-from reqs import http_request
+from lib.api.reqs import http_request
 STRIKE_BASE_URL = "https://api.strike.me/v1"
 STRIKE_HEADERS = {
     "Content-Type": "application/json",
@@ -25,7 +25,7 @@ class Strike:
             },
         )
         self.invoice_id = try_get(response, "invoiceId")
-        return self.invoice_id, False
+        return False
 
     def quote(self):
         response = http_request("POST", f"invoices/{self.invoice_id}/quote")
@@ -40,4 +40,4 @@ class Strike:
 
     def expire_invoice(self):
         response = ("PATCH", f"invoices/${self.invoice_id}/cancel")
-        return try_get(response, "state") == "PAID"
+        return try_get(response, "state") == "CANCELLED"

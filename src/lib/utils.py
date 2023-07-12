@@ -21,11 +21,7 @@ def try_get(obj, *fields, **kwargs):
     return obj
 
 
-def get_now():
-    return datetime.now()
-
-
-def get_now_date():
+def now_date():
     return datetime.now().date()
 
 
@@ -37,6 +33,12 @@ def http_request(headers, method, url, json=None):
         json=json,
     ).json()
 
+def qr_code(data):
+    qr = qrcode.make(data)
+    bio = BytesIO()
+    qr.save(bio, "PNG")
+    bio.seek(0)
+    return bio
 
 """
 TODO:
