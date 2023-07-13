@@ -175,9 +175,9 @@ async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def both():
-    await clean()
-    await summary()
+async def both(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await clean(update, context)
+    await summary(update, context)
     return "Messages cleaned. Summaries:"
 
 
@@ -190,7 +190,7 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text=CHEEKY_RESPONSE[randrange(len(CHEEKY_RESPONSE))],
         )
     debug(f"[{now}] {PROGRAM}: /summary executed")
-    args = context.args or get_dates()
+    args = context.args
     arg_len = len(args)
     if arg_len > 0 and arg_len > 2:
         return await update.message.reply_text("Too many args")
@@ -207,6 +207,9 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
             except Exception as e:
                 return await update.message.reply_text(f"Error while parsing date: {e}")
         message = f"Generating summary for each day between {' and '.join(args)}"
+    else:
+        args = get_dates()
+        message = f"Generating summary for each day in the past week: {args}"
     await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
     summaries = summarize_messages(args)
     for summary in summaries:

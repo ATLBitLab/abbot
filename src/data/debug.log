@@ -3763,3 +3763,195 @@ https://ronindojo.io/en/roninmobile
 [2023-07-12 08:41:22.163076] ATL BitLab Bot: Init Bot
 [2023-07-12 08:41:22.163076] ATL BitLab Bot: Polling!
 [2023-07-12 08:41:22.163076] ATL BitLab Bot: atl_bitlab_bot - args: ['what', 'did', 'you', 'learn', 'today?']
+[2023-07-13 06:42:34.351493] ATL BitLab Bot: Init Bot
+[2023-07-13 06:42:34.351493] ATL BitLab Bot: Polling!
+[2023-07-13 06:42:34.351493] ATL BitLab Bot: /start executed by nonni_io
+[2023-07-13 06:42:34.351493] ATL BitLab Bot: /help executed by nonni_io
+[2023-07-13 06:42:34.351493] ATL BitLab Bot: /summary executed by nonni_io
+[2023-07-13 06:42:34.351493] ATL BitLab Bot: /summary executed
+[2023-07-13 06:42:34.351493] ATL BitLab Bot: Prompts by day = {"2023-07-13": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n"}
+[2023-07-13 06:42:34.351493] ATL BitLab Bot: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "The text discusses the importance of having a good credit score.\n\n1. A good credit score is important for getting loans and other financial services.\n2. A good credit score can help you get lower interest rates on loans.\n3. A good credit score can help you get approved for a loan or other financial services.\n4. A good credit score can help you get better terms on loans.\n5. A good credit score can help you get better deals on insurance.\n6. A good credit score can help you get better deals on credit cards.\n7. A good credit score can help you get better deals on mortgages.\n\n========================\n\nA good credit score is important for getting loans and other financial services. It can help you get lower interest rates, better terms, and better deals on insurance, credit cards, and mortgages."
+    }
+  ],
+  "created": 1689248592,
+  "id": "cmpl-7bp0yLVu7rrmTx9FIrPNfQl12a2Ej",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 176,
+    "prompt_tokens": 35,
+    "total_tokens": 211
+  }
+}
+[2023-07-13 06:42:34.351493] ATL BitLab Bot: /clean executed by nonni_io
+[2023-07-13 06:42:34.351493] ATL BitLab Bot: /clean executed
+[2023-07-13 06:42:34.351493] ATL BitLab Bot: clean_jsonl_data - Deduping messages
+[2023-07-13 06:42:34.351493] ATL BitLab Bot: clean_jsonl_data - Deduping done
+[2023-07-13 06:42:34.351493] ATL BitLab Bot: /summary executed by nonni_io
+[2023-07-13 06:42:34.351493] ATL BitLab Bot: /summary executed
+[2023-07-13 06:45:18.720276] ATL BitLab Bot: Init Bot
+[2023-07-13 06:45:18.720276] ATL BitLab Bot: Polling!
+[2023-07-13 06:45:18.720276] ATL BitLab Bot: /clean executed by nonni_io
+[2023-07-13 06:45:18.720276] ATL BitLab Bot: /clean executed
+[2023-07-13 06:45:18.720276] ATL BitLab Bot: clean_jsonl_data - Deduping messages
+[2023-07-13 06:45:18.720276] ATL BitLab Bot: clean_jsonl_data - Deduping done
+[2023-07-13 06:45:18.720276] ATL BitLab Bot: /summary executed by nonni_io
+[2023-07-13 06:45:18.720276] ATL BitLab Bot: /summary executed
+[2023-07-13 06:46:14.909923] ATL BitLab Bot: Init Bot
+[2023-07-13 06:46:14.909923] ATL BitLab Bot: Polling!
+[2023-07-13 06:46:14.909923] ATL BitLab Bot: /clean executed by nonni_io
+[2023-07-13 06:46:14.909923] ATL BitLab Bot: /clean executed
+[2023-07-13 06:46:14.909923] ATL BitLab Bot: clean_jsonl_data - Deduping messages
+[2023-07-13 06:46:14.909923] ATL BitLab Bot: clean_jsonl_data - Deduping done
+[2023-07-13 06:46:14.909923] ATL BitLab Bot: /summary executed by nonni_io
+[2023-07-13 06:46:14.909923] ATL BitLab Bot: /summary executed
+[2023-07-13 06:48:43.856533] ATL BitLab Bot: Init Bot
+[2023-07-13 06:48:43.856533] ATL BitLab Bot: Polling!
+[2023-07-13 06:48:48.900155] ATL BitLab Bot: Init Bot
+[2023-07-13 06:48:48.900155] ATL BitLab Bot: Polling!
+[2023-07-13 06:48:48.900155] ATL BitLab Bot: /clean executed by nonni_io
+[2023-07-13 06:48:48.900155] ATL BitLab Bot: /clean executed
+[2023-07-13 06:48:48.900155] ATL BitLab Bot: clean_jsonl_data - Deduping messages
+[2023-07-13 06:48:48.900155] ATL BitLab Bot: clean_jsonl_data - Deduping done
+[2023-07-13 06:48:48.900155] ATL BitLab Bot: /summary executed by nonni_io
+[2023-07-13 06:48:48.900155] ATL BitLab Bot: /summary executed
+[2023-07-13 06:48:48.900155] ATL BitLab Bot: Prompts by day = {"2023-07-06": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\nGiii said Great evening and good big picture thinking! on 2023-07-06\nCitizen \ud83c\uddfa\ud83c\uddf8 said TG allows posting pictures on 2023-07-06\nCitizen \ud83c\uddfa\ud83c\uddf8 said TG allows posting pictures \ud83e\udd23\ud83d\ude44 on 2023-07-06\nGiii said Little tidbit for my fellow physics stans: Seth Lloyd https://youtu.be/XirbbUxOxiU on 2023-07-06\nbryan said I found the code i wrote back in 2019 to build the neural net I mentioned last night. If anyone is interested in what the code for constructing a LSTM neural net using tensorflow, checkout main.py starting on line 81 for code examples of how a neural net can be constructed https://github.com/bnonni/LSTM/blob/master/src/main.py\n\nspecifically, line 83 is the input layer followed by multiple hidden layers each with 200 input nodes (the blue circles last night). on 2023-07-06\nStephen said /tip 50 on 2023-07-06\nStephen said Gm on 2023-07-06\nStephen said Thanks for coming out last night everyone! I think we came up with some promising ideas together for contributing to the AI 4 ALL hackathon on 2023-07-06\npacketprotector said /send 2002 @sbddesign Thanks for leading the discussion last night. Was only able to attend briefly, but was very interesting for the short amount of time I was listening! on 2023-07-06\nCitizen \ud83c\uddfa\ud83c\uddf8 said /advanced@LightningTipBot on 2023-07-06\nPeter said Unfortunately we have a nationally known face of addiction to watch. on 2023-07-06\nJordan said ? on 2023-07-06\nPeter said It\u2019s time for me to get back on the bitcoin wagon. on 2023-07-06\nPeter said Hunter Biden on 2023-07-06\nPeter said You did see the video of his behavior at the White House on the 4th?? on 2023-07-06\nJordan said Nope on 2023-07-06\nElwood said Hes not like that any more. That was the old Hunter. The new Hunter is a heartwarming story of redemption. on 2023-07-06\nCitizen \ud83c\uddfa\ud83c\uddf8 said Has it ever occurred to anyone that Hunter \u201cforgot\u201d his laptop on purpose? What if Hunter is the CHS? on 2023-07-06\nCitizen \ud83c\uddfa\ud83c\uddf8 said \u201cLife is so strange\u201d\n\nhttps://youtu.be/1WDly1Oc_P4 on 2023-07-06\nShehzan said hey everyone, my name is Shehzan, and Im building lava.xyz on 2023-07-06\nShehzan said used to live in Atlanta btw but live closeby now on 2023-07-06\nAida said Welcomeeeeeee on 2023-07-06\nStephen said Welcome! on 2023-07-06\nStephen said The Lava Loans Protocol made it onto the Socratic topics at the end of May =) https://atlantabitdevs.org/2023/05/30/bitcoin-socratic-seminar-18/ on 2023-07-06\nArsh said Welcome! \ud83e\udee1 on 2023-07-06\nShehzan said I heard. happy to answer questions anytime on 2023-07-06\nShehzan said I live close to the area, so also happy to come to the next meetup on 2023-07-06\nShehzan said I live close to the area, so also happy to come to the next meetup if youd like me there on 2023-07-06\nRobert said This has been posited many times as a cry for help on 2023-07-06\n", "2023-07-07": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\nbryan said @alex_lewin tell ya boy to calm down https://twitter.com/bennyhodl/status/1677098038211354627 @bennybrews on 2023-07-07\nNitesh \u20bf\u26a1\ufe0f said What is bitcombine? on 2023-07-07\nbryan said @atl_bitlab_bot /start on 2023-07-07\nAida said Dont worry the guy took the 275. He will not get here. Will go somewhere else lol on 2023-07-07\nStephen said Gm on 2023-07-07\nCitizen \ud83c\uddfa\ud83c\uddf8 said \ud83e\udd14 on 2023-07-07\nJordan said My family: \"Whats a black rock?\" on 2023-07-07\nStephen said \ud83d\udcf0 The ATL BitLab Weekly Update is out: https://bit.ly/atlbitlab-2023-07-07 on 2023-07-07\nCitizen \ud83c\uddfa\ud83c\uddf8 said Well they are conveniently located atop Murder Kroger nowadays.\n\nThese lyrics are great stuff. Old Ponce actually was dangerous.\n\nhttps://youtu.be/ozAVtHKlzqQ on 2023-07-07\nStephen said \ud83c\udf7b ndgoHODL is hosting an informal bitcoiner hangout at Tucker Brewing tonight at 7pm! Im going to go check it out for a bit. https://twitter.com/ndgoHODL/status/1674619236562370560 on 2023-07-07\nStephen said \ud83e\udde0 Tomorrow, were jamming on AI bitcoin stuff in the Lab. Stop by if youd like to participate in the hackathon! https://www.meetup.com/atlbitlab/events/294567934/ on 2023-07-07\nStephen said /tip 666 on 2023-07-07\nGiii said https://lightning.engineering/posts/2023-07-05-l402-langchain/ on 2023-07-07\nJordan said I cant make it tomorrow, but happy hacking, all \ud83d\udcbb on 2023-07-07\nbryan said \ud83d\ude02 on 2023-07-07\nbryan said \ud83d\ude02 @jf1tt on 2023-07-07\nbryan said \ud83d\ude02 meme credit: @jf1tt on 2023-07-07\nGiii said Ai meets bitcoin on 2023-07-07\n", "2023-07-08": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\nCitizen \ud83c\uddfa\ud83c\uddf8 said Ya gotta get up awfully early to beat Stephen to the punch. GM\n\nDefinitely not AI generated. on 2023-07-08\nbryan said Woooowww. This is the earliest I\u2019ve ever seen you willingly interact with the group\n\ud83d\udc4f\ud83c\udffc GM sir \ud83e\udee1 on 2023-07-08\nJordan said Reminder for myself and others:\n\nCheckTemplateVerify (CTV) and AnyPrevOut (APO) are soft fork proposals for Bitcoin.\n\nHere is a summary comparison:\n\nhttps://stacker.news/items/7093 on 2023-07-08\nAlex said One of the craziest technical twitter threads I\u2019ve seen\u2026 it\u2019s a discussion about covenants and ends with someone creating a new proposal\u2026 A reminder about how much I still need to learn \n\nhttps://twitter.com/4moonsettler/status/1677459351575973889?s=46&t=8UJ-4zrOeVUt0LsBTybN6Q on 2023-07-08\nStephen said I dont do GM art on the weekends, its my day off on 2023-07-08\nStephen said Awesome. Which model? on 2023-07-08\nStephen said /tip 50 on 2023-07-08\nndgo said Hi I\u2019m a mining guy but Stephen said I should come to the meetup. I\u2019m definitely not to you guy\u2019s code-ability tho on 2023-07-08\nStephen said /tip 1000 Thanks for putting together the meetup last night. Were definitely NOT to your level of soldering and ohm measuring =) on 2023-07-08\nStephen said \ud83e\udde0 Hacking on AI and bitcoin in the Lab today https://www.meetup.com/atlbitlab/events/294567934/ on 2023-07-08\n", "2023-07-09": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n", "2023-07-10": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n", "2023-07-11": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n", "2023-07-12": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n"}
+[2023-07-13 06:48:48.900155] ATL BitLab Bot: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "\nGiii said Great evening and good big picture thinking! \nCitizen \ud83c\uddfa\ud83c\uddf8 said TG allows posting pictures \nStephen said Thanks for coming out last night everyone! \npacketprotector said /send 2002 @sbddesign \nPeter said It\u2019s time for me to get back on the bitcoin wagon. \nElwood said Hes not like that any more. \nCitizen \ud83c\uddfa\ud83c\uddf8 said Has it ever occurred to anyone that Hunter \u201cforgot\u201d his laptop on purpose? \nShehzan said hey everyone, my name is Shehzan, and Im building lava.xyz \nStephen said The Lava Loans Protocol made it onto the Socratic topics at the end of May \nRobert said This has been posited many times as a cry for help \n\n========================\n\nGiii, Citizen \ud83c\uddfa\ud83c\uddf8, Stephen, packetprotector, Peter, Elwood, Citizen \ud83c\uddfa\ud83c\uddf8, Shehzan, Aida, Arsh, and Robert discussed topics such as TG allowing posting pictures, Seth Lloyd, constructing a LSTM neural net, Hunter Biden, Lava Loans Protocol, and Hunter Biden's laptop."
+    }
+  ],
+  "created": 1689248942,
+  "id": "cmpl-7bp6cvg8I46BIXZJHz6C612HRcYKX",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 258,
+    "prompt_tokens": 886,
+    "total_tokens": 1144
+  }
+}
+[2023-07-13 06:48:48.900155] ATL BitLab Bot: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "\nBryan said @alex_lewin to tell his boy to calm down \nNitesh \u20bf\u26a1\ufe0f asked what is bitcombine \nAida said someone took the 275 and will not get there \nStephen said \"Gm\" and shared various updates \nCitizen \ud83c\uddfa\ud83c\uddf8 said \"\ud83e\udd14\" \nJordan said his family asked what a black rock is \nGiii shared a link to a post about langchain \nJordan said he couldn't make it to the hackathon \nBryan said \"\ud83d\ude02\" \nGiii said \"Ai meets bitcoin\" \n\n========================\n\nStephen shared various updates about the ATL BitLab, including a weekly update, an informal bitcoiner hangout, and a hackathon. Nitesh asked what bitcombine is, Aida said someone took the 275, Citizen \ud83c\uddfa\ud83c\uddf8 said \"\ud83e\udd14\", Jordan said his family asked what a black rock is, and Giii shared a link to a post about langchain. Bryan said \"\ud83d\ude02\" and Giii said \"Ai meets bitcoin\". Jordan said he couldn't make it to the hackathon."
+    }
+  ],
+  "created": 1689248954,
+  "id": "cmpl-7bp6os5UKqwgyrzSEXITgIHlTDD0U",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 252,
+    "prompt_tokens": 573,
+    "total_tokens": 825
+  }
+}
+[2023-07-13 06:48:48.900155] ATL BitLab Bot: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "\nCitizen \ud83c\uddfa\ud83c\uddf8 said Ya gotta get up awfully early to beat Stephen to the punch. \nGM on 2023-07-08\nJordan said Reminder for myself and others: CheckTemplateVerify (CTV) and AnyPrevOut (APO) are soft fork proposals for Bitcoin.\n========================================================================\nStephen is an active member of the group, often being the first to post or interact. He is knowledgeable about AI and Bitcoin and is generous with tips. Jordan provided a reminder about two soft fork proposals for Bitcoin. Alex was impressed by the technical discussion and Stephen's ability to create a new proposal."
+    }
+  ],
+  "created": 1689248965,
+  "id": "cmpl-7bp6zuMlCZyRMNzoMUin5B3dJRszo",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 129,
+    "prompt_tokens": 463,
+    "total_tokens": 592
+  }
+}
+[2023-07-13 06:48:48.900155] ATL BitLab Bot: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "The text discusses the importance of having a good credit score.\n\n1. A good credit score is important for many reasons. \n2. It can help you get approved for loans, credit cards, and other financial products. \n3. It can also help you get lower interest rates and better terms on those products. \n4. A good credit score can also help you get better rates on insurance and other services. \n5. It is important to pay your bills on time and keep your credit utilization low to maintain a good credit score.\n\n========================================\n\n1. A good credit score is important for many reasons. \n2. It can help you get approved for loans, credit cards, and other financial products. \n3. It can also help you get lower interest rates and better terms on those products. \n4. A good credit score can also help you get better rates on insurance and other services. \n5. It is important to pay your bills on time and keep your credit utilization low to maintain a good credit score."
+    }
+  ],
+  "created": 1689248968,
+  "id": "cmpl-7bp72scI55ZzUnJGUtwIusEZesj40",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 220,
+    "prompt_tokens": 35,
+    "total_tokens": 255
+  }
+}
+[2023-07-13 06:48:48.900155] ATL BitLab Bot: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "The text discusses the importance of having a good credit score.\n\n1. A good credit score is important for getting loans and other financial services.\n2. A good credit score can help you get lower interest rates on loans.\n3. A good credit score can help you get approved for a loan or other financial services.\n4. A good credit score can help you get better terms on loans.\n5. A good credit score can help you get better deals on insurance.\n6. A good credit score can help you get better deals on credit cards.\n7. A good credit score can help you get better deals on mortgages.\n\n========================\n\nA good credit score is important for getting loans and other financial services. It can help you get lower interest rates, better terms, and better deals on insurance, credit cards, and mortgages."
+    }
+  ],
+  "created": 1689248974,
+  "id": "cmpl-7bp78I0Jg89AmbIXTxyWRMHRToJT2",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 176,
+    "prompt_tokens": 35,
+    "total_tokens": 211
+  }
+}
+[2023-07-13 06:48:48.900155] ATL BitLab Bot: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "The text discusses the importance of having a good credit score.\n\n1. A good credit score is important for getting loans and other financial services.\n2. A good credit score can help you get lower interest rates on loans.\n3. A good credit score can help you get approved for a loan or other financial services.\n4. A good credit score can help you get better terms on loans.\n5. A good credit score can help you get better deals on insurance.\n6. A good credit score can help you get better deals on credit cards.\n7. A good credit score can help you get better deals on mortgages.\n\n========================\n\nA good credit score is important for getting loans and other financial services. It can help you get lower interest rates, better terms, and better deals on insurance, credit cards, and mortgages."
+    }
+  ],
+  "created": 1689248979,
+  "id": "cmpl-7bp7DUCBqo6jnbpTjHHek52NjcAwt",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 176,
+    "prompt_tokens": 35,
+    "total_tokens": 211
+  }
+}
+[2023-07-13 06:48:48.900155] ATL BitLab Bot: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "The text discusses the importance of having a good credit score.\n\n1. A good credit score is important for getting loans and other financial services.\n2. A good credit score can help you get lower interest rates on loans.\n3. A good credit score can help you get approved for a loan or other financial services.\n4. A good credit score can help you get better terms on loans.\n5. A good credit score can help you get better deals on insurance.\n6. A good credit score can help you get better deals on credit cards.\n7. A good credit score can help you get better deals on mortgages.\n\n========================\n\nA good credit score is important for getting loans and other financial services. It can help you get lower interest rates, better terms, and better deals on insurance, credit cards, and mortgages."
+    }
+  ],
+  "created": 1689248984,
+  "id": "cmpl-7bp7INHrVP3psa7HcBVa243skoJcn",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 176,
+    "prompt_tokens": 35,
+    "total_tokens": 211
+  }
+}
