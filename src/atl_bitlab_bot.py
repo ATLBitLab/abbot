@@ -1,6 +1,7 @@
 import os
 
 PROGRAM = "ATL BitLab Bot"
+STARTED = False
 RAW_MESSAGE_JL_FILE = os.path.abspath("data/raw_messages.jsonl")
 MESSAGES_JL_FILE = os.path.abspath("data/messages.jsonl")
 SUMMARY_LOG_FILE = os.path.abspath("data/summaries.txt")
@@ -49,26 +50,36 @@ application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
 now = datetime.now()
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    message = update.effective_message
-    if update.effective_chat.id in CHATS_TO_IGNORE:
-        return
-    # if message.
-    mpy = open(MESSAGES_PY_FILE, "a")
-    mpy.write(update.to_json())
-    mpy.write("\n")
-    mpy.close()
-    debug(f"[{now}] {PROGRAM}: handle_message - Raw message {message}")
-    message_dumps = json.dumps(
-        {
-            "from": message.from_user.first_name,
-            "date": message.date.isoformat().split("+")[0].split("T")[0],
-            **message,
-        }
-    )
-    rm_jl = open(RAW_MESSAGE_JL_FILE, "a")
-    rm_jl.write(message_dumps)
-    rm_jl.write("\n")
-    rm_jl.close()
+    try:
+        message = update.effective_message
+        if "/start" not in message and not STARTED:
+            return await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text="Bot must be started. Run /start to begin listening to and storing messages or /help for usage guide",
+            )
+        if update.effective_chat.id in CHATS_TO_IGNORE:
+            return
+        mpy = open(MESSAGES_PY_FILE, "a")
+        mpy.write(update.to_json())
+        mpy.write("\n")
+        mpy.close()
+        debug(f"[{now}] {PROGRAM}: handle_message - Raw message {message}")
+        message_dumps = json.dumps(
+            {
+                "from": message.from_user.first_name,
+                "date": message.date.isoformat().split("+")[0].split("T")[0],
+                **message.to_dict(),
+            }
+        )
+        rm_jl = open(RAW_MESSAGE_JL_FILE, "a")
+        rm_jl.write(message_dumps)
+        rm_jl.write("\n")
+        rm_jl.close()
+    except Exception as e:
+        await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text=f"Error: {e}",
+            )
 
 
 def clean_jsonl_data():
@@ -327,15 +338,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=update.effective_chat.id,
             text=CHEEKY_RESPONSE[randrange(len(CHEEKY_RESPONSE))],
         )
+    STARTED = True
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
         text="Bot started. Run /help for usage guide",
     )
-    message_handler = MessageHandler(BaseFilter(), handle_message)
-    application.add_handler(message_handler)
 
 
 def main():
+    message_handler = MessageHandler(BaseFilter(), handle_message)
+    application.add_handler(message_handler)
     debug(f"[{now}] {PROGRAM}: Init Bot")
     help_handler = CommandHandler("help", help)
     application.add_handler(help_handler)

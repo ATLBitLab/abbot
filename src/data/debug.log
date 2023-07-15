@@ -3955,3 +3955,15 @@ https://ronindojo.io/en/roninmobile
     "total_tokens": 211
   }
 }
+[2023-07-13 06:53:01.292389] ATL BitLab Bot: Init Bot
+[2023-07-13 06:53:01.292389] ATL BitLab Bot: Polling!
+[2023-07-13 07:01:54.706277] ATL BitLab Bot: Init Bot
+[2023-07-13 07:01:54.706277] ATL BitLab Bot: Polling!
+[2023-07-13 07:01:54.706277] ATL BitLab Bot: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 7, 13, 12, 2, 2, tzinfo=<UTC>), delete_chat_photo=False, entities=(MessageEntity(length=5, offset=0, type=<MessageEntityType.BOT_COMMAND>),), from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=80, supergroup_chat_created=False, text='/help')
+[2023-07-13 07:01:54.706277] ATL BitLab Bot: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 7, 13, 12, 2, 7, tzinfo=<UTC>), delete_chat_photo=False, entities=(MessageEntity(length=6, offset=0, type=<MessageEntityType.BOT_COMMAND>),), from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=82, supergroup_chat_created=False, text='/start')
+[2023-07-13 07:03:00.614015] ATL BitLab Bot: Init Bot
+[2023-07-13 07:03:00.614015] ATL BitLab Bot: Polling!
+[2023-07-13 07:03:45.245879] ATL BitLab Bot: Init Bot
+[2023-07-13 07:03:45.245879] ATL BitLab Bot: Polling!
+[2023-07-13 07:04:02.345951] ATL BitLab Bot: Init Bot
+[2023-07-13 07:04:02.345951] ATL BitLab Bot: Polling!
