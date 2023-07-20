@@ -1,5 +1,5 @@
 from requests import request
-from datetime import datetime
+from datetime import datetime, timedelta
 import qrcode
 from io import BytesIO
 
@@ -39,6 +39,14 @@ def qr_code(data):
     qr.save(bio, "PNG")
     bio.seek(0)
     return bio
+
+def get_dates(lookback=7):
+    return [
+        (
+            (datetime.now() - timedelta(days=1)).date() - timedelta(days=i - 1)
+        ).isoformat()
+        for i in range(lookback, 0, -1)
+    ]
 
 """
 TODO: abstract the payment method for FOSS users

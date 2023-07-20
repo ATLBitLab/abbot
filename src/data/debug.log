@@ -3967,3 +3967,97 @@ https://ronindojo.io/en/roninmobile
 [2023-07-13 07:03:45.245879] ATL BitLab Bot: Polling!
 [2023-07-13 07:04:02.345951] ATL BitLab Bot: Init Bot
 [2023-07-13 07:04:02.345951] ATL BitLab Bot: Polling!
+[2023-07-20 07:21:58.509937] ATL BitLab Bot: Init Bot
+[2023-07-20 07:21:58.509937] ATL BitLab Bot: Polling!
+[2023-07-20 07:22:54.905776] ATL BitLab Bot: Init Bot
+[2023-07-20 07:22:54.905776] ATL BitLab Bot: Polling!
+[2023-07-20 07:25:40.630208] ATL BitLab Bot: Init Bot
+[2023-07-20 07:25:40.630208] ATL BitLab Bot: Polling!
+[2023-07-20 07:27:18.167747] ATL BitLab Bot: Init Bot
+[2023-07-20 07:27:18.167747] ATL BitLab Bot: Polling!
+[2023-07-20 07:28:17.513557] ATL BitLab Bot: Init Bot
+[2023-07-20 07:28:17.513557] ATL BitLab Bot: Polling!
+[2023-07-20 07:28:28.209565] ATL BitLab Bot: Init Bot
+[2023-07-20 07:28:28.209565] ATL BitLab Bot: Polling!
+[2023-07-20 07:28:51.697603] ATL BitLab Bot: Init Bot
+[2023-07-20 07:28:51.697603] ATL BitLab Bot: Polling!
+[2023-07-20 07:31:08.765682] ATL BitLab Bot: Init Bot
+[2023-07-20 07:31:08.765682] ATL BitLab Bot: Polling!
+[2023-07-20 07:31:19.710582] ATL BitLab Bot: Init Bot
+[2023-07-20 07:31:19.710582] ATL BitLab Bot: Polling!
+[2023-07-20 07:31:36.836876] ATL BitLab Bot: Init Bot
+[2023-07-20 07:31:36.836876] ATL BitLab Bot: Polling!
+[2023-07-20 07:31:44.233461] ATL BitLab Bot: Init Bot
+[2023-07-20 07:31:44.233461] ATL BitLab Bot: Polling!
+[2023-07-20 07:33:38.466934] ATL BitLab Bot: Init Bot
+[2023-07-20 07:33:38.466934] ATL BitLab Bot: Polling!
+[2023-07-20 07:36:39.851332] ATL BitLab Bot: Init Bot
+[2023-07-20 07:36:39.851332] ATL BitLab Bot: Polling!
+[2023-07-20 07:37:39.041046] ATL BitLab Bot: Init Bot
+[2023-07-20 07:37:39.041046] ATL BitLab Bot: Polling!
+[2023-07-20 07:38:40.593600] ATL BitLab Bot: Init Bot
+[2023-07-20 07:38:40.593600] ATL BitLab Bot: Polling!
+[2023-07-20 07:40:22.342304] ATL BitLab Bot: Init Bot
+[2023-07-20 07:40:22.342304] ATL BitLab Bot: Polling!
+[2023-07-20 07:44:47.203717] ATL BitLab Bot: Init Bot
+[2023-07-20 07:44:47.203717] ATL BitLab Bot: Polling!
+[2023-07-20 07:45:45.272371] ATL BitLab Bot: Init Bot
+[2023-07-20 07:45:45.272371] ATL BitLab Bot: Polling!
+[2023-07-20 07:47:31.642769] ATL BitLab Bot: Init Bot
+[2023-07-20 07:47:31.642769] ATL BitLab Bot: Polling!
+[2023-07-20 07:47:49.847980] ATL BitLab Bot: Init Bot
+[2023-07-20 07:47:49.847980] ATL BitLab Bot: Polling!
+[2023-07-20 07:49:49.787115] ATL BitLab Bot: Init Bot
+[2023-07-20 07:49:49.787115] ATL BitLab Bot: Polling!
+[2023-07-20 07:50:25.929853] ATL BitLab Bot: Init Bot
+[2023-07-20 07:50:25.929853] ATL BitLab Bot: Polling!
+[2023-07-20 07:50:38.970529] ATL BitLab Bot: Init Bot
+[2023-07-20 07:50:38.970529] ATL BitLab Bot: Polling!
+[2023-07-20 07:51:18.875937] ATL BitLab Bot: Init Bot
+[2023-07-20 07:51:18.875937] ATL BitLab Bot: Polling!
+[2023-07-20 07:51:18.875937] ATL BitLab Bot: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 7, 20, 11, 51, 32, tzinfo=<UTC>), delete_chat_photo=False, entities=(MessageEntity(length=6, offset=0, type=<MessageEntityType.BOT_COMMAND>),), from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=100, supergroup_chat_created=False, text='/start')
+[2023-07-20 07:52:50.979518] ATL BitLab Bot: Init Bot
+[2023-07-20 07:52:50.979518] ATL BitLab Bot: Polling!
+[2023-07-20 07:52:50.979518] ATL BitLab Bot: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 7, 20, 11, 53, 2, tzinfo=<UTC>), delete_chat_photo=False, entities=(MessageEntity(length=6, offset=0, type=<MessageEntityType.BOT_COMMAND>),), from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=103, supergroup_chat_created=False, text='/start')
+[2023-07-20 07:53:29.624542] ATL BitLab Bot: Init Bot
+[2023-07-20 07:53:29.624542] ATL BitLab Bot: Polling!
+[2023-07-20 07:53:55.110101] ATL BitLab Bot: Init Bot
+[2023-07-20 07:53:55.110101] ATL BitLab Bot: Polling!
+[2023-07-20 07:53:55.110101] ATL BitLab Bot: /start executed by nonni_io
+[2023-07-20 07:53:55.110101] ATL BitLab Bot: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 7, 20, 11, 54, 10, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=112, supergroup_chat_created=False, text='hellop')
+[2023-07-20 07:55:08.785622] ATL BitLab Bot: Init Bot
+[2023-07-20 07:55:08.785622] ATL BitLab Bot: Polling!
+[2023-07-20 07:55:08.785622] ATL BitLab Bot: /start executed by nonni_io
+[2023-07-20 07:55:08.785622] ATL BitLab Bot: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 7, 20, 11, 55, 15, tzinfo=<UTC>), delete_chat_photo=False, entities=(MessageEntity(length=5, offset=0, type=<MessageEntityType.BOT_COMMAND>),), from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=118, supergroup_chat_created=False, text='/help')
+[2023-07-20 07:55:45.230691] ATL BitLab Bot: Init Bot
+[2023-07-20 07:55:45.230691] ATL BitLab Bot: Polling!
+[2023-07-20 07:55:45.230691] ATL BitLab Bot: /start executed by nonni_io
+[2023-07-20 07:55:45.230691] ATL BitLab Bot: /help executed by nonni_io
+[2023-07-20 07:55:45.230691] ATL BitLab Bot: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 7, 20, 11, 56, 3, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=125, supergroup_chat_created=False, text='hello bot again')
+[2023-07-20 07:57:28.418354] ATL BitLab Bot: Init Bot
+[2023-07-20 07:57:28.418354] ATL BitLab Bot: Polling!
+[2023-07-20 07:57:28.418354] ATL BitLab Bot: /start executed by nonni_io
+[2023-07-20 07:57:28.418354] ATL BitLab Bot: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 7, 20, 11, 57, 34, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=128, supergroup_chat_created=False, text='hello bot')
+[2023-07-20 07:57:28.418354] ATL BitLab Bot: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 7, 20, 11, 58, 42, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=129, supergroup_chat_created=False, text='🤷')
+[2023-07-20 07:57:28.418354] ATL BitLab Bot: handle_message - Raw message Message(animation=Animation(duration=2, file_id='CgACAgQAAxkBAAOCZLkhhxWTSLufIsaUO9GFvzTjG1oAAuwCAAL3eA1TQSnB4K0H1C8vBA', file_name='rick-and-morty-morty.mp4', file_size=71703, file_unique_id='AgAD7AIAAvd4DVM', height=220, mime_type='video/mp4', width=320), channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 7, 20, 11, 59, 3, tzinfo=<UTC>), delete_chat_photo=False, document=Document(file_id='CgACAgQAAxkBAAOCZLkhhxWTSLufIsaUO9GFvzTjG1oAAuwCAAL3eA1TQSnB4K0H1C8vBA', file_name='rick-and-morty-morty.mp4', file_size=71703, file_unique_id='AgAD7AIAAvd4DVM', mime_type='video/mp4'), from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=130, supergroup_chat_created=False)
+[2023-07-20 07:57:28.418354] ATL BitLab Bot: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 7, 20, 11, 59, 32, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=131, photo=(PhotoSize(file_id='AgACAgEAAxkBAAODZLkhpEqzoNGx-O5lx4z2qY4AAWVwAAKpqjEbTzbIRagPJRloqlx-AQADAgADcwADLwQ', file_size=1485, file_unique_id='AQADqaoxG082yEV4', height=90, width=67), PhotoSize(file_id='AgACAgEAAxkBAAODZLkhpEqzoNGx-O5lx4z2qY4AAWVwAAKpqjEbTzbIRagPJRloqlx-AQADAgADbQADLwQ', file_size=19699, file_unique_id='AQADqaoxG082yEVy', height=320, width=240), PhotoSize(file_id='AgACAgEAAxkBAAODZLkhpEqzoNGx-O5lx4z2qY4AAWVwAAKpqjEbTzbIRagPJRloqlx-AQADAgADeAADLwQ', file_size=80545, file_unique_id='AQADqaoxG082yEV9', height=800, width=600), PhotoSize(file_id='AgACAgEAAxkBAAODZLkhpEqzoNGx-O5lx4z2qY4AAWVwAAKpqjEbTzbIRagPJRloqlx-AQADAgADeQADLwQ', file_size=122702, file_unique_id='AQADqaoxG082yEV-', height=1280, width=960)), supergroup_chat_created=False)
+[2023-07-20 08:02:33.426092] ATL BitLab Bot: Init Bot
+[2023-07-20 08:02:33.426092] ATL BitLab Bot: Polling!
+[2023-07-20 08:02:33.426092] ATL BitLab Bot: /start executed by nonni_io
+[2023-07-20 08:02:33.426092] ATL BitLab Bot: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 7, 20, 12, 3, 8, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=136, photo=(PhotoSize(file_id='AgACAgEAAxkBAAOIZLkifMnAcBrMlgm_J934xkUd8dkAAqqqMRtPNshF0wFgDhWg824BAAMCAANzAAMvBA', file_size=1485, file_unique_id='AQADqqoxG082yEV4', height=90, width=67), PhotoSize(file_id='AgACAgEAAxkBAAOIZLkifMnAcBrMlgm_J934xkUd8dkAAqqqMRtPNshF0wFgDhWg824BAAMCAANtAAMvBA', file_size=19684, file_unique_id='AQADqqoxG082yEVy', height=320, width=240), PhotoSize(file_id='AgACAgEAAxkBAAOIZLkifMnAcBrMlgm_J934xkUd8dkAAqqqMRtPNshF0wFgDhWg824BAAMCAAN4AAMvBA', file_size=80544, file_unique_id='AQADqqoxG082yEV9', height=800, width=600), PhotoSize(file_id='AgACAgEAAxkBAAOIZLkifMnAcBrMlgm_J934xkUd8dkAAqqqMRtPNshF0wFgDhWg824BAAMCAAN5AAMvBA', file_size=122707, file_unique_id='AQADqqoxG082yEV-', height=1280, width=960)), supergroup_chat_created=False)
+[2023-07-20 08:03:41.169532] ATL BitLab Bot: Init Bot
+[2023-07-20 08:03:41.169532] ATL BitLab Bot: Polling!
+[2023-07-20 08:03:41.169532] ATL BitLab Bot: /start executed by nonni_io
+[2023-07-20 08:03:41.169532] ATL BitLab Bot: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 7, 20, 12, 3, 44, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=139, photo=(PhotoSize(file_id='AgACAgEAAxkBAAOLZLkioAN7MtVC3KE9HLBIuJif9TcAAqqqMRtPNshF0wFgDhWg824BAAMCAANzAAMvBA', file_size=1485, file_unique_id='AQADqqoxG082yEV4', height=90, width=67), PhotoSize(file_id='AgACAgEAAxkBAAOLZLkioAN7MtVC3KE9HLBIuJif9TcAAqqqMRtPNshF0wFgDhWg824BAAMCAANtAAMvBA', file_size=19684, file_unique_id='AQADqqoxG082yEVy', height=320, width=240), PhotoSize(file_id='AgACAgEAAxkBAAOLZLkioAN7MtVC3KE9HLBIuJif9TcAAqqqMRtPNshF0wFgDhWg824BAAMCAAN4AAMvBA', file_size=80544, file_unique_id='AQADqqoxG082yEV9', height=800, width=600), PhotoSize(file_id='AgACAgEAAxkBAAOLZLkioAN7MtVC3KE9HLBIuJif9TcAAqqqMRtPNshF0wFgDhWg824BAAMCAAN5AAMvBA', file_size=122707, file_unique_id='AQADqqoxG082yEV-', height=1280, width=960)), supergroup_chat_created=False)
+[2023-07-20 08:03:59.139670] ATL BitLab Bot: Init Bot
+[2023-07-20 08:03:59.139670] ATL BitLab Bot: Polling!
+[2023-07-20 08:03:59.139670] ATL BitLab Bot: /start executed by nonni_io
+[2023-07-20 08:03:59.139670] ATL BitLab Bot: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 7, 20, 12, 4, 2, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=142, photo=(PhotoSize(file_id='AgACAgEAAxkBAAOOZLkishdB6_yRNgOyyRk1NFhFUxIAAqqqMRtPNshF0wFgDhWg824BAAMCAANzAAMvBA', file_size=1485, file_unique_id='AQADqqoxG082yEV4', height=90, width=67), PhotoSize(file_id='AgACAgEAAxkBAAOOZLkishdB6_yRNgOyyRk1NFhFUxIAAqqqMRtPNshF0wFgDhWg824BAAMCAANtAAMvBA', file_size=19684, file_unique_id='AQADqqoxG082yEVy', height=320, width=240), PhotoSize(file_id='AgACAgEAAxkBAAOOZLkishdB6_yRNgOyyRk1NFhFUxIAAqqqMRtPNshF0wFgDhWg824BAAMCAAN4AAMvBA', file_size=80544, file_unique_id='AQADqqoxG082yEV9', height=800, width=600), PhotoSize(file_id='AgACAgEAAxkBAAOOZLkishdB6_yRNgOyyRk1NFhFUxIAAqqqMRtPNshF0wFgDhWg824BAAMCAAN5AAMvBA', file_size=122707, file_unique_id='AQADqqoxG082yEV-', height=1280, width=960)), supergroup_chat_created=False)
+[2023-07-20 08:04:36.741228] ATL BitLab Bot: Init Bot
+[2023-07-20 08:04:36.741228] ATL BitLab Bot: Polling!
+[2023-07-20 08:04:36.741228] ATL BitLab Bot: /start executed by nonni_io
+[2023-07-20 08:04:36.741228] ATL BitLab Bot: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 7, 20, 12, 4, 42, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=145, photo=(PhotoSize(file_id='AgACAgEAAxkBAAORZLki2gV3kxr4pabp5zmCwhPpRDkAAquqMRtPNshFQvwsqbBaWrsBAAMCAANzAAMvBA', file_size=1484, file_unique_id='AQADq6oxG082yEV4', height=90, width=67), PhotoSize(file_id='AgACAgEAAxkBAAORZLki2gV3kxr4pabp5zmCwhPpRDkAAquqMRtPNshFQvwsqbBaWrsBAAMCAANtAAMvBA', file_size=19692, file_unique_id='AQADq6oxG082yEVy', height=320, width=240), PhotoSize(file_id='AgACAgEAAxkBAAORZLki2gV3kxr4pabp5zmCwhPpRDkAAquqMRtPNshFQvwsqbBaWrsBAAMCAAN4AAMvBA', file_size=80541, file_unique_id='AQADq6oxG082yEV9', height=800, width=600), PhotoSize(file_id='AgACAgEAAxkBAAORZLki2gV3kxr4pabp5zmCwhPpRDkAAquqMRtPNshFQvwsqbBaWrsBAAMCAAN5AAMvBA', file_size=122696, file_unique_id='AQADq6oxG082yEV-', height=1280, width=960)), supergroup_chat_created=False)
+[2023-07-20 08:05:31.306108] ATL BitLab Bot: Init Bot
+[2023-07-20 08:05:31.306108] ATL BitLab Bot: Polling!
+[2023-07-20 08:05:31.306108] ATL BitLab Bot: /start executed by nonni_io
+[2023-07-20 08:05:31.306108] ATL BitLab Bot: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 7, 20, 12, 5, 48, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=148, photo=(PhotoSize(file_id='AgACAgEAAxkBAAOUZLkjHKrDTTreY56c9VcSayo0W8kAAqyqMRtPNshF2Axf8WmurPEBAAMCAANzAAMvBA', file_size=1127, file_unique_id='AQADrKoxG082yEV4', height=56, width=90), PhotoSize(file_id='AgACAgEAAxkBAAOUZLkjHKrDTTreY56c9VcSayo0W8kAAqyqMRtPNshF2Axf8WmurPEBAAMCAANtAAMvBA', file_size=34109, file_unique_id='AQADrKoxG082yEVy', height=200, width=320), PhotoSize(file_id='AgACAgEAAxkBAAOUZLkjHKrDTTreY56c9VcSayo0W8kAAqyqMRtPNshF2Axf8WmurPEBAAMCAAN4AAMvBA', file_size=195506, file_unique_id='AQADrKoxG082yEV9', height=500, width=800), PhotoSize(file_id='AgACAgEAAxkBAAOUZLkjHKrDTTreY56c9VcSayo0W8kAAqyqMRtPNshF2Axf8WmurPEBAAMCAAN5AAMvBA', file_size=319816, file_unique_id='AQADrKoxG082yEV-', height=800, width=1280)), supergroup_chat_created=False)

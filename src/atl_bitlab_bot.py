@@ -1,28 +1,16 @@
-import os
-
+STARTED = None
 PROGRAM = "ATL BitLab Bot"
-STARTED = False
-RAW_MESSAGE_JL_FILE = os.path.abspath("data/raw_messages.jsonl")
-MESSAGES_JL_FILE = os.path.abspath("data/messages.jsonl")
-SUMMARY_LOG_FILE = os.path.abspath("data/summaries.txt")
-MESSAGES_PY_FILE = os.path.abspath("data/backup/messages.py")
-PROMPTS_BY_DAY_FILE = os.path.abspath("data/backup/prompts_by_day.py")
-CHATS_TO_IGNORE = [-911601159, -1001608254734]
 
-WHITELIST = open("data/whitelist.txt")
-CHEEKY_RESPONSE = [
-    "Ah ah ah, you didnt say the magic word ...",
-    "Simon says ... no",
-    "Access Denied!",
-    "What do we say to the god of ATL BitLab? Not today",
-    "Do not pass go, do not collect $200",
-]
+import os
+import json
 import time
 import re
-import json
+import io
+
 from random import randrange
 from uuid import uuid4
-from datetime import datetime, timedelta
+from datetime import datetime
+from lib.utils import get_dates, try_get
 
 from telegram import Update
 from telegram.ext.filters import BaseFilter
@@ -40,48 +28,56 @@ from lib.env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY
 from help_menu import help_menu_message
 import openai
 
+BOT_DATA = io.open(os.path.abspath("data/bot_data.json"), "r")
+BOT_DATA_OBJ = json.load(BOT_DATA)
+CHATS_TO_IGNORE = try_get(BOT_DATA_OBJ, "chats")
+WHITELIST = try_get(BOT_DATA_OBJ, "whitelist")
+CHEEKY_RESPONSES = try_get(BOT_DATA_OBJ, "responses")
+RAW_MESSAGE_JL_FILE = os.path.abspath("data/raw_messages.jsonl")
+MESSAGES_JL_FILE = os.path.abspath("data/messages.jsonl")
+SUMMARY_LOG_FILE = os.path.abspath("data/summaries.txt")
+MESSAGES_PY_FILE = os.path.abspath("data/backup/messages.py")
+PROMPTS_BY_DAY_FILE = os.path.abspath("data/backup/prompts_by_day.py")
 openai.api_key = OPENAI_API_KEY
 application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
-
 now = datetime.now()
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    try:
+    
         message = update.effective_message
-        if "/start" not in message and not STARTED:
+        print(update.effective_chat.id)
+        print(STARTED)
+        if not STARTED:
             return await context.bot.send_message(
                 chat_id=update.effective_chat.id,
                 text="Bot must be started. Run /start to begin listening to and storing messages or /help for usage guide",
             )
         if update.effective_chat.id in CHATS_TO_IGNORE:
             return
-        mpy = open(MESSAGES_PY_FILE, "a")
+        mpy = io.open(MESSAGES_PY_FILE, "a")
         mpy.write(update.to_json())
         mpy.write("\n")
         mpy.close()
         debug(f"[{now}] {PROGRAM}: handle_message - Raw message {message}")
         message_dumps = json.dumps(
             {
-                "from": message.from_user.first_name,
-                "date": message.date.isoformat().split("+")[0].split("T")[0],
                 **message.to_dict(),
+                "new": True,
+                "from": message.from_user.username,
+                "date": message.date.isoformat().split("+")[0].split("T")[0],
             }
         )
-        rm_jl = open(RAW_MESSAGE_JL_FILE, "a")
+        rm_jl = io.open(RAW_MESSAGE_JL_FILE, "a")
         rm_jl.write(message_dumps)
         rm_jl.write("\n")
         rm_jl.close()
-    except Exception as e:
-        await context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text=f"Error: {e}",
-            )
+    
 
 
 def clean_jsonl_data():
     debug(f"[{now}] {PROGRAM}: clean_jsonl_data - Deduping messages")
     seen = set()  # A set to hold the hashes of each JSON object
-    with open(RAW_MESSAGE_JL_FILE, "r") as infile, open(
+    with io.open(RAW_MESSAGE_JL_FILE, "r") as infile, io.open(
         MESSAGES_JL_FILE, "w"
     ) as outfile:
         for line in infile:
@@ -113,21 +109,12 @@ def clean_jsonl_data():
     return "Cleaning done!"
 
 
-def get_dates(lookback=7):
-    return [
-        (
-            (datetime.now() - timedelta(days=1)).date() - timedelta(days=i - 1)
-        ).isoformat()
-        for i in range(lookback, 0, -1)
-    ]
-
-
 def summarize_messages(days=None):
     summaries = []
     prompts_by_day = {k: "" for k in days}
     for day in days:
         prompt = ""
-        messages_file = open(MESSAGES_JL_FILE, "r")
+        messages_file = io.open(MESSAGES_JL_FILE, "r")
         for line in messages_file.readlines():
             message = json.loads(line)
             message_date = message["date"]
@@ -142,12 +129,12 @@ def summarize_messages(days=None):
         )
         prompts_by_day[day] = final_prompt
     messages_file.close()
-    prompts_by_day_file = open(PROMPTS_BY_DAY_FILE, "w")
+    prompts_by_day_file = io.open(PROMPTS_BY_DAY_FILE, "w")
     prompts_by_day_dump = json.dumps(prompts_by_day)
     prompts_by_day_file.write(prompts_by_day_dump)
     prompts_by_day_file.close()
     debug(f"[{now}] {PROGRAM}: Prompts by day = {prompts_by_day_dump}")
-    summary_file = open(SUMMARY_LOG_FILE, "a")
+    summary_file = io.open(SUMMARY_LOG_FILE, "a")
     for day, prompt in prompts_by_day.items():
         response = openai.Completion.create(
             model="text-davinci-003",
@@ -168,10 +155,10 @@ def summarize_messages(days=None):
 async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sender = update.effective_message.from_user.username
     debug(f"[{now}] {PROGRAM}: /clean executed by {sender}")
-    if update.effective_message.from_user.username not in ADMINS:
+    if update.effective_message.from_user.username not in WHITELIST:
         return await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text=CHEEKY_RESPONSE[randrange(len(CHEEKY_RESPONSE))],
+            text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
         )
     debug(f"[{now}] {PROGRAM}: /clean executed")
     await context.bot.send_message(
@@ -191,10 +178,10 @@ async def both(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sender = update.effective_message.from_user.username
     debug(f"[{now}] {PROGRAM}: /summary executed by {sender}")
-    if sender not in ADMINS:
+    if sender not in WHITELIST:
         return await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text=CHEEKY_RESPONSE[randrange(len(CHEEKY_RESPONSE))],
+            text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
         )
     debug(f"[{now}] {PROGRAM}: /summary executed")
     args = context.args
@@ -238,7 +225,7 @@ async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # if sender not in WHITELIST:
         #     return await context.bot.send_message(
         #         chat_id=update.effective_chat.id,
-        #         text=CHEEKY_RESPONSE[randrange(len(CHEEKY_RESPONSE))],
+        #         text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
         #     )
         # debug(f"[{now}] {PROGRAM}: /prompt executed")
         await context.bot.send_message(
@@ -305,10 +292,10 @@ async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sender = update.effective_message.from_user.username
     debug(f"[{now}] {PROGRAM}: /stop executed by {sender}")
-    if update.effective_message.from_user.username not in ADMINS:
+    if update.effective_message.from_user.username not in WHITELIST:
         return await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text=CHEEKY_RESPONSE[randrange(len(CHEEKY_RESPONSE))],
+            text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
         )
     debug(f"[{now}] {PROGRAM}: /stop executed")
     await context.bot.stop_poll(
@@ -329,11 +316,12 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sender = update.effective_message.from_user.username
     debug(f"[{now}] {PROGRAM}: /start executed by {sender}")
-    if sender not in ADMINS:
+    if sender not in WHITELIST:
         return await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text=CHEEKY_RESPONSE[randrange(len(CHEEKY_RESPONSE))],
+            text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
         )
+    global STARTED
     STARTED = True
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
@@ -342,13 +330,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 def main():
-    message_handler = MessageHandler(BaseFilter(), handle_message)
-    application.add_handler(message_handler)
     debug(f"[{now}] {PROGRAM}: Init Bot")
-    help_handler = CommandHandler("help", help)
-    application.add_handler(help_handler)
     start_handler = CommandHandler("start", start)
     application.add_handler(start_handler)
+    help_handler = CommandHandler("help", help)
+    application.add_handler(help_handler)
     stop_handler = CommandHandler("stop", stop)
     application.add_handler(stop_handler)
     summary_handler = CommandHandler("summary", summary)
@@ -359,5 +345,7 @@ def main():
     application.add_handler(clean_handler)
     clean_summary_handler = CommandHandler("both", both)
     application.add_handler(clean_summary_handler)
+    message_handler = MessageHandler(BaseFilter(), handle_message)
+    application.add_handler(message_handler)
     debug(f"[{now}] {PROGRAM}: Polling!")
     application.run_polling()
