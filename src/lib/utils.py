@@ -41,10 +41,9 @@ def qr_code(data):
     return bio
 
 """
-TODO:
-- [ ] abstract the payment method for FOSS users
+TODO: abstract the payment method for FOSS users
       allow users to plug in any number of LN / BTC payment methods
       e.g home node (LND, CLN, etc)
-      cloud node (voltage, aws, etc)
-      LSPs (stike, opennode, etc.)
+          cloud node (voltage, aws, etc)
+          LSPs (stike, opennode, etc.)
 """

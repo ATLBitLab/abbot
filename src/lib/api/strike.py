@@ -1,12 +1,14 @@
 from lib.env import STRIKE_API_KEY
-from lib.utils import try_get
-from lib.api.reqs import http_request
 STRIKE_BASE_URL = "https://api.strike.me/v1"
 STRIKE_HEADERS = {
     "Content-Type": "application/json",
     "Accept": "application/json",
     "Authorization": f"Bearer {STRIKE_API_KEY}",
 }
+from lib.utils import try_get
+from lib.api.reqs import http_request
+import qrcode
+from io import BytesIO
 
 class Strike:
     def __init__(self, correlation_id, description, invoice_id):
@@ -41,3 +43,10 @@ class Strike:
     def expire_invoice(self):
         response = ("PATCH", f"invoices/${self.invoice_id}/cancel")
         return try_get(response, "state") == "CANCELLED"
+    
+    def qr_code(self, ln_invoice):
+        qr = qrcode.make(ln_invoice)
+        bio = BytesIO()
+        qr.save(bio, "PNG")
+        bio.seek(0)
+        return bio

@@ -8,15 +8,12 @@ SUMMARY_LOG_FILE = os.path.abspath("data/summaries.txt")
 MESSAGES_PY_FILE = os.path.abspath("data/backup/messages.py")
 PROMPTS_BY_DAY_FILE = os.path.abspath("data/backup/prompts_by_day.py")
 CHATS_TO_IGNORE = [-911601159, -1001608254734]
-ADMINS = ["nonni_io", "sbddesign"]
-DEDICATED_DESKS = ["alex_lewin"]
-MEMBERS = []
-WHITELIST = ADMINS + DEDICATED_DESKS
+
+WHITELIST = open("data/whitelist.txt")
 CHEEKY_RESPONSE = [
     "Ah ah ah, you didnt say the magic word ...",
     "Simon says ... no",
     "Access Denied!",
-    "Mutombo says no no no",
     "What do we say to the god of ATL BitLab? Not today",
     "Do not pass go, do not collect $200",
 ]
@@ -40,7 +37,6 @@ from lib.logger import debug
 from lib.utils import qr_code
 from lib.api.strike import Strike
 from lib.env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY
-from lib.api.strike import Strike
 from help_menu import help_menu_message
 import openai
 
