@@ -43,10 +43,7 @@ application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
 now = datetime.now()
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    
         message = update.effective_message
-        print(update.effective_chat.id)
-        print(STARTED)
         if not STARTED:
             return await context.bot.send_message(
                 chat_id=update.effective_chat.id,
@@ -175,10 +172,15 @@ async def both(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return "Messages cleaned. Summaries:"
 
 
+def whitelist_gate(sender):
+    return sender not in WHITELIST
+
+
 async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sender = update.effective_message.from_user.username
     debug(f"[{now}] {PROGRAM}: /summary executed by {sender}")
-    if sender not in WHITELIST:
+    not_whitelisted = whitelist_gate(sender)
+    if not_whitelisted:
         return await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
@@ -221,13 +223,6 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         sender = update.effective_message.from_user.username
-        # debug(f"[{now}] {PROGRAM}: /prompt executed by {sender}")
-        # if sender not in WHITELIST:
-        #     return await context.bot.send_message(
-        #         chat_id=update.effective_chat.id,
-        #         text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
-        #     )
-        # debug(f"[{now}] {PROGRAM}: /prompt executed")
         await context.bot.send_message(
             chat_id=update.effective_chat.id, text="Working on your request"
         )
@@ -243,7 +238,7 @@ async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "Error: Prompt too long. Max token len = 3095"
             )
         prompt = prompt[: prompt_len - 22] if prompt_len >= 184 else prompt
-        if sender not in DEDICATED_DESKS:
+        if sender not in WHITELIST:
             strike = Strike(str(uuid4()), f"ATL BitLab Bot: Payer - {sender}, Prompt - {prompt}", None)
             paid = strike.invoice()
             ln_invoice, timer = strike.quote()
