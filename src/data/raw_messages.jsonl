@@ -1259,6 +1259,9 @@
 {"text": "Great and super important topics. We shouldn\u2019t feel rushed to get through it, understanding the predicate is most important.", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-13"}
 {"text": "Great and super important topics. We shouldn\u2019t feel rushed to get through it, understanding the predicate is most important.", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-13"}
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 2b7eb79 (server)
 {"text": "Good morning BitLabers! Some exciting news for me this week. I\u2019ve officially launched the Liberty Pay alpha test to the Google Play store. If you have an android and are interested in being a guinea pig to help me find bugs, please let me know and either DM me a gmail address or send one here and i'll add you. Be aware: the app backend is live and using a production version of Plaid, so registratin will require real PII (name, address, DOB, phonenumber, etc.). Upon registration, you will have a LP account created and you'll be put through a production Plaid Identity verification flow which stored that PII from the registration form in their production backend.", "from": "bryan", "date": "2023-07-13"}
 {"text": "Good morning BitLabers! Some exciting news for me this week. I\u2019ve officially launched the Liberty Pay alpha test to the Google Play store. If you have an android and are interested in being a guinea pig to help me find bugs, please let me know and either DM me a gmail address or send one here and i'll add you.\n\n!! Be aware: the app backend is live and using a production version of Plaid, so registratin will require real PII (name, address, DOB, phonenumber, etc.). Upon registration, you will have a LP account created and you'll be put through a production Plaid Identity verification flow which stored that PII from the registration form in their production backend.", "from": "bryan", "date": "2023-07-13"}
 {"text": "Good morning BitLabers! Some exciting news for me this week. I\u2019ve officially launched the Liberty Pay alpha test to the Google Play store. If you have an android and are interested in being a guinea pig to help me find bugs, please let me know and either DM me a gmail address or send one here and i'll add you.\n\n!! Be aware: the app backend is live and using a production version of Plaid, so registratin will require real PII (name, address, DOB, phonenumber, etc.). Upon registration, you will have a LP account created with your PII stored in our DB, and then you'll be put through a production Plaid Identity verification flow which stores that PII from the registration form in the Plaid production backend as well. If you're not comfortable signing up with real information, no worries. Wanted to make sure you all were aware of that.", "from": "bryan", "date": "2023-07-13"}
@@ -1400,6 +1403,7 @@
 {"text": "LL docs says the fee_rate is a decimal value, and the fee_per_mill is in mSATs. how do you calculate the 500 mSAT using the 0.000001 fee_rate?", "from": "bryan", "date": "2023-07-20"}
 {"text": "best i got is to divide by 2 and multiple by 1000000 but idk why you would divide by 2\n0.000001 / 2 = 0.0000005 * 1,000,000 = 0.5 SATs \nand that still doesnt get the mSAT value, which requires 0.5 * 1000 = 500 mSATs\nis there a formula for using the fee_rate (ppm) to directly calcuate the mSATs per HTLC routed?", "from": "bryan", "date": "2023-07-20"}
 {"text": "Gm", "from": "Stephen", "date": "2023-07-20"}
+<<<<<<< HEAD
 =======
 >>>>>>> 06e1881 (server)
 =======
@@ -1412,3 +1416,5 @@
 >>>>>>> 14dc504 (server)
 =======
 >>>>>>> 05cf167 (server)
+=======
+>>>>>>> 2b7eb79 (server)
