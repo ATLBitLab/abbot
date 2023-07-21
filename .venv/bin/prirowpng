@@ -1,4 +1,4 @@
-#!/home/bryan/telegram-gpt-bot/.venv/bin/python3.11
+#!/Users/bryan/Projects/ATLBit/Lab/Telegram/bitlab_bot/.venv/bin/python3.11
 
 # http://www.python.org/doc/2.4.4/lib/module-itertools.html
 import itertools

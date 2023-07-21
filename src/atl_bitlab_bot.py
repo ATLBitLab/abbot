@@ -424,6 +424,7 @@ async def gpt_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     except Exception as e:
         debug(f"[{now}] {PROGRAM}: atl_bitlab_bot - /prompt Error: {e}")
+<<<<<<< HEAD
 =======
             n=1,
             stop=None,
@@ -435,6 +436,8 @@ async def gpt_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     except Exception as e:
 >>>>>>> 06e1881 (server)
+=======
+>>>>>>> 95bcf7c (mac changes)
         return await update.message.reply_text(f"Error: {e}")
 
 
