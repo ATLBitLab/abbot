@@ -126,46 +126,49 @@ def clean_jsonl_data():
 
 
 def summarize_messages(days=None):
-    summaries = []
-    prompts_by_day = {k: "" for k in days}
-    for day in days:
-        prompt = ""
-        messages_file = io.open(MESSAGES_JL_FILE, "r")
-        for line in messages_file.readlines():
-            message = json.loads(line)
-            message_date = message["date"]
-            if day == message_date:
-                text = message["text"]
-                sender = message["from"]
-                message = f"{sender} said {text} on {message_date}\n"
-                prompt += message
-        final_prompt = (
-            "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n"
-            + prompt
-        )
-        prompts_by_day[day] = final_prompt
-    messages_file.close()
-    prompts_by_day_file = io.open(PROMPTS_BY_DAY_FILE, "w")
-    prompts_by_day_dump = json.dumps(prompts_by_day)
-    prompts_by_day_file.write(prompts_by_day_dump)
-    prompts_by_day_file.close()
-    debug(f"[{now}] {PROGRAM}: Prompts by day = {prompts_by_day_dump}")
-    summary_file = io.open(SUMMARY_LOG_FILE, "a")
-    for day, prompt in prompts_by_day.items():
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=prompt,
-            max_tokens=4000 - len(prompt),
-            temperature=0,
-        )
-        debug(f"[{now}] {PROGRAM}: OpenAI Response = {response}")
-        summary = f"Summary for {day}:\n{response.choices[0].text.strip()}"
-        summary_file.write(
-            f"{summary}\n----------------------------------------------------------------\n\n"
-        )
-        summaries.append(summary)
-    summary_file.close()
-    return summaries
+    try:
+        summaries = []
+        prompts_by_day = {k: "" for k in days}
+        for day in days:
+            prompt = ""
+            messages_file = io.open(MESSAGES_JL_FILE, "r")
+            for line in messages_file.readlines():
+                message = json.loads(line)
+                message_date = message["date"]
+                if day == message_date:
+                    text = message["text"]
+                    sender = message["from"]
+                    message = f"{sender} said {text} on {message_date}\n"
+                    prompt += message
+            final_prompt = (
+                "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n"
+                + prompt
+            )
+            prompts_by_day[day] = final_prompt
+        messages_file.close()
+        prompts_by_day_file = io.open(PROMPTS_BY_DAY_FILE, "w")
+        prompts_by_day_dump = json.dumps(prompts_by_day)
+        prompts_by_day_file.write(prompts_by_day_dump)
+        prompts_by_day_file.close()
+        debug(f"[{now}] {PROGRAM}: Prompts by day = {prompts_by_day_dump}")
+        summary_file = io.open(SUMMARY_LOG_FILE, "a")
+        for day, prompt in prompts_by_day.items():
+            response = openai.Completion.create(
+                model="text-davinci-003",
+                prompt=prompt,
+                max_tokens=4000 - len(prompt),
+                temperature=0,
+            )
+            debug(f"[{now}] {PROGRAM}: OpenAI Response = {response}")
+            summary = f"Summary for {day}:\n{response.choices[0].text.strip()}"
+            summary_file.write(
+                f"{summary}\n----------------------------------------------------------------\n\n"
+            )
+            summaries.append(summary)
+        summary_file.close()
+        return summaries
+    except Exception as e:
+        raise e
 
 
 async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -201,6 +204,7 @@ def whitelist_gate(sender):
 
 async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
 <<<<<<< HEAD
+<<<<<<< HEAD
     sender = update.effective_message.from_user.username
     debug(f"[{now}] {PROGRAM}: /summary executed by {sender}")
     not_whitelisted = whitelist_gate(sender)
@@ -225,26 +229,54 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 return await update.message.reply_text(
                     f"Malformed date: expecting form YYYY-MM-DD"
                 )
+=======
+    try:
+        sender = update.effective_message.from_user.username
+        debug(f"[{now}] {PROGRAM}: /summary executed by {sender}")
+        not_whitelisted = whitelist_gate(sender)
+        if not_whitelisted:
+            return await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
+            )
+        debug(f"[{now}] {PROGRAM}: /summary executed")
+        args = context.args
+        arg_len = len(args)
+        if arg_len > 0 and arg_len > 2:
+            return await update.message.reply_text("Too many args")
+        elif arg_len == 1:
+            message = f"Generating summary for day {''.join(args)}"
+        elif arg_len == 2:
+            for arg in args:
+                if not re.search("^\d{4}-\d{2}-\d{2}$", arg):
+                    return await update.message.reply_text(
+                        f"Malformed date: expecting form YYYY-MM-DD"
+                    )
+                try:
+                    datetime.strptime(arg, "%Y-%m-%d").date()
+                except Exception as e:
+                    return await update.message.reply_text(f"Error while parsing date: {e}")
+            message = f"Generating summary for each day between {' and '.join(args)}"
+        else:
+            args = get_dates()
+            message = f"Generating summary for each day in the past week: {args}"
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
+        summaries = summarize_messages(args)
+        for summary in summaries:
+>>>>>>> 45252cc (tryexcept)
             try:
-                datetime.strptime(arg, "%Y-%m-%d").date()
+                await context.bot.send_message(
+                    chat_id=update.effective_chat.id, text=summary
+                )
             except Exception as e:
-                return await update.message.reply_text(f"Error while parsing date: {e}")
-        message = f"Generating summary for each day between {' and '.join(args)}"
-    else:
-        args = get_dates()
-        message = f"Generating summary for each day in the past week: {args}"
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
-    summaries = summarize_messages(args)
-    for summary in summaries:
-        try:
-            await context.bot.send_message(
-                chat_id=update.effective_chat.id, text=summary
-            )
-        except Exception as e:
-            debug(f"[{now}] {PROGRAM}: summarize error {e}")
-            await context.bot.send_message(
-                chat_id=update.effective_chat.id, text=f"Error: {e}"
-            )
+                debug(f"[{now}] {PROGRAM}: summarize error {e}")
+                await context.bot.send_message(
+                    chat_id=update.effective_chat.id, text=f"Error: {e}"
+                )
+    except Exception as e:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id, text=f"Error: {e}"
+        )
 
 
 <<<<<<< HEAD
