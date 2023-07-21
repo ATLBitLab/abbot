@@ -137,7 +137,7 @@ def summarize_messages(days=None):
             response = openai.Completion.create(
                 model="text-davinci-003",
                 prompt=prompt,
-                max_tokens=4000 - len(prompt),
+                max_tokens=4095,
                 temperature=0,
             )
             debug(f"[{now}] {PROGRAM}: OpenAI Response = {response}")
