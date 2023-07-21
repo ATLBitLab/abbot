@@ -3690,6 +3690,7 @@ https://ronindojo.io/en/roninmobile
   }
 }
 <<<<<<< HEAD
+<<<<<<< HEAD
 [2023-07-11 07:26:18.466593] ATL BitLab Bot: Init Bot
 [2023-07-11 07:26:18.467338] ATL BitLab Bot: Polling!
 [2023-07-11 07:26:31.451348] ATL BitLab Bot: Bot /start
@@ -4289,3 +4290,7 @@ https://ronindojo.io/en/roninmobile
 >>>>>>> e16a8cc (seserver)
 =======
 >>>>>>> 4ee0e4d (server)
+=======
+[2023-07-12 11:37:46.435222] ATL BitLab Bot: Init Bot
+[2023-07-12 11:37:46.436737] ATL BitLab Bot: Polling!
+>>>>>>> a7e8975 (server)
