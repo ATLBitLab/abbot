@@ -169,9 +169,13 @@ def summarize_messages(days=None):
 
 
 async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
+<<<<<<< HEAD
     sender = update.effective_message.from_user.username
     debug(f"[{now}] {PROGRAM}: /clean executed by {sender}")
     if update.effective_message.from_user.username not in WHITELIST:
+=======
+    if update.effective_message.from_user.username not in ADMINS:
+>>>>>>> 40d5b64 (add awaits)
         return await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
@@ -196,10 +200,14 @@ def whitelist_gate(sender):
 
 
 async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
+<<<<<<< HEAD
     sender = update.effective_message.from_user.username
     debug(f"[{now}] {PROGRAM}: /summary executed by {sender}")
     not_whitelisted = whitelist_gate(sender)
     if not_whitelisted:
+=======
+    if update.effective_message.from_user.username not in ADMINS:
+>>>>>>> 40d5b64 (add awaits)
         return await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
@@ -295,7 +303,7 @@ async def gpt_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         prompter = update.effective_message.from_user.username
         if prompter not in WHITELIST:
-            return context.bot.send_message(
+            return await context.bot.send_message(
                 chat_id=update.effective_chat.id,
                 text=CHEEKY_RESPONSE[randrange(len(CHEEKY_RESPONSE))],
             )
@@ -388,9 +396,13 @@ async def gpt_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
+<<<<<<< HEAD
     sender = update.effective_message.from_user.username
     debug(f"[{now}] {PROGRAM}: /stop executed by {sender}")
     if update.effective_message.from_user.username not in WHITELIST:
+=======
+    if update.effective_message.from_user.username not in ADMINS:
+>>>>>>> 40d5b64 (add awaits)
         return await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
@@ -412,9 +424,13 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+<<<<<<< HEAD
     sender = update.effective_message.from_user.username
     debug(f"[{now}] {PROGRAM}: /start executed by {sender}")
     if sender not in WHITELIST:
+=======
+    if update.effective_message.from_user.username not in ADMINS:
+>>>>>>> 40d5b64 (add awaits)
         return await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
