@@ -419,7 +419,12 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     debug(f"[{now}] {PROGRAM}: /help executed by {update.effective_message.from_user.username}")
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
+<<<<<<< HEAD
         text=help_menu_message,
+=======
+        text="Run /start to start listening for messages. Available commands:\n\n\/summary Produce daily summaries in a time frame\n\nArgs:\ndefault ⇒ produce daily summaries for the past 7 days\ndate ⇒ produce summary for date\ne.g. 2023-07-05\nstart end ⇒ produce daily summaries from start to end\ne.g 2023-07-02 2023-07-05\nstart number ⇒ produce daily summaries from start + numbers of days (0-index)\ne.g. 2023-07-02 2 ⇒ 2023-07-02 to 2023-07-04\n/clean\
+            Dedupe and remove bad chars from the raw messages\nRecommend using /clean then /summary or /both to ensure best output\n/both run clean and summary; args for /summary apply\n/prompt\ngpt-prompt ⇒ send gpt-prompt to gpt\n/help show help menu",
+>>>>>>> 22e816c (update help)
     )
 
 
