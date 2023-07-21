@@ -4061,3 +4061,33 @@ https://ronindojo.io/en/roninmobile
 [2023-07-20 08:05:31.306108] ATL BitLab Bot: Polling!
 [2023-07-20 08:05:31.306108] ATL BitLab Bot: /start executed by nonni_io
 [2023-07-20 08:05:31.306108] ATL BitLab Bot: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 7, 20, 12, 5, 48, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=148, photo=(PhotoSize(file_id='AgACAgEAAxkBAAOUZLkjHKrDTTreY56c9VcSayo0W8kAAqyqMRtPNshF2Axf8WmurPEBAAMCAANzAAMvBA', file_size=1127, file_unique_id='AQADrKoxG082yEV4', height=56, width=90), PhotoSize(file_id='AgACAgEAAxkBAAOUZLkjHKrDTTreY56c9VcSayo0W8kAAqyqMRtPNshF2Axf8WmurPEBAAMCAANtAAMvBA', file_size=34109, file_unique_id='AQADrKoxG082yEVy', height=200, width=320), PhotoSize(file_id='AgACAgEAAxkBAAOUZLkjHKrDTTreY56c9VcSayo0W8kAAqyqMRtPNshF2Axf8WmurPEBAAMCAAN4AAMvBA', file_size=195506, file_unique_id='AQADrKoxG082yEV9', height=500, width=800), PhotoSize(file_id='AgACAgEAAxkBAAOUZLkjHKrDTTreY56c9VcSayo0W8kAAqyqMRtPNshF2Axf8WmurPEBAAMCAAN5AAMvBA', file_size=319816, file_unique_id='AQADrKoxG082yEV-', height=800, width=1280)), supergroup_chat_created=False)
+[2023-07-20 22:42:23.416792] ATL BitLab Bot: Init Bot
+[2023-07-20 22:42:23.416792] ATL BitLab Bot: Polling!
+[2023-07-20 22:42:23.416792] ATL BitLab Bot: /help executed by nonni_io
+[2023-07-20 22:42:23.416792] ATL BitLab Bot: /start executed by nonni_io
+[2023-07-20 22:42:23.416792] ATL BitLab Bot: /summary executed by nonni_io
+[2023-07-20 22:42:23.416792] ATL BitLab Bot: /summary executed
+[2023-07-20 22:42:23.416792] ATL BitLab Bot: Prompts by day = {"2023-07-16": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n"}
+[2023-07-20 22:42:23.416792] ATL BitLab Bot: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "The text discusses the importance of having a good credit score.\n\n1. A good credit score is important for getting loans and other financial services.\n2. A good credit score can help you get lower interest rates on loans.\n3. A good credit score can help you get approved for a loan or other financial services.\n4. A good credit score can help you get better terms on loans.\n5. A good credit score can help you get better deals on insurance.\n6. A good credit score can help you get better deals on credit cards.\n7. A good credit score can help you get better deals on mortgages.\n\n========================\n\nA good credit score is important for getting loans and other financial services. It can help you get lower interest rates, better terms, and better deals on insurance, credit cards, and mortgages."
+    }
+  ],
+  "created": 1689907363,
+  "id": "cmpl-7eaOJ1hcfa7xPeYbww8jgLxqmvqtL",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 176,
+    "prompt_tokens": 35,
+    "total_tokens": 211
+  }
+}
+[2023-07-20 22:42:23.416792] ATL BitLab Bot: /clean executed by nonni_io
+[2023-07-20 22:42:23.416792] ATL BitLab Bot: /clean executed
+[2023-07-20 22:42:23.416792] ATL BitLab Bot: clean_jsonl_data - Deduping messages
+[2023-07-20 22:42:23.416792] ATL BitLab Bot: clean_jsonl_data - Deduping done
