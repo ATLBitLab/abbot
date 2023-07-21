@@ -1166,11 +1166,15 @@
 {"text": "as an example ...", "from": "bryan", "date": "2023-07-08"}
 {"text": "That was so worth my money.", "from": "Stephen", "date": "2023-07-08"}
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> fa17180 (server)
 {"text": "What are you guys building?", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-07-08"}
 {"text": "Telegram bot with a payment interceptor?", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-07-08"}
 {"text": "That was so worth my money.", "from": "Stephen", "date": "2023-07-08"}
 {"text": "Bryan has been working on a cool AI chat bot. Yeah, the payment interceptor is one aspect of it. Come hack with us if you like!", "from": "Stephen", "date": "2023-07-08"}
 {"text": "@alex_lewin and I are working on an upgraded BitDevs website template that will use LLMs to generate topic summaries for meetup attendees https://bolt.fun/story/kicking-off--866", "from": "Stephen", "date": "2023-07-08"}
+<<<<<<< HEAD
 {"text": "Sick!", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-07-08"}
 {"text": "Come hack with us broh", "from": "Stephen", "date": "2023-07-08"}
 {"text": "Downtown from cumming \ud83d\ude2d", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-07-08"}
@@ -1392,3 +1396,5 @@
 {"text": "Gm", "from": "Stephen", "date": "2023-07-20"}
 =======
 >>>>>>> 06e1881 (server)
+=======
+>>>>>>> fa17180 (server)
