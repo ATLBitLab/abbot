@@ -1183,6 +1183,9 @@
 {"text": "I built a telegram bot that uses chat GPT. Its storing messages from the ATL BitDevs telegram group, and then by running the summary command, it will look back 1 week and for each day, summarize the messages of that day, so we can more easily and quickly create the weekly newsletter.", "from": "bryan", "date": "2023-07-08"}
 {"text": "I realized that I'd basically created a GPT bot with telegram as the chat interface, so I added a few additional features for prompting GPT with a paywall using the bot", "from": "bryan", "date": "2023-07-08"}
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 05cf167 (server)
 {"text": "Progress is being made on development of decentralized Whirlpool", "from": "Jordan", "date": "2023-07-12"}
 {"text": "Would it be possible for me to book the conference room today from 1p - 2p?", "from": "Jordan", "date": "2023-07-12"}
 {"text": "Ya, do you have access to the calendar? I thought you did. If not,  I can book it for you", "from": "bryan", "date": "2023-07-12"}
@@ -1255,6 +1258,7 @@
 {"text": "Mike made me go into my library \ud83d\udcda \n\nThis is Hayek\u2019s most famous and most accessible book. Mandatory reading for all thinking \ud83e\udd14 adults.\n\nHighly recommended.", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-12"}
 {"text": "Great and super important topics. We shouldn\u2019t feel rushed to get through it, understanding the predicate is most important.", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-13"}
 {"text": "Great and super important topics. We shouldn\u2019t feel rushed to get through it, understanding the predicate is most important.", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-13"}
+<<<<<<< HEAD
 {"text": "Good morning BitLabers! Some exciting news for me this week. I\u2019ve officially launched the Liberty Pay alpha test to the Google Play store. If you have an android and are interested in being a guinea pig to help me find bugs, please let me know and either DM me a gmail address or send one here and i'll add you. Be aware: the app backend is live and using a production version of Plaid, so registratin will require real PII (name, address, DOB, phonenumber, etc.). Upon registration, you will have a LP account created and you'll be put through a production Plaid Identity verification flow which stored that PII from the registration form in their production backend.", "from": "bryan", "date": "2023-07-13"}
 {"text": "Good morning BitLabers! Some exciting news for me this week. I\u2019ve officially launched the Liberty Pay alpha test to the Google Play store. If you have an android and are interested in being a guinea pig to help me find bugs, please let me know and either DM me a gmail address or send one here and i'll add you.\n\n!! Be aware: the app backend is live and using a production version of Plaid, so registratin will require real PII (name, address, DOB, phonenumber, etc.). Upon registration, you will have a LP account created and you'll be put through a production Plaid Identity verification flow which stored that PII from the registration form in their production backend.", "from": "bryan", "date": "2023-07-13"}
 {"text": "Good morning BitLabers! Some exciting news for me this week. I\u2019ve officially launched the Liberty Pay alpha test to the Google Play store. If you have an android and are interested in being a guinea pig to help me find bugs, please let me know and either DM me a gmail address or send one here and i'll add you.\n\n!! Be aware: the app backend is live and using a production version of Plaid, so registratin will require real PII (name, address, DOB, phonenumber, etc.). Upon registration, you will have a LP account created with your PII stored in our DB, and then you'll be put through a production Plaid Identity verification flow which stores that PII from the registration form in the Plaid production backend as well. If you're not comfortable signing up with real information, no worries. Wanted to make sure you all were aware of that.", "from": "bryan", "date": "2023-07-13"}
@@ -1406,3 +1410,5 @@
 >>>>>>> b2471cf (server)
 =======
 >>>>>>> 14dc504 (server)
+=======
+>>>>>>> 05cf167 (server)
