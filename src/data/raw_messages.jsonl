@@ -1182,6 +1182,7 @@
 {"text": "My family: \"What's a black rock?\"", "from": "Jordan", "date": "2023-07-07"}
 {"text": "I built a telegram bot that uses chat GPT. Its storing messages from the ATL BitDevs telegram group, and then by running the summary command, it will look back 1 week and for each day, summarize the messages of that day, so we can more easily and quickly create the weekly newsletter.", "from": "bryan", "date": "2023-07-08"}
 {"text": "I realized that I'd basically created a GPT bot with telegram as the chat interface, so I added a few additional features for prompting GPT with a paywall using the bot", "from": "bryan", "date": "2023-07-08"}
+<<<<<<< HEAD
 {"text": "Progress is being made on development of decentralized Whirlpool", "from": "Jordan", "date": "2023-07-12"}
 {"text": "Would it be possible for me to book the conference room today from 1p - 2p?", "from": "Jordan", "date": "2023-07-12"}
 {"text": "Ya, do you have access to the calendar? I thought you did. If not,  I can book it for you", "from": "bryan", "date": "2023-07-12"}
@@ -1403,3 +1404,5 @@
 {"text": "Sick!", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-07-08"}
 {"text": "Come hack with us broh", "from": "Stephen", "date": "2023-07-08"}
 >>>>>>> b2471cf (server)
+=======
+>>>>>>> 14dc504 (server)
