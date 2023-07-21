@@ -246,7 +246,7 @@ async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await context.bot.send_photo(
                 chat_id=update.effective_chat.id,
                 photo=qr,
-                caption=f'To get your answer: "{prompt}"\nPlease pay the invoice:\n`{ln_invoice}`',
+                caption=f"To get your answer: \"{prompt}\"\nPlease pay the invoice:\n\n`{ln_invoice}`",
             )
             while not paid:
                 paid = strike.paid()
@@ -281,6 +281,7 @@ async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=update.effective_chat.id, text=f"Answer:\n\n{answer}"
         )
     except Exception as e:
+        debug(f"[{now}] {PROGRAM}: atl_bitlab_bot - /prompt Error: {e}")
         return await update.message.reply_text(f"Error: {e}")
 
 

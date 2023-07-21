@@ -1,4 +1,4 @@
-#!/home/bryan/telegram-gpt-bot/.venv/bin/python3.11
+#!/Users/bryan/Projects/ATLBit/Lab/Telegram/bitlab_bot/.venv/bin/python3.11
 # -*- coding: utf-8 -*-
 import re
 import sys
