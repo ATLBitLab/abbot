@@ -982,6 +982,7 @@
 {"text": "Ya gotta get up awfully early to beat Stephen to the punch. GM\n\nDefinitely not AI generated.", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-08"}
 {"text": "Woooowww. This is the earliest I\u2019ve ever seen you willingly interact with the group\n\ud83d\udc4f\ud83c\udffc GM sir \ud83e\udee1", "from": "bryan", "date": "2023-07-08"}
 {"text": "Reminder for myself and others:\n\nCheckTemplateVerify (CTV) and AnyPrevOut (APO) are soft fork proposals for Bitcoin.\n\nHere is a summary comparison:\n\nhttps://stacker.news/items/7093", "from": "Jordan", "date": "2023-07-08"}
+<<<<<<< HEAD
 {"text": "One of the craziest technical twitter threads I\u2019ve seen\u2026 it\u2019s a discussion about covenants and ends with someone creating a new proposal\u2026 A reminder about how much I still need to learn \n\nhttps://twitter.com/4moonsettler/status/1677459351575973889?s=46&t=8UJ-4zrOeVUt0LsBTybN6Q", "from": "Alex", "date": "2023-07-08"}
 {"text": "I dont do GM art on the weekends, its my day off", "from": "Stephen", "date": "2023-07-08"}
 {"text": "Awesome. Which model?", "from": "Stephen", "date": "2023-07-08"}
@@ -989,3 +990,5 @@
 {"text": "Hi I\u2019m a mining guy but Stephen said I should come to the meetup. I\u2019m definitely not to you guy\u2019s code-ability tho", "from": "ndgo", "date": "2023-07-08"}
 {"text": "/tip 1000 Thanks for putting together the meetup last night. Were definitely NOT to your level of soldering and ohm measuring =)", "from": "Stephen", "date": "2023-07-08"}
 {"text": "\ud83e\udde0 Hacking on AI and bitcoin in the Lab today https://www.meetup.com/atlbitlab/events/294567934/", "from": "Stephen", "date": "2023-07-08"}
+=======
+>>>>>>> 06e1881 (server)

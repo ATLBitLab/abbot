@@ -259,6 +259,7 @@ Summary for 2023-07-07:
 Bryan said "@alex_lewin tell ya boy to calm down" (https://twitter.com/bennyhodl/status/1677098038211354627) on 2023-07-07. Nitesh ₿⚡️ said "What is bitcombine?" on 2023-07-07. Bryan said "@atl_bitlab_bot /start" on 2023-07-07. Aida said "Don't worry the guy took the 275. He will not get here. Will go somewhere else lol" on 2023-07-07. Stephen said "Gm" on 2023-07-07. Citizen 🇺🇸 said "🤔" on 2023-07-07. Jordan said "My family: 'What's a black rock?'" on 2023-07-07. Stephen said "📰 The ATL BitLab Weekly Update is out: https://bit.ly/atlbitlab-2023-07-07" on 2023-07-07. Citizen 🇺🇸 said "Well they are conveniently located atop Murder Kroger nowadays." on 2023-07-07. Stephen said "https://youtu.be/ozAVtHKlzqQ" on 2023-07-07. Stephen said "🍻 ndgoHODL is hosting an informal bitcoiner hangout at Tucker Brewing tonight at 7pm! I'm going to go check it out for a bit. https://twitter.com/ndgoHODL/status/1674619236562370560" on 2023-07-07. Stephen said "🧠 Tomorrow, we're jamming on AI bitcoin stuff in the Lab. Stop by if you'd like to participate in the hackathon! https://www.meetup.com/atlbitlab/events/294567934/" on 2023-07-07. Stephen said "/tip 666" on 2023-07-07. Giii said "https://lightning.engineering/posts/2023-07-05-l402-langchain/" on 2023-07-07. Jordan said "I can't make it tomorrow, but happy hacking, all 💻" on 2023-07-07. Bryan said "😂" on 2023-07-07. Bryan said "😂 @jf1tt" on 2023-07-07. Bryan said "😂 meme credit: @jf1tt" on 2023-07-07. Giii said "Ai meets bitcoin" on 2023-07-07.
 ----------------------------------------------------------------
 
+<<<<<<< HEAD
 Summary for 2023-07-08:
 Stephen is known for being an early riser and is willing to interact with the group. 
 CheckTemplateVerify (CTV) and AnyPrevOut (APO) are soft fork proposals for Bitcoin. 
@@ -459,3 +460,5 @@ The text discusses the importance of having a good credit score.
 A good credit score is important for getting loans and other financial services. It can help you get lower interest rates, better terms, and better deals on insurance, credit cards, and mortgages.
 ----------------------------------------------------------------
 
+=======
+>>>>>>> 06e1881 (server)
