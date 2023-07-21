@@ -1162,3 +1162,86 @@
 {"text": null, "from": "Stephen", "date": "2023-07-08"}
 {"text": "as an example ...", "from": "bryan", "date": "2023-07-08"}
 {"text": "That was so worth my money.", "from": "Stephen", "date": "2023-07-08"}
+{"text": "What are you guys building?", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-07-08"}
+{"text": "Telegram bot with a payment interceptor?", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-07-08"}
+{"text": "That was so worth my money.", "from": "Stephen", "date": "2023-07-08"}
+{"text": "Bryan has been working on a cool AI chat bot. Yeah, the payment interceptor is one aspect of it. Come hack with us if you like!", "from": "Stephen", "date": "2023-07-08"}
+{"text": "@alex_lewin and I are working on an upgraded BitDevs website template that will use LLMs to generate topic summaries for meetup attendees https://bolt.fun/story/kicking-off--866", "from": "Stephen", "date": "2023-07-08"}
+{"text": "Sick!", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-07-08"}
+{"text": "Come hack with us broh", "from": "Stephen", "date": "2023-07-08"}
+{"text": "Downtown from cumming \ud83d\ude2d", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-07-08"}
+{"text": "My family: \"What's a black rock?\"", "from": "Jordan", "date": "2023-07-07"}
+{"text": "I built a telegram bot that uses chat GPT. Its storing messages from the ATL BitDevs telegram group, and then by running the summary command, it will look back 1 week and for each day, summarize the messages of that day, so we can more easily and quickly create the weekly newsletter.", "from": "bryan", "date": "2023-07-08"}
+{"text": "I realized that I'd basically created a GPT bot with telegram as the chat interface, so I added a few additional features for prompting GPT with a paywall using the bot", "from": "bryan", "date": "2023-07-08"}
+{"text": "Progress is being made on development of decentralized Whirlpool", "from": "Jordan", "date": "2023-07-12"}
+{"text": "Would it be possible for me to book the conference room today from 1p - 2p?", "from": "Jordan", "date": "2023-07-12"}
+{"text": "Ya, do you have access to the calendar? I thought you did. If not,  I can book it for you", "from": "bryan", "date": "2023-07-12"}
+{"text": "I'm locked out of the Google account I use for the calendar.\n\nCould you please schedule it for me today and I'll set up a new account for the future?", "from": "Jordan", "date": "2023-07-12"}
+{"text": "So the supply shortages of Raspberry Pi 4s with 8GB of RAM is no more and multiple retailers are getting new stock everyday.\n\nI was able to get 3x RPi 4s w/ 8GB RAM. Wanted to offer them for $90 cash or $85 BTC. If no one needs a Pi here, will offer them to the larger ATL group.", "from": "packetprotector", "date": "2023-07-12"}
+{"text": "So the supply shortages of Raspberry Pi 4s with 8GB of RAM is no more and multiple retailers are getting new stock everyday.\n\nI was able to get 3x RPi 4s w/ 8GB RAM. Wanted to offer them for $90 cash or $85 BTC. If no one here needs a Pi, will offer them to the larger ATL group.", "from": "packetprotector", "date": "2023-07-12"}
+{"text": null, "from": "Giii", "date": "2023-07-12"}
+{"text": "Question: where is there a good place or the best place to buy Bitcoin (non-kyc) with cash?", "from": "Adrian", "date": "2023-07-12"}
+{"text": "Ya I got you", "from": "bryan", "date": "2023-07-12"}
+{"text": "@jordan_bravo Booked Grant conference room from 1230 to 430 today", "from": "bryan", "date": "2023-07-12"}
+{"text": "Could find an Azteco store although idk how many their are in general and esp in Atlanta https://azte.co/", "from": "bryan", "date": "2023-07-12"}
+{"text": "Tonight", "from": "Elwood", "date": "2023-07-12"}
+{"text": "https://www.meetup.com/atlanta-bitplebs/events/294569375/?isFirstPublish=true", "from": "Elwood", "date": "2023-07-12"}
+{"text": "You can usually find a bitcoiner friend in your local community willing to help you out", "from": "bryan", "date": "2023-07-12"}
+{"text": null, "from": "Elwood", "date": "2023-07-12"}
+{"text": "You can usually find a bitcoiner friend in your local community willing to help you out", "from": "bryan", "date": "2023-07-12"}
+{"text": "I don't need a RPi, but thanks for asking", "from": "Jordan", "date": "2023-07-12"}
+{"text": "Anyone in here wanna help out @atron9?", "from": "bryan", "date": "2023-07-12"}
+{"text": "Thanks!", "from": "Jordan", "date": "2023-07-12"}
+{"text": "@HODLBarbarian what about your miner buddy?", "from": "bryan", "date": "2023-07-12"}
+{"text": "Turns out because he has business partners they didn't feel comfortable with non KYC sales", "from": "Elwood", "date": "2023-07-12"}
+{"text": "I'm always happy to swap some Bitcoin kid that I have KYC to me with some Bitcoin that may be KYC to you", "from": "Elwood", "date": "2023-07-12"}
+{"text": "I'm always happy to swap some Bitcoin  that I have KYC to me with some Bitcoin that may be KYC to you", "from": "Elwood", "date": "2023-07-12"}
+{"text": "And then we can both use some of the privacy tools from recent BitDevs", "from": "Elwood", "date": "2023-07-12"}
+{"text": "We're going to have a workshop on this in a few weeks.\n\nIn the mean time, if you message me I can point you some options", "from": "Jordan", "date": "2023-07-12"}
+{"text": "Ghetto on chain swaps ftw \ud83d\ude4c\ud83c\udffc", "from": "bryan", "date": "2023-07-12"}
+{"text": "Gm", "from": "Stephen", "date": "2023-07-12"}
+{"text": "There's always bitcoin meetups, anything could happen", "from": "Stephen", "date": "2023-07-12"}
+{"text": "Hey, there is an LDK Node workshop that kicked off at 10am. It's still going live right now for anyone who is interested: https://www.twitch.tv/bitcoindevelopers", "from": "Stephen", "date": "2023-07-12"}
+{"text": "Great idea! My friend Christoph created Nosta.Me which is sort of like an onboarding tool for Nostr. I think he wanted to start adding some \"What Next\" type of content eventually, like recommending services that people can start using their Nostr profile with. Might be room for potential collaboration here.\n  \nIn terms of relays, Nostream and StirFry would be examples. However, these are more developer focused things, and I don't think end users need to be too concerned with which particular software a relay is running, IMHO.", "from": "Stephen", "date": "2023-07-12"}
+{"text": "Time keeps slipping away,\n\nNever trust FIAT\n\nI could stop DCA\u2019ing if I wanted to \ud83d\ude44\ud83e\udd26\ud83c\udffb\u200d\u2642\ufe0f\n\nhttps://youtu.be/XYYGKCanqfA", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-12"}
+{"text": "Al Jourgensen for the win!", "from": "Elwood", "date": "2023-07-12"}
+{"text": "Time keeps slipping away,\n\nNever trust FIAT\n\nI could stop DCA\u2019ing if I wanted to \ud83d\ude44\ud83e\udd26\ud83c\udffb\u200d\u2642\ufe0f\n\nhttps://youtu.be/XYYGKCanqfA", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-12"}
+{"text": "/tip 666", "from": "Stephen", "date": "2023-07-12"}
+{"text": "Hello! Looking forward to the Genesis Book series! Had a parking question for today\u2019s event. Is the gravel parking area referring to the paid parking lot for  the restaurant or is there another parking area that is free to use?", "from": "Antwane", "date": "2023-07-12"}
+{"text": "I sometimes have to park on the street, especially on Saturday\u2019s. There are usually spots on the highland ave bridge but it\u2019s about a 2 block walk.", "from": "Brandon", "date": "2023-07-12"}
+{"text": "You can park for free. Give me 5 minutes and I will post helpful info on how to park for free.", "from": "Stephen", "date": "2023-07-12"}
+{"text": "I\u2019m here if someone wants to let me in", "from": "Michael", "date": "2023-07-12"}
+{"text": "Be there in one momenty", "from": "Stephen", "date": "2023-07-12"}
+{"text": "\ud83d\ude97 Parking instructions for tonight! Please read carefully if you want free parking.\n  \nhttps://atlantabitdevs.org/parking-instructions-for-atl-bitlab/\n  \nBasically, park outside the yellow tape. If a valet tries to talk to you, tell them you are a guest of a tenant.", "from": "Stephen", "date": "2023-07-12"}
+{"text": null, "from": "Stephen", "date": "2023-07-12"}
+{"text": "I sometimes have to park on the street, especially on Saturday\u2019s. There are usually spots on the highland ave bridge but it\u2019s about a 2 block walk.", "from": "Brandon", "date": "2023-07-12"}
+{"text": "Can someone post here when the Discord stream begins? TY \ud83d\ude4f\ud83c\udffc", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-12"}
+{"text": "We're going to be in the usual Discord in General", "from": "Stephen", "date": "2023-07-12"}
+{"text": "6:30 right?", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-12"}
+{"text": "We think", "from": "Stephen", "date": "2023-07-12"}
+{"text": "Live now! TY\n\nY\u2019all very talkative today \ud83d\ude44\ud83e\udd37\ud83c\udffb\u200d\u2642\ufe0f\ud83e\udd26\ud83c\udffb\u200d\u2642\ufe0f", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-12"}
+{"text": "Mike made me go into my library \ud83d\udcda \n\nThis Hayek\u2019s most famous and most accessible book. Mandatory reading for all thinking \ud83e\udd14 adults.\n\nHighly recommended.", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-12"}
+{"text": "Mike made me go into my library \ud83d\udcda \n\nThis is Hayek\u2019s most famous and most accessible book. Mandatory reading for all thinking \ud83e\udd14 adults.\n\nHighly recommended.", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-12"}
+{"text": "Table of Contents", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-12"}
+{"text": null, "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-12"}
+{"text": "His name is RMS, nobody calls him Stallman.", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-12"}
+{"text": "So is GPL Copyleft really free?", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-12"}
+{"text": "/tip 21", "from": "Stephen", "date": "2023-07-12"}
+{"text": "/tip 21", "from": "Stephen", "date": "2023-07-12"}
+{"text": "/tip 1", "from": "Stephen", "date": "2023-07-12"}
+{"text": "MIT is a BSD class license.", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-12"}
+{"text": "GIT was 14 years after the creation of Linux. ~2005 vs 1991.\n\nMotivation was that Bitkeeper revoked Linus\u2019s source code license, so he created his own system \ud83e\udd37\ud83c\udffb\u200d\u2642\ufe0f", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-12"}
+{"text": "GIT was 14 years after the creation of Linux. ~2005 vs 1991.\n\nMotivation was that Bitkeeper revoked Linus\u2019s source code control license, so he created his own system \ud83e\udd37\ud83c\udffb\u200d\u2642\ufe0f", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-12"}
+{"text": "GIT was 14 years after the creation of Linux. ~2005 vs 1991.\n\nMotivation was that the proprietary Bitkeeper software revoked Linus\u2019s source code control license, so he created his own system \ud83e\udd37\ud83c\udffb\u200d\u2642\ufe0f", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-12"}
+{"text": "Joseph Schumpeter was the Austrian\u201cCreative Destruction\u201d derived from Marx\u2019s body of work.\n\nKarl Popper is another dude of the era everyone should know.", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-12"}
+{"text": "Joseph Schumpeter was the Austrian \u201cCreative Destruction\u201d derived from Marx\u2019s body of work.\n\nKarl Popper is another dude of the era everyone should know.", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-12"}
+{"text": "Joseph Schumpeter was the Austrian \u201cCreative Destruction\u201d guy, derived from Marx\u2019s body of work.\n\nKarl Popper is another dude of the era everyone should know.", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-12"}
+{"text": "That\u2019s a silly question. Information silos are a free market.", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-12"}
+{"text": "That\u2019s a silly question. Information silos reflect/are a free market.", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-12"}
+{"text": "Just to clarify, I was making implicit reference to free markets being a tool to adjust resources by aggregating collective knowledge. Earlier in the talk there was a passing reference to this in the talk in the context of disliking central planning being it was less efficient at doing this than a free market. Hearing this made me consider that perhaps Austrian theorists had an answer to information silos because on the surface an information silo would impact a market\u2019s ability to adjust value to resources. Because closed source software seemed similar to an information silo, I was curious about information silos in the Austrian context.", "from": "Antwane", "date": "2023-07-13"}
+{"text": "This book was mentioned in the Genesis book lol", "from": "Michael", "date": "2023-07-13"}
+{"text": "I suspect that siloed information inevitably disperses to the whole market and cannot be forever trapped by a few. If true, then you do not need a model to enforce free code like the GPL; closed information derived from a permissive license will eventually become open", "from": "Antwane", "date": "2023-07-13"}
+{"text": "I had a really good time tonight. Loved the participation I feel like we could make each chapter go 1 hour easily if we wanted to.", "from": "Michael", "date": "2023-07-13"}
+{"text": "Mike made me go into my library \ud83d\udcda \n\nThis is Hayek\u2019s most famous and most accessible book. Mandatory reading for all thinking \ud83e\udd14 adults.\n\nHighly recommended.", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-12"}
+{"text": "Great and super important topics. We shouldn\u2019t feel rushed to get through it, understanding the predicate is most important.", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-13"}
+{"text": "Great and super important topics. We shouldn\u2019t feel rushed to get through it, understanding the predicate is most important.", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-13"}
