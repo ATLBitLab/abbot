@@ -294,6 +294,9 @@ Stephen and Jordan wished Happy Independence Day.
 ----------------------------------------------------------------
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 2a2f18c (server)
 Summary for 2023-07-08:
 Stephen is known for being an early riser and is willing to interact with the group. 
 CheckTemplateVerify (CTV) and AnyPrevOut (APO) are two soft fork proposals for Bitcoin. 
@@ -306,6 +309,7 @@ CheckTemplateVerify (CTV) and AnyPrevOut (APO) are two soft fork proposals for B
 A summary comparison of the two proposals can be found at the link provided.
 ----------------------------------------------------------------
 
+<<<<<<< HEAD
 Summary for 2023-07-12:
 The text discusses the importance of having a good credit score.
 
@@ -468,3 +472,5 @@ A good credit score is important for getting loans and other financial services.
 >>>>>>> 06e1881 (server)
 =======
 >>>>>>> 4ee0e4d (server)
+=======
+>>>>>>> 2a2f18c (server)
