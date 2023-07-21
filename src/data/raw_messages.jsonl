@@ -1404,6 +1404,7 @@
 {"text": "best i got is to divide by 2 and multiple by 1000000 but idk why you would divide by 2\n0.000001 / 2 = 0.0000005 * 1,000,000 = 0.5 SATs \nand that still doesnt get the mSAT value, which requires 0.5 * 1000 = 500 mSATs\nis there a formula for using the fee_rate (ppm) to directly calcuate the mSATs per HTLC routed?", "from": "bryan", "date": "2023-07-20"}
 {"text": "Gm", "from": "Stephen", "date": "2023-07-20"}
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 06e1881 (server)
 =======
@@ -1418,3 +1419,30 @@
 >>>>>>> 05cf167 (server)
 =======
 >>>>>>> 2b7eb79 (server)
+=======
+{"text": "The AI 4 All hackathon folks have a guy from Shoki AI answering questions about AI agents: https://www.youtube.com/watch?v=xCzEyPXNsFk", "from": "Stephen", "date": "2023-07-20"}
+{"text": "The AI 4 All hackathon folks have a guy from Shoki AI answering questions about AI agents: https://www.youtube.com/watch?v=xCzEyPXNsFk", "from": "Stephen", "date": "2023-07-20"}
+{"text": "If you'd just like a Raspberry Pi 4 with 8GB RAM, I'll sell for $85 in BTC and $95 in fiat.", "from": "packetprotector", "date": "2023-07-20"}
+{"text": "@Lipsi_17 and anyone that is interested, I am selling DIY Raspberry Pi nodes for $185 in BTC or $200 in fiat. Here is a parts list: https://www.amazon.com/hz/wishlist/ls/SXWK7PS8NPL0?ref_=wl_share\n\nI can pre-assemble if you would like, but that is part of the fun...!\ud83d\ude06", "from": "packetprotector", "date": "2023-07-20"}
+{"text": "Is this event really on a Friday?\n@HODLBarbarian \n\nJoin me at Pleb Miners of Georgia https://meetu.ps/e/MkrZS/zZMd/a", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-20"}
+{"text": "No", "from": "Stephen", "date": "2023-07-20"}
+{"text": "Wednesday, July 26 at Manuel's Tavern", "from": "Stephen", "date": "2023-07-20"}
+{"text": "For those of you asking about how to volunteer at TAB Conf this year, here's a form to fill out https://docs.google.com/forms/d/e/1FAIpQLSe3Sm9lzGQgFobHeMv0volLJ4RCWYi2qc2Dll2d1qT1wml2JA/viewform", "from": "bryan", "date": "2023-07-20"}
+{"text": "/tip 1", "from": "Stephen", "date": "2023-07-12"}
+{"text": "https://superagi.com/introducing-aacp-agent-to-agent-communication-protocol/", "from": "Giii", "date": "2023-07-20"}
+{"text": "There are two events listed currently, one from @HODLBarbarian on Fri (tomorrow) and another from @sbddesign on Wed.", "from": "Rich", "date": "2023-07-20"}
+{"text": "The Wednesday one is the correct one. Doug knows the correct date. It was just an accidental error when making the event. He's in another timezone right now so may not notice this for a bit.", "from": "Stephen", "date": "2023-07-20"}
+{"text": "Oh right, forgot he was in India.", "from": "Rich", "date": "2023-07-20"}
+{"text": "I was thinking maybe one of the admins could delete the wrong one", "from": "Rich", "date": "2023-07-20"}
+{"text": "That's the BitPlebs group so he will need to take care of that one.", "from": "Stephen", "date": "2023-07-20"}
+{"text": "May I suggest you and Doug make each other an admin of those Meetup groups bc people will see the erroneous info and not visit TG.", "from": "Citizen \ud83c\uddfa\ud83c\uddf8", "date": "2023-07-20"}
+{"text": "I fixed it. Now it is on the 26", "from": "Aida", "date": "2023-07-20"}
+{"text": "Replied to your question on meetup too", "from": "Aida", "date": "2023-07-20"}
+{"text": "Thanks for catching that guys", "from": "Aida", "date": "2023-07-20"}
+{"text": "Hey everyone! Base58 is doing a \"Taproot Intensive\" course the week of TAB Conf, and its being held at ATL BitLab! If you\u2019re interested in signing up, check out the webpage: https://base58.school/classes/taproot. Classes are small, and space tends to be limited so if you\u2019re seriously interested, check it out. \nPricing is on the landing page. Lmk if you have questions!", "from": "bryan", "date": "2023-07-20"}
+{"text": "Taproot it up in Atlanta ahead of TABConf!\n\n$1150 | $977\n\n\nI didn't understand the pricing. Which one is it?", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-07-20"}
+{"text": "Higher cost is that dirty dirty fiat", "from": "bryan", "date": "2023-07-20"}
+{"text": "Hence the green color \ud83d\ude09", "from": "bryan", "date": "2023-07-20"}
+{"text": "That threw me off at first too", "from": "bryan", "date": "2023-07-20"}
+{"text": "Ahhh. Orange is Bitcoin. Of course", "from": "Nitesh \u20bf\u26a1\ufe0f", "date": "2023-07-20"}
+>>>>>>> 8dc32d9 (updates from server)
