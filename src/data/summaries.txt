@@ -260,6 +260,9 @@ Bryan said "@alex_lewin tell ya boy to calm down" (https://twitter.com/bennyhodl
 ----------------------------------------------------------------
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 4ee0e4d (server)
 Summary for 2023-07-08:
 Stephen is known for being an early riser and is willing to interact with the group. 
 CheckTemplateVerify (CTV) and AnyPrevOut (APO) are soft fork proposals for Bitcoin. 
@@ -290,6 +293,7 @@ The race was called due to lightning, but all waves were done by 1030.
 Stephen and Jordan wished Happy Independence Day.
 ----------------------------------------------------------------
 
+<<<<<<< HEAD
 Summary for 2023-07-08:
 Stephen is known for being an early riser and is willing to interact with the group. 
 CheckTemplateVerify (CTV) and AnyPrevOut (APO) are two soft fork proposals for Bitcoin. 
@@ -462,3 +466,5 @@ A good credit score is important for getting loans and other financial services.
 
 =======
 >>>>>>> 06e1881 (server)
+=======
+>>>>>>> 4ee0e4d (server)

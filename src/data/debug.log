@@ -3663,6 +3663,9 @@ https://ronindojo.io/en/roninmobile
 [2023-07-08 17:43:36.022763] ATL BitLab Bot: Init Bot
 [2023-07-08 17:43:36.033652] ATL BitLab Bot: Polling!
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 4ee0e4d (server)
 [2023-07-08 18:56:07.094775] ATL BitLab Bot: Init Bot
 [2023-07-08 18:56:07.141272] ATL BitLab Bot: Polling!
 [2023-07-08 19:03:40.438489] ATL BitLab Bot: /summary executed
@@ -3686,6 +3689,7 @@ https://ronindojo.io/en/roninmobile
     "total_tokens": 319
   }
 }
+<<<<<<< HEAD
 [2023-07-11 07:26:18.466593] ATL BitLab Bot: Init Bot
 [2023-07-11 07:26:18.467338] ATL BitLab Bot: Polling!
 [2023-07-11 07:26:31.451348] ATL BitLab Bot: Bot /start
@@ -4283,3 +4287,5 @@ https://ronindojo.io/en/roninmobile
 >>>>>>> fa17180 (server)
 =======
 >>>>>>> e16a8cc (seserver)
+=======
+>>>>>>> 4ee0e4d (server)
