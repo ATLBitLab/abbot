@@ -140,6 +140,8 @@ def summarize_messages(days=None):
                     sender = message["from"]
                     message = f"{sender} said {text} on {message_date}\n"
                     prompt += message
+                    if len(prompt) > 3500:
+                        break
             final_prompt = (
                 "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n"
                 + prompt
@@ -156,7 +158,7 @@ def summarize_messages(days=None):
             response = openai.Completion.create(
                 model="text-davinci-003",
                 prompt=prompt,
-                max_tokens=4095,
+                max_tokens=4000 - len(prompt),
                 temperature=0,
             )
             debug(f"[{now}] {PROGRAM}: OpenAI Response = {response}")
