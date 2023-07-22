@@ -335,7 +335,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-def main():
+def bot_main():
     debug(f"[{now}] {PROGRAM}: Init Bot")
     start_handler = CommandHandler("start", start)
     application.add_handler(start_handler)
