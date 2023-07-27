@@ -18,5 +18,5 @@ elif CLEAN_SUMMARY:
     summarize_messages()
 
 else:
-    bot_main(DEV_MODE)
     nostr_main()
+    # bot_main(DEV_MODE)
