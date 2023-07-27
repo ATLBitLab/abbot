@@ -4,6 +4,7 @@ from lib.nostr.nostr import nostr_main
 ARGS = argv[1:]
 CLEAN = "-c" in ARGS or "--clean" in ARGS
 SUMMARY = "-s" in ARGS or "--summary" in ARGS
+DEV_MODE = "-d" in ARGS or "--dev" in ARGS
 CLEAN_SUMMARY = CLEAN and SUMMARY
 
 if CLEAN:
@@ -17,5 +18,5 @@ elif CLEAN_SUMMARY:
     summarize_messages()
 
 else:
-    bot_main()
+    bot_main(DEV_MODE)
     nostr_main()

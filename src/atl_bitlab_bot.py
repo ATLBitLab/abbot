@@ -1,5 +1,5 @@
 STARTED = None
-PROGRAM = "ATL BitLab Bot"
+PROGRAM = "atl_bitlab_bot.py"
 
 import os
 import json
@@ -24,7 +24,7 @@ from telegram.ext import (
 from lib.logger import debug
 from lib.utils import qr_code
 from lib.api.strike import Strike
-from lib.env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY
+from lib.env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY, BOT_HANDLE
 from help_menu import help_menu_message
 import openai
 
@@ -44,11 +44,9 @@ now = datetime.now()
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message = update.effective_message
+        print(message)
         if not STARTED:
-            return await context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text="Bot must be started. Run /start to begin listening to and storing messages or /help for usage guide",
-            )
+            return
         if update.effective_chat.id in CHATS_TO_IGNORE:
             return
         mpy = io.open(MESSAGES_PY_FILE, "a")
@@ -69,7 +67,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         rm_jl.write("\n")
         rm_jl.close()
     
-
 
 def clean_jsonl_data():
     debug(f"[{now}] {PROGRAM}: clean_jsonl_data - Deduping messages")
@@ -156,13 +153,13 @@ def summarize_messages(days=None):
 
 async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sender = update.effective_message.from_user.username
-    debug(f"[{now}] {PROGRAM}: /clean executed by {sender}")
+    debug(f"[{now}] {PROGRAM}: /cleanAbbot executed by {sender}")
     if update.effective_message.from_user.username not in WHITELIST:
         return await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
         )
-    debug(f"[{now}] {PROGRAM}: /clean executed")
+    debug(f"[{now}] {PROGRAM}: /cleanAbbot executed")
     await context.bot.send_message(
         chat_id=update.effective_chat.id, text="Cleaning ... please wait"
     )
@@ -184,14 +181,14 @@ def whitelist_gate(sender):
 async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         sender = update.effective_message.from_user.username
-        debug(f"[{now}] {PROGRAM}: /summary executed by {sender}")
+        debug(f"[{now}] {PROGRAM}: /summaryAbbot executed by {sender}")
         not_whitelisted = whitelist_gate(sender)
         if not_whitelisted:
             return await context.bot.send_message(
                 chat_id=update.effective_chat.id,
                 text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
             )
-        debug(f"[{now}] {PROGRAM}: /summary executed")
+        debug(f"[{now}] {PROGRAM}: /summaryAbbot executed")
         args = context.args
         arg_len = len(args)
         if arg_len > 0 and arg_len > 2:
@@ -297,30 +294,40 @@ async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sender = update.effective_message.from_user.username
-    debug(f"[{now}] {PROGRAM}: /stop executed by {sender}")
-    if update.effective_message.from_user.username not in WHITELIST:
-        return await context.bot.send_message(
+    message_text = update.message.text
+    if "abbot" in message_text:
+        debug(f"[{now}] {PROGRAM}: /stop executed by {sender}")
+        if update.effective_message.from_user.username not in WHITELIST:
+            return await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
+            )
+        debug(f"[{now}] {PROGRAM}: /stop executed")
+        await context.bot.stop_poll(
             chat_id=update.effective_chat.id,
-            text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
+            message_id=update.effective_message.id,
+            text="Bot stopped! Use /start to begin polling.",
         )
-    debug(f"[{now}] {PROGRAM}: /stop executed")
-    await context.bot.stop_poll(
-        chat_id=update.effective_chat.id,
-        message_id=update.effective_message.id,
-        text="Bot stopped! Use /start to begin polling.",
-    )
 
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    debug(f"[{now}] {PROGRAM}: /help executed by {update.effective_message.from_user.username}")
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text=help_menu_message,
-    )
+    debug(f"[{now}] {PROGRAM}: /helpAbbot executed by {update.effective_message.from_user.username}")
+    message_text = update.message.text
+    if "@TestATLBitLabBot" in message_text:
+        return await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=help_menu_message,
+        )
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sender = update.effective_message.from_user.username
+    message_text = update.message.text
+    if f"@{BOT_HANDLE}" not in message_text:
+        return await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text=f"If you want to start @{BOT_HANDLE}, please tag the bot in the start command: e.g. `/start @{BOT_HANDLE}`",
+            )
     debug(f"[{now}] {PROGRAM}: /start executed by {sender}")
     if sender not in WHITELIST:
         return await context.bot.send_message(
@@ -331,27 +338,29 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     STARTED = True
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text="Bot started. Run /help for usage guide",
+        text="Bot started. Run /helpAbbot for usage guide",
     )
 
 
-def bot_main():
-    debug(f"[{now}] {PROGRAM}: Init Bot")
+def bot_main(DEV_MODE):
+    global BOT_HANDLE
+    BOT_HANDLE = f"Test{BOT_HANDLE}" if DEV_MODE else BOT_HANDLE
+    debug(f"[{now}] {PROGRAM}: @{BOT_HANDLE} Initialized")
     start_handler = CommandHandler("start", start)
     application.add_handler(start_handler)
-    help_handler = CommandHandler("help", help)
+    help_handler = CommandHandler("helpAbbot", help)
     application.add_handler(help_handler)
     stop_handler = CommandHandler("stop", stop)
     application.add_handler(stop_handler)
-    summary_handler = CommandHandler("summary", summary)
+    summary_handler = CommandHandler("summaryAbbot", summary)
     application.add_handler(summary_handler)
-    prompt_handler = CommandHandler("prompt", atl_bitlab_bot)
+    prompt_handler = CommandHandler("promptAbbot", atl_bitlab_bot)
     application.add_handler(prompt_handler)
-    clean_handler = CommandHandler("clean", clean)
+    clean_handler = CommandHandler("cleanAbbot", clean)
     application.add_handler(clean_handler)
-    clean_summary_handler = CommandHandler("both", both)
+    clean_summary_handler = CommandHandler("bothAbbot", both)
     application.add_handler(clean_summary_handler)
     message_handler = MessageHandler(BaseFilter(), handle_message)
     application.add_handler(message_handler)
-    debug(f"[{now}] {PROGRAM}: Polling!")
+    debug(f"[{now}] {PROGRAM}: @{BOT_HANDLE} Polling")
     application.run_polling()
