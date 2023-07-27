@@ -459,3 +459,114 @@ The text discusses the importance of having a good credit score.
 A good credit score is important for getting loans and other financial services. It can help you get lower interest rates, better terms, and better deals on insurance, credit cards, and mortgages.
 ----------------------------------------------------------------
 
+Summary for 2023-07-20:
+Jordan said Whats the name of the restaurant for afterwards? 
+packetprotector said DIY Raspberry Pi nodes for $185 in BTC or $200 in fiat, Raspberry Pi 4 with 8GB RAM for $85 in BTC and $95 in fiat, and Dell Optiplex 7050 i7-6700 3.4 GHz with 16GB RAM, 1TB NVME drive for $195 in BTC and $210 fiat. 
+bryan said Can someone in here help me make sense of this? 
+Stephen said The AI 4 All hackathon folks have a guy from Shoki AI answering questions about AI agents and TAB Conf volunteer form. 
+Citizen 🇺🇸 said Is this event really on a Friday? 
+Stephen said No, Wednesday, July 26 at Manuels Tavern. 
+
+============================
+
+Jordan asked about the name of the restaurant for afterwards. Packetprotector offered DIY Raspberry Pi nodes, Raspberry Pi 4 with 8GB RAM, and Dell Optiplex 7050 i7-6700 3.4 GHz with 16GB RAM, 1TB NVME drive for various prices. Bryan asked for help understanding something. Stephen mentioned the AI 4 All hackathon and TAB Conf volunteer form. Citizen 🇺🇸 asked if the event was on a Friday and Stephen said no, it was on Wednesday, July 26 at Manuels Tavern.
+----------------------------------------------------------------
+
+Summary for 2023-07-14:
+Stephen said Mutiny Wallet was released from beta and opened to the world yesterday. Its pretty neat so far! https://www.mutinywallet.com/ 
+
+Citizen 🇺🇸 said Synthetic USD? Powered by DLCs?
+
+Stephen said Its one of those topics I typically start rambling sometime after the 2nd beer. Basically, you use a price oracle and a discrete log contract to create something that resembles a dollar if you squint at it. Alice wants the stability of the dollar and Bob wants to try and earn some yield on his BTC. Alice and Bob enter into a DLC together. Alice contributes $1 worth of bitcoin, Bob contributes $2 worth of bitcoin. Alice can redeem this UTXO for $1 worth of bitcoin and Bob gets the leftovers. If the price goes up, then Bob has profited. If the price goes down, he has lost a little, but Alice still has her $1. There are edge cases to worry about like what if the price dips too much, what if the oracle goes down, whats the best way to do this on lightning, etc. And there are ways of mitigating and responding to these situations. But thats the basic gist of it. 
+
+bryan said Hey everyone! Reminder that tomorrow is the next hack session  for the Bolt Fun “AI 4 All” hackathon at ATL BitLab. 
+
+https://meetu.ps/e/MgXRk/t1j6w/i 
+
+Come hack in the lab with me and let’s build something cool! Note the time change. We’ve pushed the time back from 10 AM to 11 AM. I will be coming in from Nashville early tomorrow morning and straight down to the lab. Unless you have a key fob, unfortunately you won’t be able to get in before I arrive, so please be mindful of that. 
+
+========================================================================
+
+Stephen announced the release of Mutiny Wallet from beta and opened to the world. Citizen 🇺🇸 asked about Synthetic USD and DLCs, and Stephen explained that it is a way to create something that resembles a dollar using a price oracle and a discrete log contract. Alice and Bob enter into a DLC together, and if the price goes up, Bob profits, and if the price goes down, Alice still has her $1. There are edge cases to consider. 
+
+Bryan reminded everyone of the hack session for the Bolt Fun “AI 4 All” hackathon at ATL BitLab, and provided a link. He also noted the time change from 10 AM to 11 AM, and that he will be coming in from Nashville early tomorrow morning.
+----------------------------------------------------------------
+
+Summary for 2023-07-15:
+Stephen said Yall Pubkey in NYC is legit 
+Nitesh ₿⚡️ said they love the name 
+Citizen 🇺🇸 asked for the neighborhood and address of Yall Pubkey 
+Stephen said it is located just north of SoHo on 6th Ave 
+Citizen 🇺🇸 said it is near Amity Hall on 3rd and Thompson 
+JF said they will likely be there next month 
+bryan asked Jordan if he was in the lab 
+Dalton asked for a good way to swap silver bullion for BTC 
+Jordan said he was on his way 
+Jordan asked if they were going to hack in the lab or the conference room 
+bryan said they were going to the lab 
+bryan shared a link to the project 
+Dalton said he had silver and wanted to swap it for BTC 
+
+========================
+
+Stephen said Yall Pubkey in NYC is legit 
+Nitesh ₿⚡️ said they love the name 
+Citizen 🇺🇸 asked for the neighborhood and address of Yall Pubkey 
+Stephen said it is located just north of SoHo on 6th Ave 
+Citizen 🇺🇸 said it is near Amity Hall on 3rd and Thompson 
+JF said they will likely be there next month 
+bryan asked Jordan if he was in the lab 
+Dalton asked for a good way to swap silver bullion for BTC 
+Jordan said he was on his way 
+Jordan asked if they were going to hack in the lab or the conference room 
+bryan said they were going to the lab 
+bryan shared a link to the project 
+Dalton said he had silver and wanted to swap it for BTC
+----------------------------------------------------------------
+
+Summary for 2023-07-16:
+Jordan is planning to go to the BitLab tomorrow. 
+Bryan is also planning to go to the BitLab at some point.
+
+====================
+
+Jordan and Bryan are both planning to go to the BitLab tomorrow.
+----------------------------------------------------------------
+
+Summary for 2023-07-17:
+Jordan, Stephen, and Garrett discussed the idea of owning 21 bitcoin equating to owning an IOU for about one millionth of the world's resources. Stephen suggested that it is more accurate to think in terms of purchasing power rather than actual claims to resources. Garrett asked for a more concrete way to explain the idea to people. 
+========================================================================
+
+Jordan, Stephen, and Garrett discussed the idea of owning 21 bitcoin equating to owning an IOU for about one millionth of the world's resources. Stephen suggested that it is more accurate to think in terms of purchasing power rather than actual claims to resources. Garrett asked for a more concrete way to explain the idea to people.
+----------------------------------------------------------------
+
+Summary for 2023-07-18:
+Money should represent time/energy. 
+Bitcoin has the advantage of diminishing supply over time with an ultimately fixed final supply known in advance. 
+Coincidence of wants, then path dependence from SoV to MoE to UoA. 
+Bitcoin Socratic Seminar #20. 
+========================================================================
+
+Tomorrow night is Bitcoin Socratic Seminar #20, which will cover topics such as money representing time/energy, Bitcoin's diminishing supply over time, and Coincidence of wants, then path dependence from SoV to MoE to UoA.
+----------------------------------------------------------------
+
+Summary for 2023-07-19:
+Robert F. Kennedy Jr. unveiled a plan to bolster the U.S. dollar by backing it with Bitcoin and abolishing Bitcoin capital gains taxes. 
+Dalton suggested that if the U.S. were to back 23 trillion USD with Bitcoin, it would require $1 million per Bitcoin to bear that burden. 
+Citizen 🇺🇸 suggested that if Bitcoin sees serious first world nation state official adoption, the price will be permanently above $1 million. 
+Mike suggested that the owner of the original Satoshi stash of 1.1 million coins is likely the one who develops the first quantum computer capable of reversing
+----------------------------------------------------------------
+
+Summary for 2023-07-20:
+Jordan said Whats the name of the restaurant for afterwards? 
+packetprotector said DIY Raspberry Pi nodes for $185 in BTC or $200 in fiat, Raspberry Pi 4 with 8GB RAM for $85 in BTC and $95 in fiat, and Dell Optiplex 7050 i7-6700 3.4 GHz with 16GB RAM, 1TB NVME drive for $195 in BTC and $210 fiat. 
+bryan said Can someone in here help me make sense of this? 
+Stephen said The AI 4 All hackathon folks have a guy from Shoki AI answering questions about AI agents and TAB Conf volunteer form. 
+Citizen 🇺🇸 said Is this event really on a Friday? 
+Stephen said No, Wednesday, July 26 at Manuels Tavern. 
+
+====================
+
+Jordan asked about the name of a restaurant for afterwards. Packetprotector offered DIY Raspberry Pi nodes, Raspberry Pi 4 with 8GB RAM, and Dell Optiplex 7050 i7-6700 3.4 GHz with 16GB RAM, 1TB NVME drive for sale. Bryan asked for help understanding something. Stephen mentioned the AI 4 All hackathon and TAB Conf volunteer form. Citizen 🇺🇸 asked if an event was on a Friday, to which Stephen replied no.
+----------------------------------------------------------------
+
