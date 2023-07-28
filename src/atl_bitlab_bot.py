@@ -206,7 +206,7 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if arg_len > 0 and arg_len > 3:
             return await context.bot.send_message("Too many args")
         chat = args[0].replace(" ", "").lower()
-        print('chat', chat)
+        dates = get_dates()
         if arg_len == 1:
             args = get_dates()
             message = f"Generating {chat} summary for past week: {args}"
@@ -245,7 +245,6 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     return await context.bot.send_message(f"Error while parsing date: {e}")
             message = f"Generating {chat} summary for each day between {' and '.join(args)}"
         else:
-            dates = get_dates()
             message = f"Generating {chat} summary for each day in the past week: {' '.join(dates)}"
         await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
         summaries = summarize_messages(chat, dates)
