@@ -687,3 +687,14 @@ Nitesh is working on automating this as a GitHub action.
 Nonni offered to help with frontend and asked if Nitesh solved the
 ----------------------------------------------------------------
 
+Summary for 2023-07-27:
+Key Points:
+- sbddesign enabled read/write permissions for everything in the bitdevs-upgrade repo
+- sbddesign suggested forking the repo to personal, making a personal access token, and seeing if that works
+- sbddesign suggested turning on payments for the atlantabitdevs org
+- Jordan got the NextJS website generating from markdown files
+- Nitesh wrote a script to scrape the links from a BitDevs Socratic markdown file and feed the content into an LLM to summarize
+- Alex and Bryan contributed to the getting the LLM summaries
+- Nitesh is working on
+----------------------------------------------------------------
+
