@@ -5226,9 +5226,158 @@ https://ronindojo.io/en/roninmobile
 [2023-07-28 19:20:56.886766] ATL BitLab Bot: /summary executed by nonni_io
 [2023-07-28 19:20:56.886766] ATL BitLab Bot: /summary executed
 [2023-07-28 19:20:56.886766] ATL BitLab Bot: atl_bitlab_bot - summary error: cannot access local variable 'dates' where it is not associated with a value
+<<<<<<< Updated upstream
 [2023-07-28 15:24:16.175515] ATL BitLab Bot: Init Bot
 [2023-07-28 15:24:16.175515] ATL BitLab Bot: Polling!
 [2023-07-28 15:24:16.175515] ATL BitLab Bot: /clean executed by nonni_io
 [2023-07-28 15:24:16.175515] ATL BitLab Bot: /clean executed
 [2023-07-28 15:24:16.175515] ATL BitLab Bot: clean_jsonl_data - Deduping messages
 [2023-07-28 15:24:16.175515] ATL BitLab Bot: clean_jsonl_data - Deduping done
+=======
+[2023-07-28 19:23:00.893393] ATL BitLab Bot: Init Bot
+[2023-07-28 19:23:00.893393] ATL BitLab Bot: Polling!
+[2023-07-28 19:23:00.893393] ATL BitLab Bot: /start executed by nonni_io
+[2023-07-28 19:23:00.893393] ATL BitLab Bot: /summary executed by nonni_io
+[2023-07-28 19:23:00.893393] ATL BitLab Bot: /summary executed
+[2023-07-28 19:23:00.893393] ATL BitLab Bot: Prompts by day = {"2023-07-21": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n", "2023-07-22": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n", "2023-07-23": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n", "2023-07-24": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n", "2023-07-25": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n", "2023-07-26": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n", "2023-07-27": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n"}
+[2023-07-28 19:23:00.893393] ATL BitLab Bot: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "The text discusses the importance of having a good credit score.\n\n1. A good credit score is important for getting loans and other financial services.\n2. A good credit score can help you get lower interest rates on loans.\n3. A good credit score can help you get approved for a loan or other financial services.\n4. A good credit score can help you get better terms on loans.\n5. A good credit score can help you get better deals on insurance.\n6. A good credit score can help you get better deals on credit cards.\n7. A good credit score can help you get better deals on mortgages.\n\n========================\n\nA good credit score is important for getting loans and other financial services. It can help you get lower interest rates, better terms, and better deals on insurance, credit cards, and mortgages."
+    }
+  ],
+  "created": 1690572191,
+  "id": "cmpl-7hNLLN0LxlMwnS2RVrB61fJuWrKBv",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 176,
+    "prompt_tokens": 35,
+    "total_tokens": 211
+  },
+  "warning": "This model version is deprecated. Migrate before January 4, 2024 to avoid disruption of service. Learn more https://platform.openai.com/docs/deprecations"
+}
+[2023-07-28 19:23:00.893393] ATL BitLab Bot: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "The text discusses the importance of having a good credit score.\n\n1. A good credit score is important for getting loans and other financial services.\n2. A good credit score can help you get lower interest rates on loans.\n3. A good credit score can help you get approved for a loan or other financial services.\n4. A good credit score can help you get better terms on loans.\n5. A good credit score can help you get better deals on insurance.\n6. A good credit score can help you get better deals on credit cards.\n7. A good credit score can help you get better deals on mortgages.\n\n========================\n\n8. A good credit score can help you get better deals on car loans.\n9. A good credit score can help you get better deals on other types of loans.\n10. A good credit score can help you get better deals on other financial services."
+    }
+  ],
+  "created": 1690572196,
+  "id": "cmpl-7hNLQUzTnswp55PXmMZTKzwwcA8Q7",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 191,
+    "prompt_tokens": 35,
+    "total_tokens": 226
+  },
+  "warning": "This model version is deprecated. Migrate before January 4, 2024 to avoid disruption of service. Learn more https://platform.openai.com/docs/deprecations"
+}
+[2023-07-28 19:23:00.893393] ATL BitLab Bot: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "The text discusses the importance of having a good credit score.\n\n1. A good credit score is important for many reasons. \n2. It can help you get approved for loans, credit cards, and other financial products. \n3. It can also help you get lower interest rates and better terms on those products. \n4. A good credit score can also help you get better rates on insurance and other services. \n5. It is important to pay your bills on time and keep your credit utilization low to maintain a good credit score.\n\n========================================\n\n1. A good credit score is important for many reasons. \n2. It can help you get approved for loans, credit cards, and other financial products. \n3. It can also help you get lower interest rates and better terms on those products. \n4. A good credit score can also help you get better rates on insurance and other services. \n5. It is important to pay your bills on time and keep your credit utilization low to maintain a good credit score."
+    }
+  ],
+  "created": 1690572202,
+  "id": "cmpl-7hNLWw6f5Gn68Nj92cJaZPZMdnbxK",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 220,
+    "prompt_tokens": 35,
+    "total_tokens": 255
+  },
+  "warning": "This model version is deprecated. Migrate before January 4, 2024 to avoid disruption of service. Learn more https://platform.openai.com/docs/deprecations"
+}
+[2023-07-28 19:23:00.893393] ATL BitLab Bot: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "The text discusses the importance of having a good credit score.\n\n1. A good credit score is important for getting loans and other financial services.\n2. A good credit score can help you get lower interest rates on loans.\n3. A good credit score can help you get approved for a loan or other financial services.\n4. A good credit score can help you get better terms on loans.\n5. A good credit score can help you get better deals on insurance.\n6. A good credit score can help you get better deals on credit cards.\n7. A good credit score can help you get better deals on mortgages.\n\n========================\n\n8. A good credit score can help you get better deals on car loans.\n9. A good credit score can help you get better deals on other types of loans.\n10. A good credit score can help you get better deals on other financial services."
+    }
+  ],
+  "created": 1690572208,
+  "id": "cmpl-7hNLcITl5JBtS0Hy4w3Ol4Y6gyz3Z",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 191,
+    "prompt_tokens": 35,
+    "total_tokens": 226
+  },
+  "warning": "This model version is deprecated. Migrate before January 4, 2024 to avoid disruption of service. Learn more https://platform.openai.com/docs/deprecations"
+}
+[2023-07-28 19:23:00.893393] ATL BitLab Bot: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "The text discusses the importance of having a good credit score.\n\n1. A good credit score is important for getting loans and other financial services.\n2. A good credit score can help you get lower interest rates on loans.\n3. A good credit score can help you get approved for a loan or other financial services.\n4. A good credit score can help you get better terms on loans.\n5. A good credit score can help you get better deals on insurance.\n6. A good credit score can help you get better deals on credit cards.\n7. A good credit score can help you get better deals on mortgages.\n\n========================\n\nA good credit score is important for getting loans and other financial services. It can help you get lower interest rates, better terms, and better deals on insurance, credit cards, and mortgages."
+    }
+  ],
+  "created": 1690572214,
+  "id": "cmpl-7hNLi6YioauM2XSh86iwIqRU5u62D",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 176,
+    "prompt_tokens": 35,
+    "total_tokens": 211
+  },
+  "warning": "This model version is deprecated. Migrate before January 4, 2024 to avoid disruption of service. Learn more https://platform.openai.com/docs/deprecations"
+}
+[2023-07-28 19:23:00.893393] ATL BitLab Bot: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "The text discusses the importance of having a good credit score.\n\n1. A good credit score is important for getting loans and other financial services.\n2. A good credit score can help you get lower interest rates on loans.\n3. A good credit score can help you get approved for a loan or other financial services.\n4. A good credit score can help you get better terms on loans.\n5. A good credit score can help you get better deals on insurance.\n6. A good credit score can help you get better deals on credit cards.\n7. A good credit score can help you get better deals on mortgages.\n\n========================\n\nA good credit score is important for getting loans and other financial services. It can help you get lower interest rates, better terms, and better deals on insurance, credit cards, and mortgages."
+    }
+  ],
+  "created": 1690572217,
+  "id": "cmpl-7hNLl6LaTZFiG7ffifVgrprHNlknJ",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 176,
+    "prompt_tokens": 35,
+    "total_tokens": 211
+  },
+  "warning": "This model version is deprecated. Migrate before January 4, 2024 to avoid disruption of service. Learn more https://platform.openai.com/docs/deprecations"
+}
+[2023-07-28 19:23:00.893393] ATL BitLab Bot: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "The text discusses the importance of having a good credit score.\n\n1. A good credit score is important for getting loans and other financial services.\n2. A good credit score can help you get lower interest rates on loans.\n3. A good credit score can help you get approved for a loan or other financial services.\n4. A good credit score can help you get better terms on loans.\n5. A good credit score can help you get better deals on insurance.\n6. A good credit score can help you get better deals on credit cards.\n7. A good credit score can help you get better deals on mortgages.\n\n========================\n\nA good credit score is important for getting loans and other financial services. It can help you get lower interest rates, better terms, and better deals on insurance, credit cards, and mortgages."
+    }
+  ],
+  "created": 1690572221,
+  "id": "cmpl-7hNLpC5QGzWR7ub1DHh9o9MlxrvTF",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 176,
+    "prompt_tokens": 35,
+    "total_tokens": 211
+  },
+  "warning": "This model version is deprecated. Migrate before January 4, 2024 to avoid disruption of service. Learn more https://platform.openai.com/docs/deprecations"
+}
+>>>>>>> Stashed changes
