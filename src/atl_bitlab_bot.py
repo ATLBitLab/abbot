@@ -201,62 +201,41 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         debug(f"[{now}] {PROGRAM}: /summary executed")
         args = context.args
-        print('context.args', context.args)
         arg_len = len(args)
-        if arg_len > 0 and arg_len > 3:
+        if arg_len > 0 and arg_len > 2:
             return await context.bot.send_message("Too many args")
-        chat = args[0].replace(" ", "").lower()
-        print('chat', chat)
-        if arg_len == 1:
-            args = get_dates()
-            message = f"Generating {chat} summary for past week: {args}"
+        elif arg_len == 1:
+            message = f"Generating summary for day {''.join(args)}"
         elif arg_len == 2:
-            date = args[1]
-            if re.search("^\d{4}-\d{2}-\d{2}$", chat):
-                return await context.bot.send_message(
-                    f"Malformed chat: expecting chat name, got {chat}"
-                )
-            if not re.search("^\d{4}-\d{2}-\d{2}$", date):
-                return await context.bot.send_message(
-                    f"Malformed date: expecting form YYYY-MM-DD, got {date}"
-                )
-            try:
-                datetime.strptime(date, "%Y-%m-%d").date()
-            except Exception as e:
-                debug(f"[{now}] {PROGRAM}: summary datetime.strptime error: {e}")
-                return await context.bot.send_message(f"Error while parsing date: {e}")
-            dates = [args[1]]
-            message = f"Generating {chat} summary for {date}"
-        elif arg_len == 3:
-            dates = args[0:2]
-            if re.search("^\d{4}-\d{2}-\d{2}$", chat):
-                return await context.bot.send_message(
-                    f"Malformed chat: expecting chat name, got {chat}"
-                )
-            for date in dates:
-                if not re.search("^\d{4}-\d{2}-\d{2}$", date):
+            for arg in args:
+                if not re.search("^\d{4}-\d{2}-\d{2}$", arg):
                     return await context.bot.send_message(
-                    f"Malformed date: expecting form YYYY-MM-DD, got {date}"
+                        f"Malformed date: expecting form YYYY-MM-DD"
                     )
                 try:
-                    datetime.strptime(date, "%Y-%m-%d").date()
+                    datetime.strptime(arg, "%Y-%m-%d").date()
                 except Exception as e:
-                    debug(f"[{now}] {PROGRAM}: summary datetime.strptime error: {e}")
                     return await context.bot.send_message(f"Error while parsing date: {e}")
-            message = f"Generating {chat} summary for each day between {' and '.join(args)}"
+            message = f"Generating summary for each day between {' and '.join(args)}"
         else:
-            dates = get_dates()
-            message = f"Generating {chat} summary for each day in the past week: {' '.join(dates)}"
+            args = get_dates()
+            message = f"Generating summary for each day in the past week: {args}"
         await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
-        summaries = summarize_messages(chat, dates)
+        summaries = summarize_messages(args)
         for summary in summaries:
-            await context.bot.send_message(
-                chat_id=update.effective_chat.id, text=summary
-            )
+            try:
+                await context.bot.send_message(
+                    chat_id=update.effective_chat.id, text=summary
+                )
+            except Exception as e:
+                debug(f"[{now}] {PROGRAM}: summarize error {e}")
+                await context.bot.send_message(
+                    chat_id=update.effective_chat.id, text=f"Error: {e}"
+                )
     except Exception as e:
-        debug(f"[{now}] {PROGRAM}: atl_bitlab_bot - summary error: {e}")
-        raise e
-        
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id, text=f"Error: {e}"
+        )
 
 
 async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -269,11 +248,11 @@ async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         debug(f"[{now}] {PROGRAM}: atl_bitlab_bot - args: {args}")
 
         if len(args) <= 0:
-            return await update.message.reply_text("Error: You didn't provide a prompt")
+            return await context.bot.send_message("Error: You didn't provide a prompt")
         prompt = " ".join(args)
         prompt_len = len(prompt)
         if len(prompt) >= 3095:
-            return await update.message.reply_text(
+            return await context.bot.send_message(
                 "Error: Prompt too long. Max token len = 3095"
             )
         prompt = prompt[: prompt_len - 22] if prompt_len >= 184 else prompt
@@ -321,7 +300,7 @@ async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     except Exception as e:
         debug(f"[{now}] {PROGRAM}: atl_bitlab_bot error: {e}")
-        return await update.message.reply_text(f"Error: {e}")
+        return await context.bot.send_message(f"Error: {e}")
 
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
