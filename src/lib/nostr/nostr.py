@@ -1,38 +1,60 @@
-from lib.env import NOSTR_SEC
+import os
+import io
+import json
 from uuid import uuid1
 from binascii import unhexlify
+import IPython
 from pynostr.key import PrivateKey
 from pynostr.relay_manager import RelayManager
 from pynostr.filters import FiltersList, Filters
 from pynostr.event import EventKind
 
+from lib.env import NOSTR_SEC
+
 private_key = PrivateKey(unhexlify(NOSTR_SEC))
 public_key = private_key.public_key
 
+NOSTR_EVENTS_FILE = os.path.abspath(os.path.join("data", "events.jsonl"))
+RELAYS = [
+   'wss://eden.nostr.land',
+   'wss://nostr.fmt.wiz.biz',
+   'wss://relay.damus.io',
+   'wss://nostr-pub.wellorder.net',
+   'wss://relay.nostr.info',
+   'wss://offchain.pub',
+   'wss://nos.lol',
+   'wss://brb.io',
+   'wss://relay.snort.social',
+   'wss://relay.current.fyi',
+   'wss://nostr.relayer.se',
+]
+
+def get_note_ids():
+  notes_jl = io.open(NOSTR_EVENTS_FILE, "r")
+  seen = set()
+  for note in notes_jl.readlines():
+    note_obj = json.loads(note)
+    seen.add(note_obj.get('id'))
+  return seen
+
 def nostr_main():
+    notes_jl = io.open(NOSTR_EVENTS_FILE, "a")
+    seen = get_note_ids()
     relay_manager = RelayManager(timeout=2)
-    relay_manager.add_relay('wss://eden.nostr.land')
-    relay_manager.add_relay('wss://nostr.fmt.wiz.biz')
-    relay_manager.add_relay('wss://relay.damus.io')
-    relay_manager.add_relay('wss://nostr-pub.wellorder.net')
-    relay_manager.add_relay('wss://relay.nostr.info')
-    relay_manager.add_relay('wss://offchain.pub')
-    relay_manager.add_relay('wss://nos.lol')
-    relay_manager.add_relay('wss://brb.io')
-    relay_manager.add_relay('wss://relay.snort.social')
-    relay_manager.add_relay('wss://relay.current.fyi')
-    relay_manager.add_relay('wss://nostr.relayer.se')
-    filters = FiltersList([Filters(kinds=[EventKind.TEXT_NOTE], limit=100)])
+    for relay in RELAYS:
+      relay_manager.add_relay(relay)
+    filters = FiltersList([Filters(kinds=[EventKind.TEXT_NOTE])])
     subscription_id = uuid1().hex
     relay_manager.add_subscription_on_all_relays(subscription_id, filters)
     relay_manager.run_sync()
-
-    while relay_manager.message_pool.has_notices():
-        notice_msg = relay_manager.message_pool.get_notice()
-        print('notice_msg.content', notice_msg.content)
     while relay_manager.message_pool.has_events():
-        event_msg = relay_manager.message_pool.get_event()
-        print('event_msg.event.content', event_msg.event.content)
+      msg = relay_manager.message_pool.get_event()
+      event_id = msg.event.id
+      if event_id not in seen:
+        seen.add(event_id)
+        notes_jl.write(json.dumps(msg.event.to_dict()))
+        notes_jl.write("\n")
+    notes_jl.close()
     relay_manager.close_all_relay_connections()
 
 '''

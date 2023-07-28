@@ -17,6 +17,4 @@ elif CLEAN_SUMMARY:
     summarize_messages()
 
 else:
-    bot_main()
-
-# nostr_main()
+    nostr_main()
