@@ -111,7 +111,7 @@ def clean_jsonl_data():
     return "Cleaning done!"
 
 
-def summarize_messages(chat, days=None):
+def summarize_messages(chat, days=None, custom_prompt=None):
     try:
         summaries = []
         prompts_by_day = {k: "" for k in days}
@@ -204,13 +204,15 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
         arg_len = len(args)
         if arg_len > 0 and arg_len > 2:
             return await context.bot.send_message("Too many args")
-        elif arg_len == 1:
-            message = f"Generating summary for day {''.join(args)}"
+        chat = args[0].replace(" ", "").lower()
+        if arg_len == 1:
+            args = get_dates()
+            message = f"Generating {chat} summary for past week: {args}"
         elif arg_len == 2:
             for arg in args:
                 if not re.search("^\d{4}-\d{2}-\d{2}$", arg):
                     return await context.bot.send_message(
-                        f"Malformed date: expecting form YYYY-MM-DD"
+                        f"Malformed date: expecting YYYY-MM-DD"
                     )
                 try:
                     datetime.strptime(arg, "%Y-%m-%d").date()
@@ -233,9 +235,76 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     chat_id=update.effective_chat.id, text=f"Error: {e}"
                 )
     except Exception as e:
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id, text=f"Error: {e}"
-        )
+        debug(f"[{now}] {PROGRAM}: atl_bitlab_bot - summary error: {e}")
+        raise e
+
+
+async def summary_custom(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        sender = update.effective_message.from_user.username
+        debug(f"[{now}] {PROGRAM}: /summary executed by {sender}")
+        not_whitelisted = whitelist_gate(sender)
+        if not_whitelisted:
+            return await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
+            )
+        debug(f"[{now}] {PROGRAM}: /summary executed")
+        args = context.args
+        print('context.args', context.args)
+        arg_len = len(args)
+        if arg_len > 0 and arg_len > 3:
+            return await context.bot.send_message("Too many args")
+        chat = args[0].replace(" ", "").lower()
+        if arg_len == 1:
+            args = get_dates()
+            message = f"Generating {chat} summary for past week: {args}"
+        elif arg_len == 2:
+            date = args[1]
+            if re.search("^\d{4}-\d{2}-\d{2}$", chat):
+                return await context.bot.send_message(
+                    f"Malformed chat: expecting chat name, got {chat}"
+                )
+            if not re.search("^\d{4}-\d{2}-\d{2}$", date):
+                return await context.bot.send_message(
+                    f"Malformed date: expecting form YYYY-MM-DD, got {date}"
+                )
+            try:
+                datetime.strptime(date, "%Y-%m-%d").date()
+            except Exception as e:
+                debug(f"[{now}] {PROGRAM}: summary datetime.strptime error: {e}")
+                return await context.bot.send_message(f"Error while parsing date: {e}")
+            dates = [args[1]]
+            message = f"Generating {chat} summary for {date}"
+        elif arg_len == 3:
+            dates = args[0:2]
+            if re.search("^\d{4}-\d{2}-\d{2}$", chat):
+                return await context.bot.send_message(
+                    f"Malformed chat: expecting chat name, got {chat}"
+                )
+            for date in dates:
+                if not re.search("^\d{4}-\d{2}-\d{2}$", date):
+                    return await context.bot.send_message(
+                    f"Malformed date: expecting form YYYY-MM-DD, got {date}"
+                    )
+                try:
+                    datetime.strptime(date, "%Y-%m-%d").date()
+                except Exception as e:
+                    debug(f"[{now}] {PROGRAM}: summary datetime.strptime error: {e}")
+                    return await context.bot.send_message(f"Error while parsing date: {e}")
+            message = f"Generating {chat} summary for each day between {' and '.join(args)}"
+        else:
+            dates = get_dates()
+            message = f"Generating {chat} summary for each day in the past week: {' '.join(dates)}"
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
+        summaries = summarize_messages(chat, dates)
+        for summary in summaries:
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id, text=summary
+            )
+    except Exception as e:
+        debug(f"[{now}] {PROGRAM}: atl_bitlab_bot - summary error: {e}")
+        raise e 
 
 
 async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -352,6 +421,8 @@ def main():
     stop_handler = CommandHandler("stop", stop)
     application.add_handler(stop_handler)
     summary_handler = CommandHandler("summary", summary)
+    application.add_handler(summary_handler)
+    summary_handler = CommandHandler("summary_custom", summary_custom)
     application.add_handler(summary_handler)
     prompt_handler = CommandHandler("prompt", atl_bitlab_bot)
     application.add_handler(prompt_handler)
