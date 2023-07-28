@@ -588,3 +588,102 @@ The text discusses the importance of having a good credit score.
 5. It is important to pay your bills on time and keep your credit utilization low to maintain a good credit score.
 ----------------------------------------------------------------
 
+Summary for 2023-07-23:
+According to the Terms and Conditions of HodlHodl, United States citizens cannot use the platform. 
+Users must be at least 18 years old, have full legal power and authority to enter into the Agreement, and be acting in compliance with the legislation of the jurisdiction they operate in. 
+Users must not use the platform for any unlawful or prohibited purpose, and must not have previously been suspended or removed from using the Services. 
+Users must also not be citizens or tax residents of the United States of America, North Korea, Iraq, Syria, and/or Sudan. 
+================================================================================
+
+Jordan Bravo asked for help with a TypeScript error on a branch he opened a PR for. 
+Guerciotti suggested a name for a non-KYC'ing operation during TABCONF. 
+Tapatingo asked for their balance.
+----------------------------------------------------------------
+
+Summary for 2023-07-27:
+The text discusses the importance of having a good credit score.
+
+1. A good credit score is important for getting loans and other financial services.
+2. A good credit score can help you get lower interest rates on loans.
+3. A good credit score can help you get approved for a loan or other financial services.
+4. A good credit score can help you get better terms on loans.
+5. A good credit score can help you get better deals on insurance.
+6. A good credit score can help you get better deals on credit cards.
+7. A good credit score can help you get better deals on mortgages.
+
+========================
+
+A good credit score is important for getting loans and other financial services. It can help you get lower interest rates, better terms, and better deals on insurance, credit cards, and mortgages.
+----------------------------------------------------------------
+
+Summary for 2023-07-27:
+The text discusses the importance of having a good credit score.
+
+1. A good credit score is important for many reasons. 
+2. It can help you get approved for loans, credit cards, and other financial products. 
+3. It can also help you get lower interest rates and better terms on those products. 
+4. A good credit score can also help you get better rates on insurance and other services. 
+5. It is important to pay your bills on time and keep your credit utilization low to maintain a good credit score.
+
+========================================
+
+1. A good credit score is important for many reasons. 
+2. It can help you get approved for loans, credit cards, and other financial products. 
+3. It can also help you get lower interest rates and better terms on those products. 
+4. A good credit score can also help you get better rates on insurance and other services. 
+5. It is important to pay your bills on time and keep your credit utilization low to maintain a good credit score.
+----------------------------------------------------------------
+
+Summary for 2023-07-27:
+The text discusses the importance of having a good credit score.
+
+1. A good credit score is important for many reasons. 
+2. It can help you get approved for loans, credit cards, and other financial products. 
+3. It can also help you get lower interest rates and better terms on those products. 
+4. A good credit score can also help you get better rates on insurance and other services. 
+5. It is important to pay your bills on time and keep your credit utilization low to maintain a good credit score.
+
+========================================
+
+1. A good credit score is important for many reasons. 
+2. It can help you get approved for loans, credit cards, and other financial products. 
+3. It can also help you get lower interest rates and better terms on those products. 
+4. A good credit score can also help you get better rates on insurance and other services. 
+5. It is important to pay your bills on time and keep your credit utilization low to maintain a good credit score.
+----------------------------------------------------------------
+
+Summary for 2023-07-27:
+The text discusses the importance of having a good credit score.
+
+1. A good credit score is important for getting loans and other financial services.
+2. A good credit score can help you get lower interest rates on loans.
+3. A good credit score can help you get approved for a loan or other financial services.
+4. A good credit score can help you get better terms on loans.
+5. A good credit score can help you get better deals on insurance.
+6. A good credit score can help you get better deals on credit cards.
+7. A good credit score can help you get better deals on mortgages.
+
+========================
+
+8. A good credit score can help you get better deals on car loans.
+9. A good credit score can help you get better deals on other types of loans.
+10. A good credit score can help you get better deals on other financial services.
+----------------------------------------------------------------
+
+Summary for 2023-07-27:
+sbddesign said I just enabled read/write permissions for everything in the bitdevs-upgrade repo. 
+Nitesh wrote a script to scrape the links from a BitDevs Socratic mark
+----------------------------------------------------------------
+
+Summary for 2023-07-27:
+sbddesign said I just enabled read/write permissions for everything in the bitdevs-upgrade repo. 
+Nitesh wrote a script to scrape the links from a BitDevs Socratic markdown file and feed the content into an LLM to summarize. 
+Stephen made UI designs in Figma and mocked with different cities. 
+Jordan got the NextJS website generating from markdown files. 
+Alex and Bryan contributed to the getting the LLM summaries. 
+Nitesh is working on automating this as a GitHub action. 
+========================================================================
+
+Nonni offered to help with frontend and asked if Nitesh solved the
+----------------------------------------------------------------
+

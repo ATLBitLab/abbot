@@ -56,9 +56,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         mpy.write("\n")
         mpy.close()
         debug(f"[{now}] {PROGRAM}: handle_message - Raw message {message}")
+        message_dict = message.to_dict(),
         message_dumps = json.dumps(
             {
-                **message.to_dict(),
+                **message_dict,
+                "chat": {
+                    "title": message.chat.title.replace(" ", "").lower(),
+                    **message.chat
+                },
                 "new": True,
                 "from": message.from_user.username,
                 "date": message.date.isoformat().split("+")[0].split("T")[0],
@@ -106,7 +111,7 @@ def clean_jsonl_data():
     return "Cleaning done!"
 
 
-def summarize_messages(days=None):
+def summarize_messages(chat, days=None):
     try:
         summaries = []
         prompts_by_day = {k: "" for k in days}
@@ -116,12 +121,13 @@ def summarize_messages(days=None):
             for line in messages_file.readlines():
                 message = json.loads(line)
                 message_date = message["date"]
-                if day == message_date:
+                message_chat = message["chat"]["title"]
+                if day == message_date and message_chat == chat:
                     text = message["text"]
                     sender = message["from"]
                     message = f"{sender} said {text} on {message_date}\n"
                     prompt += message
-                    if len(prompt) > 3500:
+                    if len(prompt) >= 3500:
                         break
             final_prompt = (
                 "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n"
@@ -135,11 +141,12 @@ def summarize_messages(days=None):
         prompts_by_day_file.close()
         debug(f"[{now}] {PROGRAM}: Prompts by day = {prompts_by_day_dump}")
         summary_file = io.open(SUMMARY_LOG_FILE, "a")
+        print('len(prompt)', len(prompt))
         for day, prompt in prompts_by_day.items():
             response = openai.Completion.create(
                 model="text-davinci-003",
                 prompt=prompt,
-                max_tokens=4000 - len(prompt),
+                max_tokens=4095 - len(prompt),
                 temperature=0,
             )
             debug(f"[{now}] {PROGRAM}: OpenAI Response = {response}")
@@ -151,6 +158,7 @@ def summarize_messages(days=None):
         summary_file.close()
         return summaries
     except Exception as e:
+        debug(f"[{now}] {PROGRAM}: summarize_messages error: {e}")
         raise e
 
 
@@ -193,41 +201,62 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         debug(f"[{now}] {PROGRAM}: /summary executed")
         args = context.args
+        print('context.args', context.args)
         arg_len = len(args)
-        if arg_len > 0 and arg_len > 2:
-            return await update.message.reply_text("Too many args")
-        elif arg_len == 1:
-            message = f"Generating summary for day {''.join(args)}"
+        if arg_len > 0 and arg_len > 3:
+            return await context.bot.send_message("Too many args")
+        chat = args[0].replace(" ", "").lower()
+        print('chat', chat)
+        if arg_len == 1:
+            args = get_dates()
+            message = f"Generating {chat} summary for past week: {args}"
         elif arg_len == 2:
-            for arg in args:
-                if not re.search("^\d{4}-\d{2}-\d{2}$", arg):
-                    return await update.message.reply_text(
-                        f"Malformed date: expecting form YYYY-MM-DD"
+            date = args[1]
+            if re.search("^\d{4}-\d{2}-\d{2}$", chat):
+                return await context.bot.send_message(
+                    f"Malformed chat: expecting chat name, got {chat}"
+                )
+            if not re.search("^\d{4}-\d{2}-\d{2}$", date):
+                return await context.bot.send_message(
+                    f"Malformed date: expecting form YYYY-MM-DD, got {date}"
+                )
+            try:
+                datetime.strptime(date, "%Y-%m-%d").date()
+            except Exception as e:
+                debug(f"[{now}] {PROGRAM}: summary datetime.strptime error: {e}")
+                return await context.bot.send_message(f"Error while parsing date: {e}")
+            dates = [args[1]]
+            message = f"Generating {chat} summary for {date}"
+        elif arg_len == 3:
+            dates = args[0:2]
+            if re.search("^\d{4}-\d{2}-\d{2}$", chat):
+                return await context.bot.send_message(
+                    f"Malformed chat: expecting chat name, got {chat}"
+                )
+            for date in dates:
+                if not re.search("^\d{4}-\d{2}-\d{2}$", date):
+                    return await context.bot.send_message(
+                    f"Malformed date: expecting form YYYY-MM-DD, got {date}"
                     )
                 try:
-                    datetime.strptime(arg, "%Y-%m-%d").date()
+                    datetime.strptime(date, "%Y-%m-%d").date()
                 except Exception as e:
-                    return await update.message.reply_text(f"Error while parsing date: {e}")
-            message = f"Generating summary for each day between {' and '.join(args)}"
+                    debug(f"[{now}] {PROGRAM}: summary datetime.strptime error: {e}")
+                    return await context.bot.send_message(f"Error while parsing date: {e}")
+            message = f"Generating {chat} summary for each day between {' and '.join(args)}"
         else:
-            args = get_dates()
-            message = f"Generating summary for each day in the past week: {args}"
+            dates = get_dates()
+            message = f"Generating {chat} summary for each day in the past week: {' '.join(dates)}"
         await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
-        summaries = summarize_messages(args)
+        summaries = summarize_messages(chat, dates)
         for summary in summaries:
-            try:
-                await context.bot.send_message(
-                    chat_id=update.effective_chat.id, text=summary
-                )
-            except Exception as e:
-                debug(f"[{now}] {PROGRAM}: summarize error {e}")
-                await context.bot.send_message(
-                    chat_id=update.effective_chat.id, text=f"Error: {e}"
-                )
+            await context.bot.send_message(
+                chat_id=update.effective_chat.id, text=summary
+            )
     except Exception as e:
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id, text=f"Error: {e}"
-        )
+        debug(f"[{now}] {PROGRAM}: atl_bitlab_bot - summary error: {e}")
+        raise e
+        
 
 
 async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -291,6 +320,7 @@ async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=update.effective_chat.id, text=f"Answer:\n\n{answer}"
         )
     except Exception as e:
+        debug(f"[{now}] {PROGRAM}: atl_bitlab_bot error: {e}")
         return await update.message.reply_text(f"Error: {e}")
 
 
