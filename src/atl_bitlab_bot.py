@@ -62,7 +62,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 **message_dict,
                 "chat": {
                     "title": message.chat.title.replace(" ", "").lower(),
-                    **message.chat
+                    **message.chat.to_dict()
                 },
                 "new": True,
                 "from": message.from_user.username,
@@ -73,21 +73,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         rm_jl.write(message_dumps)
         rm_jl.write("\n")
         rm_jl.close()
-    
 
 
 def clean_jsonl_data():
     debug(f"[{now}] {PROGRAM}: clean_jsonl_data - Deduping messages")
-    seen = set()  # A set to hold the hashes of each JSON object
-    with io.open(RAW_MESSAGE_JL_FILE, "r") as infile, io.open(
-        MESSAGES_JL_FILE, "w"
-    ) as outfile:
+    seen = set()
+    with io.open(RAW_MESSAGE_JL_FILE, "r") as infile, io.open(MESSAGES_JL_FILE, "w") as outfile:
         for line in infile:
-            obj = json.loads(line)  # Load the JSON object from the line
+            obj = json.loads(line)
             if not obj.get("text"):
                 continue
-            obj_hash = hash(json.dumps(obj, sort_keys=True))  # Hash the JSON object
-            if obj_hash not in seen:  # If the hash isn't in the set, it's a new object
+            obj_hash = hash(json.dumps(obj, sort_keys=True))
+            if obj_hash not in seen:
                 seen.add(obj_hash)
                 obj_date = obj.get("date")
                 plus_in_date = "+" in obj_date
@@ -141,7 +138,6 @@ def summarize_messages(chat, days=None):
         prompts_by_day_file.close()
         debug(f"[{now}] {PROGRAM}: Prompts by day = {prompts_by_day_dump}")
         summary_file = io.open(SUMMARY_LOG_FILE, "a")
-        print('len(prompt)', len(prompt))
         for day, prompt in prompts_by_day.items():
             response = openai.Completion.create(
                 model="text-davinci-003",
@@ -201,15 +197,13 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         debug(f"[{now}] {PROGRAM}: /summary executed")
         args = context.args
-        print('context.args', context.args)
         arg_len = len(args)
         if arg_len > 0 and arg_len > 3:
             return await context.bot.send_message("Too many args")
         chat = args[0].replace(" ", "").lower()
         dates = get_dates()
         if arg_len == 1:
-            args = get_dates()
-            message = f"Generating {chat} summary for past week: {args}"
+            message = f"Generating {chat} summary for past week: {dates}"
         elif arg_len == 2:
             date = args[1]
             if re.search("^\d{4}-\d{2}-\d{2}$", chat):
