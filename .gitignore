@@ -2,4 +2,5 @@ env.py
 __pycache__
 src/data/test
 .vscode
-.venv
+.venv/
+.env/

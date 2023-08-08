@@ -30,7 +30,8 @@ import openai
 
 BOT_DATA = io.open(os.path.abspath("data/bot_data.json"), "r")
 BOT_DATA_OBJ = json.load(BOT_DATA)
-CHATS_TO_IGNORE = try_get(BOT_DATA_OBJ, "chats")
+CHATS_TO_IGNORE = try_get(BOT_DATA_OBJ, "chats", "ignore")
+CHATS_TO_INCLUDE = list(try_get(BOT_DATA_OBJ, "chats", "include"))
 WHITELIST = try_get(BOT_DATA_OBJ, "whitelist")
 CHEEKY_RESPONSES = try_get(BOT_DATA_OBJ, "responses")
 RAW_MESSAGE_JL_FILE = os.path.abspath("data/raw_messages.jsonl")
@@ -54,9 +55,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         mpy.write("\n")
         mpy.close()
         debug(f"[{now}] {PROGRAM}: handle_message - Raw message {message}")
+        message_dict = message.to_dict()
+        # message.to_dict()
+        print('message_dict', message_dict)
+        chat_dict = message.chat.to_dict()
+        print('chat_dict', type(chat_dict))
         message_dumps = json.dumps(
             {
-                **message.to_dict(),
+                **message_dict,
+                "chat": {
+                    "title": message.chat.title.replace(" ", "").lower(),
+                    **chat_dict
+                },
                 "new": True,
                 "from": message.from_user.username,
                 "date": message.date.isoformat().split("+")[0].split("T")[0],

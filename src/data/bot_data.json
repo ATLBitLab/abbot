@@ -1,6 +1,19 @@
 {
-    "chats": [-911601159, -1001608254734],
-    "whitelist": ["sbddesign", "alex_lewin"],
+    "chats": {
+        "ignore": [
+            -911601159,
+            -1001608254734
+        ],
+        "include": {
+            "-1001670677325": "bitdevsupgrade",
+            "-1001204119993": "atlantabitdevs"
+        }
+    },
+    "whitelist": [
+        "nonni_io",
+        "sbddesign",
+        "alex_lewin"
+    ],
     "responses": [
         "Ah ah ah, you didnt say the magic word ...",
         "Simon says ... no",
