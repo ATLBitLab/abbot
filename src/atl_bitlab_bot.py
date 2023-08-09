@@ -197,14 +197,14 @@ def whitelist_gate(sender):
 async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         sender = update.effective_message.from_user.username
-        debug(f"[{now}] {PROGRAM}: /summaryAbbot executed by {sender}")
+        debug(f"[{now}] {PROGRAM}: /summary executed by {sender}")
         not_whitelisted = whitelist_gate(sender)
         if not_whitelisted:
             return await context.bot.send_message(
                 chat_id=update.effective_chat.id,
                 text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
             )
-        debug(f"[{now}] {PROGRAM}: /summaryAbbot executed")
+        debug(f"[{now}] {PROGRAM}: /summary executed")
         args = context.args
         arg_len = len(args)
         if arg_len > 0 and arg_len > 3:
@@ -345,7 +345,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    debug(f"[{now}] {PROGRAM}: /helpAbbot executed by {update.effective_message.from_user.username}")
+    debug(f"[{now}] {PROGRAM}: /help executed by {update.effective_message.from_user.username}")
     message_text = update.message.text
     if "@TestATLBitLabBot" in message_text:
         return await context.bot.send_message(
@@ -372,7 +372,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     STARTED = True
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text="Bot started. Run /helpAbbot for usage guide",
+        text="Bot started. Run /help for usage guide",
     )
 
 
@@ -382,17 +382,17 @@ def bot_main(DEV_MODE):
     debug(f"[{now}] {PROGRAM}: @{BOT_HANDLE} Initialized")
     start_handler = CommandHandler("start", start)
     application.add_handler(start_handler)
-    help_handler = CommandHandler("helpAbbot", help)
+    help_handler = CommandHandler("help", help)
     application.add_handler(help_handler)
     stop_handler = CommandHandler("stop", stop)
     application.add_handler(stop_handler)
-    summary_handler = CommandHandler("summaryAbbot", summary)
+    summary_handler = CommandHandler("summary", summary)
     application.add_handler(summary_handler)
-    prompt_handler = CommandHandler("promptAbbot", atl_bitlab_bot)
+    prompt_handler = CommandHandler("prompt", atl_bitlab_bot)
     application.add_handler(prompt_handler)
-    clean_handler = CommandHandler("cleanAbbot", clean)
+    clean_handler = CommandHandler("clean", clean)
     application.add_handler(clean_handler)
-    clean_summary_handler = CommandHandler("bothAbbot", both)
+    clean_summary_handler = CommandHandler("both", both)
     application.add_handler(clean_summary_handler)
     message_handler = MessageHandler(BaseFilter(), handle_message)
     application.add_handler(message_handler)
