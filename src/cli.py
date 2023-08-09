@@ -1,9 +1,10 @@
 from sys import argv
-from atl_bitlab_bot import clean_jsonl_data, summarize_messages, main
-
+from atl_bitlab_bot import clean_jsonl_data, summarize_messages, bot_main
+from lib.nostr.nostr import nostr_main
 ARGS = argv[1:]
 CLEAN = "-c" in ARGS or "--clean" in ARGS
 SUMMARY = "-s" in ARGS or "--summary" in ARGS
+DEV_MODE = "-d" in ARGS or "--dev" in ARGS
 CLEAN_SUMMARY = CLEAN and SUMMARY
 
 if CLEAN:
@@ -17,4 +18,5 @@ elif CLEAN_SUMMARY:
     summarize_messages()
 
 else:
-    main()
+    # nostr_main()
+    bot_main(DEV_MODE)

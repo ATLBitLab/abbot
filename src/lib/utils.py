@@ -26,12 +26,15 @@ def now_date():
 
 
 def http_request(headers, method, url, json=None):
-    return request(
-        headers=headers,
-        method=method,
-        url=url,
-        json=json,
-    ).json()
+    try:
+        return request(
+            headers=headers,
+            method=method,
+            url=url,
+            json=json,
+        ).json()
+    except Exception as e:
+        return Exception(f"Request Failed: {e}")
 
 def qr_code(data):
     qr = qrcode.make(data)
