@@ -42,13 +42,17 @@ PROMPTS_BY_DAY_FILE = os.path.abspath("data/backup/prompts_by_day.py")
 openai.api_key = OPENAI_API_KEY
 application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
 now = datetime.now()
+now_iso = now.isoformat()
+now_iso_clean = now_iso.split("+")[0].split("T")[0]
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message = update.effective_message
-        print(message)
+        message_chat_id = update.effective_chat.id
         if not STARTED:
+            debug(f"[{now}] {PROGRAM}: handle_message - Bot not started!")
             return
-        if update.effective_chat.id in CHATS_TO_IGNORE:
+        if message_chat_id in CHATS_TO_IGNORE:
+            debug(f"[{now}] {PROGRAM}: handle_message - Chat ignored {message_chat_id}")
             return
         mpy = io.open(MESSAGES_PY_FILE, "a")
         mpy.write(update.to_json())
@@ -56,22 +60,25 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         mpy.close()
         debug(f"[{now}] {PROGRAM}: handle_message - Raw message {message}")
         message_dict = message.to_dict()
-        # message.to_dict()
-        print('message_dict', message_dict)
         chat_dict = message.chat.to_dict()
-        print('chat_dict', type(chat_dict))
+        message_title = message.chat.title or None
+        username = message.from_user.username
+        first_name = message.from_user.username
+        iso_date = message.date.isoformat()
         message_dumps = json.dumps(
             {
                 **message_dict,
                 "chat": {
-                    "title": message.chat.title.replace(" ", "").lower(),
+                    "title": message_title.replace(" ", "").lower() if message_title else "",
                     **chat_dict
                 },
                 "new": True,
-                "from": message.from_user.username,
-                "date": message.date.isoformat().split("+")[0].split("T")[0],
+                "from": username,
+                "name": first_name,
+                "date": iso_date if iso_date else now_iso_clean,
             }
         )
+        print('message_dumps', message_dumps)
         rm_jl = io.open(RAW_MESSAGE_JL_FILE, "a")
         rm_jl.write(message_dumps)
         rm_jl.write("\n")
@@ -125,7 +132,7 @@ def summarize_messages(days=None):
                 message_date = message["date"]
                 if day == message_date:
                     text = message["text"]
-                    sender = message["from"]
+                    sender = try_get(message, "from")
                     message = f"{sender} said {text} on {message_date}\n"
                     prompt += message
                     if len(prompt) > 3500:
