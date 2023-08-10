@@ -63,6 +63,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_dict = message.to_dict()
     chat_dict = message.chat.to_dict()
     message_title = message.chat.title or None
+    message_type = message.chat.type or None
     username = message.from_user.username
     first_name = message.from_user.username
     iso_date = message.date.isoformat()
@@ -81,10 +82,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "date": iso_date if iso_date else now_iso_clean,
         }
     )
-    rm_jl = io.open(RAW_MESSAGE_JL_FILE, "a")
-    rm_jl.write(message_dumps)
-    rm_jl.write("\n")
-    rm_jl.close()
+    if message_type != "private":
+        rm_jl = io.open(RAW_MESSAGE_JL_FILE, "a")
+        rm_jl.write(message_dumps)
+        rm_jl.write("\n")
+        rm_jl.close()
 
 
 def clean_jsonl_data():
