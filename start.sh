@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 
 BASE_DIR="$HOME/telegram-gpt-bot"
-source "$BASE_DIR/.venv/bin/activate"
+source "$BASE_DIR/.env/bin/activate"
 cd "$BASE_DIR/src"
-$BASE_DIR/.venv/bin/python3.11 cli.py
+python3 cli.py
