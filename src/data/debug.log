@@ -6247,3 +6247,16 @@ https://ronindojo.io/en/roninmobile
 [2023-08-10 15:20:33.013884] atl_bitlab_bot.py: /cleanAbbot executed
 [2023-08-10 15:20:33.013884] atl_bitlab_bot.py: clean_jsonl_data - Deduping messages
 [2023-08-10 15:20:33.013884] atl_bitlab_bot.py: clean_jsonl_data - Deduping done
+[2023-08-10 15:27:50.532646] atl_bitlab_bot.py: @ATLBitLabBot Initialized
+[2023-08-10 15:27:50.532646] atl_bitlab_bot.py: @ATLBitLabBot Polling
+[2023-08-10 15:27:50.532646] atl_bitlab_bot.py: /start executed by nonni_io
+[2023-08-10 15:27:50.532646] atl_bitlab_bot.py: /help executed by nonni_io
+[2023-08-10 15:27:50.532646] atl_bitlab_bot.py: /help executed by nonni_io
+[2023-08-10 15:27:50.532646] atl_bitlab_bot.py: /clean executed by nonni_io
+[2023-08-10 15:27:50.532646] atl_bitlab_bot.py: /clean executed
+[2023-08-10 15:27:50.532646] atl_bitlab_bot.py: clean_jsonl_data - Deduping messages
+[2023-08-10 15:27:50.532646] atl_bitlab_bot.py: clean_jsonl_data - Deduping done
+[2023-08-10 15:27:50.532646] atl_bitlab_bot.py: /summary executed by nonni_io
+[2023-08-10 15:27:50.532646] atl_bitlab_bot.py: /summary executed
+[2023-08-10 15:27:50.532646] atl_bitlab_bot.py: summarize_messages error: 'chat'
+[2023-08-10 15:27:50.532646] atl_bitlab_bot.py: atl_bitlab_bot - summary error: 'chat'
