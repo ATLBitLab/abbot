@@ -45,49 +45,54 @@ now = datetime.now()
 now_iso = now.isoformat()
 now_iso_clean = now_iso.split("+")[0].split("T")[0]
 
+
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        message = update.effective_message
-        message_chat_id = update.effective_chat.id
-        if not STARTED:
-            debug(f"[{now}] {PROGRAM}: handle_message - Bot not started!")
-            return
-        if message_chat_id in CHATS_TO_IGNORE:
-            debug(f"[{now}] {PROGRAM}: handle_message - Chat ignored {message_chat_id}")
-            return
-        mpy = io.open(MESSAGES_PY_FILE, "a")
-        mpy.write(update.to_json())
-        mpy.write("\n")
-        mpy.close()
-        debug(f"[{now}] {PROGRAM}: handle_message - Raw message {message}")
-        message_dict = message.to_dict()
-        chat_dict = message.chat.to_dict()
-        message_title = message.chat.title or None
-        username = message.from_user.username
-        first_name = message.from_user.username
-        iso_date = message.date.isoformat()
-        message_dumps = json.dumps(
-            {
-                **message_dict,
-                "chat": {
-                    "title": message_title.replace(" ", "").lower() if message_title else "",
-                    **chat_dict
-                },
-                "new": True,
-                "from": username,
-                "name": first_name,
-                "date": iso_date if iso_date else now_iso_clean,
-            }
-        )
-        print('message_dumps', message_dumps)
-        rm_jl = io.open(RAW_MESSAGE_JL_FILE, "a")
-        rm_jl.write(message_dumps)
-        rm_jl.write("\n")
-        rm_jl.close()
+    message = update.effective_message
+    message_chat_id = update.effective_chat.id
+    if not STARTED:
+        debug(f"[{now}] {PROGRAM}: handle_message - Bot not started!")
+        return
+    if message_chat_id in CHATS_TO_IGNORE:
+        debug(f"[{now}] {PROGRAM}: handle_message - Chat ignored {message_chat_id}")
+        return
+    mpy = io.open(MESSAGES_PY_FILE, "a")
+    mpy.write(update.to_json())
+    mpy.write("\n")
+    mpy.close()
+    debug(f"[{now}] {PROGRAM}: handle_message - Raw message {message}")
+    message_dict = message.to_dict()
+    chat_dict = message.chat.to_dict()
+    message_title = message.chat.title or None
+    username = message.from_user.username
+    first_name = message.from_user.username
+    iso_date = message.date.isoformat()
+    message_dumps = json.dumps(
+        {
+            **message_dict,
+            "chat": {
+                "title": message_title.replace(" ", "").lower()
+                if message_title
+                else "",
+                **chat_dict,
+            },
+            "new": True,
+            "from": username,
+            "name": first_name,
+            "date": iso_date if iso_date else now_iso_clean,
+        }
+    )
+    rm_jl = io.open(RAW_MESSAGE_JL_FILE, "a")
+    rm_jl.write(message_dumps)
+    rm_jl.write("\n")
+    rm_jl.close()
+
 
 def clean_jsonl_data():
     debug(f"[{now}] {PROGRAM}: clean_jsonl_data - Deduping messages")
     seen = set()
-    with io.open(RAW_MESSAGE_JL_FILE, "r") as infile, io.open(MESSAGES_JL_FILE, "w") as outfile:
+    with io.open(RAW_MESSAGE_JL_FILE, "r") as infile, io.open(
+        MESSAGES_JL_FILE, "w"
+    ) as outfile:
         for line in infile:
             obj = json.loads(line)
             if not obj.get("text"):
@@ -239,14 +244,18 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
             for date in dates:
                 if not re.search("^\d{4}-\d{2}-\d{2}$", date):
                     return await context.bot.send_message(
-                    f"Malformed date: expecting form YYYY-MM-DD, got {date}"
+                        f"Malformed date: expecting form YYYY-MM-DD, got {date}"
                     )
                 try:
                     datetime.strptime(date, "%Y-%m-%d").date()
                 except Exception as e:
                     debug(f"[{now}] {PROGRAM}: summary datetime.strptime error: {e}")
-                    return await context.bot.send_message(f"Error while parsing date: {e}")
-            message = f"Generating {chat} summary for each day between {' and '.join(args)}"
+                    return await context.bot.send_message(
+                        f"Error while parsing date: {e}"
+                    )
+            message = (
+                f"Generating {chat} summary for each day between {' and '.join(args)}"
+            )
         else:
             message = f"Generating {chat} summary for each day in the past week: {' '.join(dates)}"
         await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
@@ -258,7 +267,6 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         debug(f"[{now}] {PROGRAM}: atl_bitlab_bot - summary error: {e}")
         raise e
-        
 
 
 async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -280,21 +288,25 @@ async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         prompt = prompt[: prompt_len - 22] if prompt_len >= 184 else prompt
         if sender not in WHITELIST:
-            strike = Strike(str(uuid4()), f"ATL BitLab Bot: Payer - {sender}, Prompt - {prompt}", None)
+            strike = Strike(
+                str(uuid4()),
+                f"ATL BitLab Bot: Payer - {sender}, Prompt - {prompt}",
+                None,
+            )
             paid = strike.invoice()
             ln_invoice, timer = strike.quote()
             qr = qr_code(ln_invoice)
             await context.bot.send_photo(
                 chat_id=update.effective_chat.id,
                 photo=qr,
-                caption=f"To get your answer: \"{prompt}\"\nPlease pay the invoice:\n\n`{ln_invoice}`",
+                caption=f'To get your answer: "{prompt}"\nPlease pay the invoice:\n\n`{ln_invoice}`',
             )
             while not paid:
                 paid = strike.paid()
                 if paid:
                     break
                 elif timer == 0:
-                    response = strike.expire_invoice() 
+                    response = strike.expire_invoice()
                     data = response.json()
                     state = data.state
                     return await context.bot.send_message(
@@ -345,13 +357,19 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    debug(f"[{now}] {PROGRAM}: /help executed by {update.effective_message.from_user.username}")
+    debug(
+        f"[{now}] {PROGRAM}: /help executed by {update.effective_message.from_user.username}"
+    )
     message_text = update.message.text
-    if "@TestATLBitLabBot" in message_text:
+    if f"@{BOT_HANDLE}" not in message_text:
         return await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text=help_menu_message,
+            text=f"If you want to start @{BOT_HANDLE}, please tag the bot in the start command: e.g. `/help @{BOT_HANDLE}`",
         )
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text=help_menu_message,
+    )
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -359,9 +377,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_text = update.message.text
     if f"@{BOT_HANDLE}" not in message_text:
         return await context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text=f"If you want to start @{BOT_HANDLE}, please tag the bot in the start command: e.g. `/start @{BOT_HANDLE}`",
-            )
+            chat_id=update.effective_chat.id,
+            text=f"If you want to start @{BOT_HANDLE}, please tag the bot in the start command: e.g. `/start @{BOT_HANDLE}`",
+        )
     debug(f"[{now}] {PROGRAM}: /start executed by {sender}")
     if sender not in WHITELIST:
         return await context.bot.send_message(
