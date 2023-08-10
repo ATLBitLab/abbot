@@ -169,13 +169,13 @@ def summarize_messages(chat, days=None):
 
 async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sender = update.effective_message.from_user.username
-    debug(f"[{now}] {PROGRAM}: /cleanAbbot executed by {sender}")
+    debug(f"[{now}] {PROGRAM}: /clean executed by {sender}")
     if update.effective_message.from_user.username not in WHITELIST:
         return await context.bot.send_message(
             chat_id=update.effective_chat.id,
             text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
         )
-    debug(f"[{now}] {PROGRAM}: /cleanAbbot executed")
+    debug(f"[{now}] {PROGRAM}: /clean executed")
     await context.bot.send_message(
         chat_id=update.effective_chat.id, text="Cleaning ... please wait"
     )
