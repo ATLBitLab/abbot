@@ -133,6 +133,7 @@ def summarize_messages(chat, days=None):
             messages_file = io.open(MESSAGES_JL_FILE, "r")
             for line in messages_file.readlines():
                 message = json.loads(line)
+                print('message', message)
                 message_date = message["date"]
                 message_chat = message["chat"]["title"]
                 if day == message_date and message_chat == chat:
@@ -268,7 +269,7 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
     except Exception as e:
         debug(f"[{now}] {PROGRAM}: atl_bitlab_bot - summary error: {e}")
-        raise e
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
 
 
 async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
