@@ -126,26 +126,25 @@ def clean_jsonl_data():
 
 def summarize_messages(chat, days=None):
     try:
+        prompt = "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n"
         summaries = []
         prompts_by_day = {k: "" for k in days}
         for day in days:
-            prompt = ""
+            prompt_content = ""
             messages_file = io.open(MESSAGES_JL_FILE, "r")
             for line in messages_file.readlines():
                 message = json.loads(line)
                 message_date = try_get(message, "date")
-                message_chat = try_get(message, "chat", "title")
-                if day == message_date and message_chat == chat:
+                if day == message_date:
                     text = try_get(message, "text")
                     sender = try_get(message, "from")
                     message = f"{sender} said {text} on {message_date}\n"
-                    prompt += message
-                    if len(prompt) >= 3500:
+                    prompt_content += message
+                    if len(prompt_content) >= 3500:
                         break
-            final_prompt = (
-                "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n"
-                + prompt
-            )
+            final_prompt = prompt + prompt_content
+            if prompt_content == "":
+                continue
             prompts_by_day[day] = final_prompt
         messages_file.close()
         prompts_by_day_file = io.open(PROMPTS_BY_DAY_FILE, "w")
