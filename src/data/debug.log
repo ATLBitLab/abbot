@@ -6546,3 +6546,179 @@ https://ronindojo.io/en/roninmobile
   },
   "warning": "This model version is deprecated. Migrate before January 4, 2024 to avoid disruption of service. Learn more https://platform.openai.com/docs/deprecations"
 }
+[2023-08-11 12:42:42.573363] atl_bitlab_bot.py: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "The text discusses the importance of having a good credit score.\n\n1. A good credit score is important for getting loans and other financial services.\n2. A good credit score can help you get lower interest rates on loans.\n3. A good credit score can help you get approved for a loan or other financial services.\n4. A good credit score can help you get better terms on loans.\n5. A good credit score can help you get better deals on insurance.\n6. A good credit score can help you get better deals on credit cards.\n7. A good credit score can help you get better deals on mortgages.\n\n========================\n\nA good credit score is important for getting loans and other financial services. It can help you get lower interest rates, better terms, and better deals on insurance, credit cards, and mortgages."
+    }
+  ],
+  "created": 1691772247,
+  "id": "cmpl-7mPX54PJ2idOyMrFrA6Q9V9gFzodd",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 176,
+    "prompt_tokens": 35,
+    "total_tokens": 211
+  },
+  "warning": "This model version is deprecated. Migrate before January 4, 2024 to avoid disruption of service. Learn more https://platform.openai.com/docs/deprecations"
+}
+[2023-08-11 12:42:42.573363] atl_bitlab_bot.py: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "The text discusses the importance of having a good credit score.\n\n1. A good credit score is important for many reasons. \n2. It can help you get approved for loans, credit cards, and other financial products. \n3. It can also help you get lower interest rates and better terms on those products. \n4. A good credit score can also help you get better rates on insurance and other services. \n5. It is important to pay your bills on time and keep your credit utilization low to maintain a good credit score.\n\n========================================\n\n1. A good credit score is important for many reasons. \n2. It can help you get approved for loans, credit cards, and other financial products. \n3. It can also help you get lower interest rates and better terms on those products. \n4. A good credit score can also help you get better rates on insurance and other services. \n5. It is important to pay your bills on time and keep your credit utilization low to maintain a good credit score."
+    }
+  ],
+  "created": 1691772252,
+  "id": "cmpl-7mPXAQh5pmt6LBEH0xFdnIQ9sKXjF",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 220,
+    "prompt_tokens": 35,
+    "total_tokens": 255
+  },
+  "warning": "This model version is deprecated. Migrate before January 4, 2024 to avoid disruption of service. Learn more https://platform.openai.com/docs/deprecations"
+}
+[2023-08-11 12:42:42.573363] atl_bitlab_bot.py: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "The text discusses the importance of having a good credit score.\n\n1. A good credit score is important for many reasons. \n2. It can help you get approved for loans, credit cards, and other financial products. \n3. It can also help you get lower interest rates and better terms on those products. \n4. A good credit score can also help you get better rates on insurance and other services. \n5. It is important to pay your bills on time and keep your credit utilization low to maintain a good credit score.\n\n========================================\n\n1. A good credit score is important for many reasons. \n2. It can help you get approved for loans, credit cards, and other financial products. \n3. It can also help you get lower interest rates and better terms on those products. \n4. A good credit score can also help you get better rates on insurance and other services. \n5. It is important to pay your bills on time and keep your credit utilization low to maintain a good credit score."
+    }
+  ],
+  "created": 1691772258,
+  "id": "cmpl-7mPXGvzkAo8puHy1FCZAPl3LRyqUv",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 220,
+    "prompt_tokens": 35,
+    "total_tokens": 255
+  },
+  "warning": "This model version is deprecated. Migrate before January 4, 2024 to avoid disruption of service. Learn more https://platform.openai.com/docs/deprecations"
+}
+[2023-08-11 12:42:42.573363] atl_bitlab_bot.py: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "The text discusses the importance of having a good credit score.\n\n1. A good credit score is important for getting loans and other financial services.\n2. A good credit score can help you get lower interest rates on loans.\n3. A good credit score can help you get approved for a loan or other financial services.\n4. A good credit score can help you get better terms on loans.\n5. A good credit score can help you get better deals on insurance.\n6. A good credit score can help you get better deals on credit cards.\n7. A good credit score can help you get better deals on mortgages.\n\n========================\n\n8. A good credit score can help you get better deals on car loans.\n9. A good credit score can help you get better deals on other types of loans.\n10. A good credit score can help you get better deals on other financial services."
+    }
+  ],
+  "created": 1691772262,
+  "id": "cmpl-7mPXKFgNd4862hhgTa60UOLkbw3L0",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 191,
+    "prompt_tokens": 35,
+    "total_tokens": 226
+  },
+  "warning": "This model version is deprecated. Migrate before January 4, 2024 to avoid disruption of service. Learn more https://platform.openai.com/docs/deprecations"
+}
+[2023-08-11 12:42:42.573363] atl_bitlab_bot.py: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "The text discusses the importance of having a good credit score.\n\n1. A good credit score is important for getting loans and other financial services.\n2. A good credit score can help you get lower interest rates on loans.\n3. A good credit score can help you get approved for a loan or other financial services.\n4. A good credit score can help you get better terms on loans.\n5. A good credit score can help you get better deals on insurance.\n6. A good credit score can help you get better deals on credit cards.\n7. A good credit score can help you get better deals on mortgages.\n\n========================\n\nA good credit score is important for getting loans and other financial services. It can help you get lower interest rates, better terms, and better deals on insurance, credit cards, and mortgages."
+    }
+  ],
+  "created": 1691772267,
+  "id": "cmpl-7mPXPQIq7viIoPVoFBDrvPMCflxPm",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 176,
+    "prompt_tokens": 35,
+    "total_tokens": 211
+  },
+  "warning": "This model version is deprecated. Migrate before January 4, 2024 to avoid disruption of service. Learn more https://platform.openai.com/docs/deprecations"
+}
+[2023-08-11 12:42:42.573363] atl_bitlab_bot.py: /summary executed by nonni_io
+[2023-08-11 12:42:42.573363] atl_bitlab_bot.py: /summary executed
+[2023-08-11 12:42:42.573363] atl_bitlab_bot.py: Prompts by day = {"2023-08-04": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n", "2023-08-05": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n", "2023-08-06": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n", "2023-08-07": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n", "2023-08-08": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n", "2023-08-09": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n", "2023-08-10": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n"}
+[2023-08-11 12:51:33.342854] atl_bitlab_bot.py: @TestATLBitLabBot Initialized
+[2023-08-11 12:51:33.342854] atl_bitlab_bot.py: @TestATLBitLabBot Polling
+[2023-08-11 12:51:33.342854] atl_bitlab_bot.py: /summary executed by nonni_io
+[2023-08-11 12:51:33.342854] atl_bitlab_bot.py: /summary executed
+[2023-08-11 12:51:58.994719] atl_bitlab_bot.py: @TestATLBitLabBot Initialized
+[2023-08-11 12:51:58.994719] atl_bitlab_bot.py: @TestATLBitLabBot Polling
+[2023-08-11 12:51:58.994719] atl_bitlab_bot.py: /summary executed by nonni_io
+[2023-08-11 12:51:58.994719] atl_bitlab_bot.py: /summary executed
+[2023-08-11 12:51:58.994719] atl_bitlab_bot.py: Prompts by day = {"2023-08-04": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n", "2023-08-05": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n", "2023-08-06": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n", "2023-08-07": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n", "2023-08-08": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n", "2023-08-09": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n", "2023-08-10": "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n"}
+[2023-08-11 12:51:58.994719] atl_bitlab_bot.py: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "The text discusses the importance of having a good credit score.\n\n1. A good credit score is important for many reasons. \n2. It can help you get approved for loans, credit cards, and other financial products. \n3. It can also help you get lower interest rates and better terms on those products. \n4. A good credit score can also help you get better rates on insurance and other services. \n5. It is important to pay your bills on time and keep your credit utilization low to maintain a good credit score.\n\n========================================\n\n1. A good credit score is important for many reasons. \n2. It can help you get approved for loans, credit cards, and other financial products. \n3. It can also help you get lower interest rates and better terms on those products. \n4. A good credit score can also help you get better rates on insurance and other services. \n5. It is important to pay your bills on time and keep your credit utilization low to maintain a good credit score."
+    }
+  ],
+  "created": 1691772727,
+  "id": "cmpl-7mPep2V5mnunOHRqvdSdbQf9l2B8y",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 220,
+    "prompt_tokens": 35,
+    "total_tokens": 255
+  },
+  "warning": "This model version is deprecated. Migrate before January 4, 2024 to avoid disruption of service. Learn more https://platform.openai.com/docs/deprecations"
+}
+[2023-08-11 12:51:58.994719] atl_bitlab_bot.py: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "The text discusses the importance of having a good credit score.\n\n1. A good credit score is important for many reasons. \n2. It can help you get approved for loans, credit cards, and other financial products. \n3. It can also help you get lower interest rates and better terms on those products. \n4. A good credit score can also help you get better rates on insurance and other services. \n5. It is important to pay your bills on time and keep your credit utilization low to maintain a good credit score.\n\n========================================\n\n1. A good credit score is important for many reasons. \n2. It can help you get approved for loans, credit cards, and other financial products. \n3. It can also help you get lower interest rates and better terms on those products. \n4. A good credit score can also help you get better rates on insurance and other services. \n5. It is important to pay your bills on time and keep your credit utilization low to maintain a good credit score."
+    }
+  ],
+  "created": 1691772734,
+  "id": "cmpl-7mPew4g7FDbxzpZyj9VoS8EbyXZK8",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 220,
+    "prompt_tokens": 35,
+    "total_tokens": 255
+  },
+  "warning": "This model version is deprecated. Migrate before January 4, 2024 to avoid disruption of service. Learn more https://platform.openai.com/docs/deprecations"
+}
+[2023-08-11 12:51:58.994719] atl_bitlab_bot.py: OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null,
+      "text": "The text discusses the importance of having a good credit score.\n\n1. A good credit score is important for many reasons. \n2. It can help you get approved for loans, credit cards, and other financial products. \n3. It can also help you get lower interest rates and better terms on those products. \n4. A good credit score can also help you get better rates on insurance and other services. \n5. It is important to pay your bills on time and keep your credit utilization low to maintain a good credit score.\n\n========================================\n\n1. A good credit score is important for many reasons. \n2. It can help you get approved for loans, credit cards, and other financial products. \n3. It can also help you get lower interest rates and better terms on those products. \n4. A good credit score can also help you get better rates on insurance and other services. \n5. It is important to pay your bills on time and keep your credit utilization low to maintain a good credit score."
+    }
+  ],
+  "created": 1691772740,
+  "id": "cmpl-7mPf2hWyUneIyZHBDNfCffqLRrgsh",
+  "model": "text-davinci-003",
+  "object": "text_completion",
+  "usage": {
+    "completion_tokens": 220,
+    "prompt_tokens": 35,
+    "total_tokens": 255
+  },
+  "warning": "This model version is deprecated. Migrate before January 4, 2024 to avoid disruption of service. Learn more https://platform.openai.com/docs/deprecations"
+}
+[2023-08-11 12:53:18.132899] atl_bitlab_bot.py: @TestATLBitLabBot Initialized
+[2023-08-11 12:53:18.132899] atl_bitlab_bot.py: @TestATLBitLabBot Polling
+[2023-08-11 12:53:18.132899] atl_bitlab_bot.py: /summary executed by nonni_io
+[2023-08-11 12:53:18.132899] atl_bitlab_bot.py: /summary executed

@@ -133,11 +133,10 @@ def summarize_messages(chat, days=None):
             messages_file = io.open(MESSAGES_JL_FILE, "r")
             for line in messages_file.readlines():
                 message = json.loads(line)
-                print('message', message)
-                message_date = message["date"]
-                message_chat = message["chat"]["title"]
+                message_date = try_get(message, "date")
+                message_chat = try_get(message, "chat", "title")
                 if day == message_date and message_chat == chat:
-                    text = message["text"]
+                    text = try_get(message, "text")
                     sender = try_get(message, "from")
                     message = f"{sender} said {text} on {message_date}\n"
                     prompt += message
