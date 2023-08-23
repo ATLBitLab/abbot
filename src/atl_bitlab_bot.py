@@ -24,7 +24,12 @@ from telegram.ext import (
 from lib.logger import debug
 from lib.utils import qr_code
 from lib.api.strike import Strike
-from lib.env import TEST_TELEGRAM_BOT_TOKEN, TELEGRAM_BOT_TOKEN, OPENAI_API_KEY, BOT_HANDLE
+from lib.env import (
+    TEST_TELEGRAM_BOT_TOKEN,
+    TELEGRAM_BOT_TOKEN,
+    OPENAI_API_KEY,
+    BOT_HANDLE,
+)
 from help_menu import help_menu_message
 import openai
 
@@ -152,10 +157,12 @@ def summarize_messages(chat, days=None):
         for day, prompt in prompts_by_day.items():
             response = openai.ChatCompletion.create(
                 model="gpt-4-32k",
-                messages=[{
-                    "role": "user",
-                    "content": f"Summarize the text after the asterisk. Split into paragraphs where appropriate. Do not mention the asterisk. * \n {prompt}"
-                }]
+                messages=[
+                    {
+                        "role": "user",
+                        "content": f"Summarize the text after the asterisk. Split into paragraphs where appropriate. Do not mention the asterisk. * \n {prompt}",
+                    }
+                ],
             )
             debug(f"[{now}] {PROGRAM}: OpenAI Response = {response}")
             summary = f"Summary for {day}:\n{response.choices[0].text.strip()}"
