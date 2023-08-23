@@ -396,7 +396,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def bot_main(DEV_MODE):
     global BOT_HANDLE
-    BOT_HANDLE = f"test_{BOT_HANDLE}" if DEV_MODE else f"{BOT_HANDLE}"
+    BOT_HANDLE = f"test_{BOT_HANDLE}" if DEV_MODE else BOT_HANDLE
     BOT_TOKEN = TEST_TELEGRAM_BOT_TOKEN if DEV_MODE else TELEGRAM_BOT_TOKEN
     APPLICATION = ApplicationBuilder().token(BOT_TOKEN).build()
     debug(f"[{now}] {PROGRAM}: @{BOT_HANDLE} Initialized")
