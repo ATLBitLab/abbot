@@ -1,28 +1,28 @@
 [Unit]
 Description=ATL BitLab Bot
-Documentation=https://github.com/ATLBitLab/telegram-gpt-bot
+Documentation=https://github.com/ATLBitLab/abbot
 
 After=network-online.target
 Wants=network-online.target
 
 [Service]
-Environment=HOME=/home/bryan
+Environment=HOME=/home/abbot
 
-WorkingDir=/home/bryan/telegram-gpt-bot
-ExecStart=/home/bryan/telegram-gpt-bot/start.sh
+WorkingDir=/home/abbot/abbot
+ExecStart=/home/abbot/abbot/start.sh
 
 Restart=always
 RestartSec=10
 
-StandardOutput=/home/bryan/telegram-gpt-bot/src/data/runtime.log
-StandardError=/home/bryan/telegram-gpt-bot/src/data/debug.log
+StandardOutput=/home/abbot/abbot/src/data/runtime.log
+StandardError=/home/abbot/abbot/src/data/debug.log
 
-SyslogIdentifier=atlbitlab-bot
+SyslogIdentifier=abbot
 
-User=bryan
-Group=bryan
+User=abbot
+Group=abbot
 
-RuntimeDirectory=bitcoind
+RuntimeDirectory=abbot
 RuntimeDirectoryMode=0710
 
 [Install]
