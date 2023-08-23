@@ -139,8 +139,6 @@ def summarize_messages(chat, days=None):
                     sender = try_get(message, "from")
                     message = f"{sender} said {text} on {message_date}\n"
                     prompt_content += message
-                    if len(prompt_content) >= 3500:
-                        break
             if prompt_content == "":
                 continue
             prompts_by_day[day] = prompt_content
@@ -156,14 +154,12 @@ def summarize_messages(chat, days=None):
                 model="gpt-4-32k",
                 messages=[{
                     "role": "user",
-                    "content": prompt
+                    "content": f"Summarize the text after the asterisk. Split into paragraphs where appropriate. Do not mention the asterisk. * \n {prompt}"
                 }]
             )
             debug(f"[{now}] {PROGRAM}: OpenAI Response = {response}")
             summary = f"Summary for {day}:\n{response.choices[0].text.strip()}"
-            summary_file.write(
-                f"{summary}\n----------------------------------------------------------------\n\n"
-            )
+            summary_file.write(f"{summary}\n--------------------------------\n\n")
             summaries.append(summary)
         summary_file.close()
         return summaries
