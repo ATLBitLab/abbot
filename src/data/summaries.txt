@@ -1216,3 +1216,214 @@ The text discusses the importance of having a good credit score.
 A good credit score is important for getting loans and other financial services. It can help you get lower interest rates, better terms, and better deals on insurance, credit cards, and mortgages.
 ----------------------------------------------------------------
 
+Summary for 2023-08-04:
+package com.example.demo.controller;
+
+import com.example.demo.model.User;
+import com.example.demo.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/user")
+public class UserController {
+
+    @Autowired
+    private UserService userService;
+
+    @GetMapping("/all")
+    public List<User> getAllUsers(){
+        return userService.getAllUsers();
+    }
+
+    @PostMapping("/add")
+    public void addUser(@RequestBody User user){
+        userService.addUser(user);
+    }
+
+    @PutMapping("/update")
+    public void updateUser(@RequestBody User user){
+        userService.updateUser(user);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public void deleteUser(@PathVariable int id){
+        userService.deleteUser(id);
+    }
+
+}
+----------------------------------------------------------------
+
+Summary for 2023-08-05:
+package com.example.demo.controller;
+
+import com.example.demo.model.User;
+import com.example.demo.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/user")
+public class UserController {
+
+    @Autowired
+    private UserService userService;
+
+    @GetMapping("/all")
+    public List<User> getAllUsers(){
+        return userService.getAllUsers();
+    }
+
+    @PostMapping("/add")
+    public void addUser(@RequestBody User user){
+        userService.addUser(user);
+    }
+
+    @PutMapping("/update")
+    public void updateUser(@RequestBody User user){
+        userService.updateUser(user);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public void deleteUser(@PathVariable int id){
+        userService.deleteUser(id);
+    }
+
+}
+----------------------------------------------------------------
+
+Summary for 2023-08-06:
+package com.example.demo.controller;
+
+import com.example.demo.model.User;
+import com.example.demo.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/user")
+public class UserController {
+
+    @Autowired
+    private UserService userService;
+
+    @GetMapping("/all")
+    public List<User> getAllUsers(){
+        return userService.getAllUsers();
+    }
+
+    @PostMapping("/add")
+    public void addUser(@RequestBody User user){
+        userService.addUser(user);
+    }
+
+    @PutMapping("/update")
+    public void updateUser(@RequestBody User user){
+        userService.updateUser(user);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public void deleteUser(@PathVariable int id){
+        userService.deleteUser(id);
+    }
+
+}
+----------------------------------------------------------------
+
+Summary for 2023-08-07:
+package com.example.demo.controller;
+
+import com.example.demo.model.User;
+import com.example.demo.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/user")
+public class UserController {
+
+    @Autowired
+    private UserService userService;
+
+    @GetMapping("/all")
+    public List<User> getAllUsers(){
+        return userService.getAllUsers();
+    }
+
+    @PostMapping("/add")
+    public void addUser(@RequestBody User user){
+        userService.addUser(user);
+    }
+
+    @PutMapping("/update")
+    public void updateUser(@RequestBody User user){
+        userService.updateUser(user);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public void deleteUser(@PathVariable int id){
+        userService.deleteUser(id);
+    }
+
+}
+----------------------------------------------------------------
+
+Summary for 2023-08-08:
+SeedHammer is a new platform that allows users to invest in cryptocurrency without having to buy it.
+
+Users can invest in cryptocurrency without having to buy it.
+
+SeedHammer provides a secure and easy-to-use platform for users to invest in cryptocurrency.
+
+SeedHammer is launching in 2023.
+
+========================
+
+SeedHammer is a new platform that allows users to invest in cryptocurrency without having to buy it. It provides a secure and easy-to-use platform for users to invest in cryptocurrency and is launching in 2023.
+----------------------------------------------------------------
+
+Summary for 2023-08-09:
+ClockworkKat said https://simplex.chat/contact#/?v=1-4&smp=smp%3A%2F%2Fhejn2gVIqNU6xjtGM3OwQeuk8ZEbDXVJXAlnSBJBWUA%3D%40smp16.simplex.im%2FYPHjqQwLMvYgbCAsn4EhvgoP0ugE_1Dv%23%2F%3Fv%3D1-2%26dh%3DMCowBQYDK2VuAyEAhFsmXCQTlxqvCcNyYq-VaRTuxD48ZwnTNUbLuw7ccBk%253D%26srv%3Dp3ktngodzi6qrf7w64mmde3syuzrv57y55hxabqcq3l5p6oi7yzze6qd.onion&data=%7B%22type%22%3A%22group%22%2C%22groupLinkId%22%3A%22d7g7c15p6Jwdl0PhXLssEw%3D%3D%22%7D on 2023-08-09
+jordan_bravo said Request sent on 2023-08-09
+ClockworkKat said 👋 on 2023-08-09
+jordan_bravo said Is there a BitDevs or BitPlebs the upcoming Wednesday (Aug 16)? on 2023-08-09
+HODLBarbarian said Yes, were going to have a Plebs. Next session with Mike tidwell on Genesis book on 2023-08-09
+HODLBarbarian said I need to put it in meet up on 2023-08-09
+HODLBarbarian said https://www.meetup.com/atlanta-bitplebs/events/295341756?utm_medium=email&utm_source=sendgrid&utm_campaign=event_announce_en on 2023-08-09
+HODLBarbarian said @miketwenty1 FYI on 2023-08-09
+sbddesign said ⛏️ Tonights the night! Mining facility tour at Cleanspark in Nocross. If you signed up in advanced, you should have gotten an email from the BitDevs protonmail account or through meetup.com with address and parking info. See you there! https://www.meetup.com/atlantabitdevs/events/294868473/ on 2023-08-09
+Lipsi_17 said Can anyone share where I can find the content ( video and reading) we went through in the last 2 meet ups. This would help me brush up before we do the tour this evening. Thanks in advance on 2023-08-09
+sbddesign said Heres the content from last weeks Stratum V2 discussion: https://atlbit.dev/events/2023-08-02-stratum-v2-bitcoin-mining-reading-group on 2023-08-09
+sbddesign said And here is the video we watched the week before that which talks about how mining works: https://youtu.be/6vQB3XGB7ig on 2023-08-09
+sbddesign said 🍔 Our after dinner hang is B&W Burger near Cleanspark in Norcross: B&W Burgers, Buns & Brews
+(470) 359-7896
+https://maps.app.goo.gl/ETAkwbqEyteXb4vGA?g_st=ic on 2023-08-09
+
+ClockworkKat initiated a conversation about a group chat on 2023-08-09.
+Jordan_bravo sent a request on 2023-08-09.
+HODLBarbarian announced a BitP
+----------------------------------------------------------------
+
+Summary for 2023-08-10:
+- jf1tt said There’s a rooftop here. They’re putting some tables together for a group. Can also eat downstairs if you prefer 
+- Lipsi_17 said they visited a bitcoin mining site and enjoyed it 
+- 24 people showed up to the bar 
+- Everyone enjoyed the tour and the CleanSpark peeps 
+- sbddesign suggested several places to go the next day 
+- nitesh_btc stole some coins and rubbed them on Lipsi_17's hands 
+- sbddesign suggested using bitcoin miner immersion oil as a moisturizer 
+
+========================
+
+- jordan_bravo asked for suggestions for where to go the next day 
+- sbddesign suggested several places to go the next day
+----------------------------------------------------------------
+
