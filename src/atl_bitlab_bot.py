@@ -362,10 +362,10 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"[{now}] {PROGRAM}: /help executed by {update.effective_message.from_user.username}"
     )
     message_text = update.message.text
-    if f"@{BOT_HANDLE}" not in message_text:
+    if f"{BOT_HANDLE}" not in message_text:
         return await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text=f"If you want to start @{BOT_HANDLE}, please tag the bot in the start command: e.g. `/help @{BOT_HANDLE}`",
+            text=f"If you want to start {BOT_HANDLE}, please tag the bot in the start command: e.g. `/help {BOT_HANDLE}`",
         )
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
@@ -376,10 +376,10 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sender = update.effective_message.from_user.username
     message_text = update.message.text
-    if f"@{BOT_HANDLE}" not in message_text:
+    if f"{BOT_HANDLE}" not in message_text:
         return await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text=f"If you want to start @{BOT_HANDLE}, please tag the bot in the start command: e.g. `/start @{BOT_HANDLE}`",
+            text=f"If you want to start {BOT_HANDLE}, please tag the bot in the start command: e.g. `/start {BOT_HANDLE}`",
         )
     debug(f"[{now}] {PROGRAM}: /start executed by {sender}")
     if sender not in WHITELIST:
@@ -397,8 +397,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def bot_main(DEV_MODE):
     global BOT_HANDLE
-    BOT_HANDLE = f"Test{BOT_HANDLE}" if DEV_MODE else BOT_HANDLE
-    debug(f"[{now}] {PROGRAM}: @{BOT_HANDLE} Initialized")
+    BOT_HANDLE = f"test_{BOT_HANDLE}" if DEV_MODE else BOT_HANDLE
+    debug(f"[{now}] {PROGRAM}: {BOT_HANDLE} Initialized")
     start_handler = CommandHandler("start", start)
     application.add_handler(start_handler)
     help_handler = CommandHandler("help", help)
@@ -415,5 +415,5 @@ def bot_main(DEV_MODE):
     application.add_handler(clean_summary_handler)
     message_handler = MessageHandler(BaseFilter(), handle_message)
     application.add_handler(message_handler)
-    debug(f"[{now}] {PROGRAM}: @{BOT_HANDLE} Polling")
+    debug(f"[{now}] {PROGRAM}: {BOT_HANDLE} Polling")
     application.run_polling()
