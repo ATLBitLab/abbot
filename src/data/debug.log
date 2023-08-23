@@ -6938,3 +6938,6 @@ https://ronindojo.io/en/roninmobile
   },
   "warning": "This model version is deprecated. Migrate before January 4, 2024 to avoid disruption of service. Learn more https://platform.openai.com/docs/deprecations"
 }
+[2023-08-23 14:35:27.487617] atl_bitlab_bot.py: @test_atl_bitlab_bot Initialized
+[2023-08-23 14:35:27.487617] atl_bitlab_bot.py: @test_atl_bitlab_bot Polling
+[2023-08-23 14:35:27.487617] atl_bitlab_bot.py: /start executed by nonni_io
