@@ -24,7 +24,7 @@ from telegram.ext import (
 from lib.logger import debug
 from lib.utils import qr_code
 from lib.api.strike import Strike
-from lib.env import TELEGRAM_BOT_TOKEN, OPENAI_API_KEY, BOT_HANDLE
+from lib.env import TEST_TELEGRAM_BOT_TOKEN, TELEGRAM_BOT_TOKEN, OPENAI_API_KEY, BOT_HANDLE
 from help_menu import help_menu_message
 import openai
 
@@ -40,7 +40,6 @@ SUMMARY_LOG_FILE = os.path.abspath("data/summaries.txt")
 MESSAGES_PY_FILE = os.path.abspath("data/backup/messages.py")
 PROMPTS_BY_DAY_FILE = os.path.abspath("data/backup/prompts_by_day.py")
 openai.api_key = OPENAI_API_KEY
-application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
 now = datetime.now()
 now_iso = now.isoformat()
 now_iso_clean = now_iso.split("+")[0].split("T")[0]
@@ -379,7 +378,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if f"@{BOT_HANDLE}" not in message_text:
         return await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text=f"If you want to start @{BOT_HANDLE}, please tag the bot in the start command: e.g. `/start @{BOT_HANDLE}`",
+            text=f"If you want to start @{BOT_HANDLE}, please tag the bot in the start command: e.g. /start @{BOT_HANDLE}",
         )
     debug(f"[{now}] {PROGRAM}: /start executed by {sender}")
     if sender not in WHITELIST:
@@ -397,23 +396,25 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def bot_main(DEV_MODE):
     global BOT_HANDLE
-    BOT_HANDLE = f"Test{BOT_HANDLE}" if DEV_MODE else BOT_HANDLE
+    BOT_HANDLE = f"test_{BOT_HANDLE}" if DEV_MODE else BOT_HANDLE
+    BOT_TOKEN = TEST_TELEGRAM_BOT_TOKEN if DEV_MODE else TELEGRAM_BOT_TOKEN
+    APPLICATION = ApplicationBuilder().token(BOT_TOKEN).build()
     debug(f"[{now}] {PROGRAM}: @{BOT_HANDLE} Initialized")
     start_handler = CommandHandler("start", start)
-    application.add_handler(start_handler)
+    APPLICATION.add_handler(start_handler)
     help_handler = CommandHandler("help", help)
-    application.add_handler(help_handler)
+    APPLICATION.add_handler(help_handler)
     stop_handler = CommandHandler("stop", stop)
-    application.add_handler(stop_handler)
+    APPLICATION.add_handler(stop_handler)
     summary_handler = CommandHandler("summary", summary)
-    application.add_handler(summary_handler)
+    APPLICATION.add_handler(summary_handler)
     prompt_handler = CommandHandler("prompt", atl_bitlab_bot)
-    application.add_handler(prompt_handler)
+    APPLICATION.add_handler(prompt_handler)
     clean_handler = CommandHandler("clean", clean)
-    application.add_handler(clean_handler)
+    APPLICATION.add_handler(clean_handler)
     clean_summary_handler = CommandHandler("both", both)
-    application.add_handler(clean_summary_handler)
+    APPLICATION.add_handler(clean_summary_handler)
     message_handler = MessageHandler(BaseFilter(), handle_message)
-    application.add_handler(message_handler)
+    APPLICATION.add_handler(message_handler)
     debug(f"[{now}] {PROGRAM}: @{BOT_HANDLE} Polling")
-    application.run_polling()
+    APPLICATION.run_polling()
