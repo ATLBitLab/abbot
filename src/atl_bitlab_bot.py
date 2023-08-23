@@ -37,6 +37,7 @@ BOT_DATA = io.open(os.path.abspath("data/bot_data.json"), "r")
 BOT_DATA_OBJ = json.load(BOT_DATA)
 CHATS_TO_IGNORE = try_get(BOT_DATA_OBJ, "chats", "ignore")
 CHATS_TO_INCLUDE = list(try_get(BOT_DATA_OBJ, "chats", "include"))
+CHATS_TO_INCLUDE_NAMES = list(try_get(BOT_DATA_OBJ, "chats", "include").values())
 WHITELIST = try_get(BOT_DATA_OBJ, "whitelist")
 CHEEKY_RESPONSES = try_get(BOT_DATA_OBJ, "responses")
 RAW_MESSAGE_JL_FILE = os.path.abspath("data/raw_messages.jsonl")
@@ -156,7 +157,7 @@ def summarize_messages(chat, days=None):
         summary_file = io.open(SUMMARY_LOG_FILE, "a")
         for day, prompt in prompts_by_day.items():
             response = openai.ChatCompletion.create(
-                model="gpt-4-32k",
+                model="gpt-3.5-turbo-16k",
                 messages=[
                     {
                         "role": "user",
@@ -165,7 +166,7 @@ def summarize_messages(chat, days=None):
                 ],
             )
             debug(f"[{now}] {PROGRAM}: OpenAI Response = {response}")
-            summary = f"Summary for {day}:\n{response.choices[0].text.strip()}"
+            summary = f"Summary for {day}:\n{response.choices[0].message.content.strip()}"
             summary_file.write(f"{summary}\n--------------------------------\n\n")
             summaries.append(summary)
         summary_file.close()
@@ -215,9 +216,17 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
         debug(f"[{now}] {PROGRAM}: /summary executed")
         args = context.args
         arg_len = len(args)
-        if arg_len > 0 and arg_len > 3:
-            return await context.bot.send_message("Too many args")
-        chat = args[0].replace(" ", "").lower()
+        if arg_len > 3:
+            return await context.bot.send_message(
+                chat_id=update.effective_chat.id, text="Too many args"
+            )
+        chat_arg = args[0].replace(" ", "").lower()
+        if chat_arg not in CHATS_TO_INCLUDE_NAMES:
+            return await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text=f"Chat name invalid! Expecting one of: {CHATS_TO_INCLUDE_NAMES}",
+            )
+        chat = chat_arg.replace(" ", "").lower()
         dates = get_dates()
         if arg_len == 1:
             message = f"Generating {chat} summary for past week: {dates}"
@@ -225,36 +234,44 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
             date = args[1]
             if re.search("^\d{4}-\d{2}-\d{2}$", chat):
                 return await context.bot.send_message(
-                    f"Malformed chat: expecting chat name, got {chat}"
+                    chat_id=update.effective_chat.id,
+                    text=f"Malformed chat: expecting chat name, got {chat}",
                 )
             if not re.search("^\d{4}-\d{2}-\d{2}$", date):
                 return await context.bot.send_message(
-                    f"Malformed date: expecting form YYYY-MM-DD, got {date}"
+                    chat_id=update.effective_chat.id,
+                    text=f"Malformed date: expecting form YYYY-MM-DD, got {date}",
                 )
             try:
                 datetime.strptime(date, "%Y-%m-%d").date()
             except Exception as e:
                 debug(f"[{now}] {PROGRAM}: summary datetime.strptime error: {e}")
-                return await context.bot.send_message(f"Error while parsing date: {e}")
+                return await context.bot.send_message(
+                    chat_id=update.effective_chat.id,
+                    text=f"Error while parsing date: {e}",
+                )
             dates = [args[1]]
             message = f"Generating {chat} summary for {date}"
         elif arg_len == 3:
             dates = args[0:2]
             if re.search("^\d{4}-\d{2}-\d{2}$", chat):
                 return await context.bot.send_message(
-                    f"Malformed chat: expecting chat name, got {chat}"
+                    chat_id=update.effective_chat.id,
+                    text=f"Malformed chat: expecting chat name, got {chat}"
                 )
             for date in dates:
                 if not re.search("^\d{4}-\d{2}-\d{2}$", date):
                     return await context.bot.send_message(
-                        f"Malformed date: expecting form YYYY-MM-DD, got {date}"
+                        chat_id=update.effective_chat.id,
+                        text=f"Malformed date: expecting form YYYY-MM-DD, got {date}"
                     )
                 try:
                     datetime.strptime(date, "%Y-%m-%d").date()
                 except Exception as e:
                     debug(f"[{now}] {PROGRAM}: summary datetime.strptime error: {e}")
                     return await context.bot.send_message(
-                        f"Error while parsing date: {e}"
+                        chat_id=update.effective_chat.id,
+                        text=f"Error while parsing date: {e}"
                     )
             message = (
                 f"Generating {chat} summary for each day between {' and '.join(args)}"
@@ -282,12 +299,15 @@ async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         debug(f"[{now}] {PROGRAM}: atl_bitlab_bot - args: {args}")
 
         if len(args) <= 0:
-            return await update.message.reply_text("Error: You didn't provide a prompt")
+            return await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text="Error: You didn't provide a prompt")
         prompt = " ".join(args)
         prompt_len = len(prompt)
         if len(prompt) >= 3095:
-            return await update.message.reply_text(
-                "Error: Prompt too long. Max token len = 3095"
+            return await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text="Error: Prompt too long. Max token len = 3095"
             )
         prompt = prompt[: prompt_len - 22] if prompt_len >= 184 else prompt
         if sender not in WHITELIST:
@@ -338,7 +358,7 @@ async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     except Exception as e:
         debug(f"[{now}] {PROGRAM}: atl_bitlab_bot - /prompt Error: {e}")
-        return await update.message.reply_text(f"Error: {e}")
+        return await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Error: {e}")
 
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
