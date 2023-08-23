@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 source .venv/bin/activate
 pip install -r requirements.txt
-sudo cp atlbitlab-bot.service /etc/systemd/system
+sudo cp abbot.service /etc/systemd/system
 sudo systemctl daemon-reload
-sudo systemctl enable atlbitlab-bot
-sudo systemctl start atlbitlab-bot
-sudo systemctl status atlbitlab-bot
-sudo systemctl start atlbitlab-bot
-sudo journalctl -u atlbitlab-bot | tail
+sudo systemctl enable abbot
+sudo systemctl start abbot
+sudo systemctl status abbot
+sudo systemctl start abbot
+sudo journalctl -u abbot | tail
 echo "Done!"
 exit 0
