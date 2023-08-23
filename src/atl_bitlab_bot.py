@@ -24,7 +24,12 @@ from telegram.ext import (
 from lib.logger import debug
 from lib.utils import qr_code
 from lib.api.strike import Strike
-from lib.env import TEST_TELEGRAM_BOT_TOKEN, TELEGRAM_BOT_TOKEN, OPENAI_API_KEY, BOT_HANDLE
+from lib.env import (
+    TEST_TELEGRAM_BOT_TOKEN,
+    TELEGRAM_BOT_TOKEN,
+    OPENAI_API_KEY,
+    BOT_HANDLE,
+)
 from help_menu import help_menu_message
 import openai
 
@@ -45,6 +50,18 @@ now_iso = now.isoformat()
 now_iso_clean = now_iso.split("+")[0].split("T")[0]
 
 
+def write_to_file(file_name, operation, data, new_line=True):
+    try:
+        f = io.open(file_name, operation)
+        f.write(data)
+        if new_line:
+            f.write("\n")
+        f.close()
+        return True, None
+    except Exception as e:
+        return False, e
+
+
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.effective_message
     message_chat_id = update.effective_chat.id
@@ -54,38 +71,38 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if message_chat_id in CHATS_TO_IGNORE:
         debug(f"[{now}] {PROGRAM}: handle_message - Chat ignored {message_chat_id}")
         return
-    mpy = io.open(MESSAGES_PY_FILE, "a")
-    mpy.write(update.to_json())
-    mpy.write("\n")
-    mpy.close()
     debug(f"[{now}] {PROGRAM}: handle_message - Raw message {message}")
+    success, msg = write_to_file(MESSAGES_PY_FILE, "a", update.to_json())
+    if not success:
+        debug(f"[{now}] {PROGRAM}: handle_message - Write Failed to Messages Py: {msg}")
+        return
     message_dict = message.to_dict()
-    chat_dict = message.chat.to_dict()
-    message_title = message.chat.title or None
-    message_type = message.chat.type or None
+    chat = try_get(message, "chat")
+    chat_type = try_get(chat, "type")
+    if chat_type == "private":
+        debug(f"[{now}] {PROGRAM}: handle_message - PM Detected: {message}")
+        return
+    chat_dict = chat.to_dict()
+    chat_title = try_get(chat, "title", default="atlantabitdevs")
     username = message.from_user.username
     first_name = message.from_user.username
     iso_date = message.date.isoformat()
     message_dumps = json.dumps(
         {
-            **message_dict,
-            "chat": {
-                "title": message_title.replace(" ", "").lower()
-                if message_title
-                else "",
-                **chat_dict,
-            },
+            "title": chat_title.replace(" ", "").lower() if chat_title else "",
             "new": True,
             "from": username,
             "name": first_name,
             "date": iso_date if iso_date else now_iso_clean,
+            **message_dict,
+            **chat_dict,
         }
     )
-    if message_type != "private":
-        rm_jl = io.open(RAW_MESSAGE_JL_FILE, "a")
-        rm_jl.write(message_dumps)
-        rm_jl.write("\n")
-        rm_jl.close()
+    success, msg = write_to_file(RAW_MESSAGE_JL_FILE, "a", message_dumps)
+    if not success:
+        debug(
+            f"[{now}] {PROGRAM}: handle_message - Write Failed to Raw Messages: {msg}"
+        )
 
 
 def clean_jsonl_data():
@@ -134,6 +151,7 @@ def summarize_messages(chat, days=None):
             for line in messages_file.readlines():
                 message = json.loads(line)
                 message_date = try_get(message, "date")
+                # TODO: detect if chat == message.chat
                 if day == message_date:
                     text = try_get(message, "text")
                     sender = try_get(message, "from")
