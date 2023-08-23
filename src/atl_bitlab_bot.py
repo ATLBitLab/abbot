@@ -124,8 +124,8 @@ def clean_jsonl_data():
 
 
 def summarize_messages(chat, days=None):
+    # Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n
     try:
-        prompt = "Summarize the key points in this text. Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n\n"
         summaries = []
         prompts_by_day = {k: "" for k in days}
         for day in days:
@@ -141,10 +141,9 @@ def summarize_messages(chat, days=None):
                     prompt_content += message
                     if len(prompt_content) >= 3500:
                         break
-            final_prompt = prompt + prompt_content
             if prompt_content == "":
                 continue
-            prompts_by_day[day] = final_prompt
+            prompts_by_day[day] = prompt_content
         messages_file.close()
         prompts_by_day_file = io.open(PROMPTS_BY_DAY_FILE, "w")
         prompts_by_day_dump = json.dumps(prompts_by_day)
@@ -153,11 +152,12 @@ def summarize_messages(chat, days=None):
         debug(f"[{now}] {PROGRAM}: Prompts by day = {prompts_by_day_dump}")
         summary_file = io.open(SUMMARY_LOG_FILE, "a")
         for day, prompt in prompts_by_day.items():
-            response = openai.Completion.create(
-                model="text-davinci-003",
-                prompt=prompt,
-                max_tokens=4095 - len(prompt),
-                temperature=0,
+            response = openai.ChatCompletion.create(
+                model="gpt-4-32k",
+                messages=[{
+                    "role": "user",
+                    "content": prompt
+                }]
             )
             debug(f"[{now}] {PROGRAM}: OpenAI Response = {response}")
             summary = f"Summary for {day}:\n{response.choices[0].text.strip()}"
