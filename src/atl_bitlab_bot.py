@@ -378,7 +378,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if f"@{BOT_HANDLE}" not in message_text:
         return await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text=f"If you want to start @{BOT_HANDLE}, please tag the bot in the start command: e.g. `/start @{BOT_HANDLE}`",
+            text=f"If you want to start @{BOT_HANDLE}, please tag the bot in the start command: e.g. /start @{BOT_HANDLE}",
         )
     debug(f"[{now}] {PROGRAM}: /start executed by {sender}")
     if sender not in WHITELIST:
