@@ -1,6 +1,9 @@
-env.py
 __pycache__
-src/data/test
 .vscode
 .venv/
 .env/
+dev/
+src/data/
+src/lib/env.py
+src/messages.py
+*env*
