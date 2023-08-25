@@ -10,6 +10,7 @@ import io
 from random import randrange
 from uuid import uuid4
 from datetime import datetime
+from lib import unleash
 from lib.utils import get_dates, try_get
 
 from telegram import Update
@@ -184,7 +185,6 @@ async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=update.effective_chat.id,
             text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
         )
-    debug(f"[{now}] {PROGRAM}: /clean executed")
     await context.bot.send_message(
         chat_id=update.effective_chat.id, text="Cleaning ... please wait"
     )
@@ -437,6 +437,8 @@ def bot_main(DEV_MODE):
     APPLICATION.add_handler(clean_handler)
     clean_summary_handler = CommandHandler("both", both)
     APPLICATION.add_handler(clean_summary_handler)
+    unleash = CommandHandler("unleash", unleash)
+    APPLICATION.add_handler(unleash)
     message_handler = MessageHandler(BaseFilter(), handle_message)
     APPLICATION.add_handler(message_handler)
     debug(f"[{now}] {PROGRAM}: @{BOT_HANDLE} Polling")
