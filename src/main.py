@@ -23,7 +23,7 @@ from telegram.ext import (
 
 from lib.logger import debug
 from lib.utils import qr_code
-from lib.payments import Strike
+from lib.api.strike import Strike
 from lib.env import (
     TEST_TELEGRAM_BOT_TOKEN,
     TELEGRAM_BOT_TOKEN,
