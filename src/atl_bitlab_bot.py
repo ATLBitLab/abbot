@@ -23,12 +23,13 @@ from telegram.ext import (
 
 from lib.logger import debug
 from lib.utils import qr_code
-from lib.api.strike import Strike
+from lib.payments import Strike
 from lib.env import (
     TEST_TELEGRAM_BOT_TOKEN,
     TELEGRAM_BOT_TOKEN,
     OPENAI_API_KEY,
     BOT_HANDLE,
+    STRIKE_API_KEY
 )
 from help_menu import help_menu_message
 import openai
@@ -311,36 +312,29 @@ async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         prompt = prompt[: prompt_len - 22] if prompt_len >= 184 else prompt
         if sender not in WHITELIST:
-            strike = Strike(
+            strike = Strike(STRIKE_API_KEY)
+            invoice_id, invoice, expiration = strike.get_invoice(
                 str(uuid4()),
                 f"ATL BitLab Bot: Payer - {sender}, Prompt - {prompt}",
-                None,
             )
-            paid = strike.invoice()
-            ln_invoice, timer = strike.quote()
-            qr = qr_code(ln_invoice)
+            qr = qr_code(invoice)
             await context.bot.send_photo(
                 chat_id=update.effective_chat.id,
                 photo=qr,
-                caption=f'To get your answer: "{prompt}"\nPlease pay the invoice:\n\n`{ln_invoice}`',
+                caption=f'To get your answer: "{prompt}"\nPlease pay the invoice:\n\n`{invoice}`',
             )
-            while not paid:
-                paid = strike.paid()
-                if paid:
-                    break
-                elif timer == 0:
-                    response = strike.expire_invoice()
-                    data = response.json()
-                    state = data.state
+            while not strike.invoice_is_paid(invoice_id):
+                if expiration == 0:
+                    strike.expire_invoice(invoice_id)
                     return await context.bot.send_message(
                         chat_id=update.effective_chat.id,
-                        text=f"Invoice expired {state}",
+                        text=f"Invoice expired",
                     )
-                timer -= 1
+                expiration -= 1
                 time.sleep(1)
                 await context.bot.send_message(
                     chat_id=update.effective_chat.id,
-                    text=f"Invoice expires in {timer}",
+                    text=f"Invoice expires in {expiration}",
                 )
             await context.bot.send_message(
                 chat_id=update.effective_chat.id,
