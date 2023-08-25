@@ -53,19 +53,13 @@ source .env/bin/activate
 pip3 install -r requirements.txt
 ```
 
-7. Did you create a test bot per the [Requirements](#Requirements) section? Run the test bot. Otherwise, go to step 8.
+7. If you created a test bot per the #requirements section, you can run the test bot
 ```
 cd src
 python3 cli.py --dev
 ```
 
-8. Didn't create a test bot? Run the bot normally.
-```
-cd src
-python3 cli.py
-```
-
-10. Go to your telegram and DM your bot! That's it!
+8. Go to your telegram and DM your bot! That's it!
 
 Found bugs? Need help? Submit a [Bug Report Issue](https://github.com/ATLBitLab/abbot/issues/new?assignees=&labels=&projects=&template=bug_report.md&title=)
 Feel free to contact me: https://nonni.io
