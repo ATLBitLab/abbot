@@ -1,5 +1,5 @@
 STARTED = None
-PROGRAM = "atl_bitlab_bot.py"
+PROGRAM = "main.py"
 
 import os
 import json
@@ -10,7 +10,6 @@ import io
 from random import randrange
 from uuid import uuid4
 from datetime import datetime
-from lib import unleash
 from lib.utils import get_dates, try_get
 
 from telegram import Update
