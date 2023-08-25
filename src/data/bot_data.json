@@ -1,0 +1,26 @@
+{
+    "chats": {
+        "ignore": [
+            -911601159,
+            -1001608254734
+        ],
+        "include": {
+            "-1001670677325": "bitdevsupgrade",
+            "-1001204119993": "atlantabitdevs"
+        },
+        "Atlanta BitDevs Discussion": "atlantabitdevs",
+        "BitDevs Upgrade": "bitdevsupgrade"
+    },
+    "whitelist": [
+        "nonni_io",
+        "sbddesign",
+        "alex_lewin"
+    ],
+    "responses": [
+        "Ah ah ah, you didnt say the magic word ...",
+        "Simon says ... no",
+        "Access Denied!",
+        "What do we say to the god of ATL BitLab? Not today",
+        "Do not pass go, do not collect $200"
+    ]
+}
