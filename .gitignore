@@ -3,6 +3,5 @@ __pycache__
 .venv/
 .env/
 dev/
-src/data/
 src/lib/env.py
 src/messages.py
