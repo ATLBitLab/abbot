@@ -30,28 +30,35 @@ Basic tasks that ABBot can automate include:
 ```
 git clone https://github.com/ATLBitLab/abbot.git && cd abbot
 ```
+
 2. Copy sample env file into `lib/`
 ```
 cp sample.env.py lib/env.py
 ```
+
 3. Enter your keys into the appropriate positions
+
 4. Create virtual env
 ```
 python3 -m venv .env
-``
+```
+
 5. Activate virtual env
 ```
 source .env/bin/activate
 ```
+
 6. Install requirements.txt
 ```
 pip3 install -r requirements.txt
 ```
+
 7. If you created a test bot per the #requirements section, you can run the test bot
 ```
 cd src
 python3 cli.py --dev
 ```
+
 8. Go to your telegram and DM your bot! That's it!
 
 Found bugs? Need help? Submit a [Bug Report Issue](https://github.com/ATLBitLab/abbot/issues/new?assignees=&labels=&projects=&template=bug_report.md&title=)
