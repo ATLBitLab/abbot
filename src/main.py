@@ -430,8 +430,6 @@ def bot_main(DEV_MODE):
     APPLICATION.add_handler(clean_handler)
     clean_summary_handler = CommandHandler("both", both)
     APPLICATION.add_handler(clean_summary_handler)
-    unleash = CommandHandler("unleash", unleash)
-    APPLICATION.add_handler(unleash)
     message_handler = MessageHandler(BaseFilter(), handle_message)
     APPLICATION.add_handler(message_handler)
     debug(f"[{now}] {PROGRAM}: @{BOT_HANDLE} Polling")
