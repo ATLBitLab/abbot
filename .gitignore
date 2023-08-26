@@ -1,7 +1,7 @@
 __pycache__
 .vscode
 .venv/
-.env/
+.env
 dev/
 src/lib/env.py
 src/messages.py

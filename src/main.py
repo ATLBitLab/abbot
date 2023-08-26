@@ -9,10 +9,12 @@ import re
 import io
 
 from random import randrange
+from help_menu import help_menu_message
 from uuid import uuid4
 from datetime import datetime
 from lib.utils import get_dates, try_get
 
+import openai
 from telegram import Update
 from telegram.ext.filters import BaseFilter
 from telegram.ext import (
@@ -25,20 +27,20 @@ from telegram.ext import (
 from lib.logger import debug
 from lib.utils import qr_code
 from lib.api.strike import Strike
-from lib.env import (
-    TEST_BOT_TOKEN,
-    BOT_TOKEN,
-    OPENAI_API_KEY,
-    STRIKE_API_KEY,
-)
-from help_menu import help_menu_message
-import openai
+
+from dotenv import load_dotenv, dotenv_values
+load_dotenv()
+env = dotenv_values()
+BOT_TOKEN = env.get("BOT_TOKEN")
+TEST_BOT_TOKEN = env.get("TEST_BOT_TOKEN")
+STRIKE_API_KEY = env.get("STRIKE_API_KEY")
+openai.api_key = env.get("OPENAI_API_KEY")
 
 BOT_DATA = io.open(os.path.abspath("data/bot_data.json"), "r")
 BOT_DATA_OBJ = json.load(BOT_DATA)
 CHATS_TO_IGNORE = try_get(BOT_DATA_OBJ, "chats", "ignore")
 CHATS_TO_INCLUDE = try_get(BOT_DATA_OBJ, "chats", "include")
-CHATS_TO_INCLUDE_NAMES = list(try_get(BOT_DATA_OBJ, "chats", "include").values())
+CHATS_TO_INCLUDE_NAMES = try_get(BOT_DATA_OBJ, "chats", "names")
 WHITELIST = try_get(BOT_DATA_OBJ, "whitelist")
 CHEEKY_RESPONSES = try_get(BOT_DATA_OBJ, "responses")
 RAW_MESSAGE_JL_FILE = os.path.abspath("data/raw_messages.jsonl")
@@ -46,7 +48,6 @@ MESSAGES_JL_FILE = os.path.abspath("data/messages.jsonl")
 SUMMARY_LOG_FILE = os.path.abspath("data/summaries.txt")
 MESSAGES_PY_FILE = os.path.abspath("data/backup/messages.py")
 PROMPTS_BY_DAY_FILE = os.path.abspath("data/backup/prompts_by_day.py")
-openai.api_key = OPENAI_API_KEY
 now = datetime.now()
 now_iso = now.isoformat()
 now_iso_clean = now_iso.split("+")[0].split("T")[0]
