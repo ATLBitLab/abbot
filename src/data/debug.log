@@ -295,3 +295,35 @@
 [2023-08-26 16:44:27.712548] main.py: /start executed by nonni_io
 [2023-08-26 16:44:27.712548] main.py: atl_bitlab_bot - args: ['can', 'you', 'tell', 'me', 'a', 'story?']
 [2023-08-26 16:44:27.712548] main.py: atl_bitlab_bot - /prompt Error: cannot access local variable 'response' where it is not associated with a value
+[2023-08-26 17:02:46.088795] main.py: @test_atl_bitlab_bot Initialized
+[2023-08-26 17:02:46.088795] main.py: @test_atl_bitlab_bot Polling
+[2023-08-26 17:02:46.088795] main.py: /start executed by nonni_io
+[2023-08-26 17:02:46.088795] main.py: atl_bitlab_bot - args: ['can', 'you', 'tell', 'me', 'a', 'story?']
+[2023-08-26 17:07:34.933403] main.py: @test_atl_bitlab_bot Initialized
+[2023-08-26 17:07:34.933403] main.py: @test_atl_bitlab_bot Polling
+[2023-08-26 17:07:34.933403] main.py: /start executed by nonni_io
+[2023-08-26 17:07:34.933403] main.py: abbot - args: ["what's", '12947', '/', '467284']
+[2023-08-26 17:13:36.172018] main.py: @test_atl_bitlab_bot Initialized
+[2023-08-26 17:13:36.172018] main.py: @test_atl_bitlab_bot Polling
+[2023-08-26 17:13:36.172018] main.py: /start executed by nonni_io
+[2023-08-26 17:13:36.172018] main.py: abbot - args: ['calculate', '12223445', '/', '7896987']
+[2023-08-26 17:13:36.172018] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 26, 21, 15, 3, tzinfo=<UTC>), delete_chat_photo=False, entities=(MessageEntity(length=7, offset=0, type=<MessageEntityType.BOT_COMMAND>),), from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=125, supergroup_chat_created=False, text='/cancel')
+[2023-08-26 17:22:18.532837] main.py: @test_atl_bitlab_bot Initialized
+[2023-08-26 17:22:18.532837] main.py: @test_atl_bitlab_bot Polling
+[2023-08-26 17:22:18.532837] main.py: /start executed by nonni_io
+[2023-08-26 17:22:18.532837] main.py: abbot - args: ['calculate', '12223445', '/', '7896987']
+[2023-08-26 17:22:18.532837] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 26, 21, 22, 45, tzinfo=<UTC>), delete_chat_photo=False, entities=(MessageEntity(length=372, offset=0, type=<MessageEntityType.PRE>),), from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=149, supergroup_chat_created=False, text='lnbc38440n1pjw5mgcpp5c60ncnuasxxsc2te4pll7u86d6q7hn09yfsyw9ng9zm9j2s0kwpqdrjg92ycgzzd96ycctzyppx7ap6ypgxz7t9wgsz6grwdahxu62ld9hjcgzswfhk6ur5yqkjqcmpd33h2mrpw3jjqvfjxgerxdp5x5sz7gph8qunvwfcxucqzpgxqzpesp525najhkfnz55nz6q5hsqqjmufrjp8kxmjf2xq4fxxfwymj35djys9qyyssq3fzlfvcg667cgrv88773ml8jy92rdd4dqnedzs66k7a3g8ewtwwhtwr3fnx4f2kfmexnekcu3y8c5vvrmqspm7p4eg4gvqf87la7s2cq63rnqy')
+[2023-08-26 17:22:18.532837] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 26, 21, 22, 49, tzinfo=<UTC>), delete_chat_photo=False, entities=(MessageEntity(length=372, offset=0, type=<MessageEntityType.PRE>),), from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=150, supergroup_chat_created=False, text='lnbc38440n1pjw5mgcpp5c60ncnuasxxsc2te4pll7u86d6q7hn09yfsyw9ng9zm9j2s0kwpqdrjg92ycgzzd96ycctzyppx7ap6ypgxz7t9wgsz6grwdahxu62ld9hjcgzswfhk6ur5yqkjqcmpd33h2mrpw3jjqvfjxgerxdp5x5sz7gph8qunvwfcxucqzpgxqzpesp525najhkfnz55nz6q5hsqqjmufrjp8kxmjf2xq4fxxfwymj35djys9qyyssq3fzlfvcg667cgrv88773ml8jy92rdd4dqnedzs66k7a3g8ewtwwhtwr3fnx4f2kfmexnekcu3y8c5vvrmqspm7p4eg4gvqf87la7s2cq63rnqy')
+[2023-08-26 17:23:51.010908] main.py: @test_atl_bitlab_bot Initialized
+[2023-08-26 17:23:51.010908] main.py: @test_atl_bitlab_bot Polling
+[2023-08-26 17:23:51.010908] main.py: /start executed by nonni_io
+[2023-08-26 17:23:51.010908] main.py: abbot - args: ['hey']
+[2023-08-26 17:25:58.128944] main.py: @test_atl_bitlab_bot Initialized
+[2023-08-26 17:25:58.128944] main.py: @test_atl_bitlab_bot Polling
+[2023-08-26 17:25:58.128944] main.py: /start executed by nonni_io
+[2023-08-26 17:25:58.128944] main.py: abbot - args: ['hey']
+[2023-08-26 17:27:21.557479] main.py: @test_atl_bitlab_bot Initialized
+[2023-08-26 17:27:21.557479] main.py: @test_atl_bitlab_bot Polling
+[2023-08-26 17:27:21.557479] main.py: /start executed by nonni_io
+[2023-08-26 17:27:21.557479] main.py: abbot - args: ['calculate', '12223445', '/', '7896987']
+[2023-08-26 17:27:21.557479] main.py: abbot - Answer: The division of 12223445 by 7896987 is approximately 1.5482.

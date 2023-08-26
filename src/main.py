@@ -154,7 +154,9 @@ def summarize_messages(chat, days=None):
         prompts_by_day_dump = json.dumps(prompts_by_day)
         prompts_by_day_file.write(prompts_by_day_dump)
         prompts_by_day_file.close()
-        debug(f"[{now}] {PROGRAM}: Prompts by day = {prompts_by_day_dump}")
+        debug(
+            f"[{now}] {PROGRAM}: summarize_messages - Prompts by day = {prompts_by_day_dump}"
+        )
         summary_file = io.open(SUMMARY_LOG_FILE, "a")
         for day, prompt in prompts_by_day.items():
             response = openai.ChatCompletion.create(
@@ -166,7 +168,9 @@ def summarize_messages(chat, days=None):
                     }
                 ],
             )
-            debug(f"[{now}] {PROGRAM}: OpenAI Response = {response}")
+            debug(
+                f"[{now}] {PROGRAM}: summarize_messages - OpenAI Response = {response}"
+            )
             summary = (
                 f"Summary for {day}:\n{response.choices[0].message.content.strip()}"
             )
@@ -175,7 +179,7 @@ def summarize_messages(chat, days=None):
         summary_file.close()
         return summaries
     except Exception as e:
-        debug(f"[{now}] {PROGRAM}: summarize_messages error: {e}")
+        debug(f"[{now}] {PROGRAM}: summarize_messages - error: {e}")
         raise e
 
 
@@ -208,14 +212,13 @@ def whitelist_gate(sender):
 async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         sender = update.effective_message.from_user.username
-        debug(f"[{now}] {PROGRAM}: /summary executed by {sender}")
+        debug(f"[{now}] {PROGRAM}: summary - /summary executed by {sender}")
         not_whitelisted = whitelist_gate(sender)
         if not_whitelisted:
             return await context.bot.send_message(
                 chat_id=update.effective_chat.id,
                 text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
             )
-        debug(f"[{now}] {PROGRAM}: /summary executed")
         args = context.args
         arg_len = len(args)
         if arg_len > 3:
@@ -247,7 +250,7 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
             try:
                 datetime.strptime(date, "%Y-%m-%d").date()
             except Exception as e:
-                debug(f"[{now}] {PROGRAM}: summary datetime.strptime error: {e}")
+                debug(f"[{now}] {PROGRAM}: summary - datetime.strptime error: {e}")
                 return await context.bot.send_message(
                     chat_id=update.effective_chat.id,
                     text=f"Error while parsing date: {e}",
@@ -270,7 +273,7 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 try:
                     datetime.strptime(date, "%Y-%m-%d").date()
                 except Exception as e:
-                    debug(f"[{now}] {PROGRAM}: summary datetime.strptime error: {e}")
+                    debug(f"[{now}] {PROGRAM}: summary - datetime.strptime error: {e}")
                     return await context.bot.send_message(
                         chat_id=update.effective_chat.id,
                         text=f"Error while parsing date: {e}",
@@ -287,52 +290,57 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 chat_id=update.effective_chat.id, text=summary
             )
     except Exception as e:
-        debug(f"[{now}] {PROGRAM}: atl_bitlab_bot - summary error: {e}")
+        debug(f"[{now}] {PROGRAM}: summary - error: {e}")
         await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
 
 
-async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         sender = update.effective_message.from_user.username
         await context.bot.send_message(
             chat_id=update.effective_chat.id, text="Working on your request"
         )
         args = context.args
-        debug(f"[{now}] {PROGRAM}: atl_bitlab_bot - args: {args}")
+        debug(f"[{now}] {PROGRAM}: abbot - args: {args}")
         if len(args) <= 0:
             return await context.bot.send_message(
                 chat_id=update.effective_chat.id,
                 text="Error: You didn't provide a prompt",
             )
         prompt = " ".join(args)
-        if sender not in WHITELIST:
-            strike = Strike(
-                str(uuid4()), f"ATL BitLab Bot: Payer - {sender}, Prompt - {prompt}"
-            )
-            invoice, expiration = strike.invoice()
-            qr = qr_code(invoice)
-            await context.bot.send_photo(
-                chat_id=update.effective_chat.id,
-                photo=qr,
-                caption=f'To get your answer: "{prompt}"\nPlease pay the invoice:\n\n`{invoice}`',
-            )
-            while not strike.paid():
-                if expiration == 0:
-                    strike.expire_invoice()
-                    return await context.bot.send_message(
-                        chat_id=update.effective_chat.id,
-                        text=f"Invoice expired. Retry?",
-                    )
-                expiration -= 1
-                time.sleep(1)
+        strike = Strike(
+            str(uuid4()), f"ATL BitLab Bot: Payer - {sender}, Prompt - {prompt}"
+        )
+        invoice, expiration = strike.invoice()
+        qr = qr_code(invoice)
+        await context.bot.send_photo(
+            chat_id=update.effective_chat.id,
+            photo=qr,
+            caption=f"Please pay the invoice to get the answer to the question:\n{prompt}",
+        )
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=f"`{invoice}`",
+            parse_mode="MarkdownV2",
+        )
+        while not strike.paid():
+            if expiration == 0:
+                strike.expire_invoice()
+                return await context.bot.send_message(
+                    chat_id=update.effective_chat.id,
+                    text=f"Invoice expired. Retry?",
+                )
+            if expiration % 10 == 7:
                 await context.bot.send_message(
                     chat_id=update.effective_chat.id,
-                    text=f"Invoice expires in {expiration}",
+                    text=f"Invoice expires in {expiration} seconds",
                 )
-            await context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text=f"Thank you for supporting ATL BitLab! Generating your answer. Please wait...",
-            )
+            expiration -= 1
+            time.sleep(1)
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=f"Thank you for supporting ATL BitLab!",
+        )
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo-16k",
             messages=[
@@ -344,10 +352,11 @@ async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         answer = response.choices[0].message.content.strip()
         await context.bot.send_message(
-            chat_id=update.effective_chat.id, text=f"Answer:\n\n{answer}"
+            chat_id=update.effective_chat.id, text=f"{answer}"
         )
+        debug(f"[{now}] {PROGRAM}: abbot - Answer: {answer}")
     except Exception as e:
-        debug(f"[{now}] {PROGRAM}: atl_bitlab_bot - /prompt Error: {e}")
+        debug(f"[{now}] {PROGRAM}: abbot - /prompt Error: {e}")
         return await context.bot.send_message(
             chat_id=update.effective_chat.id, text=f"Error: {e}"
         )
@@ -423,7 +432,7 @@ def bot_main(DEV_MODE):
     APPLICATION.add_handler(stop_handler)
     summary_handler = CommandHandler("summary", summary)
     APPLICATION.add_handler(summary_handler)
-    prompt_handler = CommandHandler("prompt", atl_bitlab_bot)
+    prompt_handler = CommandHandler("prompt", abbot)
     APPLICATION.add_handler(prompt_handler)
     clean_handler = CommandHandler("clean", clean)
     APPLICATION.add_handler(clean_handler)
