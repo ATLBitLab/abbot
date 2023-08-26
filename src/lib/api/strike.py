@@ -1,4 +1,5 @@
 from lib.env import STRIKE_API_KEY
+
 STRIKE_HEADERS = {
     "Content-Type": "application/json",
     "Accept": "application/json",
@@ -11,11 +12,12 @@ from lib.api.reqs import http_request
 import qrcode
 from io import BytesIO
 
+
 class Strike:
-    def __init__(self, correlation_id, description, invoice_id):
+    def __init__(self, correlation_id, description):
         self.correlation_id = correlation_id
         self.description = description
-        self.invoice_id = invoice_id
+        self.invoice_id = None
 
     def invoice(self):
         response = http_request(
@@ -28,25 +30,27 @@ class Strike:
                 "amount": {"amount": "1.00", "currency": "USD"},
             },
         )
-        print('response', response)
         self.invoice_id = try_get(response, "invoiceId")
-        return False
-
-    def quote(self):
-        response = http_request(STRIKE_HEADERS, "POST", f"{STRIKE_INVOICES_URL}/{self.invoice_id}/quote")
+        response = http_request(
+            STRIKE_HEADERS, "POST", f"{STRIKE_INVOICES_URL}/{self.invoice_id}/quote"
+        )
         return (
             try_get(response, "lnInvoice"),
             try_get(response, "expirationInSec"),
         )
 
     def paid(self):
-        check = http_request(STRIKE_HEADERS, "GET", f"{STRIKE_INVOICES_URL}/{self.invoice_id}")
-        return try_get(check, "state") == "PAID"
+        response = http_request(
+            STRIKE_HEADERS, "GET", f"{STRIKE_INVOICES_URL}/{self.invoice_id}"
+        )
+        return try_get(response, "state") == "PAID"
 
     def expire_invoice(self):
-        response = http_request(STRIKE_HEADERS, "PATCH", f"{STRIKE_INVOICES_URL}/{self.invoice_id}/cancel")
+        response = http_request(
+            STRIKE_HEADERS, "PATCH", f"{STRIKE_INVOICES_URL}/{self.invoice_id}/cancel"
+        )
         return try_get(response, "state") == "CANCELLED"
-    
+
     def qr_code(self, ln_invoice):
         qr = qrcode.make(ln_invoice)
         bio = BytesIO()

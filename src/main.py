@@ -29,7 +29,7 @@ from lib.env import (
     TELEGRAM_BOT_TOKEN,
     OPENAI_API_KEY,
     BOT_HANDLE,
-    STRIKE_API_KEY
+    STRIKE_API_KEY,
 )
 from help_menu import help_menu_message
 import openai
@@ -167,7 +167,9 @@ def summarize_messages(chat, days=None):
                 ],
             )
             debug(f"[{now}] {PROGRAM}: OpenAI Response = {response}")
-            summary = f"Summary for {day}:\n{response.choices[0].message.content.strip()}"
+            summary = (
+                f"Summary for {day}:\n{response.choices[0].message.content.strip()}"
+            )
             summary_file.write(f"{summary}\n--------------------------------\n\n")
             summaries.append(summary)
         summary_file.close()
@@ -257,13 +259,13 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if re.search("^\d{4}-\d{2}-\d{2}$", chat):
                 return await context.bot.send_message(
                     chat_id=update.effective_chat.id,
-                    text=f"Malformed chat: expecting chat name, got {chat}"
+                    text=f"Malformed chat: expecting chat name, got {chat}",
                 )
             for date in dates:
                 if not re.search("^\d{4}-\d{2}-\d{2}$", date):
                     return await context.bot.send_message(
                         chat_id=update.effective_chat.id,
-                        text=f"Malformed date: expecting form YYYY-MM-DD, got {date}"
+                        text=f"Malformed date: expecting form YYYY-MM-DD, got {date}",
                     )
                 try:
                     datetime.strptime(date, "%Y-%m-%d").date()
@@ -271,7 +273,7 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     debug(f"[{now}] {PROGRAM}: summary datetime.strptime error: {e}")
                     return await context.bot.send_message(
                         chat_id=update.effective_chat.id,
-                        text=f"Error while parsing date: {e}"
+                        text=f"Error while parsing date: {e}",
                     )
             message = (
                 f"Generating {chat} summary for each day between {' and '.join(args)}"
@@ -301,33 +303,33 @@ async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if len(args) <= 0:
             return await context.bot.send_message(
                 chat_id=update.effective_chat.id,
-                text="Error: You didn't provide a prompt")
+                text="Error: You didn't provide a prompt",
+            )
         prompt = " ".join(args)
         prompt_len = len(prompt)
         if len(prompt) >= 3095:
             return await context.bot.send_message(
                 chat_id=update.effective_chat.id,
-                text="Error: Prompt too long. Max token len = 3095"
+                text="Error: Prompt too long. Max token len = 3095",
             )
         prompt = prompt[: prompt_len - 22] if prompt_len >= 184 else prompt
         if sender not in WHITELIST:
-            strike = Strike(STRIKE_API_KEY)
-            invoice_id, invoice, expiration = strike.get_invoice(
-                str(uuid4()),
-                f"ATL BitLab Bot: Payer - {sender}, Prompt - {prompt}",
+            strike = Strike(
+                str(uuid4()), f"ATL BitLab Bot: Payer - {sender}, Prompt - {prompt}"
             )
+            invoice, expiration = strike.invoice()
             qr = qr_code(invoice)
             await context.bot.send_photo(
                 chat_id=update.effective_chat.id,
                 photo=qr,
                 caption=f'To get your answer: "{prompt}"\nPlease pay the invoice:\n\n`{invoice}`',
             )
-            while not strike.invoice_is_paid(invoice_id):
+            while not strike.paid():
                 if expiration == 0:
-                    strike.expire_invoice(invoice_id)
+                    is_expired = strike.expire_invoice()
                     return await context.bot.send_message(
                         chat_id=update.effective_chat.id,
-                        text=f"Invoice expired",
+                        text=f"Invoice expired={is_expired}",
                     )
                 expiration -= 1
                 time.sleep(1)
@@ -351,7 +353,9 @@ async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     except Exception as e:
         debug(f"[{now}] {PROGRAM}: atl_bitlab_bot - /prompt Error: {e}")
-        return await context.bot.send_message(chat_id=update.effective_chat.id, text=f"Error: {e}")
+        return await context.bot.send_message(
+            chat_id=update.effective_chat.id, text=f"Error: {e}"
+        )
 
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
