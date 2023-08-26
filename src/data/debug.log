@@ -290,3 +290,8 @@
 [2023-08-25 15:45:10.262177] main.py: /clean executed by nonni_io
 [2023-08-25 15:45:10.262177] main.py: clean_jsonl_data - Deduping messages
 [2023-08-25 15:45:10.262177] main.py: clean_jsonl_data - Deduping done
+[2023-08-26 16:44:27.712548] main.py: @test_atl_bitlab_bot Initialized
+[2023-08-26 16:44:27.712548] main.py: @test_atl_bitlab_bot Polling
+[2023-08-26 16:44:27.712548] main.py: /start executed by nonni_io
+[2023-08-26 16:44:27.712548] main.py: atl_bitlab_bot - args: ['can', 'you', 'tell', 'me', 'a', 'story?']
+[2023-08-26 16:44:27.712548] main.py: atl_bitlab_bot - /prompt Error: cannot access local variable 'response' where it is not associated with a value

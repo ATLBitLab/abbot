@@ -299,20 +299,12 @@ async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         args = context.args
         debug(f"[{now}] {PROGRAM}: atl_bitlab_bot - args: {args}")
-
         if len(args) <= 0:
             return await context.bot.send_message(
                 chat_id=update.effective_chat.id,
                 text="Error: You didn't provide a prompt",
             )
         prompt = " ".join(args)
-        prompt_len = len(prompt)
-        if len(prompt) >= 3095:
-            return await context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text="Error: Prompt too long. Max token len = 3095",
-            )
-        prompt = prompt[: prompt_len - 22] if prompt_len >= 184 else prompt
         if sender not in WHITELIST:
             strike = Strike(
                 str(uuid4()), f"ATL BitLab Bot: Payer - {sender}, Prompt - {prompt}"
@@ -326,10 +318,10 @@ async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             while not strike.paid():
                 if expiration == 0:
-                    is_expired = strike.expire_invoice()
+                    strike.expire_invoice()
                     return await context.bot.send_message(
                         chat_id=update.effective_chat.id,
-                        text=f"Invoice expired={is_expired}",
+                        text=f"Invoice expired. Retry?",
                     )
                 expiration -= 1
                 time.sleep(1)
@@ -339,17 +331,17 @@ async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
             await context.bot.send_message(
                 chat_id=update.effective_chat.id,
-                text=f"Thank you for supporting ATL BitLab. Generating your answer.",
+                text=f"Thank you for supporting ATL BitLab! Generating your answer. Please wait...",
             )
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo-16k",
-                messages=[
-                    {
-                        "role": "user",
-                        "content": prompt,
-                    }
-                ],
-            )
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo-16k",
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt,
+                }
+            ],
+        )
         answer = response.choices[0].message.content.strip()
         await context.bot.send_message(
             chat_id=update.effective_chat.id, text=f"Answer:\n\n{answer}"
