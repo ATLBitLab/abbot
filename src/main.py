@@ -1,4 +1,5 @@
 STARTED = None
+UNLEASH = False
 PROGRAM = "main.py"
 BOT_HANDLE = "atl_bitlab_bot"
 
@@ -27,14 +28,16 @@ from telegram.ext import (
 from lib.logger import debug
 from lib.utils import qr_code
 from lib.api.strike import Strike
+from lib.gpt import GPT
 
 from dotenv import load_dotenv, dotenv_values
+
 load_dotenv()
 env = dotenv_values()
 BOT_TOKEN = env.get("BOT_TOKEN")
 TEST_BOT_TOKEN = env.get("TEST_BOT_TOKEN")
 STRIKE_API_KEY = env.get("STRIKE_API_KEY")
-openai.api_key = env.get("OPENAI_API_KEY")
+chat_gpt = GPT(env.get("OPENAI_API_KEY"))
 
 BOT_DATA = io.open(os.path.abspath("data/bot_data.json"), "r")
 BOT_DATA_OBJ = json.load(BOT_DATA)
@@ -57,7 +60,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.effective_message
     print("handle_message => message", message)
     message_chat_id = update.effective_chat.id
-    if not STARTED:
+    if not UNLEASH and not STARTED:
         debug(f"[{now}] {PROGRAM}: handle_message - Bot not started!")
         return
     if message_chat_id in CHATS_TO_IGNORE:
@@ -90,11 +93,16 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "date": iso_date if iso_date else now_iso_clean,
         }
     )
+    print('message', message)
+    print('message.text', message.text)
     if message_type != "private":
         rm_jl = io.open(RAW_MESSAGE_JL_FILE, "a")
         rm_jl.write(message_dumps)
         rm_jl.write("\n")
         rm_jl.close()
+    if UNLEASH:
+        answer = chat_gpt.chat_completion(message.text)
+        await message.reply_text(answer)
 
 
 def clean_jsonl_data():
@@ -343,16 +351,7 @@ async def abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=update.effective_chat.id,
             text=f"Thank you for supporting ATL BitLab!",
         )
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo-16k",
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt,
-                }
-            ],
-        )
-        answer = response.choices[0].message.content.strip()
+        answer = chat_gpt.chat_completion(prompt)
         await context.bot.send_message(
             chat_id=update.effective_chat.id, text=f"{answer}"
         )
@@ -404,7 +403,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if f"@{BOT_HANDLE}" not in message_text:
         return await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text=f"If you want to start @{BOT_HANDLE}, please tag the bot in the start command: e.g. /start @{BOT_HANDLE}",
+            text=f"If you want to start Abbot @{BOT_HANDLE}, please tag Abbot in the start command: e.g. /start @{BOT_HANDLE}",
         )
     debug(f"[{now}] {PROGRAM}: /start executed by {sender}")
     if sender not in WHITELIST:
@@ -416,31 +415,59 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     STARTED = True
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
-        text="Bot started. Run /help for usage guide",
+        text="Abbot started. Run /help for usage guide",
     )
+
+
+async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        message = update.effective_message
+        sender = message.from_user.username
+        debug(f"[{now}] {PROGRAM}: unleash_the_abbot - /unleash executed by {sender}")
+        if sender not in WHITELIST:
+            return await message.reply_text(
+                text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
+            )
+        toggle = context.args[0].lower()
+        global UNLEASH
+        UNLEASH = True if toggle == "on" else False
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text="Abbot unleashed ✅",
+        )
+    except Exception as e:
+        error = e.with_traceback()
+        debug(f"[{now}] {PROGRAM}: unleash_the_abbot - Error: {error}")
+        await message.reply_text(f"Error: {error}")
 
 
 def bot_main(DEV_MODE):
     global BOT_HANDLE
     BOT_HANDLE = f"test_{BOT_HANDLE}" if DEV_MODE else BOT_HANDLE
     TOKEN = TEST_BOT_TOKEN if DEV_MODE else BOT_TOKEN
+
     APPLICATION = ApplicationBuilder().token(TOKEN).build()
-    debug(f"[{now}] {PROGRAM}: @{BOT_HANDLE} Initialized")
+    debug(f"[{now}] {PROGRAM}: Abbot @{BOT_HANDLE} Initialized")
+
     start_handler = CommandHandler("start", start)
-    APPLICATION.add_handler(start_handler)
     help_handler = CommandHandler("help", help)
-    APPLICATION.add_handler(help_handler)
     stop_handler = CommandHandler("stop", stop)
-    APPLICATION.add_handler(stop_handler)
     summary_handler = CommandHandler("summary", summary)
-    APPLICATION.add_handler(summary_handler)
     prompt_handler = CommandHandler("prompt", abbot)
-    APPLICATION.add_handler(prompt_handler)
     clean_handler = CommandHandler("clean", clean)
-    APPLICATION.add_handler(clean_handler)
     clean_summary_handler = CommandHandler("both", both)
-    APPLICATION.add_handler(clean_summary_handler)
+    unleash = CommandHandler("unleash", unleash_the_abbot)
     message_handler = MessageHandler(BaseFilter(), handle_message)
+
+    APPLICATION.add_handler(start_handler)
+    APPLICATION.add_handler(help_handler)
+    APPLICATION.add_handler(stop_handler)
+    APPLICATION.add_handler(summary_handler)
+    APPLICATION.add_handler(prompt_handler)
+    APPLICATION.add_handler(clean_handler)
+    APPLICATION.add_handler(clean_summary_handler)
+    APPLICATION.add_handler(unleash)
     APPLICATION.add_handler(message_handler)
-    debug(f"[{now}] {PROGRAM}: @{BOT_HANDLE} Polling")
+    
+    debug(f"[{now}] {PROGRAM}: Abbot @{BOT_HANDLE} Polling")
     APPLICATION.run_polling()
