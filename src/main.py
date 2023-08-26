@@ -1,5 +1,6 @@
 STARTED = None
 PROGRAM = "main.py"
+BOT_HANDLE = "atl_bitlab_bot"
 
 import os
 import json
@@ -25,8 +26,8 @@ from lib.logger import debug
 from lib.utils import qr_code
 from lib.api.strike import Strike
 from lib.env import (
-    TEST_TELEGRAM_BOT_TOKEN,
-    TELEGRAM_BOT_TOKEN,
+    TEST_BOT_TOKEN,
+    BOT_TOKEN,
     OPENAI_API_KEY,
     BOT_HANDLE,
     STRIKE_API_KEY
@@ -37,7 +38,7 @@ import openai
 BOT_DATA = io.open(os.path.abspath("data/bot_data.json"), "r")
 BOT_DATA_OBJ = json.load(BOT_DATA)
 CHATS_TO_IGNORE = try_get(BOT_DATA_OBJ, "chats", "ignore")
-CHATS_TO_INCLUDE = list(try_get(BOT_DATA_OBJ, "chats", "include"))
+CHATS_TO_INCLUDE = try_get(BOT_DATA_OBJ, "chats", "include")
 CHATS_TO_INCLUDE_NAMES = list(try_get(BOT_DATA_OBJ, "chats", "include").values())
 WHITELIST = try_get(BOT_DATA_OBJ, "whitelist")
 CHEEKY_RESPONSES = try_get(BOT_DATA_OBJ, "responses")
@@ -54,6 +55,7 @@ now_iso_clean = now_iso.split("+")[0].split("T")[0]
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.effective_message
+    print("handle_message => message", message)
     message_chat_id = update.effective_chat.id
     if not STARTED:
         debug(f"[{now}] {PROGRAM}: handle_message - Bot not started!")
@@ -413,8 +415,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def bot_main(DEV_MODE):
     global BOT_HANDLE
     BOT_HANDLE = f"test_{BOT_HANDLE}" if DEV_MODE else BOT_HANDLE
-    BOT_TOKEN = TEST_TELEGRAM_BOT_TOKEN if DEV_MODE else TELEGRAM_BOT_TOKEN
-    APPLICATION = ApplicationBuilder().token(BOT_TOKEN).build()
+    TOKEN = TEST_BOT_TOKEN if DEV_MODE else BOT_TOKEN
+    APPLICATION = ApplicationBuilder().token(TOKEN).build()
     debug(f"[{now}] {PROGRAM}: @{BOT_HANDLE} Initialized")
     start_handler = CommandHandler("start", start)
     APPLICATION.add_handler(start_handler)
