@@ -341,13 +341,16 @@ async def atl_bitlab_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 chat_id=update.effective_chat.id,
                 text=f"Thank you for supporting ATL BitLab. Generating your answer.",
             )
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=prompt,
-            max_tokens=4095 - len(prompt),
-            temperature=0,
-        )
-        answer = response.choices[0].text.strip()
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo-16k",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt,
+                    }
+                ],
+            )
+        answer = response.choices[0].message.content.strip()
         await context.bot.send_message(
             chat_id=update.effective_chat.id, text=f"Answer:\n\n{answer}"
         )
