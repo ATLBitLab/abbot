@@ -94,14 +94,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "date": iso_date if iso_date else now_iso_clean,
         }
     )
-    if message_type != "private":
+    private_message = message_type == "private"
+    if not private_message:
         rm_jl = io.open(RAW_MESSAGE_JL_FILE, "a")
         rm_jl.write(message_dumps)
         rm_jl.write("\n")
         rm_jl.close()
-    if UNLEASHED:
+    if UNLEASHED and private_message:
         answer = chat_gpt.chat_completion(message)
         await message.reply_text(answer)
+    else:
+        # TODO: logic for group messaging
+        pass
 
 
 def clean_jsonl_data():
