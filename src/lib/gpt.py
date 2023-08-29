@@ -6,7 +6,6 @@ from lib.utils import try_get
 
 class GPT:
     def __init__(self, api_key):
-        assert (api_key is not None, "OpenAI API key must be supplied")
         openai.api_key = api_key
         self.messages = []
 
