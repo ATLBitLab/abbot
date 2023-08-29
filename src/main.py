@@ -1,7 +1,8 @@
 STARTED = None
-UNLEASH = False
+UNLEASHED = False
 PROGRAM = "main.py"
 BOT_HANDLE = "atl_bitlab_bot"
+BOT_NAME = "Abbot"
 
 import os
 import json
@@ -60,7 +61,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.effective_message
     print("handle_message => message", message)
     message_chat_id = update.effective_chat.id
-    if not UNLEASH and not STARTED:
+    if not UNLEASHED and not STARTED:
         debug(f"[{now}] {PROGRAM}: handle_message - Bot not started!")
         return
     if message_chat_id in CHATS_TO_IGNORE:
@@ -76,7 +77,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_title = message.chat.title or None
     message_type = message.chat.type or None
     username = message.from_user.username
-    first_name = message.from_user.username
+    first_name = message.chat.first_name or username
     iso_date = message.date.isoformat()
     message_dumps = json.dumps(
         {
@@ -93,15 +94,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "date": iso_date if iso_date else now_iso_clean,
         }
     )
-    print('message', message)
-    print('message.text', message.text)
     if message_type != "private":
         rm_jl = io.open(RAW_MESSAGE_JL_FILE, "a")
         rm_jl.write(message_dumps)
         rm_jl.write("\n")
         rm_jl.close()
-    if UNLEASH:
-        answer = chat_gpt.chat_completion(message.text)
+    if UNLEASHED:
+        answer = chat_gpt.chat_completion(message)
         await message.reply_text(answer)
 
 
@@ -319,7 +318,9 @@ async def abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         prompt = " ".join(args)
         strike = Strike(
-            str(uuid4()), f"ATL BitLab Bot: Payer - {sender}, Prompt - {prompt}"
+            STRIKE_API_KEY,
+            str(uuid4()),
+            f"ATL BitLab Bot: Payer - {sender}, Prompt - {prompt}",
         )
         invoice, expiration = strike.invoice()
         qr = qr_code(invoice)
@@ -421,6 +422,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
+        UNLEASH = ("1", "True", "On")
+        LEASH = ("0", "False", "Off")
+        UNLEASH_LEASH = (*UNLEASH, *LEASH)
+
         message = update.effective_message
         sender = message.from_user.username
         debug(f"[{now}] {PROGRAM}: unleash_the_abbot - /unleash executed by {sender}")
@@ -428,26 +433,30 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return await message.reply_text(
                 text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
             )
-        toggle = context.args[0].lower()
-        global UNLEASH
-        UNLEASH = True if toggle == "on" else False
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text="Abbot unleashed ✅",
-        )
+        global UNLEASHED
+        toggle_arg = try_get(context, "args", 0, default="False").capitalize()
+        if toggle_arg not in UNLEASH_LEASH:
+            return await message.reply_text(text=f"Bad arg: expecting one of {UNLEASH_LEASH}")
+        UNLEASHED = True if toggle_arg in UNLEASH else False
+        debug(f"[{now}] {PROGRAM}: unleash_the_abbot - Unleashed={UNLEASHED}")
+        if not UNLEASHED:
+            return await message.reply_text(text="Abbot not unleashed ⛔️")
+        await message.reply_text(text="Abbot unleashed ✅")
     except Exception as e:
-        error = e.with_traceback()
+        error = e.with_traceback(None)
         debug(f"[{now}] {PROGRAM}: unleash_the_abbot - Error: {error}")
-        await message.reply_text(f"Error: {error}")
+        await message.reply_text(text=f"Error: {error}")
 
 
 def bot_main(DEV_MODE):
     global BOT_HANDLE
     BOT_HANDLE = f"test_{BOT_HANDLE}" if DEV_MODE else BOT_HANDLE
+    global BOT_NAME
+    BOT_NAME = "tAbbot" if DEV_MODE else "Abbot"
     TOKEN = TEST_BOT_TOKEN if DEV_MODE else BOT_TOKEN
 
     APPLICATION = ApplicationBuilder().token(TOKEN).build()
-    debug(f"[{now}] {PROGRAM}: Abbot @{BOT_HANDLE} Initialized")
+    debug(f"[{now}] {PROGRAM}: {BOT_NAME} @{BOT_HANDLE} Initialized")
 
     start_handler = CommandHandler("start", start)
     help_handler = CommandHandler("help", help)
@@ -468,6 +477,6 @@ def bot_main(DEV_MODE):
     APPLICATION.add_handler(clean_summary_handler)
     APPLICATION.add_handler(unleash)
     APPLICATION.add_handler(message_handler)
-    
-    debug(f"[{now}] {PROGRAM}: Abbot @{BOT_HANDLE} Polling")
+
+    debug(f"[{now}] {PROGRAM}: {BOT_NAME} @{BOT_HANDLE} Polling")
     APPLICATION.run_polling()
