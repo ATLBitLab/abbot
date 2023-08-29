@@ -33,7 +33,7 @@ git clone https://github.com/ATLBitLab/abbot.git && cd abbot
 
 2. Copy sample env file into `lib/`
 ```
-cp sample.env.py lib/env.py
+cp .env.sample src/.env
 ```
 
 3. Enter your keys into the appropriate positions
