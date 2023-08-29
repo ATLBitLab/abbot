@@ -293,3 +293,227 @@
 [2023-08-25 15:45:10.262177] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(id=-1001204119993, title='Atlanta BitDevs Discussion', type=<ChatType.SUPERGROUP>), date=datetime.datetime(2023, 8, 25, 16, 2, 26, tzinfo=<UTC>), delete_chat_photo=False, entities=(MessageEntity(length=35, offset=36, type=<MessageEntityType.URL>),), from_user=User(first_name='Stephen', id=676486800, is_bot=False, language_code='en', last_name='DeLorme', username='sbddesign'), group_chat_created=False, message_id=10587, supergroup_chat_created=False, text='🥳 The BitLab Weekly Update is out: https://bit.ly/atlbitlab-2023-08-25')
 [2023-08-25 15:45:10.262177] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(id=-1001204119993, title='Atlanta BitDevs Discussion', type=<ChatType.SUPERGROUP>), date=datetime.datetime(2023, 8, 25, 16, 2, 26, tzinfo=<UTC>), delete_chat_photo=False, edit_date=datetime.datetime(2023, 8, 25, 18, 15, 47, tzinfo=<UTC>), entities=(MessageEntity(length=35, offset=36, type=<MessageEntityType.URL>),), from_user=User(first_name='Stephen', id=676486800, is_bot=False, language_code='en', last_name='DeLorme', username='sbddesign'), group_chat_created=False, message_id=10587, supergroup_chat_created=False, text='🥳 The BitLab Weekly Update is out: https://bit.ly/atlbitlab-2023-08-25')
 [2023-08-25 15:45:10.262177] main.py: handle_message - Raw message Message(caption='Gm', channel_chat_created=False, chat=Chat(id=-1001204119993, title='Atlanta BitDevs Discussion', type=<ChatType.SUPERGROUP>), date=datetime.datetime(2023, 8, 25, 13, 26, 17, tzinfo=<UTC>), delete_chat_photo=False, edit_date=datetime.datetime(2023, 8, 25, 20, 17, 55, tzinfo=<UTC>), from_user=User(first_name='Stephen', id=676486800, is_bot=False, language_code='en', last_name='DeLorme', username='sbddesign'), group_chat_created=False, message_id=10586, photo=(PhotoSize(file_id='AgACAgEAAx0CR8VpuQACKVpk6QxzfRaYPY1tJAa_oaEu1NddHgACl6wxG2_xQUedm9CS31QowgEAAwIAA3MAAzAE', file_size=1436, file_unique_id='AQADl6wxG2_xQUd4', height=51, width=90), PhotoSize(file_id='AgACAgEAAx0CR8VpuQACKVpk6QxzfRaYPY1tJAa_oaEu1NddHgACl6wxG2_xQUedm9CS31QowgEAAwIAA20AAzAE', file_size=15716, file_unique_id='AQADl6wxG2_xQUdy', height=180, width=320), PhotoSize(file_id='AgACAgEAAx0CR8VpuQACKVpk6QxzfRaYPY1tJAa_oaEu1NddHgACl6wxG2_xQUedm9CS31QowgEAAwIAA3gAAzAE', file_size=65527, file_unique_id='AQADl6wxG2_xQUd9', height=450, width=800), PhotoSize(file_id='AgACAgEAAx0CR8VpuQACKVpk6QxzfRaYPY1tJAa_oaEu1NddHgACl6wxG2_xQUedm9CS31QowgEAAwIAA3kAAzAE', file_size=102662, file_unique_id='AQADl6wxG2_xQUd-', height=720, width=1280)), supergroup_chat_created=False)
+[2023-08-26 16:44:27.712548] main.py: @test_atl_bitlab_bot Initialized
+[2023-08-26 16:44:27.712548] main.py: @test_atl_bitlab_bot Polling
+[2023-08-26 16:44:27.712548] main.py: /start executed by nonni_io
+[2023-08-26 16:44:27.712548] main.py: atl_bitlab_bot - args: ['can', 'you', 'tell', 'me', 'a', 'story?']
+[2023-08-26 16:44:27.712548] main.py: atl_bitlab_bot - /prompt Error: cannot access local variable 'response' where it is not associated with a value
+[2023-08-26 17:02:46.088795] main.py: @test_atl_bitlab_bot Initialized
+[2023-08-26 17:02:46.088795] main.py: @test_atl_bitlab_bot Polling
+[2023-08-26 17:02:46.088795] main.py: /start executed by nonni_io
+[2023-08-26 17:02:46.088795] main.py: atl_bitlab_bot - args: ['can', 'you', 'tell', 'me', 'a', 'story?']
+[2023-08-26 17:07:34.933403] main.py: @test_atl_bitlab_bot Initialized
+[2023-08-26 17:07:34.933403] main.py: @test_atl_bitlab_bot Polling
+[2023-08-26 17:07:34.933403] main.py: /start executed by nonni_io
+[2023-08-26 17:07:34.933403] main.py: abbot - args: ["what's", '12947', '/', '467284']
+[2023-08-26 17:13:36.172018] main.py: @test_atl_bitlab_bot Initialized
+[2023-08-26 17:13:36.172018] main.py: @test_atl_bitlab_bot Polling
+[2023-08-26 17:13:36.172018] main.py: /start executed by nonni_io
+[2023-08-26 17:13:36.172018] main.py: abbot - args: ['calculate', '12223445', '/', '7896987']
+[2023-08-26 17:13:36.172018] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 26, 21, 15, 3, tzinfo=<UTC>), delete_chat_photo=False, entities=(MessageEntity(length=7, offset=0, type=<MessageEntityType.BOT_COMMAND>),), from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=125, supergroup_chat_created=False, text='/cancel')
+[2023-08-26 17:22:18.532837] main.py: @test_atl_bitlab_bot Initialized
+[2023-08-26 17:22:18.532837] main.py: @test_atl_bitlab_bot Polling
+[2023-08-26 17:22:18.532837] main.py: /start executed by nonni_io
+[2023-08-26 17:22:18.532837] main.py: abbot - args: ['calculate', '12223445', '/', '7896987']
+[2023-08-26 17:22:18.532837] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 26, 21, 22, 45, tzinfo=<UTC>), delete_chat_photo=False, entities=(MessageEntity(length=372, offset=0, type=<MessageEntityType.PRE>),), from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=149, supergroup_chat_created=False, text='lnbc38440n1pjw5mgcpp5c60ncnuasxxsc2te4pll7u86d6q7hn09yfsyw9ng9zm9j2s0kwpqdrjg92ycgzzd96ycctzyppx7ap6ypgxz7t9wgsz6grwdahxu62ld9hjcgzswfhk6ur5yqkjqcmpd33h2mrpw3jjqvfjxgerxdp5x5sz7gph8qunvwfcxucqzpgxqzpesp525najhkfnz55nz6q5hsqqjmufrjp8kxmjf2xq4fxxfwymj35djys9qyyssq3fzlfvcg667cgrv88773ml8jy92rdd4dqnedzs66k7a3g8ewtwwhtwr3fnx4f2kfmexnekcu3y8c5vvrmqspm7p4eg4gvqf87la7s2cq63rnqy')
+[2023-08-26 17:22:18.532837] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 26, 21, 22, 49, tzinfo=<UTC>), delete_chat_photo=False, entities=(MessageEntity(length=372, offset=0, type=<MessageEntityType.PRE>),), from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=150, supergroup_chat_created=False, text='lnbc38440n1pjw5mgcpp5c60ncnuasxxsc2te4pll7u86d6q7hn09yfsyw9ng9zm9j2s0kwpqdrjg92ycgzzd96ycctzyppx7ap6ypgxz7t9wgsz6grwdahxu62ld9hjcgzswfhk6ur5yqkjqcmpd33h2mrpw3jjqvfjxgerxdp5x5sz7gph8qunvwfcxucqzpgxqzpesp525najhkfnz55nz6q5hsqqjmufrjp8kxmjf2xq4fxxfwymj35djys9qyyssq3fzlfvcg667cgrv88773ml8jy92rdd4dqnedzs66k7a3g8ewtwwhtwr3fnx4f2kfmexnekcu3y8c5vvrmqspm7p4eg4gvqf87la7s2cq63rnqy')
+[2023-08-26 17:23:51.010908] main.py: @test_atl_bitlab_bot Initialized
+[2023-08-26 17:23:51.010908] main.py: @test_atl_bitlab_bot Polling
+[2023-08-26 17:23:51.010908] main.py: /start executed by nonni_io
+[2023-08-26 17:23:51.010908] main.py: abbot - args: ['hey']
+[2023-08-26 17:25:58.128944] main.py: @test_atl_bitlab_bot Initialized
+[2023-08-26 17:25:58.128944] main.py: @test_atl_bitlab_bot Polling
+[2023-08-26 17:25:58.128944] main.py: /start executed by nonni_io
+[2023-08-26 17:25:58.128944] main.py: abbot - args: ['hey']
+[2023-08-26 17:27:21.557479] main.py: @test_atl_bitlab_bot Initialized
+[2023-08-26 17:27:21.557479] main.py: @test_atl_bitlab_bot Polling
+[2023-08-26 17:27:21.557479] main.py: /start executed by nonni_io
+[2023-08-26 17:27:21.557479] main.py: abbot - args: ['calculate', '12223445', '/', '7896987']
+[2023-08-26 17:27:21.557479] main.py: abbot - Answer: The division of 12223445 by 7896987 is approximately 1.5482.
+[2023-08-26 17:39:48.128499] main.py: @test_atl_bitlab_bot Initialized
+[2023-08-26 17:39:48.128499] main.py: @test_atl_bitlab_bot Polling
+[2023-08-26 17:39:48.128499] main.py: /start executed by nonni_io
+[2023-08-26 17:39:48.128499] main.py: summary - /summary executed by nonni_io
+[2023-08-26 17:40:35.496254] main.py: @test_atl_bitlab_bot Initialized
+[2023-08-26 17:40:35.496254] main.py: @test_atl_bitlab_bot Polling
+[2023-08-26 17:40:35.496254] main.py: /start executed by nonni_io
+[2023-08-26 17:40:35.496254] main.py: summary - /summary executed by nonni_io
+[2023-08-26 17:40:35.496254] main.py: summarize_messages - Prompts by day = {"2023-08-25": "aidalop21 said Congratssss\ud83e\udd73\ud83e\udd73 on 2023-08-25\nsbddesign said Welcome @HodIerKing. Would you like to introduce yourself to the group? on 2023-08-25\nsbddesign said This Wednesday, @jordan_bravo is showing us how to get KYC free coins with tools like HodlHodl and AgoraDesk! https://www.meetup.com/atlantabitdevs/events/295669543/ on 2023-08-25\nmiketwenty1 said Ty on 2023-08-25\nnitesh_btc said Congratulations on writing c++ on 2023-08-25\nrichg90 said Hey all! Rich from Blockstream here. \n\nWanted to reach out as our team is always eager to learn more about our audience\u2019s needs, expectations, and pain points regarding their wallet use (both software+hardware) so we can continue building compelling solutions for Bitcoiners.\n\nIf you are:\n\n- Happy with how you\u2019re securing your Bitcion\n- Unhappy or have concerns with your current self-custody solution\n- Uncertain about wallets and which to choose\n- Or if you just want to rant about any wallet related topic\u2026 \n\nOur team would love to speak with you. If you\u2019re interested in providing your insight, please send me a DM.\n\nThanks in advance! on 2023-08-25\nrichg90 said Hey all! Rich from Blockstream here. \n\nWanted to reach out as our team is always eager to learn more about our audience\u2019s needs, expectations, and pain points regarding their wallet use (both software+hardware) so we can continue building compelling solutions for Bitcoiners.\n\nIf you are:\n\n- Happy with how you\u2019re securing your Bitcoin\n- Unhappy or have concerns with your current self-custody solution\n- Uncertain about wallets and which to choose\n- Or if you just want to rant about any wallet related topic\u2026 \n\nOur team would love to speak with you. If you\u2019re interested in providing your insight, please send me a DM.\n\nThanks in advance! on 2023-08-25\n"}
+[2023-08-26 17:40:35.496254] main.py: summarize_messages - OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "aidalop21 congratulates someone on an unknown achievement. sbddesign welcomes @HodIerKing and asks them to introduce themselves. sbddesign announces that @jordan_bravo will be showing how to get KYC free coins using HodlHodl and AgoraDesk in an upcoming event. miketwenty1 says \"Ty,\" presumably in response to something. nitesh_btc congratulates someone on writing C++. richg90 from Blockstream reaches out to the audience to learn about their needs, expectations, and pain points regarding their wallet use, and invites them to provide their insights via direct message. This message is repeated twice.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1693086055,
+  "id": "chatcmpl-7rvJXewbBhT79FzIRGlJjKMJmIPtk",
+  "model": "gpt-3.5-turbo-16k-0613",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 135,
+    "prompt_tokens": 490,
+    "total_tokens": 625
+  }
+}
+[2023-08-26 17:49:50.574536] main.py: @test_atl_bitlab_bot Initialized
+[2023-08-26 17:49:50.574536] main.py: @test_atl_bitlab_bot Polling
+[2023-08-26 17:49:53.190757] main.py: @test_atl_bitlab_bot Initialized
+[2023-08-26 17:49:53.190757] main.py: @test_atl_bitlab_bot Polling
+[2023-08-26 17:49:53.190757] main.py: /start executed by nonni_io
+[2023-08-26 17:49:53.190757] main.py: summary - /summary executed by nonni_io
+[2023-08-26 17:49:53.190757] main.py: summarize_messages - Prompts by day = {"2023-08-23": "sbddesign said In the bustling city of Atlanta, the esteemed members of the BitPlebs Society shall reconvene at the venerable Manuels Tavern on the twenty-third day of August. They shall indulge in sumptuous fare, refreshing libations, and engage in spirited discourse upon the topic of Bitcoin.\n\nIt is foreseen that our conversation shall be punctuated with recent happenings and primarily directed towards the much-anticipated Halving of the Bitcoin in the early days of 2024. One might say, the populace remains quite unprepared for the forthcoming events!\n\nWhile the majority amongst us harbour intentions of procuring their own sustenance and spirits from dear Manuels, those who venture to make an early appearance shall be graced with complimentary beverages.\n  \nhttps://www.meetup.com/atlanta-bitplebs/events/295475406/ on 2023-08-23\nHODLBarbarian said By the way, the agenda has changed. Since the ETF stuff seems further off, were going to focus on talking about the having. on 2023-08-23\nHODLBarbarian said By the way, the agenda has changed. Since the ETF stuff seems further off, were going to focus on talking about the halving. on 2023-08-23\nsbddesign said Reflected in the writing, but unfortunately Meetup is delivering stale og:image data on 2023-08-23\nsbddesign said Meetup delivers stale everything on 2023-08-23\naidalop21 said And we will have some fun picking the next book for our meetup. We will do it kindergarten style \ud83e\udd13\ud83e\udd13 on 2023-08-23\nbrandon_sauceda said Going to miss tonight, at home with a sick kiddo on 2023-08-23\nTapatingo said Does somebody have the link for the ChatBTC model I saw a few weeks ago? on 2023-08-23\nTapatingo said Who developed that? on 2023-08-23\nsbddesign said https://chat.bitcoinsearch.xyz/ on 2023-08-23\nsbddesign said This was a collaboration between multiple folks: Adam Jonas, Art Assoiants, Theophilus Isah, Emmanuel Itakpe, and myself. on 2023-08-23\nTapatingo said I just sent you a DM on 2023-08-23\nYourCryptoDoctor said FYI, I downloaded a copy of softwar , in case anyone wants it, or wants to keep the binding in the physical copy intact. \nJason Lowery listed a link to it on twitter a while back after he took enough shit for selling his thesis. on 2023-08-23\nYourCryptoDoctor said \ud83e\udd23 I got rugged on the Softwar download. Just looked at what I had and it\u2019s only a .jpg of the first page! But here\u2019s a link that actually works\ud83e\udd23\ud83e\udd23\ud83e\udd23\n\nhttps://drive.proton.me/urls/12Y1SW9ERR#OnNky8sz5IfN on 2023-08-23\nsbddesign said Im worried Im going to go on some kind of blacklist if I click that link on 2023-08-23\nalex_lewin said I clicked the link... can confirm theres a pop up from the NSA that informs you about your new status on the \"no fly list\" on 2023-08-23\nsbddesign said Damn! So there IS \"such an association\" on 2023-08-23\nguerciotti said Former Atlanta dentist tells her Bitcoin story.\n\nhttps://youtu.be/Okdkdz1iWDM on 2023-08-23\nHODLBarbarian said Susie B! on 2023-08-23\nHODLBarbarian said @SusieBdds on 2023-08-23\ntheBlackMarble said Likely, you are already on that list.  Maybe to be safe(r) was can pass around thumb drives at the meetups. on 2023-08-23\nHODLBarbarian said Anyone have a copy of Check your Financial Privilege that they can bring to Manuels Tavern tonight? I found all the other books for show and tell purposes but I could not put my hands on that one quickly before leaving today. on 2023-08-23\nsbddesign said No, but I do have a copy of Gladsteins Hidden Repression book here in the Lab on 2023-08-23\nTapatingo said Insert the shill - We have started Bitcoin Magazine Books. If you know an author looking for a publisher, send them our way. https://bitcoinmagazine.com/bitcoin-books on 2023-08-23\nHODLBarbarian said Is that the one on the IMF and world Bank supervillains? Ive got my copy of that with me on 2023-08-23\nguerciotti said Many years ago I almost took a World Bank job.\n\nRighteous benefits, no US Taxes because it\u2019s an International Organization status and you get an INT passport, which is pretty badass but as good as my former US Diplomatic passport. on 2023-08-23\nguerciotti said Many years ago I almost took a World Bank job.\n\nRighteous benefits, no US Taxes because it\u2019s an International Organization status and you get an INT passport, which is pretty badass but not as good as my former US Diplomatic passport. on 2023-08-23\naidalop21 said Where do I apply ? Maybe I can create Bitcoin products there. Lol on 2023-08-23\nguerciotti said Former Atlanta dentist tells her Bitcoin story.\n\nhttps://youtu.be/Okdkdz1iWDM on 2023-08-23\nsbddesign said Probably, never read it on 2023-08-23\nTapatingo said Coincidentally, we just announced that we will be publishing Aaron van Wirdums extraordinary prehistory of Bitcoin, The Genesis Book. on 2023-08-23\nTapatingo said Coincidentally, we just announced that we will be publishing Aaron van Wirdums extraordinary prehistory of Bitcoin, The Genesis Book. on 2023-08-23\npacketprotector said Sorry guys. Cant make it tonight...\ud83d\ude2d on 2023-08-23\nnitesh_btc said Banned and reported. on 2023-08-23\nsbddesign said https://chat.bitcoinsearch.xyz/ on 2023-08-23\n"}
+[2023-08-26 17:49:53.190757] main.py: summarize_messages - OpenAI Response = {
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "In the bustling city of Atlanta, the BitPlebs Society plans to reconvene at Manuels Tavern on August 23rd. They will enjoy food, drinks, and engage in discussions about Bitcoin, with a focus on the upcoming Halving event in 2024. Some members may receive complimentary beverages for arriving early. The agenda for the meetup has changed to focus on the halving instead of the ETF. The group also plans to pick a new book for their next meetup. One member will be absent due to taking care of a sick child. One member asks for a link to the ChatBTC model, which is provided by sbddesign. Another member shares a link to download a book. There is a humorous exchange about the link being potentially suspicious. Some members discuss books related to Bitcoin and financial organizations. Tapatingo mentions starting Bitcoin Magazine Books, while sbddesign admits to not having read a particular book. Packetprotector apologizes for not being able to attend the meetup, and one user announces they have banned and reported someone. The conversation ends with sbddesign sharing the link to the ChatBTC model again.",
+        "role": "assistant"
+      }
+    }
+  ],
+  "created": 1693086614,
+  "id": "chatcmpl-7rvSYNClSar0Dc65hUmm7zF5kOMrq",
+  "model": "gpt-3.5-turbo-16k-0613",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 229,
+    "prompt_tokens": 1434,
+    "total_tokens": 1663
+  }
+}
+[2023-08-26 18:46:55.171774] main.py: Abbot @test_atl_bitlab_bot Initialized
+[2023-08-26 18:46:55.171774] main.py: Abbot @test_atl_bitlab_bot Polling
+[2023-08-26 18:47:24.961726] main.py: Abbot @test_atl_bitlab_bot Initialized
+[2023-08-26 18:47:24.961726] main.py: Abbot @test_atl_bitlab_bot Polling
+[2023-08-26 18:47:24.961726] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-26 18:47:24.961726] main.py: handle_message - Bot not started!
+[2023-08-26 18:48:02.693090] main.py: Abbot @test_atl_bitlab_bot Initialized
+[2023-08-26 18:48:02.693090] main.py: Abbot @test_atl_bitlab_bot Polling
+[2023-08-26 18:48:02.693090] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-26 18:48:02.693090] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 26, 22, 48, 10, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=204, supergroup_chat_created=False, text='hey')
+[2023-08-26 18:48:31.602029] main.py: Abbot @test_atl_bitlab_bot Initialized
+[2023-08-26 18:48:31.602029] main.py: Abbot @test_atl_bitlab_bot Polling
+[2023-08-26 18:48:31.602029] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-26 18:48:31.602029] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 26, 22, 48, 40, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=207, supergroup_chat_created=False, text='hey')
+[2023-08-26 18:49:27.149812] main.py: Abbot @test_atl_bitlab_bot Initialized
+[2023-08-26 18:49:27.149812] main.py: Abbot @test_atl_bitlab_bot Polling
+[2023-08-26 18:49:27.149812] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-26 18:49:27.149812] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 26, 22, 49, 34, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=210, supergroup_chat_created=False, text='hey whats up')
+[2023-08-26 18:51:30.921174] main.py: Abbot @test_atl_bitlab_bot Initialized
+[2023-08-26 18:51:30.921174] main.py: Abbot @test_atl_bitlab_bot Polling
+[2023-08-26 18:51:30.921174] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-26 18:51:30.921174] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 26, 22, 51, 40, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=213, supergroup_chat_created=False, text='hey whats up')
+[2023-08-26 18:53:07.362413] main.py: Abbot @test_atl_bitlab_bot Initialized
+[2023-08-26 18:53:07.362413] main.py: Abbot @test_atl_bitlab_bot Polling
+[2023-08-26 18:53:07.362413] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-26 18:53:07.362413] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 26, 22, 53, 14, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=216, supergroup_chat_created=False, text='hey whats up')
+[2023-08-26 18:54:18.557570] main.py: Abbot @test_atl_bitlab_bot Initialized
+[2023-08-26 18:54:18.557570] main.py: Abbot @test_atl_bitlab_bot Polling
+[2023-08-26 18:54:18.557570] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-26 18:54:18.557570] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 26, 22, 54, 24, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=219, supergroup_chat_created=False, text='hey')
+[2023-08-26 18:54:53.904254] main.py: Abbot @test_atl_bitlab_bot Initialized
+[2023-08-26 18:54:53.904254] main.py: Abbot @test_atl_bitlab_bot Polling
+[2023-08-26 18:54:53.904254] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-26 18:54:53.904254] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 26, 22, 54, 59, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=222, supergroup_chat_created=False, text='hey')
+[2023-08-26 18:55:21.643779] main.py: Abbot @test_atl_bitlab_bot Initialized
+[2023-08-26 18:55:21.643779] main.py: Abbot @test_atl_bitlab_bot Polling
+[2023-08-26 18:55:35.370131] main.py: Abbot @test_atl_bitlab_bot Initialized
+[2023-08-26 18:55:35.370131] main.py: Abbot @test_atl_bitlab_bot Polling
+[2023-08-26 18:55:35.370131] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-26 18:55:35.370131] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 26, 22, 55, 40, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=225, supergroup_chat_created=False, text="hey, what's up?")
+[2023-08-26 18:55:35.370131] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 26, 22, 55, 55, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=227, supergroup_chat_created=False, text='What is Bitcoin?')
+[2023-08-26 18:56:42.467884] main.py: Abbot @test_atl_bitlab_bot Initialized
+[2023-08-26 18:56:42.467884] main.py: Abbot @test_atl_bitlab_bot Polling
+[2023-08-26 18:56:42.467884] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-26 18:56:42.467884] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 26, 22, 56, 49, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=231, supergroup_chat_created=False, text='what is bitcoin')
+[2023-08-25 15:45:10.262177] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(id=-1001204119993, title='Atlanta BitDevs Discussion', type=<ChatType.SUPERGROUP>), date=datetime.datetime(2023, 8, 25, 16, 2, 26, tzinfo=<UTC>), delete_chat_photo=False, entities=(MessageEntity(length=35, offset=36, type=<MessageEntityType.URL>),), from_user=User(first_name='Stephen', id=676486800, is_bot=False, language_code='en', last_name='DeLorme', username='sbddesign'), group_chat_created=False, message_id=10587, supergroup_chat_created=False, text='🥳 The BitLab Weekly Update is out: https://bit.ly/atlbitlab-2023-08-25')
+[2023-08-25 15:45:10.262177] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(id=-1001204119993, title='Atlanta BitDevs Discussion', type=<ChatType.SUPERGROUP>), date=datetime.datetime(2023, 8, 25, 16, 2, 26, tzinfo=<UTC>), delete_chat_photo=False, edit_date=datetime.datetime(2023, 8, 25, 18, 15, 47, tzinfo=<UTC>), entities=(MessageEntity(length=35, offset=36, type=<MessageEntityType.URL>),), from_user=User(first_name='Stephen', id=676486800, is_bot=False, language_code='en', last_name='DeLorme', username='sbddesign'), group_chat_created=False, message_id=10587, supergroup_chat_created=False, text='🥳 The BitLab Weekly Update is out: https://bit.ly/atlbitlab-2023-08-25')
+[2023-08-25 15:45:10.262177] main.py: handle_message - Raw message Message(caption='Gm', channel_chat_created=False, chat=Chat(id=-1001204119993, title='Atlanta BitDevs Discussion', type=<ChatType.SUPERGROUP>), date=datetime.datetime(2023, 8, 25, 13, 26, 17, tzinfo=<UTC>), delete_chat_photo=False, edit_date=datetime.datetime(2023, 8, 25, 20, 17, 55, tzinfo=<UTC>), from_user=User(first_name='Stephen', id=676486800, is_bot=False, language_code='en', last_name='DeLorme', username='sbddesign'), group_chat_created=False, message_id=10586, photo=(PhotoSize(file_id='AgACAgEAAx0CR8VpuQACKVpk6QxzfRaYPY1tJAa_oaEu1NddHgACl6wxG2_xQUedm9CS31QowgEAAwIAA3MAAzAE', file_size=1436, file_unique_id='AQADl6wxG2_xQUd4', height=51, width=90), PhotoSize(file_id='AgACAgEAAx0CR8VpuQACKVpk6QxzfRaYPY1tJAa_oaEu1NddHgACl6wxG2_xQUedm9CS31QowgEAAwIAA20AAzAE', file_size=15716, file_unique_id='AQADl6wxG2_xQUdy', height=180, width=320), PhotoSize(file_id='AgACAgEAAx0CR8VpuQACKVpk6QxzfRaYPY1tJAa_oaEu1NddHgACl6wxG2_xQUedm9CS31QowgEAAwIAA3gAAzAE', file_size=65527, file_unique_id='AQADl6wxG2_xQUd9', height=450, width=800), PhotoSize(file_id='AgACAgEAAx0CR8VpuQACKVpk6QxzfRaYPY1tJAa_oaEu1NddHgACl6wxG2_xQUedm9CS31QowgEAAwIAA3kAAzAE', file_size=102662, file_unique_id='AQADl6wxG2_xQUd-', height=720, width=1280)), supergroup_chat_created=False)
+[2023-08-29 11:52:15.355961] main.py: Abbot @test_atl_bitlab_bot Initialized
+[2023-08-29 11:52:15.355961] main.py: Abbot @test_atl_bitlab_bot Polling
+[2023-08-29 11:54:00.725831] main.py: Abbot @test_atl_bitlab_bot Initialized
+[2023-08-29 11:54:00.725831] main.py: Abbot @test_atl_bitlab_bot Polling
+[2023-08-29 11:54:00.725831] main.py: /start executed by nonni_io
+[2023-08-29 11:54:00.725831] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-29 14:16:22.612116] main.py: Abbot @test_atl_bitlab_bot Initialized
+[2023-08-29 14:16:22.612116] main.py: Abbot @test_atl_bitlab_bot Polling
+[2023-08-29 14:16:22.612116] main.py: /start executed by nonni_io
+[2023-08-29 14:16:22.612116] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-29 14:16:22.612116] main.py: unleash_the_abbot - Error: list index out of range
+[2023-08-29 14:21:41.488459] main.py: Abbot @test_atl_bitlab_bot Initialized
+[2023-08-29 14:21:41.488459] main.py: Abbot @test_atl_bitlab_bot Polling
+[2023-08-29 14:22:07.754242] main.py: Abbot @test_atl_bitlab_bot Initialized
+[2023-08-29 14:22:07.754242] main.py: Abbot @test_atl_bitlab_bot Polling
+[2023-08-29 14:23:37.789392] main.py: tAbbot @test_atl_bitlab_bot Initialized
+[2023-08-29 14:23:37.789392] main.py: tAbbot @test_atl_bitlab_bot Polling
+[2023-08-29 14:23:37.789392] main.py: /start executed by nonni_io
+[2023-08-29 14:23:37.789392] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-29 14:23:37.789392] main.py: unleash_the_abbot - Error: 'NoneType' object has no attribute 'lower'
+[2023-08-29 14:24:10.079247] main.py: tAbbot @test_atl_bitlab_bot Initialized
+[2023-08-29 14:24:10.079247] main.py: tAbbot @test_atl_bitlab_bot Polling
+[2023-08-29 14:24:10.079247] main.py: /start executed by nonni_io
+[2023-08-29 14:24:10.079247] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-29 14:24:10.079247] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-29 14:41:19.834660] main.py: tAbbot @test_atl_bitlab_bot Initialized
+[2023-08-29 14:41:19.834660] main.py: tAbbot @test_atl_bitlab_bot Polling
+[2023-08-29 14:41:57.748211] main.py: tAbbot @test_atl_bitlab_bot Initialized
+[2023-08-29 14:41:57.748211] main.py: tAbbot @test_atl_bitlab_bot Polling
+[2023-08-29 14:41:57.748211] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-29 14:41:57.748211] main.py: unleash_the_abbot - Unleashed=True
+[2023-08-29 14:41:57.748211] main.py: unleash_the_abbot - Error: Message.reply_text() got an unexpected keyword argument 'chat_id'
+[2023-08-29 14:42:26.780571] main.py: tAbbot @test_atl_bitlab_bot Initialized
+[2023-08-29 14:42:26.780571] main.py: tAbbot @test_atl_bitlab_bot Polling
+[2023-08-29 14:42:26.780571] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-29 14:42:26.780571] main.py: unleash_the_abbot - Unleashed=True
+[2023-08-29 14:42:42.301772] main.py: tAbbot @test_atl_bitlab_bot Initialized
+[2023-08-29 14:42:42.301772] main.py: tAbbot @test_atl_bitlab_bot Polling
+[2023-08-29 14:42:42.301772] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-29 14:42:42.301772] main.py: unleash_the_abbot - Unleashed=True
+[2023-08-29 14:42:42.301772] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-29 14:42:42.301772] main.py: unleash_the_abbot - Unleashed=True
+[2023-08-29 14:43:32.803878] main.py: tAbbot @test_atl_bitlab_bot Initialized
+[2023-08-29 14:43:32.803878] main.py: tAbbot @test_atl_bitlab_bot Polling
+[2023-08-29 14:43:32.803878] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-29 14:43:32.803878] main.py: unleash_the_abbot - Unleashed=True
+[2023-08-29 15:02:10.513937] main.py: tAbbot @test_atl_bitlab_bot Initialized
+[2023-08-29 15:02:10.513937] main.py: tAbbot @test_atl_bitlab_bot Polling
+[2023-08-29 15:02:10.513937] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-29 15:02:10.513937] main.py: unleash_the_abbot - Unleashed=False
+[2023-08-29 15:02:10.513937] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-29 15:02:10.513937] main.py: unleash_the_abbot - Unleashed=False
+[2023-08-29 15:02:10.513937] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-29 15:02:10.513937] main.py: unleash_the_abbot - Unleashed=False
+[2023-08-29 15:02:10.513937] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-29 15:02:10.513937] main.py: unleash_the_abbot - Unleashed=False
+[2023-08-29 15:02:10.513937] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-29 15:02:10.513937] main.py: unleash_the_abbot - Unleashed=True
+[2023-08-29 15:02:10.513937] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-29 15:02:10.513937] main.py: unleash_the_abbot - Unleashed=True
+[2023-08-29 15:02:10.513937] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-29 15:02:10.513937] main.py: unleash_the_abbot - Unleashed=True
+[2023-08-29 15:02:10.513937] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 29, 19, 3, 45, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=275, supergroup_chat_created=False, text='hey there Abbot 👋')
+[2023-08-29 15:02:10.513937] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 29, 19, 3, 57, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=277, supergroup_chat_created=False, text='When is TAB Conf?')
+[2023-08-29 15:02:10.513937] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 29, 19, 4, 21, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=279, supergroup_chat_created=False, text='When was TAB Conf 2021?')
+[2023-08-29 15:02:10.513937] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 29, 19, 4, 34, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=281, supergroup_chat_created=False, text='The Atlanta Bitcoin Conference 2021')
+[2023-08-29 15:02:10.513937] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 29, 19, 4, 51, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=283, supergroup_chat_created=False, text='When was it?')
+[2023-08-29 15:12:04.023761] main.py: tAbbot @test_atl_bitlab_bot Initialized
+[2023-08-29 15:12:04.023761] main.py: tAbbot @test_atl_bitlab_bot Polling
+[2023-08-29 15:12:04.023761] main.py: unleash_the_abbot - /unleash executed by nonni_io
+[2023-08-29 15:12:04.023761] main.py: unleash_the_abbot - Unleashed=True
+[2023-08-29 15:12:04.023761] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 29, 19, 12, 20, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=287, supergroup_chat_created=False, text='Hello Abbot')
+[2023-08-29 15:12:04.023761] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 29, 19, 12, 46, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=289, supergroup_chat_created=False, text='What is The Atlanta Bitcoin Conference 2021?')
+[2023-08-29 15:12:04.023761] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 29, 19, 12, 46, tzinfo=<UTC>), delete_chat_photo=False, edit_date=datetime.datetime(2023, 8, 29, 19, 12, 56, tzinfo=<UTC>), from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=289, supergroup_chat_created=False, text='What is The Atlanta Bitcoin Conference 2020?')
+[2023-08-29 15:12:04.023761] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 29, 19, 13, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=291, supergroup_chat_created=False, text='What is The Atlanta Bitcoin Conference 2020?')
+[2023-08-29 15:12:04.023761] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 29, 19, 13, 25, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=294, supergroup_chat_created=False, text='When was TAB Conf 2021?')
+[2023-08-29 15:12:04.023761] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 29, 19, 13, 34, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=296, supergroup_chat_created=False, text='The Atlanta Bitcoin Conference 2021')
+[2023-08-29 15:12:04.023761] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 29, 19, 13, 50, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=298, supergroup_chat_created=False, text='When was it?')
+[2023-08-25 15:45:10.262177] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(id=-1001204119993, title='Atlanta BitDevs Discussion', type=<ChatType.SUPERGROUP>), date=datetime.datetime(2023, 8, 25, 16, 2, 26, tzinfo=<UTC>), delete_chat_photo=False, entities=(MessageEntity(length=35, offset=36, type=<MessageEntityType.URL>),), from_user=User(first_name='Stephen', id=676486800, is_bot=False, language_code='en', last_name='DeLorme', username='sbddesign'), group_chat_created=False, message_id=10587, supergroup_chat_created=False, text='🥳 The BitLab Weekly Update is out: https://bit.ly/atlbitlab-2023-08-25')
+[2023-08-25 15:45:10.262177] main.py: handle_message - Raw message Message(channel_chat_created=False, chat=Chat(id=-1001204119993, title='Atlanta BitDevs Discussion', type=<ChatType.SUPERGROUP>), date=datetime.datetime(2023, 8, 25, 16, 2, 26, tzinfo=<UTC>), delete_chat_photo=False, edit_date=datetime.datetime(2023, 8, 25, 18, 15, 47, tzinfo=<UTC>), entities=(MessageEntity(length=35, offset=36, type=<MessageEntityType.URL>),), from_user=User(first_name='Stephen', id=676486800, is_bot=False, language_code='en', last_name='DeLorme', username='sbddesign'), group_chat_created=False, message_id=10587, supergroup_chat_created=False, text='🥳 The BitLab Weekly Update is out: https://bit.ly/atlbitlab-2023-08-25')
+[2023-08-25 15:45:10.262177] main.py: handle_message - Raw message Message(caption='Gm', channel_chat_created=False, chat=Chat(id=-1001204119993, title='Atlanta BitDevs Discussion', type=<ChatType.SUPERGROUP>), date=datetime.datetime(2023, 8, 25, 13, 26, 17, tzinfo=<UTC>), delete_chat_photo=False, edit_date=datetime.datetime(2023, 8, 25, 20, 17, 55, tzinfo=<UTC>), from_user=User(first_name='Stephen', id=676486800, is_bot=False, language_code='en', last_name='DeLorme', username='sbddesign'), group_chat_created=False, message_id=10586, photo=(PhotoSize(file_id='AgACAgEAAx0CR8VpuQACKVpk6QxzfRaYPY1tJAa_oaEu1NddHgACl6wxG2_xQUedm9CS31QowgEAAwIAA3MAAzAE', file_size=1436, file_unique_id='AQADl6wxG2_xQUd4', height=51, width=90), PhotoSize(file_id='AgACAgEAAx0CR8VpuQACKVpk6QxzfRaYPY1tJAa_oaEu1NddHgACl6wxG2_xQUedm9CS31QowgEAAwIAA20AAzAE', file_size=15716, file_unique_id='AQADl6wxG2_xQUdy', height=180, width=320), PhotoSize(file_id='AgACAgEAAx0CR8VpuQACKVpk6QxzfRaYPY1tJAa_oaEu1NddHgACl6wxG2_xQUedm9CS31QowgEAAwIAA3gAAzAE', file_size=65527, file_unique_id='AQADl6wxG2_xQUd9', height=450, width=800), PhotoSize(file_id='AgACAgEAAx0CR8VpuQACKVpk6QxzfRaYPY1tJAa_oaEu1NddHgACl6wxG2_xQUedm9CS31QowgEAAwIAA3kAAzAE', file_size=102662, file_unique_id='AQADl6wxG2_xQUd-', height=720, width=1280)), supergroup_chat_created=False)
