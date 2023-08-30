@@ -33,17 +33,12 @@ from lib.utils import qr_code
 from lib.api.strike import Strike
 from lib.gpt import GPT
 
-from dotenv import load_dotenv, dotenv_values
+from env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY, OPENAI_API_KEY
 
-load_dotenv()
-env = dotenv_values()
-BOT_TOKEN = env.get("BOT_TOKEN")
-TEST_BOT_TOKEN = env.get("TEST_BOT_TOKEN")
-STRIKE_API_KEY = env.get("STRIKE_API_KEY")
-OPENAI_API_KEY = env.get("OPENAI_API_KEY")
-abbot_chat_gpt = GPT(OPENAI_API_KEY, OPENAI_MODEL, "abbot")
-group_chat_gpt = GPT(OPENAI_API_KEY, OPENAI_MODEL, "group")
-private_chat_gpt = GPT(OPENAI_API_KEY, OPENAI_MODEL, "private")
+OPENAI_MODEL = "gpt-3.5-turbo-16k"
+main_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "private-abbot")
+group_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "group-abbot")
+private_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "private-abbot")
 
 BOT_DATA = io.open(os.path.abspath("data/bot_data.json"), "r")
 BOT_DATA_OBJ = json.load(BOT_DATA)
@@ -106,10 +101,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         rm_jl.close()
     if UNLEASHED:
         if not private_message and message_chat_id != -1001204119993:
-            if len(group_chat_gpt.messages) % 5 == 0:
-                answer = group_chat_gpt.chat_completion(message)
+            if len(group_abbot.messages) % 5 == 0:
+                answer = group_abbot.chat_completion(message)
                 return await message.reply_text(answer)
-        answer = private_chat_gpt.chat_completion(message)
+        answer = private_abbot.chat_completion(message)
         await message.reply_text(answer)
 
 
@@ -441,15 +436,23 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         UNLEASH_LEASH = (*UNLEASH, *LEASH)
 
         message = update.effective_message
+        message_text = update.message.text
         sender = message.from_user.username
         debug(f"unleash_the_abbot => /unleash executed by {sender}")
         if sender not in WHITELIST:
             return await message.reply_text(
                 text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
             )
+        if f"@{BOT_HANDLE}" not in message_text:
+            return await context.bot.send_message(
+                chat_id=update.effective_chat.id,
+                text=f"If you want to start Abbot @{BOT_HANDLE}, please tag Abbot in the start command: e.g. /start @{BOT_HANDLE}",
+            )
         toggle_arg = try_get(context, "args", 0, default="False").capitalize()
         if toggle_arg not in UNLEASH_LEASH:
-            return await message.reply_text(text=f"Bad arg: expecting one of {UNLEASH_LEASH}")
+            return await message.reply_text(
+                text=f"Bad arg: expecting one of {UNLEASH_LEASH}"
+            )
         UNLEASHED = True if toggle_arg in UNLEASH else False
         debug(f"unleash_the_abbot => Unleashed={UNLEASHED}")
         if not UNLEASHED:
