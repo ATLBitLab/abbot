@@ -18,7 +18,6 @@ from uuid import uuid4
 from datetime import datetime
 from lib.utils import get_dates, try_get
 
-import openai
 from telegram import Update
 from telegram.ext.filters import BaseFilter
 from telegram.ext import (
@@ -35,12 +34,13 @@ from lib.gpt import GPT
 
 from env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY, OPENAI_API_KEY
 
-OPENAI_MODEL = "gpt-3.5-turbo-16k"
-prompt_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "abbot")
-summary_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "summary-abbot")
-group_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "group-abbot")
-private_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "private-abbot")
-
+INTERNET_BRO = "You are a young tech bro in a telegram chat room responding in a way that is concise and uses internet slang."
+HELPFUL_ASSISTANT = "You are a helpful assistant"
+prompt_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "Abbot", HELPFUL_ASSISTANT)
+summary_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "SummaryAbbot", HELPFUL_ASSISTANT)
+group_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "GroupAbbot", INTERNET_BRO)
+private_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "PrivateAbbot", INTERNET_BRO)
+    
 BOT_DATA = io.open(os.path.abspath("data/bot_data.json"), "r")
 BOT_DATA_OBJ = json.load(BOT_DATA)
 CHATS_TO_IGNORE = try_get(BOT_DATA_OBJ, "chats", "ignore")
@@ -101,6 +101,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         rm_jl.write(message_dumps)
         rm_jl.write("\n")
         rm_jl.close()
+    
     if UNLEASHED:
         if private_message:
             private_abbot.update_messages(message)
@@ -108,13 +109,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return await message.reply_text(answer)
         elif not private_message:
             group_abbot.update_messages(message)
-            if f"@{BOT_HANDLE}" in message_text or (
-                len(group_abbot.messages) % 5 == 0 and message_chat_id != -1001204119993
-            ):
+            print('not private_message')
+            print('message_text', message_text)
+
+            if f"@{BOT_HANDLE}" in message_text:
                 answer = group_abbot.chat_completion()
                 return await message.reply_text(answer)
-        else:
-            pass
+            elif len(group_abbot.messages) % 5 == 0 and message_chat_id != -1001204119993:
+                answer = group_abbot.chat_completion()
+                return await message.reply_text(answer)
 
 
 def clean_jsonl_data():
