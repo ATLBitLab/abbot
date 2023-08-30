@@ -5,5 +5,5 @@ __pycache__
 dev/
 src/lib/env.py
 src/messages.py
-src/data/debug.log
-src/data/backup/messages.py
+debug.log
+messages.py
