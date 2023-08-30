@@ -573,3 +573,30 @@
 [2023-08-30] main.py: unleash_the_abbot => Unleashed=True
 [2023-08-30] main.py: handle_message => Raw message Message(channel_chat_created=False, chat=Chat(api_kwargs={'all_members_are_administrators': True}, id=-926629994, title='Burner: TAB Week Party', type=<ChatType.GROUP>), date=datetime.datetime(2023, 8, 30, 12, 21, 14, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=366, supergroup_chat_created=False, text='Testing #1')
 [2023-08-30] main.py: handle_message => Raw message Message(channel_chat_created=False, chat=Chat(api_kwargs={'all_members_are_administrators': True}, id=-926629994, title='Burner: TAB Week Party', type=<ChatType.GROUP>), date=datetime.datetime(2023, 8, 30, 12, 21, 39, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=368, supergroup_chat_created=False, text='testing 2')
+[2023-08-30] main.py: tAbbot @test_atl_bitlab_bot Initialized
+[2023-08-30] main.py: tAbbot @test_atl_bitlab_bot Polling
+[2023-08-30] main.py: unleash_the_abbot => /unleash executed by nonni_io
+[2023-08-30] main.py: unleash_the_abbot => Unleashed=True
+[2023-08-30] main.py: handle_message => Raw message Message(channel_chat_created=False, chat=Chat(api_kwargs={'all_members_are_administrators': True}, id=-926629994, title='Burner: TAB Week Party', type=<ChatType.GROUP>), date=datetime.datetime(2023, 8, 30, 12, 24, 26, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=372, supergroup_chat_created=False, text='Testing m1')
+[2023-08-30] main.py: handle_message => Raw message Message(channel_chat_created=False, chat=Chat(api_kwargs={'all_members_are_administrators': True}, id=-926629994, title='Burner: TAB Week Party', type=<ChatType.GROUP>), date=datetime.datetime(2023, 8, 30, 12, 24, 33, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=374, supergroup_chat_created=False, text='testing m2')
+[2023-08-30] main.py: /prompt executed => sender=nonni_io message=Message(channel_chat_created=False, chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2023, 8, 30, 12, 25, 6, tzinfo=<UTC>), delete_chat_photo=False, entities=(MessageEntity(length=7, offset=0, type=<MessageEntityType.BOT_COMMAND>),), from_user=User(first_name='bryan', id=1711738045, is_bot=False, language_code='en', username='nonni_io'), group_chat_created=False, message_id=376, supergroup_chat_created=False, text='/prompt can you tell me a short story?')
+[2023-08-30] main.py: abbot => args: ['can', 'you', 'tell', 'me', 'a', 'short', 'story?']
+[2023-08-30] main.py: abbot => Answer: Once upon a time in a small village, there lived a young boy named Lucas. Lucas was known for his curiosity and adventurous spirit. He always dreamt of exploring the world beyond the boundaries of his humble village.
+
+One sunny day, Lucas stumbled upon an old, mysterious map hidden deep within the attic of his grandfather's house. The map depicted a hidden treasure, said to possess unimaginable wealth and power. Fueled by excitement, Lucas decided to embark on a quest to find this treasure and fulfill his wildest dreams.
+
+Armed with the map, Lucas gathered supplies and bid farewell to his loved ones. He set off on a journey filled with perilous challenges and unknown dangers. Along the way, he encountered extraordinary creatures, navigated treacherous terrains, and faced numerous obstacles that tested his bravery and wit.
+
+Throughout his travels, Lucas also made unexpected friends who joined him on his quest. Together, they formed a resilient team, each contributing their unique skills and strengths. They shared laughter, tears, and endless stories around a campfire under a starlit sky. The bond they forged became unbreakable as they moved closer to their shared goal.
+
+After months of tireless searching, Lucas and his companions finally arrived at a hidden island, marked on the map as the location of the treasure. As they stepped ashore, they found themselves in awe of the breathtaking scenery, filled with lush forests and glistening waterfalls.
+
+Braving through underground caverns, deciphering ancient puzzles, and overcoming their deepest fears, Lucas and his friends reached the heart of the island. There, they discovered the long-lost treasure, guarded by an alluring but dangerous mythical creature.
+
+Lucas approached the creature with caution, his heart pounding with uncertainty. With the wisdom he had acquired on his journey, he managed to reason with the creature, convincing it that their intentions were pure. The creature, recognizing the courage and perseverance of the young adventurers, bestowed upon them the treasure's true power – the knowledge to bring prosperity and harmony to their village.
+
+Filled with a sense of accomplishment and gratitude, Lucas and his companions returned to their village as heroes. They used the treasure's power to heal the land, revive their village's lost prosperity, and strengthen the bonds among its people.
+
+As time passed, Lucas became an inspiration to many, sharing tales of his magnificent journey and the importance of resilience and unity. The village flourished, and Lucas became known as the fearless explorer who changed the course of their history.
+
+And so, the story of Lucas's journey lived on, reminding generations to come that with courage, determination, and a little hint of magic, dreams can truly become reality.

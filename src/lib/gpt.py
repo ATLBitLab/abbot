@@ -4,12 +4,13 @@ from telegram import Message
 from lib.utils import try_get
 
 
-class   GPT:
+class GPT:
+    messages = []
+
     def __init__(self, api_key, model, gpt_type):
         openai.api_key = api_key
         self.model = model
         self.gpt_type = gpt_type
-        self.messages = []
 
     def update_messages(self, update):
         self.messages.append(update)
