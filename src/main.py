@@ -18,7 +18,6 @@ from uuid import uuid4
 from datetime import datetime
 from lib.utils import get_dates, try_get
 
-import openai
 from telegram import Update
 from telegram.ext.filters import BaseFilter
 from telegram.ext import (
@@ -35,11 +34,12 @@ from lib.gpt import GPT
 
 from env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY, OPENAI_API_KEY
 
-OPENAI_MODEL = "gpt-3.5-turbo-16k"
-prompt_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "abbot")
-summary_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "summary-abbot")
-group_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "group-abbot")
-private_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "private-abbot")
+INTERNET_BRO = "You are a young tech bro in a telegram chat room responding in a way that is concise and uses internet slang."
+HELPFUL_ASSISTANT = "You are a helpful assistant"
+prompt_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "abbot", HELPFUL_ASSISTANT)
+summary_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "summary-abbot", HELPFUL_ASSISTANT)
+group_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "group-abbot", INTERNET_BRO)
+private_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "private-abbot", INTERNET_BRO)
 
 BOT_DATA = io.open(os.path.abspath("data/bot_data.json"), "r")
 BOT_DATA_OBJ = json.load(BOT_DATA)

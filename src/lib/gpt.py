@@ -5,11 +5,11 @@ from lib.utils import try_get
 
 
 class GPT:
-    def __init__(self, api_key, model, gpt_type):
+    def __init__(self, api_key, model, gpt_type, personality):
         openai.api_key = api_key
         self.model = model
         self.gpt_type = gpt_type
-        self.messages = []
+        self.messages = [dict(role="system", content=personality)]
 
     def update_messages(self, telegram_message: Message | str | dict):
         prompt = try_get(telegram_message, "text") if type(telegram_message) == Message else telegram_message
