@@ -101,6 +101,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         rm_jl.write(message_dumps)
         rm_jl.write("\n")
         rm_jl.close()
+    
     if UNLEASHED:
         if private_message:
             private_abbot.update_messages(message)
@@ -108,13 +109,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return await message.reply_text(answer)
         elif not private_message:
             group_abbot.update_messages(message)
-            if f"@{BOT_HANDLE}" in message_text or (
-                len(group_abbot.messages) % 5 == 0 and message_chat_id != -1001204119993
-            ):
+            if f"@{BOT_HANDLE}" in message_text:
                 answer = group_abbot.chat_completion()
                 return await message.reply_text(answer)
-        else:
-            pass
+            elif len(group_abbot.messages) % 5 == 0 and message_chat_id != -1001204119993:
+                answer = group_abbot.chat_completion()
+                return await message.reply_text(answer)
 
 
 def clean_jsonl_data():
