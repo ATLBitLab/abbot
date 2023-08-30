@@ -36,11 +36,11 @@ from env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY, OPENAI_API_KEY
 
 INTERNET_BRO = "You are a young tech bro in a telegram chat room responding in a way that is concise and uses internet slang."
 HELPFUL_ASSISTANT = "You are a helpful assistant"
-prompt_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "abbot", HELPFUL_ASSISTANT)
-summary_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "summary-abbot", HELPFUL_ASSISTANT)
-group_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "group-abbot", INTERNET_BRO)
-private_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "private-abbot", INTERNET_BRO)
-
+prompt_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "Abbot", HELPFUL_ASSISTANT)
+summary_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "SummaryAbbot", HELPFUL_ASSISTANT)
+group_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "GroupAbbot", INTERNET_BRO)
+private_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "PrivateAbbot", INTERNET_BRO)
+    
 BOT_DATA = io.open(os.path.abspath("data/bot_data.json"), "r")
 BOT_DATA_OBJ = json.load(BOT_DATA)
 CHATS_TO_IGNORE = try_get(BOT_DATA_OBJ, "chats", "ignore")
