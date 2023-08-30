@@ -1,5 +1,6 @@
 STARTED = None
 UNLEASHED = False
+MESSAGE_COUNT = 0
 PROGRAM = "main.py"
 BOT_HANDLE = "atl_bitlab_bot"
 BOT_NAME = "Abbot"
@@ -38,7 +39,8 @@ env = dotenv_values()
 BOT_TOKEN = env.get("BOT_TOKEN")
 TEST_BOT_TOKEN = env.get("TEST_BOT_TOKEN")
 STRIKE_API_KEY = env.get("STRIKE_API_KEY")
-chat_gpt = GPT(env.get("OPENAI_API_KEY"))
+OPENAI_API_KEY = env.get("OPENAI_API_KEY")
+chat_gpt = GPT(OPENAI_API_KEY)
 
 BOT_DATA = io.open(os.path.abspath("data/bot_data.json"), "r")
 BOT_DATA_OBJ = json.load(BOT_DATA)
@@ -100,12 +102,16 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         rm_jl.write(message_dumps)
         rm_jl.write("\n")
         rm_jl.close()
-    if UNLEASHED and private_message:
-        answer = chat_gpt.chat_completion(message)
+    if UNLEASHED:
+        global MESSAGE_COUNT
+        if not private_message and MESSAGE_COUNT % 5 == 0 and message_chat_id != -1001204119993:
+            group_chat_gpt = GPT(OPENAI_API_KEY)
+            MESSAGE_COUNT += 1
+            answer = group_chat_gpt.chat_completion(message)
+            return await message.reply_text(answer)
+        private_chat_gpt = GPT(OPENAI_API_KEY)
+        answer = private_chat_gpt.chat_completion(message)
         await message.reply_text(answer)
-    else:
-        # TODO: logic for group messaging
-        pass
 
 
 def clean_jsonl_data():
@@ -426,6 +432,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
+        global UNLEASHED
+        global MESSAGE_COUNT
+
         UNLEASH = ("1", "True", "On")
         LEASH = ("0", "False", "Off")
         UNLEASH_LEASH = (*UNLEASH, *LEASH)
@@ -437,7 +446,6 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return await message.reply_text(
                 text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
             )
-        global UNLEASHED
         toggle_arg = try_get(context, "args", 0, default="False").capitalize()
         if toggle_arg not in UNLEASH_LEASH:
             return await message.reply_text(text=f"Bad arg: expecting one of {UNLEASH_LEASH}")
