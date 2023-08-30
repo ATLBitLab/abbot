@@ -36,7 +36,8 @@ from lib.gpt import GPT
 from env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY, OPENAI_API_KEY
 
 OPENAI_MODEL = "gpt-3.5-turbo-16k"
-main_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "private-abbot")
+prompt_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "abbot")
+summary_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "summary-abbot")
 group_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "group-abbot")
 private_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "private-abbot")
 
@@ -94,18 +95,26 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }
     )
     private_message = message_type == "private"
+    message_text = update.message.text
     if not private_message:
         rm_jl = io.open(RAW_MESSAGE_JL_FILE, "a")
         rm_jl.write(message_dumps)
         rm_jl.write("\n")
         rm_jl.close()
     if UNLEASHED:
-        if not private_message and message_chat_id != -1001204119993:
-            if len(group_abbot.messages) % 5 == 0:
-                answer = group_abbot.chat_completion(message)
+        if private_message:
+            private_abbot.update_messages(message)
+            answer = private_abbot.chat_completion()
+            return await message.reply_text(answer)
+        elif not private_message:
+            group_abbot.update_messages(message)
+            if f"@{BOT_HANDLE}" in message_text or (
+                len(group_abbot.messages) % 5 == 0 and message_chat_id != -1001204119993
+            ):
+                answer = group_abbot.chat_completion()
                 return await message.reply_text(answer)
-        answer = private_abbot.chat_completion(message)
-        await message.reply_text(answer)
+        else:
+            pass
 
 
 def clean_jsonl_data():
@@ -167,26 +176,18 @@ def summarize_messages(chat, days=None):
         prompts_by_day_dump = json.dumps(prompts_by_day)
         prompts_by_day_file.write(prompts_by_day_dump)
         prompts_by_day_file.close()
-        debug(
-            f"[{now}] {PROGRAM}: summarize_messages => Prompts by day = {prompts_by_day_dump}"
-        )
+        debug(f"summarize_messages => Prompts by day = {prompts_by_day_dump}")
         summary_file = io.open(SUMMARY_LOG_FILE, "a")
-        for day, prompt in prompts_by_day.items():
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo-16k",
-                messages=[
-                    {
-                        "role": "user",
-                        "content": f"Summarize the text after the asterisk. Split into paragraphs where appropriate. Do not mention the asterisk. * \n {prompt}",
-                    }
-                ],
+        prompt = "Summarize the text after the asterisk. Split into paragraphs where appropriate. Do not mention the asterisk. * \n"
+        for day, content in prompts_by_day.items():
+            message = dict(
+                role="user",
+                content=f"{prompt}{content}",
             )
-            debug(
-                f"[{now}] {PROGRAM}: summarize_messages => OpenAI Response = {response}"
-            )
-            summary = (
-                f"Summary for {day}:\n{response.choices[0].message.content.strip()}"
-            )
+            summary_abbot.update_messages(message)
+            response = summary_abbot.chat_completion()
+            debug(f"summarize_messages => OpenAI Response = {response}")
+            summary = f"Summary {day}:\n{response.choices[0].message.content.strip()}"
             summary_file.write(f"{summary}\n--------------------------------\n\n")
             summaries.append(summary)
         summary_file.close()
@@ -358,7 +359,8 @@ async def abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=update.effective_chat.id,
             text=f"Thank you for supporting ATL BitLab!",
         )
-        answer = abbot_chat_gpt.chat_completion(prompt)
+        prompt_abbot.update_messages(prompt)
+        answer = prompt_abbot.chat_completion()
         await context.bot.send_message(
             chat_id=update.effective_chat.id, text=f"{answer}"
         )
@@ -389,9 +391,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    debug(
-        f"[{now}] {PROGRAM}: /help executed by {update.effective_message.from_user.username}"
-    )
+    debug(f"/help executed by {update.effective_message.from_user.username}")
     message_text = update.message.text
     if f"@{BOT_HANDLE}" not in message_text:
         return await context.bot.send_message(

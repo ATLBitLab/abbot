@@ -11,10 +11,10 @@ class GPT:
         self.gpt_type = gpt_type
         self.messages = []
 
-    def update_messages(self, telegram_message: Message | str):
+    def update_messages(self, telegram_message: Message | str | dict):
         prompt = try_get(telegram_message, "text") if type(telegram_message) == Message else telegram_message
         message_dict = dict(role="user", content=prompt)
-        self.update_messages(message_dict)
+        self.messages.append(message_dict)
 
     def chat_completion(self):
         response = openai.ChatCompletion.create(
