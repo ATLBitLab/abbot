@@ -109,6 +109,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return await message.reply_text(answer)
         elif not private_message:
             group_abbot.update_messages(message)
+            print('not private_message')
+            print('message_text', message_text)
+
             if f"@{BOT_HANDLE}" in message_text:
                 answer = group_abbot.chat_completion()
                 return await message.reply_text(answer)
