@@ -5,3 +5,5 @@ __pycache__
 dev/
 src/lib/env.py
 src/messages.py
+debug.log
+messages.py
