@@ -443,11 +443,8 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return await message.reply_text(
                 text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
             )
-        if f"@{BOT_HANDLE}" not in message_text:
-            return await context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text=f"If you want to start Abbot @{BOT_HANDLE}, please tag Abbot in the start command: e.g. /start @{BOT_HANDLE}",
-            )
+        elif f"@{BOT_HANDLE}" not in message_text:
+            return
         toggle_arg = try_get(context, "args", 0, default="False").capitalize()
         if toggle_arg not in UNLEASH_LEASH:
             return await message.reply_text(
