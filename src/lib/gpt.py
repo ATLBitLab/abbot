@@ -16,10 +16,7 @@ class GPT:
         self.handle = handle
         self.type = type
         self.personality = personality
-        self.messages = [
-            dict(role="system", content=personality),
-            dict(role="user", content="this is a dummy message"),
-        ]
+        self.messages = [dict(role="system", content=personality)]
         self.unleashed = unleashed
         self.started = True
 
@@ -39,9 +36,11 @@ class GPT:
 
     def unleash(self):
         self.unleashed = True
+        return self.unleashed
 
     def leash(self):
         self.unleashed = False
+        return self.unleashed
 
     def update_messages(self, telegram_message: Message | str | dict):
         prompt = (
@@ -61,4 +60,4 @@ class GPT:
             return try_get(response, "choices", 0, "message", "content")
         except Exception as e:
             debug(f"Error: GPT => chat_completion => exception={e}")
-            return False
+            return None

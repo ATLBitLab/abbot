@@ -36,6 +36,7 @@ BOT_DATA_OBJ = json.load(BOT_DATA)
 CHATS_TO_IGNORE = try_get(BOT_DATA_OBJ, "chats", "ignore")
 CHATS_TO_INCLUDE_SUMMARY = try_get(BOT_DATA_OBJ, "chats", "include", "summary")
 CHATS_TO_INCLUDE_UNLEASH = try_get(BOT_DATA_OBJ, "chats", "include", "unleash")
+CHAT_NAME_MAPPING = try_get(BOT_DATA_OBJ, "chats", "mapping", "nameToShortName")
 WHITELIST = try_get(BOT_DATA_OBJ, "whitelist")
 CHEEKY_RESPONSES = try_get(BOT_DATA_OBJ, "responses", "cheeky")
 PITHY_RESPONSES = try_get(BOT_DATA_OBJ, "responses", "pithy")
@@ -58,68 +59,88 @@ now_iso_clean = now_iso.split("+")[0].split("T")[0]
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    message = update.effective_message
-    message_chat_id = update.effective_chat.id
-    if not summary_abbot.started:
-        debug(f"handle_message => Bot not started!")
-        return
-    if message_chat_id in CHATS_TO_IGNORE:
-        debug(f"handle_message => Chat ignored {message_chat_id}")
-        return
+    debug(f"main => handle_message => Raw update {update}")
     mpy = io.open(MESSAGES_PY_FILE, "a")
     mpy.write(update.to_json())
     mpy.write("\n")
     mpy.close()
-    debug(f"handle_message => Raw message {message}")
-    message_dict = message.to_dict()
-    chat_dict = message.chat.to_dict()
-    message_title = message.chat.title or None
-    message_type = message.chat.type or None
-    username = message.from_user.username
-    first_name = message.chat.first_name or username
-    chat_id = update.effective_chat.id
-    iso_date = message.date.isoformat()
-    message_dumps = json.dumps(
+
+    message = try_get(update, "effective_message") or update.effective_message
+    message_text = try_get(message, "text") or update.effective_chat
+    debug(f"main => handle_message => Raw message {message}")
+    username = try_get(message, "from_user", "username")
+    date = (try_get(message, "date") or now).isoformat().split("+")[0].split("T")[0]
+
+    chat = try_get(update, "effective_chat")
+    debug(f"main => handle_message => Raw chat {chat}")
+    name = try_get(chat, "first_name", default=username)
+    chat_id = try_get(chat, "id")
+    chat_title = try_get(
+        CHAT_NAME_MAPPING, try_get(chat, "title"), default="atlantabitdevs"
+    )
+    chat_type = try_get(chat, "type")
+    chat_id = try_get(chat, "id")
+    private_chat = chat_type == "private"
+
+    if chat_id in CHATS_TO_IGNORE:
+        debug(f"main => handle_message => Chat ignored {chat_id}")
+        return
+    if not summary_abbot.started:
+        debug(f"main => handle_message => {summary_abbot.name} stopped")
+        return await message.reply_text(
+            f"{summary_abbot.name} stopped, please run /start @{BOT_HANDLE}"
+        )
+    message_dump = json.dumps(
         {
-            **message_dict,
-            "chat": {
-                "title": message_title.replace(" ", "").lower()
-                if message_title
-                else "",
-                **chat_dict,
-            },
-            "new": True,
+            **message.to_dict(),
+            **chat.to_dict(),
+            "title": chat_title,
             "from": username,
-            "name": first_name,
-            "date": iso_date if iso_date else now_iso_clean,
+            "name": name,
+            "date": date,
+            "new": True,
         }
     )
-    private_message = message_type == "private"
-    message_text = update.message.text
-    if not private_message:
-        rm_jl = io.open(RAW_MESSAGE_JL_FILE, "a")
-        rm_jl.write(message_dumps)
-        rm_jl.write("\n")
-        rm_jl.close()
+    if private_chat:
+        debug(f"main => handle_message => Private chat={private_chat}")
+        return
 
-    if private_message and private_abbot.unleashed:
-        private_abbot.update_messages(message)
-        answer = private_abbot.chat_completion()
-        if not answer:
-            answer = f"Sorry, I broke. Try again later. {private_abbot.name} leashed ⛔️"
-        return await message.reply_text(answer)
+    rm_jl = io.open(RAW_MESSAGE_JL_FILE, "a")
+    rm_jl.write(message_dump)
+    rm_jl.write("\n")
+    rm_jl.close()
 
-    if chat_id in CHATS_TO_INCLUDE_UNLEASH:
-        if group_abbot.unleashed:
+    handle_in_message = f"@{group_abbot.handle}" in message_text
+    if group_abbot.unleashed or private_abbot.unleashed:
+        if private_chat:
+            private_abbot.update_messages(message)
+            answer = private_abbot.chat_completion()
+            if not answer:
+                emoji = "✅" if group_abbot.leash() else "⛔️"
+                answer = f"Please try again later. {group_abbot.name} leashed {emoji}"
+            return await message.reply_text(answer)
+
+        elif chat_id in CHATS_TO_INCLUDE_UNLEASH:
             group_abbot.update_messages(message)
-            debug(f"not private_message => message_text={message_text}")
-            if f"@{group_abbot.handle}" in message_text or len(group_abbot.messages) % 5 == 0:
+            debug(f"not private_chat => message_text={message_text}")
+            if handle_in_message:
                 answer = group_abbot.chat_completion()
                 if not answer:
-                    answer = f"Sorry, I broke. Try again later. {group_abbot.name} leashed ⛔️"
+                    emoji = "✅" if group_abbot.leash() else "⛔️"
+                    answer = (
+                        f"Please try again later. {group_abbot.name} leashed {emoji}"
+                    )
                 return await message.reply_text(answer)
-        elif f"@{group_abbot.handle}" in message_text:
-            return await message.reply_text(PITHY_RESPONSES[0])
+            elif len(group_abbot.messages) % 5 == 0:
+                answer = group_abbot.chat_completion()
+                if not answer:
+                    emoji = "✅" if group_abbot.leash() else "⛔️"
+                    answer = (
+                        f"Please try again later. {group_abbot.name} leashed {emoji}"
+                    )
+                return await message.reply_text(answer)
+    elif not private_chat and handle_in_message:
+        return await message.reply_text(PITHY_RESPONSES[0])
 
 
 def clean_jsonl_data():
@@ -157,6 +178,32 @@ def clean_jsonl_data():
     return "Cleaning done!"
 
 
+async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    sender = update.effective_message.from_user.username
+    debug(f"main => clean => /clean executed by {sender}")
+    if update.effective_message.from_user.username not in WHITELIST:
+        return await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
+        )
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, text="Cleaning ... please wait"
+    )
+    await context.bot.send_message(
+        chat_id=update.effective_chat.id, text=clean_jsonl_data()
+    )
+
+
+async def both(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await clean(update, context)
+    await summary(update, context)
+    return "Messages cleaned. Summaries:"
+
+
+def whitelist_gate(sender):
+    return sender not in WHITELIST
+
+
 def summarize_messages(chat, days=None):
     # Separate the key points with an empty line, another line with 10 equal signs, and then another empty line. \n
     try:
@@ -181,149 +228,83 @@ def summarize_messages(chat, days=None):
         prompts_by_day_dump = json.dumps(prompts_by_day)
         prompts_by_day_file.write(prompts_by_day_dump)
         prompts_by_day_file.close()
-        debug(f"summarize_messages => Prompts by day = {prompts_by_day_dump}")
+        debug(f"main => summarize_messages => Prompts by day = {prompts_by_day_dump}")
         summary_file = io.open(SUMMARY_LOG_FILE, "a")
         prompt = "Summarize the text after the asterisk. Split into paragraphs where appropriate. Do not mention the asterisk. * \n"
         for day, content in prompts_by_day.items():
-            message = dict(
-                role="user",
-                content=f"{prompt}{content}",
-            )
-            summary_abbot.update_messages(message)
-            response = summary_abbot.chat_completion()
-            debug(f"summarize_messages => OpenAI Response = {response}")
-            summary = f"Summary {day}:\n{response.choices[0].message.content.strip()}"
+            summary_abbot.update_messages(f"{prompt}{content}")
+            answer = summary_abbot.chat_completion()
+            debug(f"main => summarize_messages => OpenAI Response = {answer}")
+            summary = f"Summary {day}:\n{answer.strip()}"
             summary_file.write(f"{summary}\n--------------------------------\n\n")
             summaries.append(summary)
         summary_file.close()
-        return summaries
+        return True, summaries
     except Exception as e:
-        debug(f"summarize_messages => error: {e}")
-        raise e
-
-
-async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    sender = update.effective_message.from_user.username
-    debug(f"/clean executed by {sender}")
-    if update.effective_message.from_user.username not in WHITELIST:
-        return await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
-        )
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id, text="Cleaning ... please wait"
-    )
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id, text=clean_jsonl_data()
-    )
-
-
-async def both(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await clean(update, context)
-    await summary(update, context)
-    return "Messages cleaned. Summaries:"
-
-
-def whitelist_gate(sender):
-    return sender not in WHITELIST
+        debug(f"main => summarize_messages => error: {e}")
+        return False, e
 
 
 async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        sender = update.effective_message.from_user.username
-        debug(f"summary => /summary executed by {sender}")
-        not_whitelisted = whitelist_gate(sender)
-        if not_whitelisted:
-            return await context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
+        message = update.effective_message
+        sender = message.from_user.username
+        debug(f"main => summary => /summary executed by {sender}")
+        if whitelist_gate(sender):
+            return await message.reply_text(
+                CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
             )
-        args = context.args
+
+        args = try_get(context, "args")
         arg_len = len(args)
         if arg_len > 3:
-            return await context.bot.send_message(
-                chat_id=update.effective_chat.id, text="Too many args"
-            )
-        chat_arg = args[0].replace(" ", "").lower()
-        summary_chat_names = ("atlantabitdevs", "'Atlanta BitDevs Discussion'")
-        if chat_arg not in summary_chat_names:
-            return await context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text=f"Chat name invalid! Expecting one of: {summary_chat_names}",
-            )
-        chat = chat_arg.replace(" ", "").lower()
+            return await message.reply_text("Bad args: too many args")
+
+        date_regex = "^\d{4}-\d{2}-\d{2}$"
         dates = get_dates()
-        if arg_len == 1:
-            message = f"Generating {chat} summary for past week: {dates}"
-        elif arg_len == 2:
-            date = args[1]
-            if re.search("^\d{4}-\d{2}-\d{2}$", chat):
-                return await context.bot.send_message(
-                    chat_id=update.effective_chat.id,
-                    text=f"Malformed chat: expecting chat name, got {chat}",
-                )
-            if not re.search("^\d{4}-\d{2}-\d{2}$", date):
-                return await context.bot.send_message(
-                    chat_id=update.effective_chat.id,
-                    text=f"Malformed date: expecting form YYYY-MM-DD, got {date}",
-                )
-            try:
-                datetime.strptime(date, "%Y-%m-%d").date()
-            except Exception as e:
-                debug(f"summary => datetime.strptime error: {e}")
-                return await context.bot.send_message(
-                    chat_id=update.effective_chat.id,
-                    text=f"Error while parsing date: {e}",
-                )
-            dates = [args[1]]
-            message = f"Generating {chat} summary for {date}"
+        chat = try_get(args, 0).replace(" ", "").lower()
+
+        if chat != "atlantabitdevs":
+            return await message.reply_text("Bad args: Expecting 'atlantabitdevs'")
+        response_message = f"Generating {chat} summary for {dates}"
+        if arg_len == 2:
+            date = try_get(args, 1)
+            if not re.search(date_regex, date):
+                error = f"Bad args: for 2 args, expecting '/command <chatname> <date>', received {''.join(args)}; e.g. /summary atlantabitdevs 2023-01-01"
+                return await message.reply_text(error)
+            dates = [date]
+            response_message = f"Generating {chat} summary for {dates}"
         elif arg_len == 3:
-            dates = args[0:2]
-            if re.search("^\d{4}-\d{2}-\d{2}$", chat):
-                return await context.bot.send_message(
-                    chat_id=update.effective_chat.id,
-                    text=f"Malformed chat: expecting chat name, got {chat}",
-                )
+            dates = try_get(args[1:])
+            response_message = f"Generating {chat} summary for {dates}"
             for date in dates:
-                if not re.search("^\d{4}-\d{2}-\d{2}$", date):
-                    return await context.bot.send_message(
-                        chat_id=update.effective_chat.id,
-                        text=f"Malformed date: expecting form YYYY-MM-DD, got {date}",
-                    )
-                try:
-                    datetime.strptime(date, "%Y-%m-%d").date()
-                except Exception as e:
-                    debug(f"summary => datetime.strptime error: {e}")
-                    return await context.bot.send_message(
-                        chat_id=update.effective_chat.id,
-                        text=f"Error while parsing date: {e}",
-                    )
-            message = (
-                f"Generating {chat} summary for each day between {' and '.join(args)}"
-            )
+                if not re.search(date_regex, date):
+                    error = f"Bad args: expecting '/summary <chatname> <date> <date>', received {''.join(args)}; e.g. /summary atlantabitdevs 2023-01-01 2023-01-03"
+                    return await message.reply_text(error)
         else:
-            message = f"Generating {chat} summary for each day in the past week: {' '.join(dates)}"
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
-        summaries = summarize_messages(chat, dates)
-        for summary in summaries:
-            await context.bot.send_message(
-                chat_id=update.effective_chat.id, text=summary
-            )
-    except Exception as e:
-        debug(f"summary => error: {e}")
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
+            response_message = f"Generating {chat} summary for {dates}"
+
+        await message.reply_text(response_message)
+        success, response = summarize_messages(chat, dates)
+        if not success:
+            return await message.reply_text(response)
+        for summary in response:
+            await message.reply_text(summary)
+    except Exception as error:
+        debug(f"main => summary => error: {error}")
+        return await message.reply_text(f"Error: {error}")
 
 
 async def abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         sender = update.effective_message.from_user.username
         message = update.effective_message
-        debug(f"/prompt executed => sender={sender} message={message}")
+        debug(f"main => abbot => /prompt executed => sender={sender} message={message}")
         await context.bot.send_message(
             chat_id=update.effective_chat.id, text="Working on your request"
         )
         args = context.args
-        debug(f"abbot => args: {args}")
+        debug(f"main => abbot => args: {args}")
         if len(args) <= 0:
             return await context.bot.send_message(
                 chat_id=update.effective_chat.id,
@@ -370,39 +351,42 @@ async def abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=update.effective_chat.id, text=f"{answer}"
         )
-        debug(f"abbot => Answer: {answer}")
-    except Exception as e:
-        debug(f"abbot => /prompt Error: {e}")
-        return await context.bot.send_message(
-            chat_id=update.effective_chat.id, text=f"Error: {e}"
-        )
+        debug(f"main => abbot => Answer: {answer}")
+    except Exception as error:
+        debug(f"main => abbot => /prompt Error: {error}")
+        await message.reply_text(f"Error: {error}")
 
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sender = update.effective_message.from_user.username
-    message_text = update.message.text
-    if "abbot" in message_text:
-        debug(f"/stop executed by {sender}")
-        if update.effective_message.from_user.username not in WHITELIST:
-            return await context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
-            )
-        debug(f"/stop executed")
-        await context.bot.stop_poll(
-            chat_id=update.effective_chat.id,
-            message_id=update.effective_message.id,
-            text="Bot stopped! Use /start to begin polling.",
+    message = update.effective_message
+    message_text = message.text
+    debug(f"main => stop => /stop executed by {sender}")
+    if sender not in WHITELIST:
+        return await message.reply_text(
+            CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
         )
+    if f"@{BOT_HANDLE}" not in message_text:
+        return await message.reply_text(
+            f"To stop, tag @{BOT_HANDLE} in the help command: e.g. /stop @{BOT_HANDLE}"
+        )
+
+    await context.bot.stop_poll(
+        chat_id=update.effective_chat.id,
+        message_id=update.effective_message.id,
+        text=f"@{BOT_HANDLE} stopped! Use /start @{BOT_HANDLE} to restart bot",
+    )
 
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    debug(f"/help executed by {update.effective_message.from_user.username}")
+    debug(
+        f"main => help => /help executed by {update.effective_message.from_user.username}"
+    )
     message_text = update.message.text
     if f"@{BOT_HANDLE}" not in message_text:
         return await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text=f"If you want to start @{BOT_HANDLE}, please tag the bot in the start command: e.g. `/help @{BOT_HANDLE}`",
+            text=f"For help, tag @{BOT_HANDLE} in the help command: e.g. /help @{BOT_HANDLE}",
         )
     await context.bot.send_message(
         chat_id=update.effective_chat.id,
@@ -412,30 +396,34 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        message = update.effective_message
-        message_text = update.message.text
-        sender = message.from_user.username
-        print("context.args", context.args)
-        bot_type = try_get(context, "args", 1, default="group")
-
-        possible_bot_types = ("group", "private")
-        if bot_type not in possible_bot_types:
-            err = f"Bad arg: expecting one of {possible_bot_types}"
-            return await message.reply_text(err)
+        args = context.args
 
         UNLEASH = ("1", "True", "On")
         LEASH = ("0", "False", "Off")
         UNLEASH_LEASH = (*UNLEASH, *LEASH)
 
-        debug(f"unleash_the_abbot => /unleash executed by {sender}")
+        message = update.effective_message
+        message_text = update.message.text
+        sender = message.from_user.username
+
+        bot_toggle = try_get(context, "args", 0, default="False").capitalize()
+        bot_type = try_get(context, "args", 1, default="group")
+        possible_bot_types = ("group", "private")
+
+        if bot_type not in possible_bot_types:
+            err = f"Bad arg: expecting one of {possible_bot_types}"
+            return await message.reply_text(err)
+
+        debug(f"unleash_the_abbot => /unleash {args} executed by {sender}")
         if sender not in WHITELIST:
             cheek = CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))]
             return await message.reply_text(cheek)
         elif f"@{BOT_HANDLE}" not in message_text:
-            return
+            return await message.reply_text(
+                f"To unleash @{BOT_HANDLE}, run unleash with proper args: e.g. /unleash 1 group @{BOT_HANDLE}",
+            )
 
-        toggle_arg = try_get(context, "args", 0, default="False").capitalize()
-        if toggle_arg not in UNLEASH_LEASH:
+        if bot_toggle not in UNLEASH_LEASH:
             err = f"Bad arg: expecting one of {UNLEASH_LEASH}"
             return await message.reply_text(err)
 
@@ -445,7 +433,7 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
             which_bot = private_abbot
             which_bot_name = private_abbot.name
 
-        if toggle_arg in UNLEASH:
+        if bot_toggle in UNLEASH:
             which_bot.unleash()
             await message.reply_text(f"{which_bot_name} unleashed ✅")
         else:
