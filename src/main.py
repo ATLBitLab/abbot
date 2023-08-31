@@ -1,10 +1,7 @@
-STARTED = None
-UNLEASHED = False
-MESSAGE_COUNT = 0
 PROGRAM = "main.py"
 BOT_HANDLE = "atl_bitlab_bot"
 BOT_NAME = "Abbot"
-OPENAI_MODEL = "gpt-3.5-turbo-16k"
+
 
 import os
 import json
@@ -34,20 +31,22 @@ from lib.gpt import GPT
 
 from env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY, OPENAI_API_KEY
 
-INTERNET_BRO = "You are a young tech bro in a telegram chat room responding in a way that is concise and uses internet slang."
-HELPFUL_ASSISTANT = "You are a helpful assistant"
-prompt_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "Abbot", HELPFUL_ASSISTANT)
-summary_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "SummaryAbbot", HELPFUL_ASSISTANT)
-group_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "GroupAbbot", INTERNET_BRO)
-private_abbot = GPT(OPENAI_API_KEY, OPENAI_MODEL, "PrivateAbbot", INTERNET_BRO)
-    
 BOT_DATA = io.open(os.path.abspath("data/bot_data.json"), "r")
 BOT_DATA_OBJ = json.load(BOT_DATA)
 CHATS_TO_IGNORE = try_get(BOT_DATA_OBJ, "chats", "ignore")
-CHATS_TO_INCLUDE = try_get(BOT_DATA_OBJ, "chats", "include")
-CHATS_TO_INCLUDE_NAMES = try_get(BOT_DATA_OBJ, "chats", "names")
+CHATS_TO_INCLUDE_SUMMARY = try_get(BOT_DATA_OBJ, "chats", "include", "summary")
+CHATS_TO_INCLUDE_UNLEASH = try_get(BOT_DATA_OBJ, "chats", "include", "unleash")
 WHITELIST = try_get(BOT_DATA_OBJ, "whitelist")
-CHEEKY_RESPONSES = try_get(BOT_DATA_OBJ, "responses")
+CHEEKY_RESPONSES = try_get(BOT_DATA_OBJ, "responses", "cheeky")
+PITHY_RESPONSES = try_get(BOT_DATA_OBJ, "responses", "pithy")
+
+TECH_BRO_BITCOINER = try_get(BOT_DATA_OBJ, "personalities", "TECH_BRO_BITCOINER")
+HELPFUL_ASSISTANT = try_get(BOT_DATA_OBJ, "personalities", "HELPFUL_ASSISTANT")
+prompt_abbot = GPT(BOT_NAME, BOT_HANDLE, "prompt", HELPFUL_ASSISTANT)
+summary_abbot = GPT(f"s{BOT_NAME}", BOT_HANDLE, "summary", HELPFUL_ASSISTANT)
+group_abbot = GPT(f"g{BOT_NAME}", BOT_HANDLE, "group", TECH_BRO_BITCOINER, True)
+private_abbot = GPT(f"p{BOT_NAME}", BOT_HANDLE, "private", TECH_BRO_BITCOINER, True)
+
 RAW_MESSAGE_JL_FILE = os.path.abspath("data/raw_messages.jsonl")
 MESSAGES_JL_FILE = os.path.abspath("data/messages.jsonl")
 SUMMARY_LOG_FILE = os.path.abspath("data/summaries.txt")
@@ -61,8 +60,8 @@ now_iso_clean = now_iso.split("+")[0].split("T")[0]
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.effective_message
     message_chat_id = update.effective_chat.id
-    if not UNLEASHED and not STARTED:
-        debug(f"handle_message => Bot not unleashed or started!")
+    if not summary_abbot.started:
+        debug(f"handle_message => Bot not started!")
         return
     if message_chat_id in CHATS_TO_IGNORE:
         debug(f"handle_message => Chat ignored {message_chat_id}")
@@ -78,6 +77,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_type = message.chat.type or None
     username = message.from_user.username
     first_name = message.chat.first_name or username
+    chat_id = update.effective_chat.id
     iso_date = message.date.isoformat()
     message_dumps = json.dumps(
         {
@@ -101,23 +101,25 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         rm_jl.write(message_dumps)
         rm_jl.write("\n")
         rm_jl.close()
-    
-    if UNLEASHED:
-        if private_message:
-            private_abbot.update_messages(message)
-            answer = private_abbot.chat_completion()
-            return await message.reply_text(answer)
-        elif not private_message:
-            group_abbot.update_messages(message)
-            print('not private_message')
-            print('message_text', message_text)
 
-            if f"@{BOT_HANDLE}" in message_text:
+    if private_message and private_abbot.unleashed:
+        private_abbot.update_messages(message)
+        answer = private_abbot.chat_completion()
+        if not answer:
+            answer = f"Sorry, I broke. Try again later. {private_abbot.name} leashed ⛔️"
+        return await message.reply_text(answer)
+
+    if chat_id in CHATS_TO_INCLUDE_UNLEASH:
+        if group_abbot.unleashed:
+            group_abbot.update_messages(message)
+            debug(f"not private_message => message_text={message_text}")
+            if f"@{group_abbot.handle}" in message_text or len(group_abbot.messages) % 5 == 0:
                 answer = group_abbot.chat_completion()
+                if not answer:
+                    answer = f"Sorry, I broke. Try again later. {group_abbot.name} leashed ⛔️"
                 return await message.reply_text(answer)
-            elif len(group_abbot.messages) % 5 == 0 and message_chat_id != -1001204119993:
-                answer = group_abbot.chat_completion()
-                return await message.reply_text(answer)
+        elif f"@{group_abbot.handle}" in message_text:
+            return await message.reply_text(PITHY_RESPONSES[0])
 
 
 def clean_jsonl_data():
@@ -243,10 +245,11 @@ async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 chat_id=update.effective_chat.id, text="Too many args"
             )
         chat_arg = args[0].replace(" ", "").lower()
-        if chat_arg not in CHATS_TO_INCLUDE_NAMES:
+        summary_chat_names = ("atlantabitdevs", "'Atlanta BitDevs Discussion'")
+        if chat_arg not in summary_chat_names:
             return await context.bot.send_message(
                 chat_id=update.effective_chat.id,
-                text=f"Chat name invalid! Expecting one of: {CHATS_TO_INCLUDE_NAMES}",
+                text=f"Chat name invalid! Expecting one of: {summary_chat_names}",
             )
         chat = chat_arg.replace(" ", "").lower()
         dates = get_dates()
@@ -407,57 +410,49 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    sender = update.effective_message.from_user.username
-    message_text = update.message.text
-    if f"@{BOT_HANDLE}" not in message_text:
-        return await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text=f"If you want to start Abbot @{BOT_HANDLE}, please tag Abbot in the start command: e.g. /start @{BOT_HANDLE}",
-        )
-    debug(f"/start executed by {sender}")
-    if sender not in WHITELIST:
-        return await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
-        )
-    global STARTED
-    STARTED = True
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id,
-        text="Abbot started. Run /help for usage guide",
-    )
-
-
 async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        global UNLEASHED
-        global MESSAGE_COUNT
+        message = update.effective_message
+        message_text = update.message.text
+        sender = message.from_user.username
+        print("context.args", context.args)
+        bot_type = try_get(context, "args", 1, default="group")
+
+        possible_bot_types = ("group", "private")
+        if bot_type not in possible_bot_types:
+            err = f"Bad arg: expecting one of {possible_bot_types}"
+            return await message.reply_text(err)
 
         UNLEASH = ("1", "True", "On")
         LEASH = ("0", "False", "Off")
         UNLEASH_LEASH = (*UNLEASH, *LEASH)
 
-        message = update.effective_message
-        message_text = update.message.text
-        sender = message.from_user.username
         debug(f"unleash_the_abbot => /unleash executed by {sender}")
         if sender not in WHITELIST:
-            return await message.reply_text(
-                text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
-            )
+            cheek = CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))]
+            return await message.reply_text(cheek)
         elif f"@{BOT_HANDLE}" not in message_text:
             return
+
         toggle_arg = try_get(context, "args", 0, default="False").capitalize()
         if toggle_arg not in UNLEASH_LEASH:
-            return await message.reply_text(
-                text=f"Bad arg: expecting one of {UNLEASH_LEASH}"
-            )
-        UNLEASHED = True if toggle_arg in UNLEASH else False
-        debug(f"unleash_the_abbot => Unleashed={UNLEASHED}")
-        if not UNLEASHED:
-            return await message.reply_text(text="Abbot not unleashed ⛔️")
-        await message.reply_text(text=f"{BOT_NAME} unleashed ✅")
+            err = f"Bad arg: expecting one of {UNLEASH_LEASH}"
+            return await message.reply_text(err)
+
+        which_bot = group_abbot
+        which_bot_name = group_abbot.name
+        if bot_type == "private":
+            which_bot = private_abbot
+            which_bot_name = private_abbot.name
+
+        if toggle_arg in UNLEASH:
+            which_bot.unleash()
+            await message.reply_text(f"{which_bot_name} unleashed ✅")
+        else:
+            which_bot.leash()
+            await message.reply_text(f"{which_bot_name} leashed ⛔️")
+
+        debug(f"unleash_the_abbot => Unleashed={which_bot.unleashed}")
     except Exception as e:
         error = e.with_traceback(None)
         debug(f"unleash_the_abbot => Error: {error}")
@@ -474,7 +469,6 @@ def bot_main(DEV_MODE):
     APPLICATION = ApplicationBuilder().token(TOKEN).build()
     debug(f"{BOT_NAME} @{BOT_HANDLE} Initialized")
 
-    start_handler = CommandHandler("start", start)
     help_handler = CommandHandler("help", help)
     stop_handler = CommandHandler("stop", stop)
     summary_handler = CommandHandler("summary", summary)
@@ -484,7 +478,6 @@ def bot_main(DEV_MODE):
     unleash = CommandHandler("unleash", unleash_the_abbot)
     message_handler = MessageHandler(BaseFilter(), handle_message)
 
-    APPLICATION.add_handler(start_handler)
     APPLICATION.add_handler(help_handler)
     APPLICATION.add_handler(stop_handler)
     APPLICATION.add_handler(summary_handler)
