@@ -16,6 +16,6 @@ def get_logger():
 
 
 def debug(msg):
-    msg_formatted = f"[{now}] {PROGRAM}: {msg}"
+    msg_formatted = f"[{now}] {PROGRAM}: {msg}\n"
     print(msg_formatted)
     logger.debug(msg_formatted)

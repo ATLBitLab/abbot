@@ -101,6 +101,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "new": True,
         }
     )
+    debug(f"main => handle_message => message_dump={message_dump}")
     if private_chat:
         debug(f"main => handle_message => Private chat={private_chat}")
         return
