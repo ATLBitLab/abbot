@@ -54,8 +54,7 @@ class GPT:
     def chat_completion(self):
         try:
             response = openai.ChatCompletion.create(
-                model=self.model,
-                messages=self.messages,
+                model=self.model, messages=self.messages, tempature=0.5
             )
             return try_get(response, "choices", 0, "message", "content")
         except Exception as e:

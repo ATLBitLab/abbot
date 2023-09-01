@@ -112,36 +112,33 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     rm_jl.close()
 
     handle_in_message = f"@{group_abbot.handle}" in message_text
-    if group_abbot.unleashed or private_abbot.unleashed:
-        if private_chat:
-            private_abbot.update_messages(message)
-            answer = private_abbot.chat_completion()
-            if not answer:
-                emoji = "✅" if group_abbot.leash() else "⛔️"
-                answer = f"Please try again later. {group_abbot.name} leashed {emoji}"
+    if private_chat and (private_abbot and try_get(private_abbot, "unleashed")):
+        private_abbot.update_messages(message)
+        answer = private_abbot.chat_completion()
+        if not answer:
+            emoji = "✅" if group_abbot.leash() else "⛔️"
+            answer = f"Please try again later. {group_abbot.name} leashed {emoji}"
             return await message.reply_text(answer)
 
-        elif chat_id in CHATS_TO_INCLUDE_UNLEASH:
-            group_abbot.update_messages(message)
-            debug(f"not private_chat => message_text={message_text}")
-            if handle_in_message:
-                answer = group_abbot.chat_completion()
-                if not answer:
-                    emoji = "✅" if group_abbot.leash() else "⛔️"
-                    answer = (
-                        f"Please try again later. {group_abbot.name} leashed {emoji}"
-                    )
-                return await message.reply_text(answer)
-            elif len(group_abbot.messages) % 5 == 0:
-                answer = group_abbot.chat_completion()
-                if not answer:
-                    emoji = "✅" if group_abbot.leash() else "⛔️"
-                    answer = (
-                        f"Please try again later. {group_abbot.name} leashed {emoji}"
-                    )
-                return await message.reply_text(answer)
-    elif not private_chat and handle_in_message:
-        return await message.reply_text(PITHY_RESPONSES[0])
+    elif (group_abbot and try_get(group_abbot, "unleashed")) and chat_id in CHATS_TO_INCLUDE_UNLEASH:
+        group_abbot.update_messages(message)
+        debug(f"not private_chat => message_text={message_text}")
+        if handle_in_message:
+            answer = group_abbot.chat_completion()
+            if not answer:
+                emoji = "✅" if group_abbot.leash() else "⛔️"
+                answer = (
+                    f"Please try again later. {group_abbot.name} leashed {emoji}"
+                )
+            return await message.reply_text(answer)
+        elif len(group_abbot.messages) % 5 == 0:
+            answer = group_abbot.chat_completion()
+            if not answer:
+                emoji = "✅" if group_abbot.leash() else "⛔️"
+                answer = (
+                    f"Please try again later. {group_abbot.name} leashed {emoji}"
+                )
+            return await message.reply_text(answer)
 
 
 def clean_jsonl_data():
