@@ -29,7 +29,7 @@ from lib.utils import qr_code
 from lib.api.strike import Strike
 from lib.gpt import GPT
 
-from env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY, OPENAI_API_KEY
+from env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY
 
 BOT_DATA = io.open(os.path.abspath("data/bot_data.json"), "r")
 BOT_DATA_OBJ = json.load(BOT_DATA)

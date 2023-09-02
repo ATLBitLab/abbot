@@ -1,5 +1,5 @@
 # ABBot
-A simple telegram bot using ChatGPT to automate some basic tasks
+Helpful Bot @ATLBitLab. Est. block 797812.
 
 ## Summary
 ABBot stands for **A**tl **B**itlab **Bot**. 
@@ -9,7 +9,7 @@ Basic tasks that ABBot can automate include:
 2. Content creation and marketing
 3. Payments
 4. Answering questions and basic AI chat interactions
-5. Nostr
+5. Nostr, X
 
 ## Requirements
 - Must have python3
