@@ -136,7 +136,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         debug(f"handle_message => No abbot! which_abbot={which_abbot}")
         return
 
-    if f"@{which_abbot.handle}" not in message_text and not use_group_abbot:
+    if use_group_abbot and f"@{which_abbot.handle}" not in message_text:
         debug(f"handle_message => Bot not tagged! message_text={message_text}")
         if len(which_abbot.messages) % 5 != 0:
             debug(f"handle_message => Not 5th message! {len(group_abbot.messages)}")
