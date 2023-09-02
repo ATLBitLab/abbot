@@ -1,7 +1,18 @@
+import os
+import logging
+
 from requests import request
 from datetime import datetime, timedelta
 import qrcode
 from io import BytesIO
+
+from constants import PROGRAM
+
+logger = logging.getLogger("atl_bitlab_bot")
+logger.setLevel(logging.DEBUG)
+fh = logging.FileHandler(os.path.abspath("data/debug.log"))
+fh.setLevel(logging.DEBUG)
+logger.addHandler(fh)
 
 
 def try_get(obj, *fields, **kwargs):
@@ -36,12 +47,14 @@ def http_request(headers, method, url, json=None):
     except Exception as e:
         return Exception(f"Request Failed: {e}")
 
+
 def qr_code(data):
     qr = qrcode.make(data)
     bio = BytesIO()
     qr.save(bio, "PNG")
     bio.seek(0)
     return bio
+
 
 def get_dates(lookback=7):
     return [
@@ -51,10 +64,12 @@ def get_dates(lookback=7):
         for i in range(lookback, 0, -1)
     ]
 
-"""
-TODO: abstract the payment method for FOSS users
-      allow users to plug in any number of LN / BTC payment methods
-      e.g home node (LND, CLN, etc)
-          cloud node (voltage, aws, etc)
-          LSPs (stike, opennode, etc.)
-"""
+
+def get_logger():
+    return logger
+
+
+def debug(msg):
+    msg_formatted = f"[{now_date()}] {PROGRAM}: {msg}\n"
+    print(msg_formatted)
+    logger.debug(msg_formatted)

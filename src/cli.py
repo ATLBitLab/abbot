@@ -1,21 +1,26 @@
 from sys import argv
-from main import clean_jsonl_data, summarize_messages, bot_main
+from lib.utils import debug
+from main import abbot, bot_clean_jsonl_data, bot_summarize_messages, bot_start
+import constants
 
+print('constants.DEV_MODE', constants.DEV_MODE)
 ARGS = argv[1:]
 CLEAN = "-c" in ARGS or "--clean" in ARGS
 SUMMARY = "-s" in ARGS or "--summary" in ARGS
-DEV_MODE = "-d" in ARGS or "--dev" in ARGS
+constants.DEV_MODE = True if "-d" in ARGS or "--dev" in ARGS else False
+print('constants.DEV_MODE', constants.DEV_MODE)
 CLEAN_SUMMARY = CLEAN and SUMMARY
 
 if CLEAN:
-    clean_jsonl_data()
+    bot_clean_jsonl_data()
 
 elif SUMMARY:
-    summarize_messages()
+    bot_summarize_messages()
 
 elif CLEAN_SUMMARY:
-    clean_jsonl_data()
-    summarize_messages()
+    bot_clean_jsonl_data()
+    bot_summarize_messages()
 
 else:
-    bot_main(DEV_MODE)
+    started = abbot.start()
+    debug(f"{abbot.name} @{abbot.handle} Started={started}")
