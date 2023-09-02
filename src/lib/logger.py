@@ -1,7 +1,7 @@
 import os
 import logging
 
-from lib.utils import now_date, try_get
+from lib.utils import now_date
 
 logger = logging.getLogger("atl_bitlab_bot")
 logger.setLevel(logging.DEBUG)
