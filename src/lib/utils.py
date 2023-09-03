@@ -1,3 +1,4 @@
+from constants import TELEGRAM_MESSAGE_FIELDS
 from requests import request
 from datetime import datetime, timedelta
 import qrcode
@@ -21,6 +22,12 @@ def try_get(obj, *fields, **kwargs):
     return obj
 
 
+def try_gets(obj, keys=TELEGRAM_MESSAGE_FIELDS, **kwargs):
+    additional_keys = kwargs.pop("keys", None)
+    keys = [*keys, *additional_keys] if additional_keys else keys
+    return {f"{key}": try_get(obj, key, kwargs) for key in keys}
+
+
 def now_date():
     return datetime.now().date()
 
@@ -36,12 +43,14 @@ def http_request(headers, method, url, json=None):
     except Exception as e:
         return Exception(f"Request Failed: {e}")
 
+
 def qr_code(data):
     qr = qrcode.make(data)
     bio = BytesIO()
     qr.save(bio, "PNG")
     bio.seek(0)
     return bio
+
 
 def get_dates(lookback=7):
     return [
@@ -50,6 +59,7 @@ def get_dates(lookback=7):
         ).isoformat()
         for i in range(lookback, 0, -1)
     ]
+
 
 """
 TODO: abstract the payment method for FOSS users

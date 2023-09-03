@@ -1,3 +1,4 @@
+from functools import wraps
 from sys import argv
 
 ARGS = argv[1:]
@@ -6,7 +7,7 @@ SUMMARY = "-s" in ARGS or "--summary" in ARGS
 DEV_MODE = "-d" in ARGS or "--dev" in ARGS
 CLEAN_SUMMARY = CLEAN and SUMMARY
 
-from constants import BOT_NAME, BOT_HANDLE
+from constants import BOT_NAME, BOT_HANDLE, TELEGRAM_MESSAGE_FIELDS
 
 BOT_NAME = f"t{BOT_NAME}" if DEV_MODE else BOT_NAME
 BOT_HANDLE = f"test_{BOT_HANDLE}" if DEV_MODE else BOT_HANDLE
@@ -21,9 +22,9 @@ from random import randrange
 from help_menu import help_menu_message
 from uuid import uuid4
 from datetime import datetime
-from lib.utils import get_dates, try_get
+from lib.utils import get_dates, try_get, try_gets
 
-from telegram import Update
+from telegram import Update, Message
 from telegram.ext.filters import BaseFilter
 from telegram.ext import (
     ApplicationBuilder,
@@ -43,7 +44,7 @@ BOT_DATA = io.open(os.path.abspath("data/bot_data.json"), "r")
 BOT_DATA_OBJ = json.load(BOT_DATA)
 CHATS_TO_IGNORE = try_get(BOT_DATA_OBJ, "chats", "ignore")
 CHATS_TO_INCLUDE_SUMMARY = try_get(BOT_DATA_OBJ, "chats", "include", "summary")
-CHATS_TO_INCLUDE_UNLEASH = try_get(BOT_DATA_OBJ, "chats", "include", "unleash")
+# CHATS_TO_INCLUDE_UNLEASH = try_get(BOT_DATA_OBJ, "chats", "include", "unleash")
 CHAT_NAME_MAPPING = try_get(BOT_DATA_OBJ, "chats", "mapping", "nameToShortName")
 WHITELIST = try_get(BOT_DATA_OBJ, "whitelist")
 CHEEKY_RESPONSES = try_get(BOT_DATA_OBJ, "responses", "cheeky")
@@ -75,13 +76,19 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     mpy.close()
 
     message = try_get(update, "effective_message") or update.effective_message
-    message_text = try_get(message, "text") or update.effective_chat
+    all_message_data = try_gets(message)
+    debug(f"handle_message => all_message_data={all_message_data}")
+    if not message:
+        debug(f"handle_message => Update.effective_message missing! {message}")
+        return
+    chat = try_get(update, "effective_chat") or try_get(message, "chat")
+    debug(f"handle_message => Raw chat {chat}")
+    message_text = try_get(message, "text") or try_get(chat, "")
+
     debug(f"handle_message => Raw message {message}")
     username = try_get(message, "from_user", "username")
     date = (try_get(message, "date") or now).isoformat().split("+")[0].split("T")[0]
 
-    chat = try_get(update, "effective_chat")
-    debug(f"handle_message => Raw chat {chat}")
     name = try_get(chat, "first_name", default=username)
     chat_id = try_get(chat, "id")
     chat_title = try_get(
@@ -121,7 +128,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     which_abbot = None
     use_group_abbot = (
         not private_chat
-        and chat_id in CHATS_TO_INCLUDE_UNLEASH
+        and chat_id not in CHATS_TO_INCLUDE_SUMMARY
         and group_abbot.unleashed
     )
     use_private_abbot = private_chat and private_abbot.unleashed
@@ -136,15 +143,21 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         debug(f"handle_message => No abbot! which_abbot={which_abbot}")
         return
 
-    if use_group_abbot and f"@{which_abbot.handle}" not in message_text:
-        debug(f"handle_message => Bot not tagged! message_text={message_text}")
-        if len(which_abbot.messages) % 5 != 0:
-            debug(f"handle_message => Not 5th message! {len(group_abbot.messages)}")
+    handle = f"@{which_abbot.handle}"
+    history_len = len(which_abbot.chat_history)
+    if use_group_abbot:
+        if handle not in message_text:
+            debug(
+                f"handle_message => Bot {handle} not tagged, message_text={message_text}"
+            )
+            return
+        elif history_len % 5 != 0:
+            debug(f"handle_message => len % 5 != 0, len={history_len}")
             return
 
     debug(f"handle_message => All checks passed! which_abbot={which_abbot}")
     error = f"Please try again later. {which_abbot.name} leashed ⛔️"
-    which_abbot.update_message_content(message)
+    which_abbot.update_chat_history(dict(role="user", content=message_text))
     answer = which_abbot.chat_completion()
     response = error if not answer else answer
     return await message.reply_text(response)
@@ -397,6 +410,41 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id=update.effective_chat.id,
         text=help_menu_message,
     )
+
+
+def trycatch(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        try:
+            # ---- Success ----
+            return fn(*args, **kwargs)
+        except Exception as error:
+            debug(f"abbot => /prompt Error: {error}")
+            raise error
+
+    return wrapper
+
+
+@trycatch
+async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        message = (
+            try_get(update, "message")
+            or try_get(update, "effective_message")
+            or update.message
+        )
+        sender = try_get(message, "from_user", "username")
+
+        debug(f"abbot_status => /status executed by {sender}")
+        if sender not in WHITELIST:
+            cheek = CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))]
+            return await message.reply_text(cheek)
+
+        await message.reply_text(help_menu_message)
+    except Exception as e:
+        error = e.with_traceback(None)
+        debug(f"abbot_status => Error: {error}")
+        await message.reply_text(text=f"Error: {error}")
 
 
 async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):

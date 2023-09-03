@@ -3,7 +3,7 @@ __pycache__
 .venv/
 .env
 dev/
-src/lib/env.py
-src/messages.py
+env.py
+*_abbot.jsonl
 debug.log
 messages.py
