@@ -4,6 +4,6 @@ __pycache__
 .env
 dev/
 env.py
-#*_abbot.jsonl
+*_abbot.jsonl
 debug.log
 messages.py
