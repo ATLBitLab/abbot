@@ -55,8 +55,6 @@ HELPFUL_ASSISTANT = try_get(BOT_DATA_OBJ, "personalities", "HELPFUL_ASSISTANT")
 
 prompt_abbot = GPT(BOT_NAME, BOT_HANDLE, "prompt", HELPFUL_ASSISTANT)
 summary_abbot = GPT(f"s{BOT_NAME}", BOT_HANDLE, "summary", HELPFUL_ASSISTANT)
-group_abbot = GPT(f"g{BOT_NAME}", BOT_HANDLE, "group", TECH_BRO_BITCOINER, True)
-private_abbot = GPT(f"p{BOT_NAME}", BOT_HANDLE, "private", TECH_BRO_BITCOINER, True)
 
 RAW_MESSAGE_JL_FILE = os.path.abspath("data/raw_messages.jsonl")
 MESSAGES_JL_FILE = os.path.abspath("data/messages.jsonl")
@@ -69,7 +67,7 @@ now_iso_clean = now_iso.split("+")[0].split("T")[0]
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    debug(f"handle_message => Raw update {update}")
+    debug(f"handle_message => Raw update={update}")
     mpy = io.open(MESSAGES_PY_FILE, "a")
     mpy.write(update.to_json())
     mpy.write("\n")
@@ -80,68 +78,77 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         or try_get(update, "effective_message")
         or update.message
     )
-    reply_to_message = try_get(message, "reply_to_message")
+    if not message:
+        debug(f"handle_message => Missing Message object={message}")
+        return
+    debug(f"handle_message => Raw message={message}")
+
+    reply_message = try_get(message, "reply_to_message")
+
     all_message_data = try_gets(message)
     debug(f"handle_message => all_message_data={all_message_data}")
-    if not message:
-        debug(f"handle_message => Update.effective_message missing! {message}")
-        return
-    chat = try_get(update, "effective_chat") or try_get(message, "chat")
-    debug(f"handle_message => Raw chat {chat}")
-    message_text = try_get(message, "text")
 
-    debug(f"handle_message => Raw message {message}")
+    chat = try_get(update, "effective_chat") or try_get(message, "chat")
+    debug(f"handle_message => Raw chat={chat}")
+
+    message_text = try_get(message, "text")
+    debug(f"handle_message => Message text={message_text}")
+    if not message_text:
+        debug(f"handle_message => Missing message text={message_text}")
+        return
+
     username = try_get(message, "from_user", "username")
     date = (try_get(message, "date") or now).isoformat().split("+")[0].split("T")[0]
-
     name = try_get(chat, "first_name", default=username)
     chat_id = try_get(chat, "id")
-    chat_title = try_get(chat, "title", default="atlantabitdevs")
-    if chat_title != "atlantabitdevs":
-        chat_title = try_get(CHAT_NAME_MAPPING, chat_title, default="atlantabitdevs")
     chat_type = try_get(chat, "type")
-    chat_id = try_get(chat, "id")
-    private_chat = chat_type == "private"
+    is_private_chat = chat_type == "private"
+    is_chat_to_ignore = chat_id in CHATS_TO_IGNORE
+    default = "privatechat" if is_private_chat else ""
+    chat_title = try_get(chat, "title", default)
 
-    if chat_id in CHATS_TO_IGNORE:
-        debug(f"handle_message => Chat ignored {chat_id}")
-        return
-    if not summary_abbot.started:
-        debug(f"handle_message => {summary_abbot.name} stopped")
-        return await message.reply_text(
-            f"{summary_abbot.name} stopped, please run /start @{BOT_HANDLE}"
+    summary_started = summary_abbot.started
+    if not summary_started:
+        debug(f"handle_message => {summary_abbot.name} not started={summary_started}")
+        started = summary_abbot.start()
+        debug(f"handle_message => {summary_abbot.name} started={started}")
+
+    if not is_private_chat and not is_chat_to_ignore:
+        debug(f"handle_message => is_private_chat={is_private_chat}")
+        debug(f"handle_message => is_chat_to_ignore={is_chat_to_ignore}")
+        chat_title = try_get(CHAT_NAME_MAPPING, chat_title, default="atlantabitdevs")
+        message_dump = json.dumps(
+            {
+                "id": chat_id,
+                "title": chat_title,
+                "from": username,
+                "name": name,
+                "date": date,
+                "new": True,
+            }
         )
-    message_dump = json.dumps(
-        {
-            "id": chat_id,
-            "title": chat_title,
-            "from": username,
-            "name": name,
-            "date": date,
-            "new": True,
-        }
-    )
-    debug(f"handle_message => message_dump={message_dump}")
-    if not private_chat or chat_id not in CHATS_TO_IGNORE:
-        debug(f"handle_message => Private chat={private_chat}")
+        debug(f"handle_message => message_dump={message_dump}")
         rm_jl = io.open(RAW_MESSAGE_JL_FILE, "a")
         rm_jl.write(message_dump)
         rm_jl.write("\n")
         rm_jl.close()
 
     which_abbot = None
-    is_group_chat = (
-        not private_chat
-        and chat_id not in CHATS_TO_INCLUDE_SUMMARY
-        and group_abbot.unleashed
-    )
-    use_private_abbot = private_chat and private_abbot.unleashed
+    is_group_chat = not is_private_chat and chat_id not in CHATS_TO_INCLUDE_SUMMARY
     if is_group_chat:
-        debug(f"handle_message => Use group_abbot={is_group_chat}")
-        which_abbot = group_abbot
-    elif use_private_abbot:
-        debug(f"handle_message => Use private_abbot={use_private_abbot}")
-        which_abbot = private_abbot
+        debug(f"handle_message => is_group_chat={is_group_chat}")
+        which_abbot = GPT(
+            f"g{BOT_NAME}", BOT_HANDLE, "group", chat_id, TECH_BRO_BITCOINER, True
+        )
+    elif is_private_chat:
+        debug(f"handle_message => is_private_chat={is_private_chat}")
+        which_abbot = GPT(
+            f"p{BOT_NAME}",
+            BOT_HANDLE,
+            f"{chat_id}_{now_iso_clean}_private",
+            TECH_BRO_BITCOINER,
+            True,
+        )
 
     if not which_abbot:
         debug(f"handle_message => No abbot! which_abbot={which_abbot}")
@@ -149,9 +156,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     handle = f"@{which_abbot.handle}"
     history_len = len(which_abbot.chat_history)
-    if is_group_chat and not reply_to_message:
-        msg = f"handle_message => is_group_chat={is_group_chat}, is_reply={reply_to_message}"
-        debug(msg)
+    if is_group_chat and not reply_message:
+        debug(f"handle_message => is_group={is_group_chat}, reply={reply_message}")
         if handle not in message_text and history_len % 5 != 0:
             debug(f"handle_message => {handle} not tagged, message_text={message_text}")
             debug(f"handle_message => len % 5 != 0, len={history_len}")
@@ -173,12 +179,13 @@ def clean_jsonl_data():
     ) as outfile:
         for line in infile:
             obj = json.loads(line)
-            if not obj.get("text"):
+            obj_text = try_get(obj, "text")
+            if not obj_text:
                 continue
             obj_hash = hash(json.dumps(obj, sort_keys=True))
             if obj_hash not in seen:
                 seen.add(obj_hash)
-                obj_date = obj.get("date")
+                obj_date = try_get(obj, "date")
                 plus_in_date = "+" in obj_date
                 t_in_date = "T" in obj_date
                 plus_and_t = plus_in_date and t_in_date
@@ -188,7 +195,6 @@ def clean_jsonl_data():
                     obj["date"] = obj_date.split("+")[0]
                 elif t_in_date:
                     obj["date"] = obj_date.split("T")[0]
-                obj_text = obj.get("text")
                 apos_in_text = "'" in obj_text
                 if apos_in_text:
                     obj["text"] = obj_text.replace("'", "")
@@ -429,23 +435,47 @@ def trycatch(fn):
 
 async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
+        debug(f"abbot_status => context={context}")
         message = (
             try_get(update, "message")
             or try_get(update, "effective_message")
             or update.message
         )
+        chat = try_get(update, "effective_chat") or try_get(message, "chat")
+        chat_type = try_get(chat, "type")
+        is_private_chat = chat_type == "private"
+        chat_id = try_get(chat, "id")
         sender = try_get(message, "from_user", "username")
-
         debug(f"abbot_status => /status executed by {sender}")
+
         if sender not in WHITELIST:
             cheek = CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))]
             return await message.reply_text(cheek)
-        for abbot in (prompt_abbot, summary_abbot, group_abbot, private_abbot):
-            await message.reply_text(abbot.status())
-    except Exception as e:
-        error = e.with_traceback(None)
-        debug(f"abbot_status => Error: {error}")
-        await message.reply_text(text=f"Error: {error}")
+
+        abbots = [prompt_abbot, summary_abbot, group_abbot]
+        if is_private_chat:
+            private_abbot = GPT(
+                f"p{BOT_NAME}",
+                BOT_HANDLE,
+                f"{chat_id}_{now_iso_clean}_private",
+                TECH_BRO_BITCOINER,
+                True,
+            )
+            abbots.append(private_abbot)
+        for abbot in abbots:
+            status = json.dumps(abbot.status(), indent=4)
+            debug(f"abbot_status => {abbot.name} status={status}")
+            await message.reply_text(status)
+    except Exception as error:
+        cause = error.__cause__
+        context = error.__context__
+        traceback = error.__traceback__
+        args = error.args
+        error_msg = (
+            f"args={args}\ncause={cause}\ncontext={context}\ntraceback={traceback}"
+        )
+        debug(f"abbot_status => Error={error}, ErrorMessage={error_msg}")
+        await message.reply_text(f"Error={error} ErrorMessage={error_msg}")
 
 
 async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -456,9 +486,17 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         LEASH = ("0", "False", "Off")
         UNLEASH_LEASH = (*UNLEASH, *LEASH)
 
-        message = update.effective_message
-        message_text = update.message.text
-        sender = message.from_user.username
+        message = (
+            try_get(update, "message")
+            or try_get(update, "effective_message")
+            or update.message
+        )
+        message_text = try_get(message, "text")
+        chat = try_get(update, "effective_chat") or try_get(message, "chat")
+        chat_type = try_get(chat, "type")
+        is_private_chat = chat_type == "private"
+        chat_id = try_get(chat, "id")
+        sender = try_get(message, "from_user", "username")
 
         bot_toggle = try_get(context, "args", 0, default="False").capitalize()
         bot_type = try_get(context, "args", 1, default="group")
@@ -484,8 +522,14 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         which_bot = group_abbot
         which_bot_name = group_abbot.name
         if bot_type == "private":
-            which_bot = private_abbot
-            which_bot_name = private_abbot.name
+            which_bot = GPT(
+                f"p{BOT_NAME}",
+                BOT_HANDLE,
+                f"{chat_id}_{now_iso_clean}_private",
+                TECH_BRO_BITCOINER,
+                True,
+            )
+            which_bot_name = which_bot.name
 
         if bot_toggle in UNLEASH:
             which_bot.unleash()
