@@ -130,14 +130,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         rm_jl.close()
 
     which_abbot = None
-    use_group_abbot = (
+    is_group_chat = (
         not private_chat
         and chat_id not in CHATS_TO_INCLUDE_SUMMARY
         and group_abbot.unleashed
     )
     use_private_abbot = private_chat and private_abbot.unleashed
-    if use_group_abbot:
-        debug(f"handle_message => Use group_abbot={use_group_abbot}")
+    if is_group_chat:
+        debug(f"handle_message => Use group_abbot={is_group_chat}")
         which_abbot = group_abbot
     elif use_private_abbot:
         debug(f"handle_message => Use private_abbot={use_private_abbot}")
@@ -149,8 +149,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     handle = f"@{which_abbot.handle}"
     history_len = len(which_abbot.chat_history)
-    if use_group_abbot and not reply_to_message:
-        debug(f"handle_message => use_group_abbot={use_group_abbot}, reply_to_message={reply_to_message}")
+    if is_group_chat and not reply_to_message:
+        msg = f"handle_message => is_group_chat={is_group_chat}, is_reply={reply_to_message}"
+        debug(msg)
         if handle not in message_text and history_len % 5 != 0:
             debug(f"handle_message => {handle} not tagged, message_text={message_text}")
             debug(f"handle_message => len % 5 != 0, len={history_len}")
