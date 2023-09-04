@@ -80,6 +80,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         or try_get(update, "effective_message")
         or update.message
     )
+    reply_to_message = try_get(message, "reply_to_message")
     all_message_data = try_gets(message)
     debug(f"handle_message => all_message_data={all_message_data}")
     if not message:
@@ -148,7 +149,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     handle = f"@{which_abbot.handle}"
     history_len = len(which_abbot.chat_history)
-    if use_group_abbot:
+    if use_group_abbot and not reply_to_message:
+        debug(f"handle_message => use_group_abbot={use_group_abbot}, reply_to_message={reply_to_message}")
         if handle not in message_text and history_len % 5 != 0:
             debug(f"handle_message => {handle} not tagged, message_text={message_text}")
             debug(f"handle_message => len % 5 != 0, len={history_len}")
