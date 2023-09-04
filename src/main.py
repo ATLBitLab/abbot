@@ -514,8 +514,8 @@ if __name__ == "__main__":
     prompt_handler = CommandHandler("prompt", abbot)
     clean_handler = CommandHandler("clean", clean)
     clean_summary_handler = CommandHandler("both", both)
-    unleash = CommandHandler("unleash", unleash_the_abbot)
-    unleash = CommandHandler("status", abbot_status)
+    unleash_handler = CommandHandler("unleash", unleash_the_abbot)
+    status_handler = CommandHandler("status", abbot_status)
     message_handler = MessageHandler(BaseFilter(), handle_message)
 
     APPLICATION.add_handler(help_handler)
@@ -524,7 +524,8 @@ if __name__ == "__main__":
     APPLICATION.add_handler(prompt_handler)
     APPLICATION.add_handler(clean_handler)
     APPLICATION.add_handler(clean_summary_handler)
-    APPLICATION.add_handler(unleash)
+    APPLICATION.add_handler(unleash_handler)
+    APPLICATION.add_handler(status_handler)
     APPLICATION.add_handler(message_handler)
 
     debug(f"{BOT_NAME} @{BOT_HANDLE} Polling")
