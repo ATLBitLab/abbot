@@ -75,7 +75,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     mpy.write("\n")
     mpy.close()
 
-    message = try_get(update, "effective_message") or update.effective_message
+    message = (
+        try_get(update, "message")
+        or try_get(update, "effective_message")
+        or update.message
+    )
     all_message_data = try_gets(message)
     debug(f"handle_message => all_message_data={all_message_data}")
     if not message:
@@ -83,7 +87,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     chat = try_get(update, "effective_chat") or try_get(message, "chat")
     debug(f"handle_message => Raw chat {chat}")
-    message_text = try_get(message, "text") or try_get(chat, "")
+    message_text = try_get(message, "text")
 
     debug(f"handle_message => Raw message {message}")
     username = try_get(message, "from_user", "username")
@@ -91,9 +95,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     name = try_get(chat, "first_name", default=username)
     chat_id = try_get(chat, "id")
-    chat_title = try_get(
-        CHAT_NAME_MAPPING, try_get(chat, "title"), default="atlantabitdevs"
-    )
+    chat_title = try_get(chat, "title", default="atlantabitdevs")
+    if chat_title != "atlantabitdevs":
+        chat_title = try_get(CHAT_NAME_MAPPING, chat_title, default="atlantabitdevs")
     chat_type = try_get(chat, "type")
     chat_id = try_get(chat, "id")
     private_chat = chat_type == "private"
@@ -108,8 +112,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     message_dump = json.dumps(
         {
-            **message.to_dict(),
-            **chat.to_dict(),
+            "id": chat_id,
             "title": chat_title,
             "from": username,
             "name": name,
