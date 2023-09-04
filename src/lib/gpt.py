@@ -11,8 +11,15 @@ import openai
 
 
 class GPT:
-    def __init__(self, name, handle, context, chat_id, personality, unleashed=False):
-        self.CHAT_HISTORY_ABS_PATH = abspath(f"data/gpt/{context}")
+    def __init__(
+        self,
+        name: str,
+        handle: str,
+        personality: str,
+        context: str,
+        chat_id=None,
+        unleashed: bool = False,
+    ):
         openai.api_key = OPENAI_API_KEY
         self.model = OPENAI_MODEL
         self.name = name
@@ -20,9 +27,16 @@ class GPT:
         self.context = context
         self.personality = personality
         self.gpt_system = dict(role="system", content=personality)
+        self.chat_id = chat_id
         self.unleashed = unleashed
         self.started = True
-        self.chat_history_file_path = f"{self.CHAT_HISTORY_ABS_PATH}/{chat_id}.jsonl"
+
+        chat_history_abs_filepath = abspath(f"data/gpt/{context}")
+        self.chat_history_file_path = (
+            f"{chat_history_abs_filepath}/{chat_id}.jsonl"
+            if chat_id
+            else f"{chat_history_abs_filepath}/{context}_abbot.jsonl"
+        )
         self.chat_history_file = self._open_history()
         self.chat_history_file_cursor = self.chat_history_file.tell()
         self.chat_history = self._inflate_history()
@@ -65,8 +79,16 @@ class GPT:
         self.chat_history_file.seek(self.chat_history_file_cursor)
         return chat_history
 
-    def status(self) -> dict(started=str, unleashed=str):
-        return dict(name=self.name, started=self.started, unleashed=self.unleashed)
+    def status(self) -> dict(name=str, started=str, unleashed=str, chat_id=str | None):
+        status = dict(
+            name=self.name,
+            started=self.started,
+            unleashed=self.unleashed,
+        )
+        if not self.chat_id:
+            return status
+        status.update(dict(chat_id=self.chat_id))
+        return status
 
     def start(self) -> bool:
         self.started = True
@@ -87,9 +109,9 @@ class GPT:
         return self.unleashed
 
     def update_chat_history(self, chat_message: dict(role=str, content=str)) -> None:
-        debug(f"{__name__} => update_chat_history => chat_message={chat_message}")
+        debug(f"update_chat_history => chat_message={chat_message}")
         self.chat_history.append(chat_message)
-        debug(f"{__name__} => update_chat_history => chat_history={self.chat_history}")
+        debug(f"update_chat_history => chat_history={self.chat_history}")
         self.chat_history_file.write(f"{json.dumps(chat_message)}\n")
 
     def chat_completion(self) -> str | None:

@@ -53,8 +53,8 @@ PITHY_RESPONSES = try_get(BOT_DATA_OBJ, "responses", "pithy")
 TECH_BRO_BITCOINER = try_get(BOT_DATA_OBJ, "personalities", "TECH_BRO_BITCOINER")
 HELPFUL_ASSISTANT = try_get(BOT_DATA_OBJ, "personalities", "HELPFUL_ASSISTANT")
 
-prompt_abbot = GPT(BOT_NAME, BOT_HANDLE, "prompt", HELPFUL_ASSISTANT)
-summary_abbot = GPT(f"s{BOT_NAME}", BOT_HANDLE, "summary", HELPFUL_ASSISTANT)
+prompt_abbot = GPT(BOT_NAME, BOT_HANDLE, HELPFUL_ASSISTANT, "prompt")
+summary_abbot = GPT(f"s{BOT_NAME}", BOT_HANDLE, HELPFUL_ASSISTANT, "summary")
 
 RAW_MESSAGE_JL_FILE = os.path.abspath("data/raw_messages.jsonl")
 MESSAGES_JL_FILE = os.path.abspath("data/messages.jsonl")
@@ -138,16 +138,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if is_group_chat:
         debug(f"handle_message => is_group_chat={is_group_chat}")
         which_abbot = GPT(
-            f"g{BOT_NAME}", BOT_HANDLE, "group", chat_id, TECH_BRO_BITCOINER, True
+            f"g{BOT_NAME}", BOT_HANDLE, TECH_BRO_BITCOINER, "group", chat_id, True
         )
     elif is_private_chat:
         debug(f"handle_message => is_private_chat={is_private_chat}")
         which_abbot = GPT(
-            f"p{BOT_NAME}",
-            BOT_HANDLE,
-            f"{chat_id}_{now_iso_clean}_private",
-            TECH_BRO_BITCOINER,
-            True,
+            f"p{BOT_NAME}", BOT_HANDLE, TECH_BRO_BITCOINER, "private", chat_id, True
         )
 
     if not which_abbot:
@@ -433,9 +429,8 @@ def trycatch(fn):
     return wrapper
 
 
-async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE, abbots):
     try:
-        debug(f"abbot_status => context={context}")
         message = (
             try_get(update, "message")
             or try_get(update, "effective_message")
@@ -444,6 +439,7 @@ async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat = try_get(update, "effective_chat") or try_get(message, "chat")
         chat_type = try_get(chat, "type")
         is_private_chat = chat_type == "private"
+        is_group_chat = chat_type == "group"
         chat_id = try_get(chat, "id")
         sender = try_get(message, "from_user", "username")
         debug(f"abbot_status => /status executed by {sender}")
@@ -452,16 +448,25 @@ async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
             cheek = CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))]
             return await message.reply_text(cheek)
 
-        abbots = [prompt_abbot, summary_abbot, group_abbot]
+        abbots = [prompt_abbot, summary_abbot]
         if is_private_chat:
             private_abbot = GPT(
                 f"p{BOT_NAME}",
                 BOT_HANDLE,
-                f"{chat_id}_{now_iso_clean}_private",
                 TECH_BRO_BITCOINER,
-                True,
+                "private",
+                chat_id
             )
             abbots.append(private_abbot)
+        elif is_group_chat:
+            group_abbot = GPT(
+                f"g{BOT_NAME}",
+                BOT_HANDLE,
+                TECH_BRO_BITCOINER,
+                "group",
+                chat_id
+            )
+            abbots.append(group_abbot)
         for abbot in abbots:
             status = json.dumps(abbot.status(), indent=4)
             debug(f"abbot_status => {abbot.name} status={status}")
@@ -480,69 +485,78 @@ async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        args = context.args
-
-        UNLEASH = ("1", "True", "On")
-        LEASH = ("0", "False", "Off")
-        UNLEASH_LEASH = (*UNLEASH, *LEASH)
-
+        args = try_get(context, "args")
         message = (
             try_get(update, "message")
             or try_get(update, "effective_message")
             or update.message
         )
-        message_text = try_get(message, "text")
-        chat = try_get(update, "effective_chat") or try_get(message, "chat")
-        chat_type = try_get(chat, "type")
-        is_private_chat = chat_type == "private"
-        chat_id = try_get(chat, "id")
         sender = try_get(message, "from_user", "username")
-
-        bot_toggle = try_get(context, "args", 0, default="False").capitalize()
-        bot_type = try_get(context, "args", 1, default="group")
-        possible_bot_types = ("group", "private")
-
-        if bot_type not in possible_bot_types:
-            err = f"Bad arg: expecting one of {possible_bot_types}"
-            return await message.reply_text(err)
-
         debug(f"unleash_the_abbot => /unleash {args} executed by {sender}")
         if sender not in WHITELIST:
             cheek = CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))]
             return await message.reply_text(cheek)
-        elif f"@{BOT_HANDLE}" not in message_text:
-            return await message.reply_text(
-                f"To unleash @{BOT_HANDLE}, run unleash with proper args: e.g. /unleash 1 group @{BOT_HANDLE}",
-            )
 
-        if bot_toggle not in UNLEASH_LEASH:
+        message_text = try_get(message, "text")
+        if f"@{BOT_HANDLE}" not in message_text:
+            msg = (
+                f"To unleash @{BOT_HANDLE}, run unleash with proper args from proper context"
+                f"(within PM or group): e.g. /unleash 1 @{BOT_HANDLE}",
+            )
+            return await message.reply_text(msg)
+
+        chat = try_get(update, "effective_chat") or try_get(message, "chat")
+        chat_id = try_get(chat, "id")
+        chat_type = try_get(chat, "type")
+        is_private_chat = chat_type == "private"
+
+        UNLEASH = ("1", "True", "On")
+        LEASH = ("0", "False", "Off")
+        UNLEASH_LEASH = (*UNLEASH, *LEASH)
+        bot_status = try_get(args, 0, default="False").capitalize()
+        debug(f"unleash_the_abbot => bot_status={bot_status}")
+        if bot_status not in UNLEASH_LEASH:
             err = f"Bad arg: expecting one of {UNLEASH_LEASH}"
             return await message.reply_text(err)
 
-        which_bot = group_abbot
-        which_bot_name = group_abbot.name
-        if bot_type == "private":
-            which_bot = GPT(
+        unleash = bot_status in UNLEASH
+        which_abbot = (
+            GPT(
                 f"p{BOT_NAME}",
                 BOT_HANDLE,
-                f"{chat_id}_{now_iso_clean}_private",
                 TECH_BRO_BITCOINER,
-                True,
+                "private",
+                chat_id,
+                unleash,
             )
-            which_bot_name = which_bot.name
-
-        if bot_toggle in UNLEASH:
-            which_bot.unleash()
-            await message.reply_text(f"{which_bot_name} unleashed ✅")
+            if is_private_chat
+            else GPT(
+                f"g{BOT_NAME}",
+                BOT_HANDLE,
+                TECH_BRO_BITCOINER,
+                "group",
+                chat_id,
+                unleash,
+            )
+        )
+        if unleash:
+            which_abbot.unleash()
         else:
-            which_bot.leash()
-            await message.reply_text(f"{which_bot_name} leashed ⛔️")
-
-        debug(f"unleash_the_abbot => Unleashed={which_bot.unleashed}")
-    except Exception as e:
-        error = e.with_traceback(None)
-        debug(f"unleash_the_abbot => Error: {error}")
-        await message.reply_text(text=f"Error: {error}")
+            which_abbot.leash()
+        response = "unleashed ✅" if unleash else "leashed ⛔️"
+        which_abbot_name = which_abbot.name
+        debug(f"unleash_the_abbot => {which_abbot_name} {response}")
+        return await message.reply_text(f"{which_abbot_name} {response}")
+    except Exception as error:
+        cause = error.__cause__
+        context = error.__context__
+        traceback = error.__traceback__
+        args = error.args
+        error_msg = (
+            f"args={args}\ncause={cause}\ncontext={context}\ntraceback={traceback}"
+        )
+        debug(f"unleash_the_abbot => Error={error}, ErrorMessage={error_msg}")
+        await message.reply_text(f"Error={error} ErrorMessage={error_msg}")
 
 
 if __name__ == "__main__":
