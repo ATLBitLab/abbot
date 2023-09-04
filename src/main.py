@@ -149,7 +149,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     handle = f"@{which_abbot.handle}"
     history_len = len(which_abbot.chat_history)
     if use_group_abbot:
-        if handle not in message_text or history_len % 5 != 0:
+        if handle not in message_text and history_len % 5 != 0:
             debug(f"handle_message => {handle} not tagged, message_text={message_text}")
             debug(f"handle_message => len % 5 != 0, len={history_len}")
             return
