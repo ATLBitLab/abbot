@@ -7,7 +7,7 @@ SUMMARY = "-s" in ARGS or "--summary" in ARGS
 DEV_MODE = "-d" in ARGS or "--dev" in ARGS
 CLEAN_SUMMARY = CLEAN and SUMMARY
 
-from constants import BOT_NAME, BOT_HANDLE, TELEGRAM_MESSAGE_FIELDS
+from constants import BOT_NAME, BOT_HANDLE
 
 BOT_NAME = f"t{BOT_NAME}" if DEV_MODE else BOT_NAME
 BOT_HANDLE = f"test_{BOT_HANDLE}" if DEV_MODE else BOT_HANDLE
@@ -44,7 +44,7 @@ BOT_DATA = io.open(os.path.abspath("data/bot_data.json"), "r")
 BOT_DATA_OBJ = json.load(BOT_DATA)
 CHATS_TO_IGNORE = try_get(BOT_DATA_OBJ, "chats", "ignore")
 CHATS_TO_INCLUDE_SUMMARY = try_get(BOT_DATA_OBJ, "chats", "include", "summary")
-# CHATS_TO_INCLUDE_UNLEASH = try_get(BOT_DATA_OBJ, "chats", "include", "unleash")
+# CHATS_TO_INCLUDE_UNLEASH = try_get(BOT_D`ATA_OBJ, "chats", "include", "unleash")
 CHAT_NAME_MAPPING = try_get(BOT_DATA_OBJ, "chats", "mapping", "nameToShortName")
 WHITELIST = try_get(BOT_DATA_OBJ, "whitelist")
 CHEEKY_RESPONSES = try_get(BOT_DATA_OBJ, "responses", "cheeky")
@@ -121,7 +121,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }
     )
     debug(f"handle_message => message_dump={message_dump}")
-    if not private_chat:
+    if not private_chat or chat_id not in CHATS_TO_IGNORE:
         debug(f"handle_message => Private chat={private_chat}")
         rm_jl = io.open(RAW_MESSAGE_JL_FILE, "a")
         rm_jl.write(message_dump)
@@ -428,7 +428,6 @@ def trycatch(fn):
     return wrapper
 
 
-@trycatch
 async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         message = (
@@ -516,6 +515,7 @@ if __name__ == "__main__":
     clean_handler = CommandHandler("clean", clean)
     clean_summary_handler = CommandHandler("both", both)
     unleash = CommandHandler("unleash", unleash_the_abbot)
+    unleash = CommandHandler("status", abbot_status)
     message_handler = MessageHandler(BaseFilter(), handle_message)
 
     APPLICATION.add_handler(help_handler)
