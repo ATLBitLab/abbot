@@ -441,8 +441,8 @@ async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if sender not in WHITELIST:
             cheek = CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))]
             return await message.reply_text(cheek)
-
-        await message.reply_text(help_menu_message)
+        for abbot in (prompt_abbot, summary_abbot, group_abbot, private_abbot):
+            await message.reply_text(abbot.status())
     except Exception as e:
         error = e.with_traceback(None)
         debug(f"abbot_status => Error: {error}")

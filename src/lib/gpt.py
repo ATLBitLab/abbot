@@ -84,7 +84,7 @@ class GPT:
         return chat_history
 
     def status(self) -> dict(started=str, unleashed=str):
-        return dict(started=self.started, unleashed=self.unleashed)
+        return dict(name=self.name, started=self.started, unleashed=self.unleashed)
 
     def start(self) -> bool:
         self.started = True
