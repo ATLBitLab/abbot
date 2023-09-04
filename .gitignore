@@ -5,7 +5,7 @@ __pycache__
 .env
 dev/
 env.py
-*_abbot.jsonl
+private_abbot.jsonl
 debug.log
 messages.py
 private_abbot.json
