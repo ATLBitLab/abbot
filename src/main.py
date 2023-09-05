@@ -191,6 +191,7 @@ def clean_data():
                 debug(
                     f"clean_data => Exception={exception}, ExceptionMessage={exception_msg}"
                 )
+                continue
             obj_text = try_get(obj, "text")
             if not obj_text:
                 continue
