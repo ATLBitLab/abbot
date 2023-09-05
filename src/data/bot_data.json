@@ -9,7 +9,9 @@
             },
             "nameToShortName": {
                 "Atlanta BitDevs Discussion": "atlantabitdevs",
-                "BitDevs Upgrade": "bitdevsupgrade"
+                "BitDevs Upgrade": "bitdevsupgrade",
+                "Burner: TAB Week Party": "burner:tabweekparty",
+                "ATL BitLab": "atlbitlab"
             }
         },
         "ignore": [

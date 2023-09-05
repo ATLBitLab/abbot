@@ -104,7 +104,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_type = try_get(chat, "type")
     is_private_chat = chat_type == "private"
     is_chat_to_ignore = chat_id in CHATS_TO_IGNORE
-    default = "privatechat" if is_private_chat else ""
+    default = "private" if is_private_chat else ""
     chat_title = try_get(chat, "title", default)
 
     summary_started = summary_abbot.started
@@ -120,8 +120,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message_dump = json.dumps(
             {
                 "id": chat_id,
+                "type": chat_type,
                 "title": chat_title,
                 "from": username,
+                "text": message_text,
                 "name": name,
                 "date": date,
                 "new": True,
@@ -170,10 +172,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def clean_jsonl_data():
     debug(f"clean_jsonl_data => Deduping messages")
     seen = set()
-    with io.open(RAW_MESSAGE_JL_FILE, "r") as infile, io.open(
-        MESSAGES_JL_FILE, "w"
-    ) as outfile:
+    raw_open = io.open(RAW_MESSAGE_JL_FILE, "r")
+    messages_open = io.open(MESSAGES_JL_FILE, "w")
+    with raw_open as infile, messages_open as outfile:
         for line in infile:
+            debug(f"clean_jsonl_data => line={line}")
             obj = json.loads(line)
             obj_text = try_get(obj, "text")
             if not obj_text:
@@ -451,20 +454,12 @@ async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         abbots = [prompt_abbot, summary_abbot]
         if is_private_chat:
             private_abbot = GPT(
-                f"p{BOT_NAME}",
-                BOT_HANDLE,
-                TECH_BRO_BITCOINER,
-                "private",
-                chat_id
+                f"p{BOT_NAME}", BOT_HANDLE, TECH_BRO_BITCOINER, "private", chat_id
             )
             abbots.append(private_abbot)
         elif is_group_chat:
             group_abbot = GPT(
-                f"g{BOT_NAME}",
-                BOT_HANDLE,
-                TECH_BRO_BITCOINER,
-                "group",
-                chat_id
+                f"g{BOT_NAME}", BOT_HANDLE, TECH_BRO_BITCOINER, "group", chat_id
             )
             abbots.append(group_abbot)
         for abbot in abbots:
