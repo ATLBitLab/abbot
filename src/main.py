@@ -23,7 +23,14 @@ from random import randrange
 from help_menu import help_menu_message
 from uuid import uuid4
 from datetime import datetime
-from lib.utils import get_dates, try_get, try_get_telegram_message_data, try_gets, error
+from lib.utils import (
+    get_dates,
+    try_get,
+    try_get_telegram_message_data,
+    try_gets,
+    error,
+    try_set,
+)
 
 from telegram import Update, Message
 from telegram.ext.filters import BaseFilter
@@ -177,9 +184,10 @@ def clean_data():
     messages_open = open(MESSAGES_JL_FILE, "w")
     with raw_open as infile, messages_open as outfile:
         for line in infile:
+            obj_hash = hash(json.dumps(obj, sort_keys=True))
             debug(f"clean_data => line={line}")
             try:
-                obj = json.loads(line)
+                obj = json.loads(obj)
             except Exception as exception:
                 cause, context, traceback, args = deconstruct_error(exception)
                 exception_msg = (
@@ -192,25 +200,43 @@ def clean_data():
                     f"clean_data => Exception={exception}, ExceptionMessage={exception_msg}"
                 )
                 continue
-            obj_text = try_get(obj, "text")
-            if not obj_text:
-                continue
-            obj_hash = hash(json.dumps(obj, sort_keys=True))
             if obj_hash not in seen:
                 seen.add(obj_hash)
+                # get and clean text
+                obj_text = try_get(obj, "text")
+                apos_in_text = "'" in obj_text
+                obj_title = try_get(obj, "title")
+                title_has_spaces = " " in obj_title
                 obj_date = try_get(obj, "date")
                 plus_in_date = "+" in obj_date
                 t_in_date = "T" in obj_date
                 plus_and_t = plus_in_date and t_in_date
-                if plus_and_t:
-                    obj["date"] = obj_date.split("+")[0].split("T")[0]
+                if not obj_text:
+                    continue
+                elif apos_in_text:
+                    obj = try_set(obj, obj_text.replace("'", ""), "text")
+                if not obj_title:
+                    continue
+                elif title_has_spaces:
+                    clean_title = try_get(
+                        CHAT_NAME_MAPPING,
+                        obj_title,
+                        default=obj_title.lower().replace(" ", ""),
+                    )
+                    obj = try_set(obj, clean_title, "title")
+                if not obj_date:
+                    continue
+                elif plus_and_t:
+                    obj = try_set(
+                        obj,
+                        obj_date.replace("+", " ").replace("T", " ").split(" ")[0],
+                        "date",
+                    )
                 elif plus_in_date:
-                    obj["date"] = obj_date.split("+")[0]
+                    obj = try_set(obj, obj_date.replace("+", " ").split(" ")[0], "date")
                 elif t_in_date:
-                    obj["date"] = obj_date.split("T")[0]
-                apos_in_text = "'" in obj_text
-                if apos_in_text:
-                    obj["text"] = obj_text.replace("'", "")
+                    obj = try_set(obj, obj_date.replace("T", " ").split(" ")[0], "date")
+
                 outfile.write(json.dumps(obj))
                 outfile.write("\n")
     infile.close()

@@ -45,12 +45,27 @@ def error(message="", **kwargs):
     return data
 
 
+def try_set(obj, value, *keys, **kwargs):
+    default = kwargs.pop("default", None)
+    if kwargs:
+        unexpected_kw = kwargs[kwargs.keys()[0]]
+        raise TypeError("try_set received unexpected keyword argument", unexpected_kw)
+    for key in keys:
+        try:
+            obj[key] = value
+        except (AttributeError, KeyError, TypeError, IndexError):
+            try:
+                obj = getattr(obj, key)
+            except Exception:
+                return default
+    return obj
+
+
 def try_get(obj, *fields, **kwargs):
     default = kwargs.pop("default", None)
     if kwargs:
-        raise TypeError(
-            "try_get() received unexpected keyword argument", kwargs[kwargs.keys()[0]]
-        )
+        unexpected_kw = kwargs[kwargs.keys()[0]]
+        raise TypeError("try_get received unexpected keyword argument", unexpected_kw)
     for field in fields:
         try:
             obj = obj[field]
