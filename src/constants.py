@@ -13,3 +13,4 @@ TELEGRAM_MESSAGE_FIELDS = [
     "video_note",
     "caption",
 ]
+UNLEASH_ABBOT = True

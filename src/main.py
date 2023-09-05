@@ -7,22 +7,23 @@ SUMMARY = "-s" in ARGS or "--summary" in ARGS
 DEV_MODE = "-d" in ARGS or "--dev" in ARGS
 CLEAN_SUMMARY = CLEAN and SUMMARY
 
-from constants import BOT_NAME, BOT_HANDLE
+import constants
+from constants import BOT_NAME, BOT_HANDLE, UNLEASH_ABBOT
 
 BOT_NAME = f"t{BOT_NAME}" if DEV_MODE else BOT_NAME
 BOT_HANDLE = f"test_{BOT_HANDLE}" if DEV_MODE else BOT_HANDLE
 
-import os
 import json
 import time
 import re
-import io
+from os.path import abspath
+from io import open
 
 from random import randrange
 from help_menu import help_menu_message
 from uuid import uuid4
 from datetime import datetime
-from lib.utils import get_dates, try_get, try_gets
+from lib.utils import get_dates, try_get, try_get_telegram_message_data, try_gets, error
 
 from telegram import Update, Message
 from telegram.ext.filters import BaseFilter
@@ -40,7 +41,7 @@ from lib.gpt import GPT
 
 from env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY
 
-BOT_DATA = io.open(os.path.abspath("data/bot_data.json"), "r")
+BOT_DATA = open(abspath("data/bot_data.json"), "r")
 BOT_DATA_OBJ = json.load(BOT_DATA)
 CHATS_TO_IGNORE = try_get(BOT_DATA_OBJ, "chats", "ignore")
 CHATS_TO_INCLUDE_SUMMARY = try_get(BOT_DATA_OBJ, "chats", "include", "summary")
@@ -56,11 +57,11 @@ HELPFUL_ASSISTANT = try_get(BOT_DATA_OBJ, "personalities", "HELPFUL_ASSISTANT")
 prompt_abbot = GPT(BOT_NAME, BOT_HANDLE, HELPFUL_ASSISTANT, "prompt")
 summary_abbot = GPT(f"s{BOT_NAME}", BOT_HANDLE, HELPFUL_ASSISTANT, "summary")
 
-RAW_MESSAGE_JL_FILE = os.path.abspath("data/raw_messages.jsonl")
-MESSAGES_JL_FILE = os.path.abspath("data/messages.jsonl")
-SUMMARY_LOG_FILE = os.path.abspath("data/summaries.txt")
-MESSAGES_PY_FILE = os.path.abspath("data/backup/messages.py")
-PROMPTS_BY_DAY_FILE = os.path.abspath("data/backup/prompts_by_day.py")
+RAW_MESSAGE_JL_FILE = abspath("data/raw_messages.jsonl")
+MESSAGES_JL_FILE = abspath("data/messages.jsonl")
+SUMMARY_LOG_FILE = abspath("data/summaries.txt")
+MESSAGES_PY_FILE = abspath("data/backup/messages.py")
+PROMPTS_BY_DAY_FILE = abspath("data/backup/prompts_by_day.py")
 now = datetime.now()
 now_iso = now.isoformat()
 now_iso_clean = now_iso.split("+")[0].split("T")[0]
@@ -68,7 +69,7 @@ now_iso_clean = now_iso.split("+")[0].split("T")[0]
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     debug(f"handle_message => Raw update={update}")
-    mpy = io.open(MESSAGES_PY_FILE, "a")
+    mpy = open(MESSAGES_PY_FILE, "a")
     mpy.write(update.to_json())
     mpy.write("\n")
     mpy.close()
@@ -85,7 +86,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     reply_message = try_get(message, "reply_to_message")
 
-    all_message_data = try_gets(message)
+    all_message_data = try_get_telegram_message_data(message)
     debug(f"handle_message => all_message_data={all_message_data}")
 
     chat = try_get(update, "effective_chat") or try_get(message, "chat")
@@ -130,7 +131,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             }
         )
         debug(f"handle_message => message_dump={message_dump}")
-        rm_jl = io.open(RAW_MESSAGE_JL_FILE, "a")
+        rm_jl = open(RAW_MESSAGE_JL_FILE, "a")
         rm_jl.write(message_dump)
         rm_jl.write("\n")
         rm_jl.close()
@@ -169,15 +170,27 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return await message.reply_text(response)
 
 
-def clean_jsonl_data():
-    debug(f"clean_jsonl_data => Deduping messages")
+def clean_data():
+    debug(f"clean_data => Deduping messages")
     seen = set()
-    raw_open = io.open(RAW_MESSAGE_JL_FILE, "r")
-    messages_open = io.open(MESSAGES_JL_FILE, "w")
+    raw_open = open(RAW_MESSAGE_JL_FILE, "r")
+    messages_open = open(MESSAGES_JL_FILE, "w")
     with raw_open as infile, messages_open as outfile:
         for line in infile:
-            debug(f"clean_jsonl_data => line={line}")
-            obj = json.loads(line)
+            debug(f"clean_data => line={line}")
+            try:
+                obj = json.loads(line)
+            except Exception as exception:
+                cause, context, traceback, args = deconstruct_error(exception)
+                exception_msg = (
+                    f"args={args}"
+                    f"\ncause={cause}"
+                    f"\ncontext={context}"
+                    f"\ntraceback={traceback}"
+                )
+                debug(
+                    f"clean_data => Exception={exception}, ExceptionMessage={exception_msg}"
+                )
             obj_text = try_get(obj, "text")
             if not obj_text:
                 continue
@@ -201,24 +214,42 @@ def clean_jsonl_data():
                 outfile.write("\n")
     infile.close()
     outfile.close()
-    debug(f"clean_jsonl_data => Deduping done")
+    debug(f"clean_data => Deduping done")
     return "Cleaning done!"
 
 
+def rand_num():
+    return randrange(len(CHEEKY_RESPONSES))
+
+
 async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    sender = update.effective_message.from_user.username
-    debug(f"clean => /clean executed by {sender}")
-    if update.effective_message.from_user.username not in WHITELIST:
-        return await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text=CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
+    try:
+        message = (
+            try_get(update, "message")
+            or try_get(update, "effective_message")
+            or update.message
         )
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id, text="Cleaning ... please wait"
-    )
-    await context.bot.send_message(
-        chat_id=update.effective_chat.id, text=clean_jsonl_data()
-    )
+        sender = try_get(message, "from_user", "username")
+        debug(f"clean => /clean executed by {sender}")
+        if not message or not sender:
+            debug(f"clean => message={message} sender={sender} undefined")
+            return await message.reply_text()
+        elif sender not in WHITELIST:
+            debug(f"clean => sender={sender} not whitelisted")
+            return await message.reply_text(CHEEKY_RESPONSES[rand_num()])
+
+        await message.reply_text("Cleaning ... please wait")
+        await message.reply_text(clean_data())
+    except Exception as error:
+        cause, context, traceback, args = deconstruct_error(error)
+        error_msg = (
+            f"args={args}"
+            f"\ncause={cause}"
+            f"\ncontext={context}"
+            f"\ntraceback={traceback}"
+        )
+        debug(f"abbot_status => Error={error}, ErrorMessage={error_msg}")
+        await message.reply_text(f"Error={error} ErrorMessage={error_msg}")
 
 
 async def both(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -238,7 +269,7 @@ def summarize_messages(chat, days=None):
         prompts_by_day = {k: "" for k in days}
         for day in days:
             prompt_content = ""
-            messages_file = io.open(MESSAGES_JL_FILE, "r")
+            messages_file = open(MESSAGES_JL_FILE, "r")
             for line in messages_file.readlines():
                 message = json.loads(line)
                 message_date = try_get(message, "date")
@@ -251,12 +282,12 @@ def summarize_messages(chat, days=None):
                 continue
             prompts_by_day[day] = prompt_content
         messages_file.close()
-        prompts_by_day_file = io.open(PROMPTS_BY_DAY_FILE, "w")
+        prompts_by_day_file = open(PROMPTS_BY_DAY_FILE, "w")
         prompts_by_day_dump = json.dumps(prompts_by_day)
         prompts_by_day_file.write(prompts_by_day_dump)
         prompts_by_day_file.close()
         debug(f"summarize_messages => Prompts by day = {prompts_by_day_dump}")
-        summary_file = io.open(SUMMARY_LOG_FILE, "a")
+        summary_file = open(SUMMARY_LOG_FILE, "a")
         prompt = "Summarize the text after the asterisk. Split into paragraphs where appropriate. Do not mention the asterisk. * \n"
         for day, content in prompts_by_day.items():
             summary_abbot.update_message_content(f"{prompt}{content}")
@@ -406,14 +437,19 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    message = (
+        try_get(update, "message")
+        or try_get(update, "effective_message")
+        or update.message
+    )
+    message_text = try_get(message, "text")
     debug(f"help => /help executed by {update.effective_message.from_user.username}")
-    message_text = update.message.text
     if f"@{BOT_HANDLE}" not in message_text:
-        return await context.bot.send_message(
+        return await message.reply_text(
             chat_id=update.effective_chat.id,
             text=f"For help, tag @{BOT_HANDLE} in the help command: e.g. /help @{BOT_HANDLE}",
         )
-    await context.bot.send_message(
+    await message.reply_text(
         chat_id=update.effective_chat.id,
         text=help_menu_message,
     )
@@ -430,6 +466,10 @@ def trycatch(fn):
             raise error
 
     return wrapper
+
+
+def deconstruct_error(error):
+    return try_gets(error, keys=["__cause__", "__context__", "__traceback__", "args"])
 
 
 async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -467,10 +507,7 @@ async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
             debug(f"abbot_status => {abbot.name} status={status}")
             await message.reply_text(status)
     except Exception as error:
-        cause = error.__cause__
-        context = error.__context__
-        traceback = error.__traceback__
-        args = error.args
+        cause, context, traceback, args = deconstruct_error(error)
         error_msg = (
             f"args={args}\ncause={cause}\ncontext={context}\ntraceback={traceback}"
         )
@@ -514,7 +551,7 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
             err = f"Bad arg: expecting one of {UNLEASH_LEASH}"
             return await message.reply_text(err)
 
-        unleash = bot_status in UNLEASH
+        constants.UNLEASH_ABBOT = bot_status in UNLEASH
         which_abbot = (
             GPT(
                 f"p{BOT_NAME}",
@@ -522,7 +559,7 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 TECH_BRO_BITCOINER,
                 "private",
                 chat_id,
-                unleash,
+                constants.UNLEASH_ABBOT,
             )
             if is_private_chat
             else GPT(
@@ -531,14 +568,14 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 TECH_BRO_BITCOINER,
                 "group",
                 chat_id,
-                unleash,
+                constants.UNLEASH_ABBOT,
             )
         )
-        if unleash:
+        if constants.UNLEASH_ABBOT:
             which_abbot.unleash()
         else:
             which_abbot.leash()
-        response = "unleashed ✅" if unleash else "leashed ⛔️"
+        response = "unleashed ✅" if constants.UNLEASH_ABBOT else "leashed ⛔️"
         which_abbot_name = which_abbot.name
         debug(f"unleash_the_abbot => {which_abbot_name} {response}")
         return await message.reply_text(f"{which_abbot_name} {response}")
@@ -576,7 +613,8 @@ if __name__ == "__main__":
     APPLICATION.add_handler(prompt_handler)
     APPLICATION.add_handler(clean_handler)
     APPLICATION.add_handler(clean_summary_handler)
-    APPLICATION.add_handler(unleash_handler)
+    if UNLEASH_ABBOT:
+        APPLICATION.add_handler(unleash_handler)
     APPLICATION.add_handler(status_handler)
     APPLICATION.add_handler(message_handler)
 

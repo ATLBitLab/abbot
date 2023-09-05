@@ -1,8 +1,48 @@
+from os.path import abspath
+import logging
+
+logger = logging.getLogger("atl_bitlab_bot")
+logger.setLevel(logging.DEBUG)
+fh = logging.FileHandler(abspath("data/debug.log"))
+fh.setLevel(logging.DEBUG)
+logger.addHandler(fh)
+
 from constants import TELEGRAM_MESSAGE_FIELDS
 from requests import request
 from datetime import datetime, timedelta
 import qrcode
 from io import BytesIO
+
+
+def now_date():
+    return datetime.now().date()
+
+
+def get_dates(lookback=7):
+    return [
+        (
+            (datetime.now() - timedelta(days=1)).date() - timedelta(days=i - 1)
+        ).isoformat()
+        for i in range(lookback, 0, -1)
+    ]
+
+
+def get_logger():
+    return logger
+
+
+def debug(msg):
+    msg_formatted = f"[{now_date()}] {__name__}: {msg}\n"
+    print(msg_formatted)
+    logger.debug(msg_formatted)
+
+
+def error(message="", **kwargs):
+    data = {"status": "error", "message": message}
+    for key in kwargs.keys():
+        data[key] = kwargs[key]
+    debug(f"Error: {data}")
+    return data
 
 
 def try_get(obj, *fields, **kwargs):
@@ -22,14 +62,18 @@ def try_get(obj, *fields, **kwargs):
     return obj
 
 
-def try_gets(obj, keys=TELEGRAM_MESSAGE_FIELDS, **kwargs):
+def try_get_telegram_message_data(telegram_message):
+    return {f"{key}": try_get(telegram_message, key) for key in TELEGRAM_MESSAGE_FIELDS}
+
+
+def try_gets(obj, keys=[], return_type="list", **kwargs):
     additional_keys = kwargs.pop("keys", None)
     keys = [*keys, *additional_keys] if additional_keys else keys
-    return {f"{key}": try_get(obj, key, kwargs) for key in keys}
-
-
-def now_date():
-    return datetime.now().date()
+    return (
+        [try_get(obj, key, kwargs) for key in keys]
+        if return_type == "list"
+        else {f"{key}": try_get(obj, key, kwargs) for key in keys}
+    )
 
 
 def http_request(headers, method, url, json=None):
@@ -50,21 +94,3 @@ def qr_code(data):
     qr.save(bio, "PNG")
     bio.seek(0)
     return bio
-
-
-def get_dates(lookback=7):
-    return [
-        (
-            (datetime.now() - timedelta(days=1)).date() - timedelta(days=i - 1)
-        ).isoformat()
-        for i in range(lookback, 0, -1)
-    ]
-
-
-"""
-TODO: abstract the payment method for FOSS users
-      allow users to plug in any number of LN / BTC payment methods
-      e.g home node (LND, CLN, etc)
-          cloud node (voltage, aws, etc)
-          LSPs (stike, opennode, etc.)
-"""
