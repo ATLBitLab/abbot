@@ -429,7 +429,7 @@ def trycatch(fn):
     return wrapper
 
 
-async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE, abbots):
+async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         message = (
             try_get(update, "message")
