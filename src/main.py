@@ -91,7 +91,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     debug(f"handle_message => Raw message={message}")
 
-    reply_message = try_get(message, "reply_to_message")
+    reply_to_message = try_get(message, "reply_to_message")
+    debug(f"handle_message => reply_to_message={reply_to_message}")
+    reply_to_message_from = try_get(reply_to_message, "from")
+    reply_to_message_from_bot = try_get(reply_to_message_from, "is_bot")
+    reply_to_message_bot_username = try_get(reply_to_message_from, "username")
 
     all_message_data = try_get_telegram_message_data(message)
     debug(f"handle_message => all_message_data={all_message_data}")
@@ -160,13 +164,28 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         debug(f"handle_message => No abbot! which_abbot={which_abbot}")
         return
 
-    handle = f"@{which_abbot.handle}"
-    history_len = len(which_abbot.chat_history)
-    if is_group_chat and not reply_message:
-        debug(f"handle_message => is_group={is_group_chat}, reply={reply_message}")
-        if handle not in message_text and history_len % 5 != 0:
-            debug(f"handle_message => {handle} not tagged, message_text={message_text}")
-            debug(f"handle_message => len % 5 != 0, len={history_len}")
+    which_name = which_abbot.name
+    which_handle = which_abbot.handle
+    which_history_len = len(which_abbot.chat_history)
+    if which_name in ("gAbbot", "gtAbbot"):
+        if not reply_to_message:
+            msg = f"handle_message => which_name={which_name}, reply_to_message={reply_to_message}"
+            debug(msg)
+            if f"@{which_handle}" not in message_text and which_history_len % 5 != 0:
+                msg = f"handle_message => {which_handle} not tagged, message_text={message_text}"
+                debug(msg)
+                debug(f"handle_message => len % 5 != 0, len={which_history_len}")
+                return
+        elif not reply_to_message_from_bot:
+            msg = f"handle_message => reply_to_message_from_bot={reply_to_message_from_bot}"
+            debug(msg)
+            debug(f"handle_message => reply_to_message={reply_to_message}")
+            return
+        elif reply_to_message_bot_username != which_handle:
+            msg = f"handle_message => bot_username != which_handle={reply_to_message_bot_username != which_handle}"
+            debug(msg)
+            debug(f"handle_message => bot_username={reply_to_message_bot_username}")
+            debug(f"handle_message => which_handle={which_handle}")
             return
 
     debug(f"handle_message => All checks passed! which_abbot={which_abbot}")
