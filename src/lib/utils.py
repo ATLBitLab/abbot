@@ -1,12 +1,4 @@
 from os.path import abspath
-import logging
-
-logger = logging.getLogger("atl_bitlab_bot")
-logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler(abspath("data/debug.log"))
-fh.setLevel(logging.DEBUG)
-logger.addHandler(fh)
-
 from constants import TELEGRAM_MESSAGE_FIELDS
 from requests import request
 from datetime import datetime, timedelta
@@ -25,24 +17,6 @@ def get_dates(lookback=7):
         ).isoformat()
         for i in range(lookback, 0, -1)
     ]
-
-
-def get_logger():
-    return logger
-
-
-def debug(msg):
-    msg_formatted = f"[{now_date()}] {__name__}: {msg}\n"
-    print(msg_formatted)
-    logger.debug(msg_formatted)
-
-
-def error(message="", **kwargs):
-    data = {"status": "error", "message": message}
-    for key in kwargs.keys():
-        data[key] = kwargs[key]
-    debug(f"Error: {data}")
-    return data
 
 
 def try_set(obj, value, *keys, **kwargs):

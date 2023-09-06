@@ -28,9 +28,11 @@ from lib.utils import (
     try_get,
     try_get_telegram_message_data,
     try_gets,
-    error,
     try_set,
+    qr_code,
 )
+
+from lib.logger import debug, error
 
 from telegram import Update, Message
 from telegram.ext.filters import BaseFilter
@@ -41,8 +43,6 @@ from telegram.ext import (
     MessageHandler,
 )
 
-from lib.logger import debug
-from lib.utils import qr_code
 from lib.api.strike import Strike
 from lib.gpt import GPT
 
@@ -78,7 +78,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     debug(f"handle_message => Raw update={update}")
     mpy = open(MESSAGES_PY_FILE, "a")
     mpy.write(update.to_json())
-    mpy.write("\n")
+    mpy.write("dwen")
     mpy.close()
 
     message = (
@@ -168,6 +168,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     which_handle = which_abbot.handle
     which_history_len = len(which_abbot.chat_history)
     if which_name in ("gAbbot", "gtAbbot"):
+        which_abbot.update_chat_history(dict(role="user", content=message_text))
         if not reply_to_message:
             msg = f"handle_message => which_name={which_name}, reply_to_message={reply_to_message}"
             debug(msg)
@@ -190,7 +191,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     debug(f"handle_message => All checks passed! which_abbot={which_abbot}")
     error = f"Please try again later. {which_abbot.name} leashed ⛔️"
-    which_abbot.update_chat_history(dict(role="user", content=message_text))
     answer = which_abbot.chat_completion()
     response = error if not answer else answer
     return await message.reply_text(response)

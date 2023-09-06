@@ -1,21 +1,30 @@
-import os
-import logging
+from os.path import abspath
+from logging import getLogger, FileHandler, DEBUG, ERROR
 
 from lib.utils import now_date
-
-logger = logging.getLogger("atl_bitlab_bot")
-logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler(os.path.abspath("data/debug.log"))
-fh.setLevel(logging.DEBUG)
-logger.addHandler(fh)
 now = now_date()
 
+debugger = getLogger("abbot_debugger")
+debugger.setLevel(DEBUG)
+debug_handler = FileHandler(abspath("data/debug.log"))
+debug_handler.setLevel(DEBUG)
+debugger.addHandler(debug_handler)
 
-def get_logger():
-    return logger
+
+errogger = getLogger("abbot_errogger")
+errogger.setLevel(ERROR)
+error_handler = FileHandler(abspath("data/error.log"))
+error_handler.setLevel(ERROR)
+errogger.addHandler(error_handler)
 
 
-def debug(msg):
-    msg_formatted = f"[{now}] {__name__}: {msg}\n"
-    print(msg_formatted)
-    logger.debug(msg_formatted)
+def error(message=""):
+    message_formatted = f"[{now_date()}] {__name__}: {message}\n"
+    print(message_formatted)
+    errogger.error(message_formatted)
+
+
+def debug(message=""):
+    message_formatted = f"[{now_date()}] {__name__}: {message}\n"
+    print(message_formatted)
+    debugger.debug(message_formatted)
