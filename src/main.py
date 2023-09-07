@@ -79,7 +79,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     debug(f"handle_message => Raw update={update}")
     mpy = open(MESSAGES_PY_FILE, "a")
     mpy.write(update.to_json())
-    mpy.write("dwen")
+    mpy.write("\n")
     mpy.close()
 
     message = (
