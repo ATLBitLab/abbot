@@ -1,9 +1,19 @@
-from os.path import abspath
-from constants import TELEGRAM_MESSAGE_FIELDS
 from requests import request
 from datetime import datetime, timedelta
 import qrcode
 from io import BytesIO
+
+TELEGRAM_MESSAGE_FIELDS = [
+    "audio",
+    "document",
+    "game",
+    "photo",
+    "sticker",
+    "video",
+    "voice",
+    "video_note",
+    "caption",
+]
 
 
 def now_date():
