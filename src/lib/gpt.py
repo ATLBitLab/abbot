@@ -1,9 +1,10 @@
 import json
-from io import TextIOWrapper
+from io import TextIOWrapper, open
 from os.path import abspath, isfile
+from typing import AnyStr
+from constants import BOT_HANDLE, BOT_NAME
 
 from env import OPENAI_API_KEY
-from constants import OPENAI_MODEL
 from lib.logger import debug
 from lib.utils import try_get
 
@@ -11,6 +12,8 @@ import openai
 
 
 class GPT:
+    OPENAI_MODEL = "gpt-3.5-turbo-16k"
+
     def __init__(
         self,
         name: str,
@@ -19,27 +22,27 @@ class GPT:
         context: str,
         chat_id=None,
         unleashed: bool = False,
-    ):
-        openai.api_key = OPENAI_API_KEY
-        self.model = OPENAI_MODEL
-        self.name = name
-        self.handle = handle
-        self.context = context
-        self.personality = personality
-        self.gpt_system = dict(role="system", content=personality)
-        self.chat_id = chat_id
-        self.unleashed = unleashed
-        self.started = True
+    ) -> object:
+        openai.api_key: str = OPENAI_API_KEY
+        self.model: str = self.OPENAI_MODEL
+        self.name: str = name
+        self.handle: str = handle
+        self.context: str = context
+        self.personality: str = personality
+        self.gpt_system: dict = dict(role="system", content=personality)
+        self.chat_id: str = chat_id
+        self.unleashed: bool = unleashed
+        self.started: bool = True
 
-        chat_history_abs_filepath = abspath(f"data/gpt/{context}")
-        self.chat_history_file_path = (
+        chat_history_abs_filepath: AnyStr @ abspath = abspath(f"data/gpt/{context}")
+        self.chat_history_file_path: str = (
             f"{chat_history_abs_filepath}/{chat_id}.jsonl"
             if chat_id
             else f"{chat_history_abs_filepath}/{context}_abbot.jsonl"
         )
-        self.chat_history_file = self._open_history()
-        self.chat_history_file_cursor = self.chat_history_file.tell()
-        self.chat_history = self._inflate_history()
+        self.chat_history_file: TextIOWrapper = self._open_history()
+        self.chat_history_file_cursor: int = self.chat_history_file.tell()
+        self.chat_history: list = self._inflate_history()
 
     def __str__(self) -> str:
         return (
@@ -65,10 +68,10 @@ class GPT:
             return self._create_history()
         return open(self.chat_history_file_path, "a+")
 
-    def _close_history(self):
+    def _close_history(self) -> None:
         self.chat_history_file.close()
 
-    def _inflate_history(self) -> list(dict(role=str, content=str)):
+    def _inflate_history(self) -> list:
         chat_history = []
         self.chat_history_file_cursor = self.chat_history_file.tell()
         self.chat_history_file.seek(0)
@@ -79,7 +82,7 @@ class GPT:
         self.chat_history_file.seek(self.chat_history_file_cursor)
         return chat_history
 
-    def status(self) -> dict(name=str, started=str, unleashed=str, chat_id=str | None):
+    def status(self) -> dict:
         status = dict(
             name=self.name,
             started=self.started,
@@ -131,3 +134,23 @@ class GPT:
         except Exception as e:
             debug(f"Error: GPT => chat_completion => exception={e}")
             return None
+
+
+BOT_DATA = open(abspath("data/bot_data.json"), "r")
+BOT_DATA_OBJ = json.load(BOT_DATA)
+CHATS_TO_IGNORE = try_get(BOT_DATA_OBJ, "chats", "ignore")
+CHATS_TO_INCLUDE_SUMMARY = try_get(BOT_DATA_OBJ, "chats", "include", "summary")
+CHAT_NAME_MAPPING = try_get(BOT_DATA_OBJ, "chats", "mapping", "nameToShortName")
+WHITELIST = try_get(BOT_DATA_OBJ, "whitelist")
+CHEEKY_RESPONSES = try_get(BOT_DATA_OBJ, "responses", "cheeky")
+PITHY_RESPONSES = try_get(BOT_DATA_OBJ, "responses", "pithy")
+RAW_MESSAGE_JL_FILE = abspath("data/raw_messages.jsonl")
+MESSAGES_JL_FILE = abspath("data/messages.jsonl")
+SUMMARY_LOG_FILE = abspath("data/summaries.txt")
+MESSAGES_PY_FILE = abspath("data/backup/messages.py")
+PROMPTS_BY_DAY_FILE = abspath("data/backup/prompts_by_day.py")
+TECH_BRO_BITCOINER = try_get(BOT_DATA_OBJ, "personalities", "TECH_BRO_BITCOINER")
+HELPFUL_ASSISTANT = try_get(BOT_DATA_OBJ, "personalities", "HELPFUL_ASSISTANT")
+PROMPT_ABBOT = GPT(BOT_NAME, BOT_HANDLE, HELPFUL_ASSISTANT, "prompt")
+SUMMARY_ABBOT = GPT(f"s{BOT_NAME}", BOT_HANDLE, HELPFUL_ASSISTANT, "summary")
+ABBOTS = dict(prompt=PROMPT_ABBOT, summary=SUMMARY_ABBOT)
