@@ -2,16 +2,28 @@ import json
 from io import TextIOWrapper, open
 from os.path import abspath, isfile
 from typing import AnyStr
-from constants import BOT_HANDLE, BOT_NAME
 
 from env import OPENAI_API_KEY
-from lib.logger import debug
+from lib.logger import debug, error
 from lib.utils import try_get
 
 import openai
 
 
-class GPT:
+class Abbots:
+    BOTS = dict()
+
+    def __init__(self, prompt, summary):
+        self.BOTS.update(dict(prompt=prompt, summary=summary))
+
+    def __str__(self) -> str:
+        return f"Abbots(BOTS={self.BOTS}"
+
+    def __repr__(self) -> str:
+        return f"Abbots(BOTS={self.BOTS}"
+
+
+class GPT(Abbots):
     OPENAI_MODEL = "gpt-3.5-turbo-16k"
 
     def __init__(
@@ -131,26 +143,21 @@ class GPT:
             if answer:
                 self.update_chat_history(response_dict)
             return answer
-        except Exception as e:
-            debug(f"Error: GPT => chat_completion => exception={e}")
+        except Exception as exception:
+            error(f"Error: chat_completion => exception={exception}")
             return None
 
+    def update_abbots(self, chat_id: str | int, bot: object) -> None:
+        try:
+            Abbots.BOTS[chat_id] = bot
+            abbot_updated = Abbots.BOTS[chat_id]
+            debug(f"update_abbots => BOTS={Abbots.BOTS}, BOTS[chat_id]={abbot_updated}")
+        except Exception as exception:
+            error(f"Error: update_abbots => exception={exception}")
+            return None
 
-BOT_DATA = open(abspath("data/bot_data.json"), "r")
-BOT_DATA_OBJ = json.load(BOT_DATA)
-CHATS_TO_IGNORE = try_get(BOT_DATA_OBJ, "chats", "ignore")
-CHATS_TO_INCLUDE_SUMMARY = try_get(BOT_DATA_OBJ, "chats", "include", "summary")
-CHAT_NAME_MAPPING = try_get(BOT_DATA_OBJ, "chats", "mapping", "nameToShortName")
-WHITELIST = try_get(BOT_DATA_OBJ, "whitelist")
-CHEEKY_RESPONSES = try_get(BOT_DATA_OBJ, "responses", "cheeky")
-PITHY_RESPONSES = try_get(BOT_DATA_OBJ, "responses", "pithy")
-RAW_MESSAGE_JL_FILE = abspath("data/raw_messages.jsonl")
-MESSAGES_JL_FILE = abspath("data/messages.jsonl")
-SUMMARY_LOG_FILE = abspath("data/summaries.txt")
-MESSAGES_PY_FILE = abspath("data/backup/messages.py")
-PROMPTS_BY_DAY_FILE = abspath("data/backup/prompts_by_day.py")
-TECH_BRO_BITCOINER = try_get(BOT_DATA_OBJ, "personalities", "TECH_BRO_BITCOINER")
-HELPFUL_ASSISTANT = try_get(BOT_DATA_OBJ, "personalities", "HELPFUL_ASSISTANT")
-PROMPT_ABBOT = GPT(BOT_NAME, BOT_HANDLE, HELPFUL_ASSISTANT, "prompt")
-SUMMARY_ABBOT = GPT(f"s{BOT_NAME}", BOT_HANDLE, HELPFUL_ASSISTANT, "summary")
-ABBOTS = dict(prompt=PROMPT_ABBOT, summary=SUMMARY_ABBOT)
+    def get_abbots(self) -> Abbots.BOTS:
+        return Abbots.BOTS
+
+    def get_chat_history(self) -> list:
+        return self.chat_history

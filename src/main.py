@@ -7,7 +7,13 @@ SUMMARY = "-s" in ARGS or "--summary" in ARGS
 DEV_MODE = "-d" in ARGS or "--dev" in ARGS
 CLEAN_SUMMARY = CLEAN and SUMMARY
 
-from constants import BOT_NAME, BOT_HANDLE, THE_CREATOR
+from constants import (
+    BOT_NAME,
+    BOT_HANDLE,
+    HELPFUL_ASSISTANT,
+    THE_CREATOR,
+    TECH_BRO_BITCOINER,
+)
 
 BOT_NAME = f"t{BOT_NAME}" if DEV_MODE else BOT_NAME
 BOT_HANDLE = f"test_{BOT_HANDLE}" if DEV_MODE else BOT_HANDLE
@@ -16,6 +22,7 @@ import json
 import time
 import re
 from io import open
+from os.path import abspath
 
 from random import randrange
 from help_menu import help_menu_message
@@ -42,27 +49,27 @@ from telegram.ext import (
 )
 
 from lib.api.strike import Strike
-from lib.gpt import (
-    GPT,
-    MESSAGES_PY_FILE,
-    ABBOTS,
-    CHATS_TO_IGNORE,
-    CHATS_TO_INCLUDE_SUMMARY,
-    CHAT_NAME_MAPPING,
-    WHITELIST,
-    CHEEKY_RESPONSES,
-    TECH_BRO_BITCOINER,
-    RAW_MESSAGE_JL_FILE,
-    MESSAGES_JL_FILE,
-    SUMMARY_LOG_FILE,
-    MESSAGES_PY_FILE,
-    PROMPTS_BY_DAY_FILE,
-    PROMPT_ABBOT,
-    SUMMARY_ABBOT,
-)
+from lib.gpt import GPT, Abbots
+
+PROMPT_ABBOT = GPT(BOT_NAME, BOT_HANDLE, HELPFUL_ASSISTANT, "prompt")
+SUMMARY_ABBOT = GPT(f"s{BOT_NAME}", BOT_HANDLE, HELPFUL_ASSISTANT, "summary")
+ABBOTS = Abbots(PROMPT_ABBOT, SUMMARY_ABBOT)
 
 from env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY
 
+BOT_DATA = open(abspath("data/bot_data.json"), "r")
+BOT_DATA_OBJ = json.load(BOT_DATA)
+CHATS_TO_IGNORE = try_get(BOT_DATA_OBJ, "chats", "ignore")
+CHATS_TO_INCLUDE_SUMMARY = try_get(BOT_DATA_OBJ, "chats", "include", "summary")
+CHAT_NAME_MAPPING = try_get(BOT_DATA_OBJ, "chats", "mapping", "nameToShortName")
+WHITELIST = try_get(BOT_DATA_OBJ, "whitelist")
+CHEEKY_RESPONSES = try_get(BOT_DATA_OBJ, "responses", "cheeky")
+PITHY_RESPONSES = try_get(BOT_DATA_OBJ, "responses", "pithy")
+RAW_MESSAGE_JL_FILE = abspath("data/raw_messages.jsonl")
+MESSAGES_JL_FILE = abspath("data/messages.jsonl")
+SUMMARY_LOG_FILE = abspath("data/summaries.txt")
+MESSAGES_PY_FILE = abspath("data/backup/messages.py")
+PROMPTS_BY_DAY_FILE = abspath("data/backup/prompts_by_day.py")
 now = datetime.now()
 now_iso = now.isoformat()
 now_iso_clean = now_iso.split("+")[0].split("T")[0]
@@ -147,29 +154,29 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         bot_context = "group"
         which_abbot = try_get(ABBOTS, chat_id)
         if not which_abbot:
-            ABBOTS[chat_id] = GPT(
-                f"{bot_context}{BOT_NAME}{chat_id}",
+            which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
+            which_abbot = GPT(
+                which_bot_name,
                 BOT_HANDLE,
                 TECH_BRO_BITCOINER,
                 bot_context,
                 chat_id,
                 True,
             )
-            which_abbot = ABBOTS[chat_id]
         debug(f"handle_message => is_group_chat={is_group_chat}, bot={which_abbot}")
     elif is_private_chat:
         bot_context = "private"
         which_abbot = try_get(ABBOTS, chat_id)
         if not which_abbot:
-            ABBOTS[chat_id] = GPT(
-                f"{bot_context}{BOT_NAME}-{chat_id}",
+            which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
+            which_abbot = GPT(
+                which_bot_name,
                 BOT_HANDLE,
                 TECH_BRO_BITCOINER,
                 bot_context,
                 chat_id,
                 True,
             )
-            which_abbot = ABBOTS[chat_id]
         debug(f"handle_message => is_private_chat={is_private_chat}, bot={which_abbot}")
     debug(f"handle_message => ABBOTS={ABBOTS}")
     if not which_abbot:
@@ -179,7 +186,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     which_handle = which_abbot.handle
     which_history_len = len(which_abbot.chat_history)
     which_abbot.update_chat_history(dict(role="user", content=message_text))
-    ABBOTS[chat_id] = which_abbot
+    which_abbot.update_abbots(chat_id, which_abbot)
+    got_abbots = which_abbot.get_abbots()
+    chat_history = which_abbot.get_chat_history()
+    debug(f"handle_message => got_abbots={got_abbots} chat_history={chat_history}")
     if "group" in which_name:
         if not reply_to_message:
             msg = f"handle_message => which_name={which_name}, reply_to_message={reply_to_message}"
@@ -201,9 +211,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             debug(f"handle_message => which_handle={which_handle}")
             return
 
-    debug(f"handle_message => All checks passed! which_abbot={which_abbot}")
+    debug(f"handle_message => All checks passed!")
     error = f"Please try again later. {which_abbot.name} leashed ⛔️"
     answer = which_abbot.chat_completion()
+    debug(f"handle_message => got_abbots={got_abbots} chat_history={chat_history}")
     response = error if not answer else answer
     return await message.reply_text(response)
 
@@ -367,6 +378,7 @@ def summarize_messages(chat, days=None):
         prompt = "Summarize the text after the asterisk. Split into paragraphs where appropriate. Do not mention the asterisk. * \n"
         for day, content in prompts_by_day.items():
             SUMMARY_ABBOT.update_chat_history(f"{prompt}{content}")
+            SUMMARY_ABBOT.update_abbots("prompt", SUMMARY_ABBOT)
             answer = SUMMARY_ABBOT.chat_completion()
             debug(f"summarize_messages => OpenAI Response = {answer}")
             summary = f"Summary {day}:\n{answer.strip()}"
@@ -589,14 +601,16 @@ async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 chat_id,
                 True,
             )
-            ABBOTS[chat_id] = which_abbot
+            which_abbot.update_abbots(chat_id, which_abbot)
             debug(f"abbot_status => bot={which_abbot}")
-        debug(f"abbot_status => ABBOTS={ABBOTS}")
-        for _, abbot in ABBOTS.items():
+        got_abbots = which_abbot.get_abbots()
+        debug(f"abbot_status => ABBOTS={got_abbots}")
+        for _, abbot in got_abbots.items():
             status = json.dumps(abbot.status(), indent=4)
             debug(f"abbot_status => {abbot.name} status={status}")
             await message.reply_text(status)
     except Exception as exception:
+        exception.with_traceback(None)
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
         debug(f"abbot_status => Error={exception}, ErrorMessage={error_msg}")
@@ -604,6 +618,7 @@ async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
         await message.reply_text(f"Sorry ... taking a nap. Hmu later.")
+        raise exception
 
 
 async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -653,7 +668,7 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 if bot_context == "private"
                 else f"{bot_context}{BOT_NAME}{chat_id}",
             )
-            ABBOTS[chat_id] = GPT(
+            which_abbot = GPT(
                 bot_name,
                 BOT_HANDLE,
                 TECH_BRO_BITCOINER,
@@ -661,14 +676,16 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 chat_id,
                 True,
             )
-            which_abbot = ABBOTS[chat_id]
             debug(f"unleash_the_abbot => abbot={which_abbot}")
-        debug(f"unleash_the_abbot => ABBOTS={ABBOTS}")
         if bot_status in UNLEASH:
             unleashed = which_abbot.unleash()
         else:
             unleashed = which_abbot.leash()
-        ABBOTS[chat_id] = which_abbot
+
+        which_abbot.update_abbots(chat_id, which_abbot)
+        get_abbots = which_abbot.get_abbots()
+        debug(f"unleash_the_abbot => ABBOTS={get_abbots}")
+
         response = "unleashed ✅" if unleashed else "leashed ⛔️"
         which_abbot_name = which_abbot.name
         debug(f"unleash_the_abbot => {which_abbot_name} {response}")
