@@ -167,8 +167,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     which_name = which_abbot.name
     which_handle = which_abbot.handle
     which_history_len = len(which_abbot.chat_history)
+    which_abbot.update_chat_history(dict(role="user", content=message_text))
     if which_name in ("gAbbot", "gtAbbot"):
-        which_abbot.update_chat_history(dict(role="user", content=message_text))
         if not reply_to_message:
             msg = f"handle_message => which_name={which_name}, reply_to_message={reply_to_message}"
             debug(msg)
