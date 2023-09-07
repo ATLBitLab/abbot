@@ -78,7 +78,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     debug(f"handle_message => Raw update={update}")
     mpy = open(MESSAGES_PY_FILE, "a")
     mpy.write(update.to_json())
-    mpy.write("dwen")
+    mpy.write("\n")
     mpy.close()
 
     message = (
@@ -336,7 +336,7 @@ def summarize_messages(chat, days=None):
         summary_file = open(SUMMARY_LOG_FILE, "a")
         prompt = "Summarize the text after the asterisk. Split into paragraphs where appropriate. Do not mention the asterisk. * \n"
         for day, content in prompts_by_day.items():
-            summary_abbot.update_message_content(f"{prompt}{content}")
+            summary_abbot.update_chat_history(f"{prompt}{content}")
             answer = summary_abbot.chat_completion()
             debug(f"summarize_messages => OpenAI Response = {answer}")
             summary = f"Summary {day}:\n{answer.strip()}"
@@ -450,7 +450,7 @@ async def abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=update.effective_chat.id,
             text=f"Thank you for supporting ATL BitLab!",
         )
-        prompt_abbot.update_message_content(prompt)
+        prompt_abbot.update_chat_history(prompt)
         answer = prompt_abbot.chat_completion()
         await context.bot.send_message(
             chat_id=update.effective_chat.id, text=f"{answer}"
