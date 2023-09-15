@@ -124,9 +124,9 @@ class GPT(Abbots):
         return self.unleashed
 
     def update_chat_history(self, chat_message: dict(role=str, content=str)) -> None:
-        debug(f"update_chat_history => chat_message={chat_message}")
+        # debug(f"update_chat_history => chat_message={chat_message}")
         self.chat_history.append(chat_message)
-        debug(f"update_chat_history => chat_history={self.chat_history}")
+        # debug(f"update_chat_history => chat_history={self.chat_history}")
         self.chat_history_file.write(f"{json.dumps(chat_message)}\n")
 
     def chat_completion(self) -> str | None:

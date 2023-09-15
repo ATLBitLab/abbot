@@ -380,7 +380,9 @@ def summarize_messages(chat, days=None):
         for day, content in prompts_by_day.items():
             SUMMARY_ABBOT.update_chat_history(f"{prompt}{content}")
             SUMMARY_ABBOT.update_abbots("prompt", SUMMARY_ABBOT)
-            answer = SUMMARY_ABBOT.chat_completion() or ""
+            answer = SUMMARY_ABBOT.chat_completion()
+            if answer == "":
+                continue
             debug(f"summarize_messages => OpenAI Response = {answer}")
             summary = f"Summary {day}:\n{answer.strip()}"
             summary_file.write(f"{summary}\n--------------------------------\n\n")
