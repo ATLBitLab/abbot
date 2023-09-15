@@ -380,13 +380,11 @@ def summarize_messages(chat, days=None):
         for day, content in prompts_by_day.items():
             SUMMARY_ABBOT.update_chat_history(f"{prompt}{content}")
             SUMMARY_ABBOT.update_abbots("prompt", SUMMARY_ABBOT)
-            answer = SUMMARY_ABBOT.chat_completion()
-            if answer == "":
-                continue
-            debug(f"summarize_messages => OpenAI Response = {answer}")
-            summary = f"Summary {day}:\n{answer.strip()}"
-            summary_file.write(f"{summary}\n--------------------------------\n\n")
-            summaries.append(summary)
+        answer = SUMMARY_ABBOT.chat_completion()    
+        debug(f"summarize_messages => OpenAI Response = {answer}")
+        summary = f"Summary {day}:\n{answer.strip()}"
+        summary_file.write(f"{summary}\n--------------------------------\n\n")
+        summaries.append(summary)
         summary_file.close()
         return summaries
     except Exception as exception:
