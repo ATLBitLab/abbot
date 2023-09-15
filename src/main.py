@@ -356,11 +356,12 @@ def summarize_messages(chat, days=None):
         prompts_by_day = {k: "" for k in days}
         for day in days:
             prompt_content = ""
-            messages_file = open(MESSAGES_JL_FILE, "r")
+            messages_file = open(RAW_MESSAGE_JL_FILE, "r")
             for line in messages_file.readlines():
                 message = json.loads(line)
                 message_date = try_get(message, "date")
-                if day == message_date:
+                message_title = try_get(message, "title")
+                if day == message_date and chat == message_title:
                     text = try_get(message, "text")
                     sender = try_get(message, "from")
                     message = f"{sender} said {text} on {message_date}\n"
