@@ -10,9 +10,10 @@ CLEAN_SUMMARY = CLEAN and SUMMARY
 from constants import (
     BOT_NAME,
     BOT_HANDLE,
-    HELPFUL_ASSISTANT,
+    SUMMARY_ASSISTANT,
+    PROMPT_ASSISTANT,
     THE_CREATOR,
-    TECH_BRO_BITCOINER,
+    ATL_BITCOINER,
 )
 
 BOT_NAME = f"t{BOT_NAME}" if DEV_MODE else BOT_NAME
@@ -51,8 +52,8 @@ from telegram.ext import (
 from lib.api.strike import Strike
 from lib.gpt import GPT, Abbots
 
-PROMPT_ABBOT = GPT(BOT_NAME, BOT_HANDLE, HELPFUL_ASSISTANT, "prompt")
-SUMMARY_ABBOT = GPT(f"s{BOT_NAME}", BOT_HANDLE, HELPFUL_ASSISTANT, "summary")
+PROMPT_ABBOT = GPT(BOT_NAME, BOT_HANDLE, PROMPT_ASSISTANT, "prompt")
+SUMMARY_ABBOT = GPT(f"s{BOT_NAME}", BOT_HANDLE, SUMMARY_ASSISTANT, "summary")
 ABBOTS = Abbots(PROMPT_ABBOT, SUMMARY_ABBOT)
 
 from env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY
@@ -158,7 +159,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             which_abbot = GPT(
                 which_bot_name,
                 BOT_HANDLE,
-                TECH_BRO_BITCOINER,
+                ATL_BITCOINER,
                 bot_context,
                 chat_id,
                 True,
@@ -172,7 +173,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             which_abbot = GPT(
                 which_bot_name,
                 BOT_HANDLE,
-                TECH_BRO_BITCOINER,
+                ATL_BITCOINER,
                 bot_context,
                 chat_id,
                 True,
@@ -597,7 +598,7 @@ async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
             which_abbot = GPT(
                 bot_name,
                 BOT_HANDLE,
-                TECH_BRO_BITCOINER,
+                ATL_BITCOINER,
                 bot_context,
                 chat_id,
                 True,
@@ -672,7 +673,7 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
             which_abbot = GPT(
                 bot_name,
                 BOT_HANDLE,
-                TECH_BRO_BITCOINER,
+                ATL_BITCOINER,
                 bot_context,
                 chat_id,
                 True,
@@ -685,7 +686,7 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         which_abbot.update_abbots(chat_id, which_abbot)
         get_abbots = which_abbot.get_abbots()
-        debug(f"unleash_the_abbot => ABBOTS={get_abbots}")
+        debug(f"unleash_the_abbot => which_abbot={which_abbot}")
 
         response = "unleashed ✅" if unleashed else "leashed ⛔️"
         which_abbot_name = which_abbot.name
