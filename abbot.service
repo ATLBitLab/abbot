@@ -7,8 +7,6 @@ Wants=network-online.target
 
 [Service]
 Environment=HOME=/home/abbot
-
-WorkingDir=/home/abbot/abbot
 ExecStart=/home/abbot/abbot/start.sh
 
 Restart=always
