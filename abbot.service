@@ -14,9 +14,6 @@ ExecStart=/home/abbot/abbot/start.sh
 Restart=always
 RestartSec=10
 
-StandardOutput=/home/abbot/abbot/src/data/runtime.log
-StandardError=/home/abbot/abbot/src/data/debug.log
-
 SyslogIdentifier=abbot
 
 User=abbot
