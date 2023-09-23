@@ -121,12 +121,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     default = "private" if is_private_chat else ""
     chat_title = try_get(chat, "title", default)
 
-    summary_started = SUMMARY_ABBOT.started
-    if not summary_started:
-        debug(f"handle_message => {SUMMARY_ABBOT.name} not started={summary_started}")
-        started = SUMMARY_ABBOT.start()
-        debug(f"handle_message => {SUMMARY_ABBOT.name} started={started}")
-
     if not is_private_chat and not is_chat_to_ignore:
         debug(f"handle_message => is_private_chat={is_private_chat}")
         debug(f"handle_message => is_chat_to_ignore={is_chat_to_ignore}")
@@ -381,7 +375,7 @@ def summarize_messages(chat, days=None):
         for day, content in prompts_by_day.items():
             SUMMARY_ABBOT.update_chat_history(f"{prompt}{content}")
             SUMMARY_ABBOT.update_abbots("prompt", SUMMARY_ABBOT)
-        answer = SUMMARY_ABBOT.chat_completion()    
+        answer = SUMMARY_ABBOT.chat_completion()
         debug(f"summarize_messages => OpenAI Response = {answer}")
         summary = f"Summary {day}:\n{answer.strip()}"
         summary_file.write(f"{summary}\n--------------------------------\n\n")
