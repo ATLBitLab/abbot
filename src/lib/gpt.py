@@ -3,7 +3,9 @@ from io import TextIOWrapper, open
 from os.path import abspath, isfile
 from typing import AnyStr
 
+from constants import OPENAI_MODEL
 from env import OPENAI_API_KEY
+
 from lib.logger import debug, error
 from lib.utils import try_get
 
@@ -24,8 +26,6 @@ class Abbots:
 
 
 class GPT(Abbots):
-    OPENAI_MODEL = "gpt-3.5-turbo-16k"
-
     def __init__(
         self,
         name: str,
@@ -36,7 +36,7 @@ class GPT(Abbots):
         unleashed: bool = False,
     ) -> object:
         openai.api_key: str = OPENAI_API_KEY
-        self.model: str = self.OPENAI_MODEL
+        self.model: str = OPENAI_MODEL
         self.name: str = name
         self.handle: str = handle
         self.context: str = context
@@ -132,9 +132,6 @@ class GPT(Abbots):
             response = openai.ChatCompletion.create(
                 model=self.model,
                 messages=self.chat_history,
-                temperature=1,
-                frequency_penalty=0.5,
-                presence_penalty=0.5,
             )
             answer = try_get(response, "choices", 0, "message", "content")
             response_dict = dict(role="assistant", content=answer)

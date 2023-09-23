@@ -209,7 +209,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     debug(f"handle_message => All checks passed!")
     error = f"Please try again later. {which_abbot.name} leashed ⛔️"
     answer = which_abbot.chat_completion()
-    debug(f"handle_message => got_abbots={got_abbots} chat_history={chat_history}")
     response = error if not answer else answer
     return await message.reply_text(response)
 
@@ -600,7 +599,6 @@ async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
             which_abbot.update_abbots(chat_id, which_abbot)
             debug(f"abbot_status => bot={which_abbot}")
         got_abbots = which_abbot.get_abbots()
-        debug(f"abbot_status => ABBOTS={got_abbots}")
         for _, abbot in got_abbots.items():
             status = json.dumps(abbot.status(), indent=4)
             debug(f"abbot_status => {abbot.name} status={status}")
@@ -679,9 +677,6 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
             unleashed = which_abbot.leash()
 
         which_abbot.update_abbots(chat_id, which_abbot)
-        get_abbots = which_abbot.get_abbots()
-        debug(f"unleash_the_abbot => which_abbot={which_abbot}")
-
         response = "unleashed ✅" if unleashed else "leashed ⛔️"
         which_abbot_name = which_abbot.name
         debug(f"unleash_the_abbot => {which_abbot_name} {response}")
