@@ -14,6 +14,8 @@ from constants import (
     PROMPT_ASSISTANT,
     THE_CREATOR,
     ATL_BITCOINER,
+    CHAT_TITLE_TO_SHORT_TITLE,
+    ABBOT_USER_ID,
 )
 
 BOT_NAME = f"t{BOT_NAME}" if DEV_MODE else BOT_NAME
@@ -62,7 +64,9 @@ BOT_DATA = open(abspath("data/bot_data.json"), "r")
 BOT_DATA_OBJ = json.load(BOT_DATA)
 CHATS_TO_IGNORE = try_get(BOT_DATA_OBJ, "chats", "ignore")
 CHATS_TO_INCLUDE_SUMMARY = try_get(BOT_DATA_OBJ, "chats", "include", "summary")
-CHAT_NAME_MAPPING = try_get(BOT_DATA_OBJ, "chats", "mapping", "nameToShortName")
+CHAT_TITLE_TO_SHORT_TITLE_JSON = try_get(
+    BOT_DATA_OBJ, "chats", "mapping", "nameToShortName"
+)
 WHITELIST = try_get(BOT_DATA_OBJ, "whitelist")
 CHEEKY_RESPONSES = try_get(BOT_DATA_OBJ, "responses", "cheeky")
 PITHY_RESPONSES = try_get(BOT_DATA_OBJ, "responses", "pithy")
@@ -76,6 +80,10 @@ now_iso = now.isoformat()
 now_iso_clean = now_iso.split("+")[0].split("T")[0]
 
 
+async def initial_abbot_opt_in(message: Message):
+    return
+
+
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     debug(f"handle_message => Raw update={update}")
     mpy = open(MESSAGES_PY_FILE, "a")
@@ -83,15 +91,42 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     mpy.write("\n")
     mpy.close()
 
-    message = (
-        try_get(update, "message")
-        or try_get(update, "effective_message")
-        or update.message
+    message: Message = try_get(update, "message") or try_get(
+        update, "effective_message"
     )
+    chat = try_get(message, "chat") or try_get(update, "effective_chat")
+
     if not message:
-        debug(f"handle_message => Missing Message object={message}")
+        debug(f"handle_message => Missing Message={message}")
         return
-    debug(f"handle_message => Raw message={message}")
+
+    debug(f"handle_message => Message={message}")
+    debug(f"handle_message => Chat={chat}")
+
+    abbot_added_to_new_chat = try_get(message, "group_chat_created")
+    abbot_added_to_existing_chat = (
+        try_get(message, "chat", "new_chat_members", "user", "id") == ABBOT_USER_ID
+    )
+    if abbot_added_to_new_chat or abbot_added_to_existing_chat:
+        return await message.reply_text(
+            "Hello! Thank you for talking to Abbot (@atl_bitlab_bot) either in your DMs or your channel!\n\n"
+            "To use Abbot, you must opt-in to the Terms & Conditions:\n\n"
+            "   - Abbot will collect all messages sent either in DM or in the channel.\n"
+            "   - Abbot will store those messages in a secure way.\n"
+            "   - Abbot will use these messages for the purpose of understanding and remaining current with the conversational context.\n"
+            "   - Abbot will be able to provide sensible and relevant reactions and updates in real-time.\n\n"
+            "These Terms & Conditions will remain in place until:\n\n"
+            "   1. The /stop command is run.\n"
+            "   2. Abbot is removed from a channel.\n"
+            "   3. Either the /amnesia or /neuralyze commands are run.\n"
+            "If you agree to these Terms & Conditions and would like to opt-in, please run the /start command.\n\n"
+            "If you are messaging Abbot in a DM, simply run /start.\n"
+            "If you are adding Abbot to a channel, have a channel admin run /start.\n"
+            "If you do not agree to these Terms & Conditions and would like to opt-out, simply do nothing or remove Abbot from the channel.\n\n"
+            "If you have multiple bots in one channel, be sure to tag Abbot (@atl_bitlab_bot) when running /start, e.g. /start @atl_bitlab_bot.\n\n"
+            "Thank you for using Abbot! We hope you enjoy your experience!"
+            "If you have questions, concerns or needs regarding Abbot, please feel free to DM @nonni_io on Telegram."
+        )
 
     reply_to_message = try_get(message, "reply_to_message")
     debug(f"handle_message => reply_to_message={reply_to_message}")
@@ -101,9 +136,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     all_message_data = try_get_telegram_message_data(message)
     debug(f"handle_message => all_message_data={all_message_data}")
-
-    chat = try_get(update, "effective_chat") or try_get(message, "chat")
-    debug(f"handle_message => Raw chat={chat}")
 
     message_text = try_get(message, "text")
     debug(f"handle_message => Message text={message_text}")
@@ -118,13 +150,16 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_type = try_get(chat, "type")
     is_private_chat = chat_type == "private"
     is_chat_to_ignore = chat_id in CHATS_TO_IGNORE
-    default = "private" if is_private_chat else ""
-    chat_title = try_get(chat, "title", default)
+    chat_title = try_get(chat, "title")
+    chat_title_short_name = try_get(CHAT_TITLE_TO_SHORT_TITLE, chat_title)
+    if not chat_title_short_name:
+        chat_title_short_name = chat_title.lower().replace(" ", "")
+        CHAT_TITLE_TO_SHORT_TITLE[chat_title] = chat_title_short_name
 
     if not is_private_chat and not is_chat_to_ignore:
-        debug(f"handle_message => is_private_chat={is_private_chat}")
-        debug(f"handle_message => is_chat_to_ignore={is_chat_to_ignore}")
-        chat_title = try_get(CHAT_NAME_MAPPING, chat_title, default="atlantabitdevs")
+        debug(
+            f"handle_message => is_private_chat={is_private_chat} is_chat_to_ignore={is_chat_to_ignore}"
+        )
         message_dump = json.dumps(
             {
                 "id": chat_id,
@@ -147,12 +182,36 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             debug(f"handle_message => is_atl_bitdevs={is_atl_bitdevs}")
             return
 
-    bot_context = "group"
-    if is_private_chat:
+    which_abbot = None
+    is_group_chat = not is_private_chat and chat_id not in CHATS_TO_INCLUDE_SUMMARY
+    if is_group_chat:
+        bot_context = "group"
+        which_abbot = try_get(ABBOTS, chat_id)
+        if not which_abbot:
+            which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
+            which_abbot = GPT(
+                which_bot_name,
+                BOT_HANDLE,
+                ATL_BITCOINER,
+                bot_context,
+                chat_id,
+                True,
+            )
+        debug(f"handle_message => is_group_chat={is_group_chat}")
+    elif is_private_chat:
         bot_context = "private"
+        which_abbot = try_get(ABBOTS, chat_id)
+        if not which_abbot:
+            which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
+            which_abbot = GPT(
+                which_bot_name,
+                BOT_HANDLE,
+                ATL_BITCOINER,
+                bot_context,
+                chat_id,
+                True,
+            )
         debug(f"handle_message => is_private_chat={is_private_chat}")
-
-    which_abbot: GPT = try_get(ABBOTS, chat_id)
     if not which_abbot:
         which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
         which_abbot = GPT(
@@ -237,7 +296,7 @@ def clean_data():
                         continue
                     elif title_has_spaces:
                         clean_title = try_get(
-                            CHAT_NAME_MAPPING,
+                            CHAT_TITLE_TO_SHORT_TITLE,
                             obj_title,
                             default=obj_title.lower().replace(" ", ""),
                         )
@@ -716,6 +775,10 @@ async def abbot_rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await message.reply_text(f"Sorry ... taking a nap. Hmu later.")
 
 
+async def start():
+
+
+
 if __name__ == "__main__":
     TOKEN = TEST_BOT_TOKEN if DEV_MODE else BOT_TOKEN
 
@@ -731,6 +794,7 @@ if __name__ == "__main__":
     unleash_handler = CommandHandler("unleash", unleash_the_abbot)
     status_handler = CommandHandler("status", abbot_status)
     rules_handler = CommandHandler("rules", abbot_rules)
+    start_handler = CommandHandler("start", start)
     message_handler = MessageHandler(BaseFilter(), handle_message)
 
     APPLICATION.add_handler(help_handler)
@@ -742,6 +806,7 @@ if __name__ == "__main__":
     APPLICATION.add_handler(unleash_handler)
     APPLICATION.add_handler(status_handler)
     APPLICATION.add_handler(rules_handler)
+    APPLICATION.add_handler(start_handler)
     APPLICATION.add_handler(message_handler)
 
     debug(f"{BOT_NAME} @{BOT_HANDLE} Polling")
