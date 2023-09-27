@@ -5,7 +5,8 @@ __pycache__
 .env
 dev/
 env.py
-debug.log
+*.log
+*.gz
 messages.py
 private_abbot.json
 src/data/gpt/private
