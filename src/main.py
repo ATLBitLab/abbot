@@ -40,7 +40,7 @@ from lib.utils import (
 
 from lib.logger import debug, error
 
-from telegram import Update, Message
+from telegram import Update, Message, Chat
 from telegram.ext.filters import BaseFilter
 from telegram.ext import (
     ApplicationBuilder,
@@ -522,22 +522,35 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    message = (
-        try_get(update, "message")
-        or try_get(update, "effective_message")
-        or update.message
-    )
-    message_text = try_get(message, "text")
-    debug(f"help => /help executed by {update.effective_message.from_user.username}")
-    if f"@{BOT_HANDLE}" not in message_text:
-        return await message.reply_text(
-            chat_id=update.effective_chat.id,
-            text=f"For help, tag @{BOT_HANDLE} in the help command: e.g. /help @{BOT_HANDLE}",
+    try:
+        message: Message = try_get(update, "message") or try_get(
+            update, "effective_message"
         )
-    await message.reply_text(
-        chat_id=update.effective_chat.id,
-        text=help_menu_message,
-    )
+        sender = try_get(message, "from_user", "username")
+        message_text = try_get(message, "text")
+        chat: Chat = try_get(update, "effective_chat") or try_get(message, "chat")
+        chat_type = try_get(chat, "type")
+        is_private_chat = chat_type == "private"
+        is_group_chat = chat_type == "group"
+        debug(f"help => /help executed by {sender}")
+        if is_group_chat:
+            if f"@{BOT_HANDLE}" not in message_text:
+                return await message.reply_text(
+                    f"For help, tag @{BOT_HANDLE} in the help command: e.g. /help @{BOT_HANDLE}",
+                )
+            return await message.reply_text(help_menu_message)
+        if is_private_chat:
+            await message.reply_text(help_menu_message)
+    except Exception as exception:
+        exception.with_traceback(None)
+        cause, traceback, args = deconstruct_error(exception)
+        error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
+        error(f"abbot_status => Error={exception}, ErrorMessage={error_msg}")
+        await context.bot.send_message(
+            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
+        )
+        await message.reply_text(f"Sorry ... taking a nap. Hmu later.")
+        raise exception
 
 
 def trycatch(fn):
@@ -559,10 +572,8 @@ def deconstruct_error(error):
 
 async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        message = (
-            try_get(update, "message")
-            or try_get(update, "effective_message")
-            or update.message
+        message: Message = try_get(update, "message") or try_get(
+            update, "effective_message"
         )
         chat = try_get(update, "effective_chat") or try_get(message, "chat")
         chat_type = try_get(chat, "type")
@@ -572,7 +583,7 @@ async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         sender = try_get(message, "from_user", "username")
         debug(f"abbot_status => /status executed by {sender}")
 
-        if sender not in WHITELIST:
+        if sender not in WHITELIST or sender:
             cheek = CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))]
             return await message.reply_text(cheek)
 
@@ -607,7 +618,7 @@ async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         exception.with_traceback(None)
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-        debug(f"abbot_status => Error={exception}, ErrorMessage={error_msg}")
+        error(f"abbot_status => Error={exception}, ErrorMessage={error_msg}")
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
@@ -684,7 +695,7 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as exception:
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-        debug(f"abbot_status => Error={exception}, ErrorMessage={error_msg}")
+        error(f"abbot_status => Error={exception}, ErrorMessage={error_msg}")
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
