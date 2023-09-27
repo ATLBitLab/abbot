@@ -713,7 +713,7 @@ if __name__ == "__main__":
     APPLICATION = ApplicationBuilder().token(TOKEN).build()
     debug(f"{BOT_NAME} @{BOT_HANDLE} Initialized")
 
-    help_handler = CommandHandler("help", help)
+    # help_handler = CommandHandler("help", help)
     stop_handler = CommandHandler("stop", stop)
     summary_handler = CommandHandler("summary", summary)
     prompt_handler = CommandHandler("prompt", abbot)
@@ -724,7 +724,7 @@ if __name__ == "__main__":
     rules_handler = CommandHandler("rules", abbot_rules)
     message_handler = MessageHandler(BaseFilter(), handle_message)
 
-    APPLICATION.add_handler(help_handler)
+    # APPLICATION.add_handler(help_handler)
     APPLICATION.add_handler(stop_handler)
     APPLICATION.add_handler(summary_handler)
     APPLICATION.add_handler(prompt_handler)
