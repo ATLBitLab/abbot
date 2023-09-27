@@ -173,7 +173,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 True,
             )
         debug(f"handle_message => is_private_chat={is_private_chat}, bot={which_abbot}")
-    debug(f"handle_message => ABBOTS={ABBOTS}")
     if not which_abbot:
         debug(f"handle_message => No abbot! which_abbot={which_abbot}")
         return
@@ -182,9 +181,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     which_history_len = len(which_abbot.chat_history)
     which_abbot.update_chat_history(dict(role="user", content=message_text))
     which_abbot.update_abbots(chat_id, which_abbot)
-    got_abbots = which_abbot.get_abbots()
-    chat_history = which_abbot.get_chat_history()
-    debug(f"handle_message => got_abbots={got_abbots} chat_history={chat_history}")
     if "group" in which_name:
         if not reply_to_message:
             msg = f"handle_message => which_name={which_name}, reply_to_message={reply_to_message}"
@@ -713,7 +709,7 @@ if __name__ == "__main__":
     APPLICATION = ApplicationBuilder().token(TOKEN).build()
     debug(f"{BOT_NAME} @{BOT_HANDLE} Initialized")
 
-    # help_handler = CommandHandler("help", help)
+    help_handler = CommandHandler("help", help)
     stop_handler = CommandHandler("stop", stop)
     summary_handler = CommandHandler("summary", summary)
     prompt_handler = CommandHandler("prompt", abbot)
@@ -724,7 +720,7 @@ if __name__ == "__main__":
     rules_handler = CommandHandler("rules", abbot_rules)
     message_handler = MessageHandler(BaseFilter(), handle_message)
 
-    # APPLICATION.add_handler(help_handler)
+    APPLICATION.add_handler(help_handler)
     APPLICATION.add_handler(stop_handler)
     APPLICATION.add_handler(summary_handler)
     APPLICATION.add_handler(prompt_handler)
