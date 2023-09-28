@@ -625,7 +625,7 @@ async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         args = try_get(context, "args")
-        message = (
+        message: Message = (
             try_get(update, "message")
             or try_get(update, "effective_message")
             or update.message
@@ -698,9 +698,32 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await message.reply_text(f"Sorry ... taking a nap. Hmu later.")
 
 
-def abbot_rules():
-    # To get an immediate response in a group chat, please tag me in your message or reply directly to a message I have sent previously. Otherwise, I will chime in every so often.
-    pass
+async def abbot_rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        message: Message = try_get(update, "message") or try_get(
+            update, "effective_message"
+        )
+        chat = try_get(update, "effective_chat") or try_get(message, "chat")
+        chat_id = try_get(chat, "id")
+        sender = try_get(message, "from_user", "username")
+        debug(f"abbot_rules => /rules executed by {sender} - chat={chat} chat_id={chat_id}")
+        await message.reply_text(
+            "Hey! The name's Abbot but you can think of me as your go-to guide for all things Bitcoin and ATL BitLab. AKA the virtual Bitcoin whisperer. 😉\n\n"
+            "Here's the lowdown on how to get my attention: \n\n"
+            "1. Slap an @atl_bitlab_bot before your message in the group chat - I'll come running to answer. \n"
+            "2. Feel more comfortable replying directly to my messages? Go ahead! I'm all ears.. err.. code. \n"
+            "3. Fancy a one-on-one chat? Slide into my DMs. \n\n"
+            "Now, enough with the rules! Let's dive into the world of Bitcoin together! \n\n"
+            "Ready. Set. Stack Sats! 🚀"
+        )
+    except Exception as exception:
+        cause, traceback, args = deconstruct_error(exception)
+        error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
+        error(f"abbot_status => Error={exception}, ErrorMessage={error_msg}")
+        await context.bot.send_message(
+            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
+        )
+        await message.reply_text(f"Sorry ... taking a nap. Hmu later.")
 
 
 if __name__ == "__main__":
