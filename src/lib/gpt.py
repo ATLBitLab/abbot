@@ -157,6 +157,7 @@ class GPT(Abbots):
     def update_abbots(self, chat_id: str | int, bot: object) -> None:
         try:
             Abbots.BOTS[chat_id] = bot
+            abbot_updated = Abbots.BOTS[chat_id]
             debug(f"update_abbots => chat_id={chat_id}")
         except Exception as exception:
             error(f"Error: update_abbots => exception={exception}")
