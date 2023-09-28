@@ -726,11 +726,9 @@ async def abbot_rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat = try_get(update, "effective_chat") or try_get(message, "chat")
         chat_id = try_get(chat, "id")
         sender = try_get(message, "from_user", "username")
-        debug(
-            f"abbot_rules => /rules executed by {sender} - chat={chat} chat_id={chat_id}"
-        )
+        debug(f"abbot_rules => /rules executed by {sender} - chat={chat} chat_id={chat_id}")
         await message.reply_text(
-            "Hey! The name's Abbot but you can think of me as your go-to guide for all things Bitcoin. AKA the virtual Bitcoin whisperer. 😉\n\n"
+            "Hey! The name's Abbot but you can think of me as your go-to guide for all things Bitcoin and ATL BitLab. AKA the virtual Bitcoin whisperer. 😉\n\n"
             "Here's the lowdown on how to get my attention: \n\n"
             "1. Slap an @atl_bitlab_bot before your message in the group chat - I'll come running to answer. \n"
             "2. Feel more comfortable replying directly to my messages? Go ahead! I'm all ears.. err.. code. \n"
