@@ -5,6 +5,7 @@
                 "-1001204119993": "Atlanta BitDevs Discussion",
                 "-1001670677325": "Bitdevs Upgrade",
                 "-926629994": "Burner: TAB Week Party",
+<<<<<<< HEAD
                 "-1001961459761": "ATL BitLab Party 2023",
                 "-1001608254734": "ATL BitLab",
                 "-911601159": "Weekly Newsletter Content"
@@ -16,6 +17,15 @@
                 "ATL BitLab": "atlbitlab",
                 "ATL BitLab Party 2023": "atlbitlabparty2023",
                 "Weekly Newsletter Content": "weeklynewslettercontent"
+=======
+                "-1001608254734": "ATL BitLab"
+            },
+            "nameToShortName": {
+                "Atlanta BitDevs Discussion": "atlantabitdevs",
+                "BitDevs Upgrade": "bitdevsupgrade",
+                "Burner: TAB Week Party": "burner:tabweekparty",
+                "ATL BitLab": "atlbitlab"
+>>>>>>> f1b19ba (rebase)
             }
         },
         "ignore": [
