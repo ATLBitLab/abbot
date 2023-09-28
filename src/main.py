@@ -744,11 +744,9 @@ async def abbot_rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat = try_get(update, "effective_chat") or try_get(message, "chat")
         chat_id = try_get(chat, "id")
         sender = try_get(message, "from_user", "username")
-        debug(
-            f"abbot_rules => /rules executed by {sender} - chat={chat} chat_id={chat_id}"
-        )
+        debug(f"abbot_rules => /rules executed by {sender} - chat={chat} chat_id={chat_id}")
         await message.reply_text(
-            "Hey! The name's Abbot but you can think of me as your go-to guide for all things Bitcoin. AKA the virtual Bitcoin whisperer. 😉\n\n"
+            "Hey! The name's Abbot but you can think of me as your go-to guide for all things Bitcoin and ATL BitLab. AKA the virtual Bitcoin whisperer. 😉\n\n"
             "Here's the lowdown on how to get my attention: \n\n"
             "1. Slap an @atl_bitlab_bot before your message in the group chat - I'll come running to answer. \n"
             "2. Feel more comfortable replying directly to my messages? Go ahead! I'm all ears.. err.. code. \n"
@@ -756,120 +754,6 @@ async def abbot_rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Now, enough with the rules! Let's dive into the world of Bitcoin together! \n\n"
             "Ready. Set. Stack Sats! 🚀"
         )
-    except Exception as exception:
-        cause, traceback, args = deconstruct_error(exception)
-        error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-        error(f"abbot_status => Error={exception}, ErrorMessage={error_msg}")
-        await context.bot.send_message(
-            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
-        )
-        await message.reply_text(f"Sorry ... taking a nap. Hmu later.")
-
-
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    try:
-        debug(f"handle_message => Raw update={update}")
-        message: Message = try_get(update, "message") or try_get(
-            update, "effective_message"
-        )
-        chat: Chat = try_get(message, "chat") or try_get(update, "effective_chat")
-        user: User = try_get(message, "from_user")
-        if not message:
-            debug(f"handle_message => Missing Message: {message}")
-            return
-        if not chat:
-            error(f"handle_message => Missing Chat: {chat}")
-            return
-        if not user:
-            error(f"handle_message => Missing User: {user}")
-            return
-
-        debug(f"handle_message => Message={message}")
-        debug(f"handle_message => Chat={chat}")
-        debug(f"handle_message => User={user}")
-
-        message_text = try_get(message, "text")
-        chat_id = try_get(chat, "id")
-        chat_type = try_get(chat, "type")
-        user_id = try_get(user, "id")
-        if not message_text:
-            debug(f"handle_message => Missing Message Text: {message_text}")
-            return
-        if not chat_id:
-            error(f"handle_message => Missing Chat ID: {chat_id}")
-            return
-        if not chat_type:
-            error(f"handle_message => Missing Chat Type: {chat_type}")
-            return
-        if not user_id:
-            debug(f"handle_message => Missing User ID: {user_id}")
-            return
-
-        debug(f"handle_message => message_text={message_text}")
-        debug(f"handle_message => chat_id={chat_id}")
-        debug(f"handle_message => chat_type={chat_type}")
-        debug(f"handle_message => user_id={user_id}")
-
-        is_private_chat = chat_type == "private"
-        is_group_chat = not is_private_chat and chat_id not in (
-            *CHAT_IDS_TO_SUMMARY,
-            *CHAT_IDS_TO_IGNORE,
-        )
-        if is_group_chat:
-            admins = await context.bot.get_chat_administrators(chat_id)
-            admin_ids = [admin.user.id for admin in admins]
-            if user_id not in admin_ids:
-                return await update.message.reply_text(
-                    "Sorry, you are not an admin! Please ask an admin to run the /start command."
-                )
-
-        bot_context = "group"
-        if is_private_chat:
-            bot_context = "private"
-            debug(f"handle_message => is_private_chat={is_private_chat}")
-        debug(f"handle_message => bot_context={bot_context}")
-
-        which_abbot = try_get(ABBOTS, chat_id)
-        if not which_abbot:
-            which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
-            which_abbot = GPT(
-                which_bot_name,
-                BOT_HANDLE,
-                ATL_BITCOINER,
-                bot_context,
-                chat_id,
-                True,
-                True,
-            )
-
-        if not which_abbot:
-            debug(f"handle_message => No abbot! Which Abbot: {which_abbot}")
-            return await message.reply_text(
-                f"/start failed ... please try again later or contact @nonni_io"
-            )
-
-        which_name = which_abbot.name
-        which_handle = which_abbot.handle
-        which_history_len = len(which_abbot.chat_history)
-
-        debug(f"handle_message => which_name={which_name}")
-        debug(f"handle_message => which_handle={which_handle}")
-        debug(f"handle_message => which_history_len={which_history_len}")
-
-        creator_content = INIT_GROUP_MESSAGE if is_group_chat else INIT_PRIVATE_MESSAGE
-        which_abbot.update_chat_history(dict(role="system", content=creator_content))
-        which_abbot.update_chat_history(dict(role="user", content=message_text))
-        which_abbot.update_abbots(chat_id, which_abbot)
-
-        error_msg = f"Please try again later or contact @nonni_io"
-        response = which_abbot.chat_completion()
-        if not response:
-            status = which_abbot.leash()
-            response = f"{which_abbot.name} leashed={status} ⛔️! {error_msg}."
-            await context.bot.send_message(
-                chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
-            )
-        await message.reply_text(response)
     except Exception as exception:
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
