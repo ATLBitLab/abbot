@@ -29,9 +29,9 @@
         }
     },
     "whitelist": [
-        "nonni_io",
-        "sbddesign",
-        "alex_lewin"
+        "@nonni_io",
+        "@sbddesign",
+        "@alex_lewin"
     ],
     "responses": {
         "cheeky": [
