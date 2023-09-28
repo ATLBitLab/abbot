@@ -146,7 +146,7 @@ class GPT(Abbots):
         try:
             Abbots.BOTS[chat_id] = bot
             abbot_updated = Abbots.BOTS[chat_id]
-            debug(f"update_abbots => BOTS={Abbots.BOTS}, BOTS[chat_id]={abbot_updated}")
+            debug(f"update_abbots => chat_id={chat_id}")
         except Exception as exception:
             error(f"Error: update_abbots => exception={exception}")
             return None
