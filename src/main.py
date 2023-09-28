@@ -16,6 +16,10 @@ from constants import (
     ATL_BITCOINER,
     CHAT_TITLE_TO_SHORT_TITLE,
     ABBOT_USER_ID,
+    CHAT_IDS_TO_IGNORE,
+    CHAT_IDS_TO_SUMMARY,
+    SUPER_DOOPER_ADMINS,
+    CHEEKY_RESPONSES,
 )
 
 BOT_NAME = f"t{BOT_NAME}" if DEV_MODE else BOT_NAME
@@ -42,7 +46,7 @@ from lib.utils import (
 
 from lib.logger import debug, error
 
-from telegram import Update, Message, Chat
+from telegram import Update, Message, Chat, User
 from telegram.ext.filters import BaseFilter
 from telegram.ext import (
     ApplicationBuilder,
@@ -56,32 +60,18 @@ from lib.gpt import GPT, Abbots
 
 PROMPT_ABBOT = GPT(BOT_NAME, BOT_HANDLE, PROMPT_ASSISTANT, "prompt")
 SUMMARY_ABBOT = GPT(f"s{BOT_NAME}", BOT_HANDLE, SUMMARY_ASSISTANT, "summary")
-ABBOTS = Abbots(PROMPT_ABBOT, SUMMARY_ABBOT)
+ABBOTS = try_get(Abbots, "BOTS") or Abbots(PROMPT_ABBOT, SUMMARY_ABBOT)
+# TODO: detect jsonl files and add group/private abbots
 
 from env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY
 
-BOT_DATA = open(abspath("data/bot_data.json"), "r")
-BOT_DATA_OBJ = json.load(BOT_DATA)
-CHATS_TO_IGNORE = try_get(BOT_DATA_OBJ, "chats", "ignore")
-CHATS_TO_INCLUDE_SUMMARY = try_get(BOT_DATA_OBJ, "chats", "include", "summary")
-CHAT_TITLE_TO_SHORT_TITLE_JSON = try_get(
-    BOT_DATA_OBJ, "chats", "mapping", "nameToShortName"
-)
-WHITELIST = try_get(BOT_DATA_OBJ, "whitelist")
-CHEEKY_RESPONSES = try_get(BOT_DATA_OBJ, "responses", "cheeky")
-PITHY_RESPONSES = try_get(BOT_DATA_OBJ, "responses", "pithy")
+BOT_DATA_OBJ = json.load(open(abspath("data/bot_data.json"), "r"))
 RAW_MESSAGE_JL_FILE = abspath("data/raw_messages.jsonl")
 MESSAGES_JL_FILE = abspath("data/messages.jsonl")
 SUMMARY_LOG_FILE = abspath("data/summaries.txt")
 MESSAGES_PY_FILE = abspath("data/backup/messages.py")
 PROMPTS_BY_DAY_FILE = abspath("data/backup/prompts_by_day.py")
 now = datetime.now()
-now_iso = now.isoformat()
-now_iso_clean = now_iso.split("+")[0].split("T")[0]
-
-
-async def initial_abbot_opt_in(message: Message):
-    return
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -94,10 +84,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message: Message = try_get(update, "message") or try_get(
         update, "effective_message"
     )
-    chat = try_get(message, "chat") or try_get(update, "effective_chat")
+    chat: Chat = try_get(message, "chat") or try_get(update, "effective_chat")
 
     if not message:
-        debug(f"handle_message => Missing Message={message}")
+        debug(f"handle_message => Missing Message: {message}")
+        return
+    if not chat:
+        debug(f"handle_message => Missing Chat: {chat}")
         return
 
     debug(f"handle_message => Message={message}")
@@ -107,26 +100,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     abbot_added_to_existing_chat = (
         try_get(message, "chat", "new_chat_members", "user", "id") == ABBOT_USER_ID
     )
-    if abbot_added_to_new_chat or abbot_added_to_existing_chat:
-        return await message.reply_text(
-            "Hello! Thank you for talking to Abbot (@atl_bitlab_bot) either in your DMs or your channel!\n\n"
-            "To use Abbot, you must opt-in to the Terms & Conditions:\n\n"
-            "   - Abbot will collect all messages sent either in DM or in the channel.\n"
-            "   - Abbot will store those messages in a secure way.\n"
-            "   - Abbot will use these messages for the purpose of understanding and remaining current with the conversational context.\n"
-            "   - Abbot will be able to provide sensible and relevant reactions and updates in real-time.\n\n"
-            "These Terms & Conditions will remain in place until:\n\n"
-            "   1. The /stop command is run.\n"
-            "   2. Abbot is removed from a channel.\n"
-            "   3. Either the /amnesia or /neuralyze commands are run.\n"
-            "If you agree to these Terms & Conditions and would like to opt-in, please run the /start command.\n\n"
-            "If you are messaging Abbot in a DM, simply run /start.\n"
-            "If you are adding Abbot to a channel, have a channel admin run /start.\n"
-            "If you do not agree to these Terms & Conditions and would like to opt-out, simply do nothing or remove Abbot from the channel.\n\n"
-            "If you have multiple bots in one channel, be sure to tag Abbot (@atl_bitlab_bot) when running /start, e.g. /start @atl_bitlab_bot.\n\n"
-            "Thank you for using Abbot! We hope you enjoy your experience!"
-            "If you have questions, concerns or needs regarding Abbot, please feel free to DM @nonni_io on Telegram."
-        )
+
+    username = try_get(message, "from_user", "username")
+    date = (try_get(message, "date") or now).strftime("%m/%d/%Y")
+
+    name = try_get(chat, "first_name", default=username)
+    chat_id = try_get(chat, "id")
+    chat_type = try_get(chat, "type")
 
     reply_to_message = try_get(message, "reply_to_message")
     debug(f"handle_message => reply_to_message={reply_to_message}")
@@ -143,23 +123,60 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         debug(f"handle_message => Missing message text={message_text}")
         return
 
-    username = try_get(message, "from_user", "username")
-    date = (try_get(message, "date") or now).isoformat().split("+")[0].split("T")[0]
-    name = try_get(chat, "first_name", default=username)
-    chat_id = try_get(chat, "id")
-    chat_type = try_get(chat, "type")
-    is_private_chat = chat_type == "private"
-    is_chat_to_ignore = chat_id in CHATS_TO_IGNORE
     chat_title = try_get(chat, "title")
     chat_title_short_name = try_get(CHAT_TITLE_TO_SHORT_TITLE, chat_title)
     if not chat_title_short_name:
         chat_title_short_name = chat_title.lower().replace(" ", "")
         CHAT_TITLE_TO_SHORT_TITLE[chat_title] = chat_title_short_name
 
-    if not is_private_chat and not is_chat_to_ignore:
-        debug(
-            f"handle_message => is_private_chat={is_private_chat} is_chat_to_ignore={is_chat_to_ignore}"
+    is_private_chat = chat_type == "private"
+    is_group_chat = not is_private_chat and chat_id not in (
+        *CHAT_IDS_TO_SUMMARY,
+        *CHAT_IDS_TO_IGNORE,
+    )
+    abbot_context = "group"
+    if is_group_chat:
+        debug(f"handle_message => is_group_chat={is_group_chat}")
+    elif is_private_chat:
+        abbot_context = "private"
+        debug(f"handle_message => is_private_chat={is_private_chat}")
+
+    debug(f"handle_message => abbot_context={abbot_context}")
+
+    which_abbot: GPT(Abbots) = try_get(ABBOTS, chat_id)
+    if not which_abbot or not try_get(which_abbot, "started"):
+        return await message.reply_text(
+            "Hello! Thank you for talking to Abbot (@atl_bitlab_bot), A Bitcoin Bot for local communities!\n\n"
+            "Abbot is meant to provide education to local bitcoin communities and help community organizers with various tasks.\n\n"
+            "To use Abbot in your DMs or your channel, you must first opt-in to the Usage Agreement / Terms & Conditions.\n\n"
+            "To start Abbot, you must run the /start command. By doing so, you agree to the following:"
+            "   1. Abbot collects all messages sent in a DM or in a channel.\n"
+            "   2. Abbot stores all colleceted messages.\n"
+            "   3. Abbot uses these messages for the purpose of understanding and remaining current with the conversational context.\n"
+            "   4. Abbot uses this context to provide sensible and relevant reactions and updates in real-time.\n\n"
+            "The Usage Agreement / Terms & Conditions will remain agreed to until one of the following actions are taken:\n\n"
+            "   1. The /stop command is run.\n"
+            "   2. Abbot is removed from a channel.\n"
+            "   3. Either the /amnesia or /neuralyze commands are run.\n"
+            "If you agree to the Usage Agreement / Terms & Conditions and would like to opt-in, please run the /start command.\n\n"
+            "If you are messaging Abbot in a DM, simply run /start.\n"
+            "If you are adding Abbot to a channel, have a channel admin run /start.\n"
+            "If you do not agree to the Usage Agreement / Terms & Conditions and would like to opt-out, do not run /start."
+            "If in a channel, remove Abbot from the channel.\n\n"
+            "If you have multiple bots in one channel, be sure to tag Abbot (@atl_bitlab_bot) when running /start, e.g. /start @atl_bitlab_bot.\n\n"
+            "Thank you for using Abbot! We hope you enjoy your experience!"
+            "If you have questions, concerns, feature requests or find bugs, please contact @nonni_io or @ATLBitLab on Telegram."
         )
+
+    which_name = try_get(which_abbot, "name")
+    which_handle = try_get(which_abbot, "handle")
+    which_history_len = len(try_get(which_abbot, "chat_history", default=[]))
+    is_chat_to_ignore = chat_id in CHAT_IDS_TO_IGNORE
+
+    if not is_private_chat and not is_chat_to_ignore:
+        debug(f"handle_message => is_private_chat={is_private_chat}")
+        debug(f"handle_message => is_chat_to_ignore={is_chat_to_ignore}")
+
         message_dump = json.dumps(
             {
                 "id": chat_id,
@@ -182,50 +199,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             debug(f"handle_message => is_atl_bitdevs={is_atl_bitdevs}")
             return
 
-    which_abbot = None
-    is_group_chat = not is_private_chat and chat_id not in CHATS_TO_INCLUDE_SUMMARY
-    if is_group_chat:
-        bot_context = "group"
-        which_abbot = try_get(ABBOTS, chat_id)
-        if not which_abbot:
-            which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
-            which_abbot = GPT(
-                which_bot_name,
-                BOT_HANDLE,
-                ATL_BITCOINER,
-                bot_context,
-                chat_id,
-                True,
-            )
-        debug(f"handle_message => is_group_chat={is_group_chat}")
-    elif is_private_chat:
-        bot_context = "private"
-        which_abbot = try_get(ABBOTS, chat_id)
-        if not which_abbot:
-            which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
-            which_abbot = GPT(
-                which_bot_name,
-                BOT_HANDLE,
-                ATL_BITCOINER,
-                bot_context,
-                chat_id,
-                True,
-            )
-        debug(f"handle_message => is_private_chat={is_private_chat}")
-    if not which_abbot:
-        which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
-        which_abbot = GPT(
-            which_bot_name,
-            BOT_HANDLE,
-            ATL_BITCOINER,
-            bot_context,
-            chat_id,
-            True,
-        )
-
-    which_name = which_abbot.name
-    which_handle = which_abbot.handle
-    which_history_len = len(which_abbot.chat_history)
     which_abbot.update_chat_history(dict(role="user", content=message_text))
     which_abbot.update_abbots(chat_id, which_abbot)
     if "group" in which_name:
@@ -344,7 +317,7 @@ async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE, both: bool =
         if not message or not sender:
             debug(f"clean => message={message} sender={sender} undefined")
             return await message.reply_text()
-        elif sender not in WHITELIST:
+        elif sender not in SUPER_DOOPER_ADMINS:
             debug(f"clean => sender={sender} not whitelisted")
             return await message.reply_text(CHEEKY_RESPONSES[rand_num()])
         return clean_data()
@@ -384,7 +357,7 @@ async def both(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 def whitelist_gate(sender):
-    return sender not in WHITELIST
+    return sender not in SUPER_DOOPER_ADMINS
 
 
 def summarize_messages(chat, days=None):
@@ -548,7 +521,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.effective_message
     message_text = message.text
     debug(f"stop => /stop executed by {sender}")
-    if sender not in WHITELIST:
+    if sender not in SUPER_DOOPER_ADMINS:
         return await message.reply_text(
             CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
         )
@@ -626,7 +599,7 @@ async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         sender = try_get(message, "from_user", "username")
         debug(f"abbot_status => /status executed by {sender}")
 
-        if sender not in WHITELIST or sender:
+        if sender not in SUPER_DOOPER_ADMINS or sender:
             cheek = CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))]
             return await message.reply_text(cheek)
 
@@ -685,7 +658,7 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id = try_get(chat, "id")
         sender = try_get(message, "from_user", "username")
         debug(f"unleash_the_abbot => /unleash {args} executed by {sender}")
-        if sender not in WHITELIST:
+        if sender not in SUPER_DOOPER_ADMINS:
             cheek = CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))]
             return await message.reply_text(cheek)
         if f"@{BOT_HANDLE}" not in message_text:
@@ -775,8 +748,113 @@ async def abbot_rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await message.reply_text(f"Sorry ... taking a nap. Hmu later.")
 
 
-async def start():
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        debug(f"handle_message => Raw update={update}")
+        message: Message = try_get(update, "message") or try_get(
+            update, "effective_message"
+        )
+        chat: Chat = try_get(message, "chat") or try_get(update, "effective_chat")
+        user: User = try_get(message, "from_user")
+        if not message:
+            debug(f"handle_message => Missing Message: {message}")
+            return
+        if not chat:
+            error(f"handle_message => Missing Chat: {chat}")
+            return
+        if not user:
+            error(f"handle_message => Missing User: {user}")
+            return
 
+        debug(f"handle_message => Message={message}")
+        debug(f"handle_message => Chat={chat}")
+        debug(f"handle_message => User={user}")
+
+        message_text = try_get(message, "text")
+        chat_id = try_get(chat, "id")
+        chat_type = try_get(chat, "type")
+        user_id = try_get(user, "id")
+        if not message_text:
+            debug(f"handle_message => Missing Message Text: {message_text}")
+            return
+        if not chat_id:
+            error(f"handle_message => Missing Chat ID: {chat_id}")
+            return
+        if not chat_type:
+            error(f"handle_message => Missing Chat Type: {chat_type}")
+            return
+        if not user_id:
+            debug(f"handle_message => Missing User ID: {user_id}")
+            return
+
+        debug(f"handle_message => message_text={message_text}")
+        debug(f"handle_message => chat_id={chat_id}")
+        debug(f"handle_message => chat_type={chat_type}")
+        debug(f"handle_message => user_id={user_id}")
+
+        is_private_chat = chat_type == "private"
+        is_group_chat = not is_private_chat and chat_id not in (
+            *CHAT_IDS_TO_SUMMARY,
+            *CHAT_IDS_TO_IGNORE,
+        )
+        if is_group_chat:
+            admins = await context.bot.get_chat_administrators(chat_id)
+            admin_ids = [admin.user.id for admin in admins]
+            if user_id not in admin_ids:
+                return await update.message.reply_text(
+                    "Sorry, you are not an admin! Please ask an admin to run the /start command."
+                )
+
+        bot_context = "group"
+        if is_private_chat:
+            bot_context = "private"
+            debug(f"handle_message => is_private_chat={is_private_chat}")
+        debug(f"handle_message => bot_context={bot_context}")
+
+        which_abbot = try_get(ABBOTS, chat_id)
+        if not which_abbot:
+            which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
+            which_abbot = GPT(
+                which_bot_name,
+                BOT_HANDLE,
+                ATL_BITCOINER,
+                bot_context,
+                chat_id,
+                True,
+                True,
+            )
+
+        if not which_abbot:
+            debug(f"handle_message => No abbot! Which Abbot: {which_abbot}")
+            return await message.reply_text(
+                f"/start failed ... please try again later or contact @nonni_io"
+            )
+
+        which_name = which_abbot.name
+        which_handle = which_abbot.handle
+        which_history_len = len(which_abbot.chat_history)
+
+        debug(f"handle_message => which_name={which_name}")
+        debug(f"handle_message => which_handle={which_handle}")
+        debug(f"handle_message => which_history_len={which_history_len}")
+
+        which_abbot.update_chat_history(dict(role="user", content=message_text))
+        which_abbot.update_abbots(chat_id, which_abbot)
+
+        error_msg = f"Please try again later or contact @nonni_io"
+        response = which_abbot.chat_completion()
+        if not response:
+            status = which_abbot.leash()
+            response = f"{which_abbot.name} leashed={status} ⛔️! {error}."
+        return await message.reply_text(response)
+    except Exception as exception:
+        cause, traceback, args = deconstruct_error(exception)
+        error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
+        error(f"abbot_status => Error={exception}, ErrorMessage={error_msg}")
+        await context.bot.send_message(
+            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
+        )
+        await message.reply_text(f"Sorry ... taking a nap. Hmu later.")
 
 
 if __name__ == "__main__":

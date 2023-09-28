@@ -32,8 +32,9 @@ class GPT(Abbots):
         handle: str,
         personality: str,
         context: str,
-        chat_id=None,
+        chat_id: int= None,
         unleashed: bool = False,
+        started: bool = False
     ) -> object:
         openai.api_key: str = OPENAI_API_KEY
         self.model: str = OPENAI_MODEL
@@ -44,7 +45,7 @@ class GPT(Abbots):
         self.gpt_system: dict = dict(role="system", content=personality)
         self.chat_id: str = chat_id
         self.unleashed: bool = unleashed
-        self.started: bool = True
+        self.started: bool = started
 
         chat_history_abs_filepath: AnyStr @ abspath = abspath(f"data/gpt/{context}")
         self.chat_history_file_path: str = (
@@ -145,11 +146,16 @@ class GPT(Abbots):
     def update_abbots(self, chat_id: str | int, bot: object) -> None:
         try:
             Abbots.BOTS[chat_id] = bot
+<<<<<<< HEAD
             abbot_updated = Abbots.BOTS[chat_id]
             debug(f"update_abbots => chat_id={chat_id}")
+=======
+            abbot_updated: GPT = Abbots.BOTS[chat_id]
+            debug(f"update_abbots => chat_id={chat_id}, abbot_updated={abbot_updated.__str__()}")
+>>>>>>> 8828262 (more changes)
         except Exception as exception:
             error(f"Error: update_abbots => exception={exception}")
-            return None
+            raise exception
 
     def get_abbots(self) -> Abbots.BOTS:
         return Abbots.BOTS
