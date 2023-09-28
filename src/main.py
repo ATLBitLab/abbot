@@ -195,6 +195,26 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         rm_jl.write("\n")
         rm_jl.close()
 
+    bot_context = "group"
+    if is_private_chat:
+        bot_context = "private"
+        debug(f"handle_message => is_private_chat={is_private_chat}")
+
+    which_abbot: GPT = try_get(ABBOTS, chat_id)
+    if not which_abbot:
+        which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
+        which_abbot = GPT(
+            which_bot_name,
+            BOT_HANDLE,
+            ATL_BITCOINER,
+            bot_context,
+            chat_id,
+            True,
+        )
+
+    which_name = which_abbot.name
+    which_handle = which_abbot.handle
+    which_history_len = len(which_abbot.chat_history)
     which_abbot.update_chat_history(dict(role="user", content=message_text))
     which_abbot.update_abbots(chat_id, which_abbot)
     if "group" in which_name:
@@ -722,9 +742,11 @@ async def abbot_rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat = try_get(update, "effective_chat") or try_get(message, "chat")
         chat_id = try_get(chat, "id")
         sender = try_get(message, "from_user", "username")
-        debug(f"abbot_rules => /rules executed by {sender} - chat={chat} chat_id={chat_id}")
+        debug(
+            f"abbot_rules => /rules executed by {sender} - chat={chat} chat_id={chat_id}"
+        )
         await message.reply_text(
-            "Hey! The name's Abbot but you can think of me as your go-to guide for all things Bitcoin and ATL BitLab. AKA the virtual Bitcoin whisperer. 😉\n\n"
+            "Hey! The name's Abbot but you can think of me as your go-to guide for all things Bitcoin. AKA the virtual Bitcoin whisperer. 😉\n\n"
             "Here's the lowdown on how to get my attention: \n\n"
             "1. Slap an @atl_bitlab_bot before your message in the group chat - I'll come running to answer. \n"
             "2. Feel more comfortable replying directly to my messages? Go ahead! I'm all ears.. err.. code. \n"
