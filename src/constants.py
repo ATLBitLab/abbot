@@ -1,3 +1,7 @@
+import json
+from io import open
+from os.path import abspath
+
 PROGRAM = "main.py"
 BOT_NAME = "Abbot"
 BOT_HANDLE = "atl_bitlab_bot"
@@ -36,3 +40,5 @@ CHEEKY_RESPONSES = [
     "Do not pass go, do not collect $200",
 ]
 PITHY_RESPONSES = ["Sorry, I'm taking a nap, ttyl."]
+ABBOTS_STARTED = BOT_DATA_OBJ = json.load(open(abspath("data/abbots.json"), "r"))
+
