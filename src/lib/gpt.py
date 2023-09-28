@@ -32,9 +32,9 @@ class GPT(Abbots):
         handle: str,
         personality: str,
         context: str,
-        chat_id: int= None,
+        chat_id: int = None,
         unleashed: bool = False,
-        started: bool = False
+        started: bool = False,
     ) -> object:
         openai.api_key: str = OPENAI_API_KEY
         self.model: str = OPENAI_MODEL
@@ -146,13 +146,8 @@ class GPT(Abbots):
     def update_abbots(self, chat_id: str | int, bot: object) -> None:
         try:
             Abbots.BOTS[chat_id] = bot
-<<<<<<< HEAD
             abbot_updated = Abbots.BOTS[chat_id]
             debug(f"update_abbots => chat_id={chat_id}")
-=======
-            abbot_updated: GPT = Abbots.BOTS[chat_id]
-            debug(f"update_abbots => chat_id={chat_id}, abbot_updated={abbot_updated.__str__()}")
->>>>>>> 8828262 (more changes)
         except Exception as exception:
             error(f"Error: update_abbots => exception={exception}")
             raise exception
