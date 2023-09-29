@@ -66,15 +66,12 @@ from lib.gpt import GPT, Abbots
 PROMPT_ABBOT = GPT(f"p{BOT_NAME}", BOT_HANDLE, PROMPT_ASSISTANT, "prompt")
 SUMMARY_ABBOT = GPT(f"s{BOT_NAME}", BOT_HANDLE, SUMMARY_ASSISTANT, "summary")
 ALL_ABBOTS = [PROMPT_ABBOT, SUMMARY_ABBOT]
-print("GROUP_OPTIN", GROUP_OPTIN)
 
 for group_chat in listdir(abspath("data/gpt/group")):
     if ".jsonl" not in group_chat:
         continue
     bot_context = "group"
-    chat_id = group_chat.split(".")[0]
-    print("chat_id", chat_id)
-    print(f"{chat_id} in {GROUP_OPTIN},", int(chat_id) in GROUP_OPTIN)
+    chat_id = int(group_chat.split(".")[0])
     abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
     group_abbot = GPT(
         abbot_name,
@@ -82,7 +79,7 @@ for group_chat in listdir(abspath("data/gpt/group")):
         ATL_BITCOINER,
         bot_context,
         chat_id,
-        int(chat_id) in GROUP_OPTIN,
+        chat_id in GROUP_OPTIN,
     )
     ALL_ABBOTS.append(group_abbot)
 
@@ -90,7 +87,7 @@ for private_chat in listdir(abspath("data/gpt/private")):
     if ".jsonl" not in private_chat:
         continue
     bot_context = "private"
-    chat_id = private_chat.split(".")[0]
+    chat_id = int(private_chat.split(".")[0])
     abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
     group_abbot = GPT(
         abbot_name,
@@ -98,12 +95,14 @@ for private_chat in listdir(abspath("data/gpt/private")):
         ATL_BITCOINER,
         bot_context,
         chat_id,
-        int(chat_id) in PRIVATE_OPTIN,
+        chat_id in PRIVATE_OPTIN,
     )
     ALL_ABBOTS.append(group_abbot)
 
-ABBOTS = Abbots(ALL_ABBOTS)
-debug(f"main => {ABBOTS.__str__()}")
+abbots = Abbots(ALL_ABBOTS)
+ABBOTS = abbots.get_bots()
+debug(f"main abbots => {abbots.__str__()}")
+
 from env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY
 
 RAW_MESSAGE_JL_FILE = abspath("data/raw_messages.jsonl")
@@ -136,35 +135,22 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     debug(f"handle_message => Message={message}")
     debug(f"handle_message => Chat={chat}")
 
-    # abbot_added_to_new_chat = try_get(message, "group_chat_created")
-    # abbot_added_to_existing_chat = (
-    #     try_get(message, "chat", "new_chat_members", "user", "id") == ABBOT_USER_ID
-    # )
-
     username = try_get(message, "from_user", "username")
     date = (try_get(message, "date") or now).strftime("%m/%d/%Y")
 
     name = try_get(chat, "first_name", default=username)
     chat_id = try_get(chat, "id")
-    print('chat_id', chat_id)
-    print('type(chat_id)', type(chat_id))
     chat_type = try_get(chat, "type")
 
     reply_to_message = try_get(message, "reply_to_message")
-    debug(f"handle_message => reply_to_message={reply_to_message}")
     reply_to_message_from = try_get(reply_to_message, "from")
     reply_to_message_from_bot = try_get(reply_to_message_from, "is_bot")
     reply_to_message_bot_username = try_get(reply_to_message_from, "username")
-
     all_message_data = try_get_telegram_message_data(message)
-    debug(f"handle_message => all_message_data={all_message_data}")
-
     message_text = try_get(message, "text")
-    debug(f"handle_message => Message text={message_text}")
     if not message_text:
         debug(f"handle_message => Missing message text={message_text}")
         return
-
     is_private_chat = chat_type == "private"
     if not is_private_chat:
         chat_title = try_get(chat, "title")
@@ -173,17 +159,22 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_title_short_name = chat_title.lower().replace(" ", "")
             CHAT_TITLE_TO_SHORT_TITLE[chat_title] = chat_title_short_name
 
-    abbot_context = "group"
+    bot_context = "group"
     if is_private_chat:
-        abbot_context = "private"
+        bot_context = "private"
         debug(f"handle_message => is_private_chat={is_private_chat}")
-    debug(f"handle_message => abbot_context={abbot_context}")
+    debug(f"handle_message => reply_to_message={reply_to_message}")
+    debug(f"handle_message => all_message_data={all_message_data}")
+    debug(f"handle_message => Message text={message_text}")
+    debug(f"handle_message => bot_context={bot_context}")
 
-    which_abbot: GPT(Abbots) = try_get(ABBOTS, str(chat_id))
-    print('which_abbot', which_abbot)
-    print('not which_abbot', not which_abbot)
-    print('try_get(which_abbot, "started")', try_get(which_abbot, "started"))
-    if not which_abbot or not try_get(which_abbot, "started"):
+    which_abbot: GPT = try_get(ABBOTS, chat_id)
+    if not which_abbot:
+        which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
+        which_abbot = GPT(
+            which_bot_name, BOT_HANDLE, ATL_BITCOINER, bot_context, chat_id
+        )
+    if not try_get(which_abbot, "started"):
         return await message.reply_text(
             "Hello! Thank you for talking to Abbot (@atl_bitlab_bot), A Bitcoin Bot for local communities!\n\n"
             "Abbot is meant to provide education to local bitcoin communities and help community organizers with various tasks.\n\n"
@@ -206,16 +197,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Thank you for using Abbot! We hope you enjoy your experience!\n\n"
             "If you have questions, concerns, feature requests or find bugs, please contact @nonni_io or @ATLBitLab on Telegram."
         )
-
-    which_name = try_get(which_abbot, "name")
-    which_handle = try_get(which_abbot, "handle")
-    which_history_len = len(try_get(which_abbot, "chat_history", default=[]))
     is_chat_to_ignore = chat_id in CHAT_IDS_TO_IGNORE
-
     if not is_private_chat and not is_chat_to_ignore:
         debug(f"handle_message => is_private_chat={is_private_chat}")
         debug(f"handle_message => is_chat_to_ignore={is_chat_to_ignore}")
-
         message_dump = json.dumps(
             {
                 "id": chat_id,
@@ -238,34 +223,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             debug(f"handle_message => is_atl_bitdevs={is_atl_bitdevs}")
             return
 
-    bot_context = "group"
-    if is_private_chat:
-        bot_context = "private"
-        debug(f"handle_message => is_private_chat={is_private_chat}")
-
-    which_abbot: GPT = try_get(ABBOTS, chat_id)
-    if not which_abbot:
-        return await message.reply_text("Error!")
-    # if not which_abbot:
-    #     which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
-    #     which_abbot = GPT(
-    #         which_bot_name,
-    #         BOT_HANDLE,
-    #         ATL_BITCOINER,
-    #         bot_context,
-    #         chat_id,
-    #         True,
-    #     )
-
-    which_name = which_abbot.name
-    which_handle = which_abbot.handle
-    which_history_len = len(which_abbot.chat_history)
+    which_name = try_get(which_abbot, "name")
+    which_handle = try_get(which_abbot, "handle")
+    which_history_len = len(try_get(which_abbot, "chat_history", default=[]))
     which_abbot.update_chat_history(dict(role="user", content=message_text))
     which_abbot.update_abbots(chat_id, which_abbot)
-    if "group" in which_name:
+    group_in_name = "group" in which_name
+    if group_in_name:
         if not reply_to_message:
-            msg = f"handle_message => which_name={which_name}, reply_to_message={reply_to_message}"
-            debug(msg)
+            debug(f"handle_message => which_name={which_name}")
+            debug(
+                f"handle_message => group_in_name={group_in_name} reply_to_message={reply_to_message}"
+            )
             if f"@{which_handle}" not in message_text and which_history_len % 5 != 0:
                 msg = f"handle_message => {which_handle} not tagged, message_text={message_text}"
                 debug(msg)

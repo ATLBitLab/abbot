@@ -13,10 +13,10 @@ import openai
 
 
 class Abbots:
-    BOTS = dict()
+    BOTS: dict = dict()
 
     def __init__(self, abbots: list):
-        bots = dict()
+        bots: dict = dict()
         for abbot in abbots:
             name = try_get(abbot, "chat_id")
             bots[name] = abbot
@@ -33,7 +33,7 @@ class Abbots:
     def __repr__(self) -> str:
         return f"Abbots(BOTS={self.BOTS}"
 
-    def get_bots(self) -> BOTS:
+    def get_bots(self) -> dict:
         return self.BOTS
 
 
@@ -71,8 +71,8 @@ class GPT(Abbots):
     def __str__(self) -> str:
         return (
             f"GPT(model={self.model}, name={self.name}, "
-            f"handle={self.handle}, context={self.context} "
-            f"started={self.started}"
+            f"handle={self.handle}, context={self.context}, "
+            f"chat_id={self.chat_id}, started={self.started}"
         )
 
     def __repr__(self) -> str:
@@ -157,7 +157,6 @@ class GPT(Abbots):
     def update_abbots(self, chat_id: str | int, bot: object) -> None:
         try:
             Abbots.BOTS[chat_id] = bot
-            abbot_updated = Abbots.BOTS[chat_id]
             debug(f"update_abbots => chat_id={chat_id}")
         except Exception as exception:
             error(f"Error: update_abbots => exception={exception}")
