@@ -10,6 +10,10 @@ CLEAN_SUMMARY = CLEAN and SUMMARY
 from constants import (
     BOT_NAME,
     BOT_HANDLE,
+    GROUP_OPTIN,
+    INIT_GROUP_MESSAGE,
+    INIT_PRIVATE_MESSAGE,
+    PRIVATE_OPTIN,
     SUMMARY_ASSISTANT,
     PROMPT_ASSISTANT,
     THE_CREATOR,
@@ -29,6 +33,7 @@ import json
 import time
 import re
 from io import open
+from os import listdir
 from os.path import abspath
 
 from random import randrange
@@ -58,14 +63,49 @@ from telegram.ext import (
 from lib.api.strike import Strike
 from lib.gpt import GPT, Abbots
 
-PROMPT_ABBOT = GPT(BOT_NAME, BOT_HANDLE, PROMPT_ASSISTANT, "prompt")
+PROMPT_ABBOT = GPT(f"p{BOT_NAME}", BOT_HANDLE, PROMPT_ASSISTANT, "prompt")
 SUMMARY_ABBOT = GPT(f"s{BOT_NAME}", BOT_HANDLE, SUMMARY_ASSISTANT, "summary")
-ABBOTS = try_get(Abbots, "BOTS") or Abbots(PROMPT_ABBOT, SUMMARY_ABBOT)
-# TODO: detect jsonl files and add group/private abbots
+ALL_ABBOTS = [PROMPT_ABBOT, SUMMARY_ABBOT]
+print("GROUP_OPTIN", GROUP_OPTIN)
 
+for group_chat in listdir(abspath("data/gpt/group")):
+    if ".jsonl" not in group_chat:
+        continue
+    bot_context = "group"
+    chat_id = group_chat.split(".")[0]
+    print("chat_id", chat_id)
+    print(f"{chat_id} in {GROUP_OPTIN},", int(chat_id) in GROUP_OPTIN)
+    abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
+    group_abbot = GPT(
+        abbot_name,
+        BOT_HANDLE,
+        ATL_BITCOINER,
+        bot_context,
+        chat_id,
+        int(chat_id) in GROUP_OPTIN,
+    )
+    ALL_ABBOTS.append(group_abbot)
+
+for private_chat in listdir(abspath("data/gpt/private")):
+    if ".jsonl" not in private_chat:
+        continue
+    bot_context = "private"
+    chat_id = private_chat.split(".")[0]
+    abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
+    group_abbot = GPT(
+        abbot_name,
+        BOT_HANDLE,
+        ATL_BITCOINER,
+        bot_context,
+        chat_id,
+        int(chat_id) in PRIVATE_OPTIN,
+    )
+    ALL_ABBOTS.append(group_abbot)
+
+ABBOTS = Abbots(ALL_ABBOTS)
+debug(f"main => {ABBOTS.__str__()}")
 from env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY
 
-BOT_DATA_OBJ = json.load(open(abspath("data/bot_data.json"), "r"))
 RAW_MESSAGE_JL_FILE = abspath("data/raw_messages.jsonl")
 MESSAGES_JL_FILE = abspath("data/messages.jsonl")
 SUMMARY_LOG_FILE = abspath("data/summaries.txt")
@@ -96,16 +136,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     debug(f"handle_message => Message={message}")
     debug(f"handle_message => Chat={chat}")
 
-    abbot_added_to_new_chat = try_get(message, "group_chat_created")
-    abbot_added_to_existing_chat = (
-        try_get(message, "chat", "new_chat_members", "user", "id") == ABBOT_USER_ID
-    )
+    # abbot_added_to_new_chat = try_get(message, "group_chat_created")
+    # abbot_added_to_existing_chat = (
+    #     try_get(message, "chat", "new_chat_members", "user", "id") == ABBOT_USER_ID
+    # )
 
     username = try_get(message, "from_user", "username")
     date = (try_get(message, "date") or now).strftime("%m/%d/%Y")
 
     name = try_get(chat, "first_name", default=username)
     chat_id = try_get(chat, "id")
+    print('chat_id', chat_id)
+    print('type(chat_id)', type(chat_id))
     chat_type = try_get(chat, "type")
 
     reply_to_message = try_get(message, "reply_to_message")
@@ -123,48 +165,45 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         debug(f"handle_message => Missing message text={message_text}")
         return
 
-    chat_title = try_get(chat, "title")
-    chat_title_short_name = try_get(CHAT_TITLE_TO_SHORT_TITLE, chat_title)
-    if not chat_title_short_name:
-        chat_title_short_name = chat_title.lower().replace(" ", "")
-        CHAT_TITLE_TO_SHORT_TITLE[chat_title] = chat_title_short_name
-
     is_private_chat = chat_type == "private"
-    is_group_chat = not is_private_chat and chat_id not in (
-        *CHAT_IDS_TO_SUMMARY,
-        *CHAT_IDS_TO_IGNORE,
-    )
+    if not is_private_chat:
+        chat_title = try_get(chat, "title")
+        chat_title_short_name = try_get(CHAT_TITLE_TO_SHORT_TITLE, chat_title)
+        if not chat_title_short_name:
+            chat_title_short_name = chat_title.lower().replace(" ", "")
+            CHAT_TITLE_TO_SHORT_TITLE[chat_title] = chat_title_short_name
+
     abbot_context = "group"
-    if is_group_chat:
-        debug(f"handle_message => is_group_chat={is_group_chat}")
-    elif is_private_chat:
+    if is_private_chat:
         abbot_context = "private"
         debug(f"handle_message => is_private_chat={is_private_chat}")
-
     debug(f"handle_message => abbot_context={abbot_context}")
 
-    which_abbot: GPT(Abbots) = try_get(ABBOTS, chat_id)
+    which_abbot: GPT(Abbots) = try_get(ABBOTS, str(chat_id))
+    print('which_abbot', which_abbot)
+    print('not which_abbot', not which_abbot)
+    print('try_get(which_abbot, "started")', try_get(which_abbot, "started"))
     if not which_abbot or not try_get(which_abbot, "started"):
         return await message.reply_text(
             "Hello! Thank you for talking to Abbot (@atl_bitlab_bot), A Bitcoin Bot for local communities!\n\n"
             "Abbot is meant to provide education to local bitcoin communities and help community organizers with various tasks.\n\n"
-            "To use Abbot in your DMs or your channel, you must first opt-in to the Usage Agreement / Terms & Conditions.\n\n"
-            "To start Abbot, you must run the /start command. By doing so, you agree to the following:"
-            "   1. Abbot collects all messages sent in a DM or in a channel.\n"
-            "   2. Abbot stores all colleceted messages.\n"
-            "   3. Abbot uses these messages for the purpose of understanding and remaining current with the conversational context.\n"
-            "   4. Abbot uses this context to provide sensible and relevant reactions and updates in real-time.\n\n"
-            "The Usage Agreement / Terms & Conditions will remain agreed to until one of the following actions are taken:\n\n"
+            "Before you can use Abbot, please read the following Usage Agreement / Terms & Conditions:\n"
+            "   1. Abbot can collect and store all messages sent in a DM or in a channel.\n"
+            "   3. Abbot can use these messages to remain current with the chat context.\n"
+            "   4. Abbot can use this context to respond in a relevant and useful way.\n\n"
+            "These terms will remain agreed to by the user until one of the following actions are taken:\n"
             "   1. The /stop command is run.\n"
-            "   2. Abbot is removed from a channel.\n"
-            "   3. Either the /amnesia or /neuralyze commands are run.\n"
-            "If you agree to the Usage Agreement / Terms & Conditions and would like to opt-in, please run the /start command.\n\n"
-            "If you are messaging Abbot in a DM, simply run /start.\n"
-            "If you are adding Abbot to a channel, have a channel admin run /start.\n"
-            "If you do not agree to the Usage Agreement / Terms & Conditions and would like to opt-out, do not run /start."
-            "If in a channel, remove Abbot from the channel.\n\n"
-            "If you have multiple bots in one channel, be sure to tag Abbot (@atl_bitlab_bot) when running /start, e.g. /start @atl_bitlab_bot.\n\n"
-            "Thank you for using Abbot! We hope you enjoy your experience!"
+            "   2. Abbot is removed from a group channel.\n"
+            "   3. Either the /amnesia or /neuralyze commands are run.\n\n"
+            "If you agree to the above Usage Agreement / Terms & Conditions and want to opt-in, here's how:\n"
+            "   1. If you are in a DM, simply run /start.\n"
+            "   2. If you are in a group channel, have a channel admin run /start.\n\n"
+            "If you do not agree to the Usage Agreement / Terms & Conditions or would like to opt-out, here's how:\n"
+            "   1. DO NOT run /start.\n"
+            "   2. If you are in a DM, do nothing. You can safely delete the DM. No messages have been collected!\n"
+            "   3. If you are in a group channel, have an admin remove Abbot from the channel.\n\n"
+            "If you have multiple bots in one channel, you may need to run /start @atl_bitlab_bot to avoid bot confusion!\n\n"
+            "Thank you for using Abbot! We hope you enjoy your experience!\n\n"
             "If you have questions, concerns, feature requests or find bugs, please contact @nonni_io or @ATLBitLab on Telegram."
         )
 
@@ -206,15 +245,17 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     which_abbot: GPT = try_get(ABBOTS, chat_id)
     if not which_abbot:
-        which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
-        which_abbot = GPT(
-            which_bot_name,
-            BOT_HANDLE,
-            ATL_BITCOINER,
-            bot_context,
-            chat_id,
-            True,
-        )
+        return await message.reply_text("Error!")
+    # if not which_abbot:
+    #     which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
+    #     which_abbot = GPT(
+    #         which_bot_name,
+    #         BOT_HANDLE,
+    #         ATL_BITCOINER,
+    #         bot_context,
+    #         chat_id,
+    #         True,
+    #     )
 
     which_name = which_abbot.name
     which_handle = which_abbot.handle
@@ -858,6 +899,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         debug(f"handle_message => which_handle={which_handle}")
         debug(f"handle_message => which_history_len={which_history_len}")
 
+        creator_content = INIT_GROUP_MESSAGE if is_group_chat else INIT_PRIVATE_MESSAGE
+        which_abbot.update_chat_history(dict(role="system", content=creator_content))
         which_abbot.update_chat_history(dict(role="user", content=message_text))
         which_abbot.update_abbots(chat_id, which_abbot)
 
@@ -865,8 +908,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         response = which_abbot.chat_completion()
         if not response:
             status = which_abbot.leash()
-            response = f"{which_abbot.name} leashed={status} ⛔️! {error}."
-        return await message.reply_text(response)
+            response = f"{which_abbot.name} leashed={status} ⛔️! {error_msg}."
+            await context.bot.send_message(
+                chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
+            )
+        await message.reply_text(response)
     except Exception as exception:
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
