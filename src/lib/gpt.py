@@ -15,14 +15,26 @@ import openai
 class Abbots:
     BOTS = dict()
 
-    def __init__(self, prompt, summary):
-        self.BOTS.update(dict(prompt=prompt, summary=summary))
+    def __init__(self, abbots: list):
+        bots = dict()
+        for abbot in abbots:
+            name = try_get(abbot, "chat_id")
+            bots[name] = abbot
+        self.BOTS.update(bots)
+        print("gpt => Abbots => self.BOTS", self.BOTS.keys())
 
     def __str__(self) -> str:
-        return f"Abbots(BOTS={self.BOTS}"
+        _str_ = f"\nAbbots(BOTS="
+        BOTS = self.BOTS.values()
+        for bot in BOTS:
+            _str_ += f"{bot.__str__()})\n"
+        return f"{_str_.rstrip()})\n"
 
     def __repr__(self) -> str:
         return f"Abbots(BOTS={self.BOTS}"
+
+    def get_bots(self) -> BOTS:
+        return self.BOTS
 
 
 class GPT(Abbots):
@@ -32,9 +44,8 @@ class GPT(Abbots):
         handle: str,
         personality: str,
         context: str,
-        chat_id: int= None,
-        unleashed: bool = False,
-        started: bool = False
+        chat_id: int = None,
+        started: bool = False,
     ) -> object:
         openai.api_key: str = OPENAI_API_KEY
         self.model: str = OPENAI_MODEL
@@ -44,8 +55,8 @@ class GPT(Abbots):
         self.personality: str = personality
         self.gpt_system: dict = dict(role="system", content=personality)
         self.chat_id: str = chat_id
-        self.unleashed: bool = unleashed
         self.started: bool = started
+        self.unleashed: bool = started
 
         chat_history_abs_filepath: AnyStr @ abspath = abspath(f"data/gpt/{context}")
         self.chat_history_file_path: str = (
@@ -60,8 +71,8 @@ class GPT(Abbots):
     def __str__(self) -> str:
         return (
             f"GPT(model={self.model}, name={self.name}, "
-            f"handle={self.handle}, context={self.context}, "
-            f"personality={self.personality}, unleashed={self.unleashed})"
+            f"handle={self.handle}, context={self.context} "
+            f"started={self.started}"
         )
 
     def __repr__(self) -> str:
