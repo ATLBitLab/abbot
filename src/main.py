@@ -198,6 +198,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         rm_jl.write(message_dump)
         rm_jl.write("\n")
         rm_jl.close()
+        is_atl_bitdevs = chat_id == -1001204119993
+        if is_atl_bitdevs:
+            debug(f"handle_message => is_atl_bitdevs={is_atl_bitdevs}")
+            return
 
     which_name = try_get(which_abbot, "name")
     which_handle = try_get(which_abbot, "handle")
