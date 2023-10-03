@@ -195,6 +195,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Thank you for using Abbot! We hope you enjoy your experience! \n\n"
             "If you have questions, concerns, feature requests or find bugs, please contact @nonni_io or @ATLBitLab on Telegram."
         )
+
     which_name = try_get(which_abbot, "name")
     which_handle = try_get(which_abbot, "handle")
     which_history_len = len(try_get(which_abbot, "chat_history", default=[]))
