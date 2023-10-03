@@ -171,9 +171,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         rm_jl.write(message_dump)
         rm_jl.write("\n")
         rm_jl.close()
-        if is_atl_bitdevs:
-            debug(f"handle_message => is_atl_bitdevs={is_atl_bitdevs}")
-            return
+    if is_atl_bitdevs:
+        debug(f"handle_message => is_atl_bitdevs={is_atl_bitdevs}")
+        return
     bot_context = "group"
     if is_private_chat:
         bot_context = "private"
