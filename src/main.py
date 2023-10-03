@@ -166,7 +166,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         which_abbot = GPT(
             which_bot_name, BOT_HANDLE, ATL_BITCOINER, bot_context, chat_id
         )
-    if not try_get(which_abbot, "started"):
+    if chat_id == -1001204119993 or not try_get(which_abbot, "started"):
         return await message.reply_text(
             "Hello! Thank you for talking to Abbot (@atl_bitlab_bot), A Bitcoin Bot for local communities! \n\n"
             "Abbot is meant to provide education to local bitcoin communities and help community organizers with various tasks. \n\n"
@@ -185,7 +185,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             {
                 "id": chat_id,
                 "type": chat_type,
-                "title": chat_title,
+                "title": chat_title or chat_title_short_name,
                 "from": username,
                 "text": message_text,
                 "name": name,

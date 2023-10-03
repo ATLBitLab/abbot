@@ -23,6 +23,7 @@ CHAT_TITLE_TO_SHORT_TITLE = {
     "ATL BitLab": "atlbitlab",
     "ATL BitLab Party 2023": "atlbitlabparty2023",
     "Weekly Newsletter Content": "weeklynewslettercontent",
+    "BitMiami": "bitmiami"
 }
 CHAT_ID_TO_CHAT_TITLE = {
     "-1001204119993": "Atlanta BitDevs Discussion",
@@ -31,6 +32,7 @@ CHAT_ID_TO_CHAT_TITLE = {
     "-1001961459761": "ATL BitLab Party 2023",
     "-1001608254734": "ATL BitLab",
     "-911601159": "Weekly Newsletter Content",
+    "-1001463874413": "BitMiami"
 }
 CHAT_IDS_TO_IGNORE = [-911601159, -1001670677325]
 CHAT_IDS_TO_SUMMARY = [-1001204119993]
