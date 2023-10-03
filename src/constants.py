@@ -47,3 +47,4 @@ PITHY_RESPONSES = ["Sorry, I'm taking a nap, ttyl."]
 ABBOTS_JSON = json.load(open(abspath("data/usage_toc_status.json"), "r"))
 GROUP_OPTIN = try_get(ABBOTS_JSON, "GROUP_OPTIN")
 PRIVATE_OPTIN = try_get(ABBOTS_JSON, "PRIVATE_OPTIN")
+COUNT = 5
