@@ -10,6 +10,7 @@ CLEAN_SUMMARY = CLEAN and SUMMARY
 from constants import (
     BOT_NAME,
     BOT_HANDLE,
+    COUNT,
     GROUP_OPTIN,
     INIT_GROUP_MESSAGE,
     INIT_PRIVATE_MESSAGE,
@@ -142,11 +143,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = try_get(chat, "id")
     chat_type = try_get(chat, "type")
 
-    reply_to_message = try_get(message, "reply_to_message")
-    reply_to_message_from = try_get(reply_to_message, "from")
-    reply_to_message_from_bot = try_get(reply_to_message_from, "is_bot")
-    reply_to_message_bot_username = try_get(reply_to_message_from, "username")
-    all_message_data = try_get_telegram_message_data(message)
     message_text = try_get(message, "text")
     if not message_text:
         debug(f"handle_message => Missing message text={message_text}")
@@ -163,10 +159,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if is_private_chat:
         bot_context = "private"
         debug(f"handle_message => is_private_chat={is_private_chat}")
-    debug(f"handle_message => reply_to_message={reply_to_message}")
-    debug(f"handle_message => all_message_data={all_message_data}")
-    debug(f"handle_message => Message text={message_text}")
-    debug(f"handle_message => bot_context={bot_context}")
 
     which_abbot: GPT = try_get(ABBOTS, chat_id)
     if not which_abbot:
@@ -176,25 +168,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
     if not try_get(which_abbot, "started"):
         return await message.reply_text(
-            "Hello! Thank you for talking to Abbot (@atl_bitlab_bot), A Bitcoin Bot for local communities!\n\n"
-            "Abbot is meant to provide education to local bitcoin communities and help community organizers with various tasks.\n\n"
-            "Before you can use Abbot, please read the following Usage Agreement / Terms & Conditions:\n"
-            "   1. Abbot can collect and store all messages sent in a DM or in a channel.\n"
-            "   3. Abbot can use these messages to remain current with the chat context.\n"
-            "   4. Abbot can use this context to respond in a relevant and useful way.\n\n"
-            "These terms will remain agreed to by the user until one of the following actions are taken:\n"
-            "   1. The /stop command is run.\n"
-            "   2. Abbot is removed from a group channel.\n"
-            "   3. Either the /amnesia or /neuralyze commands are run.\n\n"
-            "If you agree to the above Usage Agreement / Terms & Conditions and want to opt-in, here's how:\n"
-            "   1. If you are in a DM, simply run /start.\n"
-            "   2. If you are in a group channel, have a channel admin run /start.\n\n"
-            "If you do not agree to the Usage Agreement / Terms & Conditions or would like to opt-out, here's how:\n"
-            "   1. DO NOT run /start.\n"
-            "   2. If you are in a DM, do nothing. You can safely delete the DM. No messages have been collected!\n"
-            "   3. If you are in a group channel, have an admin remove Abbot from the channel.\n\n"
-            "If you have multiple bots in one channel, you may need to run /start @atl_bitlab_bot to avoid bot confusion!\n\n"
-            "Thank you for using Abbot! We hope you enjoy your experience!\n\n"
+            "Hello! Thank you for talking to Abbot (@atl_bitlab_bot), A Bitcoin Bot for local communities! \n\n"
+            "Abbot is meant to provide education to local bitcoin communities and help community organizers with various tasks. \n\n"
+            "To start Abbot in a group chat, have a channel admin run /start \n\n"
+            "To start Abbot in a DM, simply run /start. \n\n"
+            "By running /start, you agree to our Terms & policies: https://atlbitlab.com/abbot/policies. \n\n"
+            "If you have multiple bots in one channel, you may need to run /start @atl_bitlab_bot to avoid bot confusion! \n\n"
+            "Thank you for using Abbot! We hope you enjoy your experience! \n\n"
             "If you have questions, concerns, feature requests or find bugs, please contact @nonni_io or @ATLBitLab on Telegram."
         )
     is_chat_to_ignore = chat_id in CHAT_IDS_TO_IGNORE
@@ -225,20 +205,28 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     which_abbot.update_chat_history(dict(role="user", content=message_text))
     which_abbot.update_abbots(chat_id, which_abbot)
     group_in_name = "group" in which_name
+    reply_to_message = try_get(message, "reply_to_message")
+    reply_to_message_from = try_get(reply_to_message, "from")
+    reply_to_message_from_bot = try_get(reply_to_message_from, "is_bot")
+    reply_to_message_bot_username = try_get(reply_to_message_from, "username")
+    all_message_data = try_get_telegram_message_data(message)
+    debug(f"handle_message => reply_to_message={reply_to_message}")
+    debug(f"handle_message => all_message_data={all_message_data}")
+    debug(f"handle_message => Message text={message_text}")
+    debug(f"handle_message => bot_context={bot_context}")
     if group_in_name:
         if not reply_to_message:
             debug(f"handle_message => which_name={which_name}")
-            debug(
-                f"handle_message => group_in_name={group_in_name} reply_to_message={reply_to_message}"
-            )
-            if f"@{which_handle}" not in message_text and which_history_len % 5 != 0:
-                msg = f"handle_message => {which_handle} not tagged, message_text={message_text}"
-                debug(msg)
-                debug(f"handle_message => len % 5 != 0, len={which_history_len}")
+            debug(f"handle_message => group={group_in_name} reply={reply_to_message}")
+            if (
+                f"@{which_handle}" not in message_text
+                and which_history_len % COUNT != 0
+            ):
+                debug(f"handle_message => handle untagged, message={message_text}")
+                debug(f"handle_message => {which_history_len} % {COUNT} != 0")
                 return
         elif not reply_to_message_from_bot:
-            msg = f"handle_message => reply_to_message_from_bot={reply_to_message_from_bot}"
-            debug(msg)
+            debug(f"handle_message => reply_from_bot={reply_to_message_from_bot}")
             debug(f"handle_message => reply_to_message={reply_to_message}")
             return
         elif reply_to_message_bot_username != which_handle:
