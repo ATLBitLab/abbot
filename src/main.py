@@ -835,7 +835,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 bot_context,
                 chat_id,
                 True,
-                True,
             )
 
         if not which_abbot:
