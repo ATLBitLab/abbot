@@ -20,9 +20,7 @@ from constants import (
     THE_CREATOR,
     ATL_BITCOINER,
     CHAT_TITLE_TO_SHORT_TITLE,
-    ABBOT_USER_ID,
-    CHAT_IDS_TO_IGNORE,
-    CHAT_IDS_TO_SUMMARY,
+    OPTINOUT_FILEPATH,
     SUPER_DOOPER_ADMINS,
     CHEEKY_RESPONSES,
 )
@@ -48,6 +46,7 @@ from lib.utils import (
     try_gets,
     try_set,
     qr_code,
+    update_optin_optout,
 )
 
 from lib.logger import debug, error
@@ -142,18 +141,16 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not message_text:
         debug(f"handle_message => Missing message text={message_text}")
         return
-    is_private_chat = chat_type == "private"
-    if not is_private_chat:
+    private_chat = chat_type == "private"
+    if not private_chat:
         chat_title = try_get(chat, "title")
         chat_title_short_name = try_get(CHAT_TITLE_TO_SHORT_TITLE, chat_title)
         if not chat_title_short_name:
             chat_title_short_name = chat_title.lower().replace(" ", "")
             CHAT_TITLE_TO_SHORT_TITLE[chat_title] = chat_title_short_name
     is_atl_bitdevs = chat_id == -1001204119993
-    is_chat_to_ignore = chat_id in CHAT_IDS_TO_IGNORE
-    if not is_private_chat and not is_chat_to_ignore:
-        debug(f"handle_message => is_private_chat={is_private_chat}")
-        debug(f"handle_message => is_chat_to_ignore={is_chat_to_ignore}")
+    if not private_chat:
+        debug(f"handle_message => private_chat={private_chat}")
         message_dump = json.dumps(
             {
                 "id": chat_id,
@@ -175,9 +172,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         debug(f"handle_message => is_atl_bitdevs={is_atl_bitdevs}")
         return
     bot_context = "group"
-    if is_private_chat:
+    if private_chat:
         bot_context = "private"
-        debug(f"handle_message => is_private_chat={is_private_chat}")
+        debug(f"handle_message => private_chat={private_chat}")
     which_abbot: GPT = try_get(ABBOTS, chat_id)
     if not which_abbot:
         which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
@@ -527,27 +524,6 @@ async def abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await message.reply_text(f"Error: {error}")
 
 
-async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    sender = update.effective_message.from_user.username
-    message = update.effective_message
-    message_text = message.text
-    debug(f"stop => /stop executed by {sender}")
-    if sender not in SUPER_DOOPER_ADMINS:
-        return await message.reply_text(
-            CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
-        )
-    if f"@{BOT_HANDLE}" not in message_text:
-        return await message.reply_text(
-            f"To stop, tag @{BOT_HANDLE} in the help command: e.g. /stop @{BOT_HANDLE}"
-        )
-
-    await context.bot.stop_poll(
-        chat_id=update.effective_chat.id,
-        message_id=update.effective_message.id,
-        text=f"@{BOT_HANDLE} stopped! Use /start @{BOT_HANDLE} to restart bot",
-    )
-
-
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         message: Message = try_get(update, "message") or try_get(
@@ -557,7 +533,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message_text = try_get(message, "text")
         chat: Chat = try_get(update, "effective_chat") or try_get(message, "chat")
         chat_type = try_get(chat, "type")
-        is_private_chat = chat_type == "private"
+        private_chat = chat_type == "private"
         is_group_chat = chat_type == "group"
         debug(f"help => /help executed by {sender}")
         if is_group_chat:
@@ -566,7 +542,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     f"For help, tag @{BOT_HANDLE} in the help command: e.g. /help @{BOT_HANDLE}",
                 )
             return await message.reply_text(help_menu_message)
-        if is_private_chat:
+        if private_chat:
             await message.reply_text(help_menu_message)
     except Exception as exception:
         exception.with_traceback(None)
@@ -604,7 +580,7 @@ async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         chat = try_get(update, "effective_chat") or try_get(message, "chat")
         chat_type = try_get(chat, "type")
-        is_private_chat = chat_type == "private"
+        private_chat = chat_type == "private"
         is_group_chat = chat_type == "group"
         chat_id = try_get(chat, "id")
         sender = try_get(message, "from_user", "username")
@@ -614,7 +590,7 @@ async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
             cheek = CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))]
             return await message.reply_text(cheek)
 
-        if is_private_chat:
+        if private_chat:
             bot_context = "private"
         elif is_group_chat:
             bot_context = "group"
@@ -664,7 +640,7 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message_text = try_get(message, "text")
         chat = try_get(update, "effective_chat") or try_get(message, "chat")
         chat_type = try_get(chat, "type")
-        is_private_chat = chat_type == "private"
+        private_chat = chat_type == "private"
         is_group_chat = chat_type == "group"
         chat_id = try_get(chat, "id")
         sender = try_get(message, "from_user", "username")
@@ -688,7 +664,7 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return await message.reply_text(
                 f"Bad arg: expecting one of {UNLEASH_LEASH}"
             )
-        if is_private_chat:
+        if private_chat:
             bot_context = "private"
         elif is_group_chat:
             bot_context = "group"
@@ -776,11 +752,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not user:
             error(f"handle_message => Missing User: {user}")
             return
-
         debug(f"handle_message => Message={message}")
         debug(f"handle_message => Chat={chat}")
         debug(f"handle_message => User={user}")
-
         message_text = try_get(message, "text")
         chat_id = try_get(chat, "id")
         chat_type = try_get(chat, "type")
@@ -797,31 +771,26 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not user_id:
             debug(f"handle_message => Missing User ID: {user_id}")
             return
-
         debug(f"handle_message => message_text={message_text}")
         debug(f"handle_message => chat_id={chat_id}")
         debug(f"handle_message => chat_type={chat_type}")
         debug(f"handle_message => user_id={user_id}")
-
-        is_private_chat = chat_type == "private"
-        is_group_chat = not is_private_chat and chat_id not in (
-            *CHAT_IDS_TO_SUMMARY,
-            *CHAT_IDS_TO_IGNORE,
-        )
-        if is_group_chat:
+        private_chat = chat_type == "private"
+        if not private_chat:
             admins = await context.bot.get_chat_administrators(chat_id)
             admin_ids = [admin.user.id for admin in admins]
             if user_id not in admin_ids:
                 return await update.message.reply_text(
                     "Sorry, you are not an admin! Please ask an admin to run the /start command."
                 )
-
         bot_context = "group"
-        if is_private_chat:
+        creator_content = INIT_GROUP_MESSAGE
+        if private_chat:
+            debug(f"handle_message => private_chat={private_chat}")
             bot_context = "private"
-            debug(f"handle_message => is_private_chat={is_private_chat}")
+            creator_content = INIT_PRIVATE_MESSAGE
         debug(f"handle_message => bot_context={bot_context}")
-
+        debug(f"handle_message => creator_content={creator_content}")
         which_abbot = try_get(ABBOTS, chat_id)
         if not which_abbot:
             which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
@@ -833,26 +802,21 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 chat_id,
                 True,
             )
-
         if not which_abbot:
             debug(f"handle_message => No abbot! Which Abbot: {which_abbot}")
             return await message.reply_text(
                 f"/start failed ... please try again later or contact @nonni_io"
             )
-
         which_name = which_abbot.name
         which_handle = which_abbot.handle
         which_history_len = len(which_abbot.chat_history)
-
         debug(f"handle_message => which_name={which_name}")
         debug(f"handle_message => which_handle={which_handle}")
         debug(f"handle_message => which_history_len={which_history_len}")
-
-        creator_content = INIT_GROUP_MESSAGE if is_group_chat else INIT_PRIVATE_MESSAGE
         which_abbot.update_chat_history(dict(role="system", content=creator_content))
         which_abbot.update_chat_history(dict(role="user", content=message_text))
         which_abbot.update_abbots(chat_id, which_abbot)
-
+        update_optin_optout(OPTINOUT_FILEPATH, bot_context, chat_id, True)
         error_msg = f"Please try again later or contact @nonni_io"
         response = which_abbot.chat_completion()
         if not response:
@@ -862,6 +826,88 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
             )
         await message.reply_text(response)
+    except Exception as exception:
+        cause, traceback, args = deconstruct_error(exception)
+        error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
+        error(f"abbot_status => Error={exception}, ErrorMessage={error_msg}")
+        await context.bot.send_message(
+            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
+        )
+        await message.reply_text(f"Sorry ... taking a nap. Hmu later.")
+
+
+async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        debug(f"stop => Raw update={update}")
+        message: Message = try_get(update, "message") or try_get(
+            update, "effective_message"
+        )
+        chat: Chat = try_get(message, "chat") or try_get(update, "effective_chat")
+        user: User = try_get(message, "from_user")
+        if not message:
+            debug(f"stop => Missing Message: {message}")
+            return
+        if not chat:
+            error(f"stop => Missing Chat: {chat}")
+            return
+        if not user:
+            error(f"stop => Missing User: {user}")
+            return
+        debug(f"stop => Message={message}")
+        debug(f"stop => Chat={chat}")
+        debug(f"stop => User={user}")
+        message_text = try_get(message, "text")
+        chat_id = try_get(chat, "id")
+        chat_type = try_get(chat, "type")
+        user_id = try_get(user, "id")
+        if not message_text:
+            debug(f"stop => Missing Message Text: {message_text}")
+            return
+        if not chat_id:
+            error(f"stop => Missing Chat ID: {chat_id}")
+            return
+        if not chat_type:
+            error(f"stop => Missing Chat Type: {chat_type}")
+            return
+        if not user_id:
+            debug(f"stop => Missing User ID: {user_id}")
+            return
+        debug(f"stop => message_text={message_text}")
+        debug(f"stop => chat_id={chat_id}")
+        debug(f"stop => chat_type={chat_type}")
+        debug(f"stop => user_id={user_id}")
+        private_chat = chat_type == "private"
+        if not private_chat:
+            admins = await context.bot.get_chat_administrators(chat_id)
+            admin_ids = [admin.user.id for admin in admins]
+            if user_id not in admin_ids:
+                return await update.message.reply_text(
+                    "Sorry, you are not an admin! Please ask an admin to run the /stop command."
+                )
+        debug(f"stop => /stop executed by {user} in group chat {chat_id}")
+        if not which_abbot:
+            debug(f"stop => No abbot! Which Abbot: {which_abbot}")
+            return await message.reply_text(
+                f"/stop failed! No Abbot to stop! Have you run /start yet?"
+                "If so, please try again later or contact @nonni_io"
+            )
+        update_optin_optout(OPTINOUT_FILEPATH, bot_context, chat_id, False)
+        which_abbot: GPT = try_get(ABBOTS, chat_id)
+        stopped = which_abbot.stop()
+        if not stopped:
+            debug(f"stop => No abbot! Which Abbot: {which_abbot}")
+            await message.reply_text(
+                f"/stop failed! No Abbot to stop! Have you run /start yet?"
+                "If so, please try again later or contact @nonni_io"
+            )
+            return await context.bot.send_message(
+                chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
+            )
+        await context.bot.stop_poll(
+            chat_id=update.effective_chat.id,
+            message_id=update.effective_message.id,
+            text=f"{which_abbot.name} stopped! Use /start to restart {which_abbot.name}",
+        )
     except Exception as exception:
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"

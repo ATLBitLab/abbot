@@ -1,7 +1,10 @@
+from io import open
 from requests import request
 from datetime import datetime, timedelta
 import qrcode
 from io import BytesIO
+
+from lib.logger import error
 
 TELEGRAM_MESSAGE_FIELDS = [
     "audio",
@@ -93,3 +96,32 @@ def qr_code(data):
     qr.save(bio, "PNG")
     bio.seek(0)
     return bio
+
+
+import json
+
+
+def update_optin_optout(
+    file_path: str, context: str, chat_id: int, opt_in: bool
+) -> bool:
+    try:
+        """
+        Update the JSON file at `file_path` by adding `chat_id` to the array associated with `context`.
+        """
+        # Read the existing data
+        optinout_data = json.load(open(file_path, "r"))
+
+        # Add the new value to the appropriate context
+        if opt_in:
+            optinout_data[context].append(chat_id)
+        else:
+            optinout_data[context].remove(chat_id)
+
+        # Write the updated optinout_data back to the file
+        with open(file_path, "w") as file:
+            json.dump(optinout_data, file, indent=4)
+
+        return True
+    except Exception as exception:
+        error(f"context {context} not found in optinout_data.")
+        raise exception

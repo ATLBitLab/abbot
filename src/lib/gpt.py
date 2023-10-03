@@ -119,11 +119,13 @@ class GPT(Abbots):
 
     def start(self) -> bool:
         self.started = True
+        self.unleashed = self.started
         self._open_history()
         return self.started
 
     def stop(self) -> bool:
         self.started = False
+        self.unleashed = self.started
         self.chat_history_file.close()
         return self.started
 

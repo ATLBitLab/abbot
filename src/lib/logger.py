@@ -1,8 +1,8 @@
 from os.path import abspath
 from logging import getLogger, FileHandler, DEBUG, ERROR
+from datetime import datetime
 
-from lib.utils import now_date
-now = now_date()
+now = datetime.now().date()
 
 debugger = getLogger("abbot_debugger")
 debugger.setLevel(DEBUG)
@@ -19,12 +19,12 @@ errogger.addHandler(error_handler)
 
 
 def error(message=""):
-    message_formatted = f"[{now_date()}] {__name__}: {message}\n"
+    message_formatted = f"[{now}] {__name__}: {message}\n"
     print(message_formatted)
     errogger.error(message_formatted)
 
 
 def debug(message=""):
-    message_formatted = f"[{now_date()}] {__name__}: {message}\n"
+    message_formatted = f"[{now}] {__name__}: {message}\n"
     print(message_formatted)
     debugger.debug(message_formatted)

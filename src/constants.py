@@ -34,9 +34,6 @@ CHAT_ID_TO_CHAT_TITLE = {
     "-911601159": "Weekly Newsletter Content",
     "-1001463874413": "BitMiami"
 }
-CHAT_IDS_TO_IGNORE = [-911601159, -1001670677325, -1001717918574, -1001204119993]
-CHAT_IDS_TO_SUMMARY = [-1001204119993]
-CHAT_IDS_TO_UNLEASH = [-926629994, -1001608254734]
 SUPER_DOOPER_ADMINS = ["nonni_io", "sbddesign", "alex_lewin"]
 CHEEKY_RESPONSES = [
     "Ah ah ah, you didnt say the magic word ...",
@@ -46,7 +43,8 @@ CHEEKY_RESPONSES = [
     "Do not pass go, do not collect $200",
 ]
 PITHY_RESPONSES = ["Sorry, I'm taking a nap, ttyl."]
-ABBOTS_JSON = json.load(open(abspath("data/usage_toc_status.json"), "r"))
-GROUP_OPTIN = try_get(ABBOTS_JSON, "GROUP_OPTIN")
-PRIVATE_OPTIN = try_get(ABBOTS_JSON, "PRIVATE_OPTIN")
+OPTINOUT_FILEPATH = abspath("data/optin_optout.json")
+ABBOTS_JSON = json.load(open(OPTINOUT_FILEPATH, "r"))
+GROUP_OPTIN = try_get(ABBOTS_JSON, "group")
+PRIVATE_OPTIN = try_get(ABBOTS_JSON, "private")
 COUNT = 5
