@@ -149,7 +149,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not chat_title_short_name:
             chat_title_short_name = chat_title.lower().replace(" ", "")
             CHAT_TITLE_TO_SHORT_TITLE[chat_title] = chat_title_short_name
-    is_atl_bitdevs = chat_id == -1001204119993
+    is_atl_bitdevs = chat_id == -1001204119993 or chat_title == 'Atlanta BitDevs Discussion' or chat_title_short_name == 'atlantabitdevsdiscussion'
     is_chat_to_ignore = chat_id in CHAT_IDS_TO_IGNORE
     if not is_private_chat and not is_chat_to_ignore:
         debug(f"handle_message => is_private_chat={is_private_chat}")
