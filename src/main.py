@@ -107,7 +107,7 @@ from env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY
 
 RAW_MESSAGE_JL_FILE = abspath("data/raw_messages.jsonl")
 MESSAGES_JL_FILE = abspath("data/messages.jsonl")
-SUMMARY_LOG_FILE = abspath("data/summaries.txt")
+SUMMARY_LOG_FILE = abspath("data/backup/summaries.txt")
 MESSAGES_PY_FILE = abspath("data/backup/messages.py")
 PROMPTS_BY_DAY_FILE = abspath("data/backup/prompts_by_day.py")
 now = datetime.now()
@@ -143,19 +143,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     private_chat = chat_type == "private"
     if not private_chat:
-        chat_title = try_get(chat, "title")
-        chat_title_short_name = try_get(CHAT_TITLE_TO_SHORT_TITLE, chat_title)
-        if not chat_title_short_name:
-            chat_title_short_name = chat_title.lower().replace(" ", "")
-            CHAT_TITLE_TO_SHORT_TITLE[chat_title] = chat_title_short_name
-    is_atl_bitdevs = chat_id == -1001204119993
+        chat_title = try_get(chat, "title", default="").lower().replace(" ", "")
     if not private_chat:
         debug(f"handle_message => private_chat={private_chat}")
         message_dump = json.dumps(
             {
                 "id": chat_id,
                 "type": chat_type,
-                "title": chat_title or chat_title_short_name,
+                "title": chat_title,
                 "from": username,
                 "text": message_text,
                 "name": name,
@@ -164,10 +159,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             }
         )
         debug(f"handle_message => message_dump={message_dump}")
-        rm_jl = open(RAW_MESSAGE_JL_FILE, "a")
-        rm_jl.write(message_dump)
-        rm_jl.write("\n")
-        rm_jl.close()
+        raw_messages_jsonl = open(RAW_MESSAGE_JL_FILE, "a")
+        raw_messages_jsonl.write(message_dump)
+        raw_messages_jsonl.write("\n")
+        raw_messages_jsonl.close()
+    is_atl_bitdevs = chat_id == -1001204119993
     if is_atl_bitdevs:
         debug(f"handle_message => is_atl_bitdevs={is_atl_bitdevs}")
         return

@@ -31,7 +31,7 @@ class Abbots:
         return f"{_str_.rstrip()})\n"
 
     def __repr__(self) -> str:
-        return f"Abbots(BOTS={self.BOTS}"
+        return f"Abbots(BOTS={self.BOTS})"
 
     def get_bots(self) -> dict:
         return self.BOTS

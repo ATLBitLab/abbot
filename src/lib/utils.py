@@ -1,9 +1,9 @@
+import json
 from io import open
 from requests import request
 from datetime import datetime, timedelta
-import qrcode
+from qrcode import make
 from io import BytesIO
-
 from lib.logger import error
 
 TELEGRAM_MESSAGE_FIELDS = [
@@ -91,14 +91,11 @@ def http_request(headers, method, url, json=None):
 
 
 def qr_code(data):
-    qr = qrcode.make(data)
+    qr = make(data)
     bio = BytesIO()
     qr.save(bio, "PNG")
     bio.seek(0)
     return bio
-
-
-import json
 
 
 def update_optin_optout(
