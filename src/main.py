@@ -163,10 +163,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         raw_messages_jsonl.write(message_dump)
         raw_messages_jsonl.write("\n")
         raw_messages_jsonl.close()
-    is_atl_bitdevs = chat_id == -1001204119993
-    if is_atl_bitdevs:
-        debug(f"handle_message => is_atl_bitdevs={is_atl_bitdevs}")
-        return
     bot_context = "group"
     if private_chat:
         bot_context = "private"
