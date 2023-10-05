@@ -109,14 +109,19 @@ def update_optin_optout(
         optinout_data = json.load(open(file_path, "r"))
 
         # Add the new value to the appropriate context
-        if opt_in:
-            optinout_data[context].append(chat_id)
-        else:
-            optinout_data[context].remove(chat_id)
+        change_made = False
+        optinout_list = optinout_data[context]
+        if opt_in and chat_id not in optinout_list:
+            optinout_list.append(chat_id)
+            change_made = True
+        elif not opt_in and chat_id in optinout_list:
+            optinout_list.remove(chat_id)
+            change_made = True
 
         # Write the updated optinout_data back to the file
-        with open(file_path, "w") as file:
-            json.dump(optinout_data, file, indent=4)
+        if change_made:
+            with open(file_path, "w") as file:
+                json.dump(optinout_data, file, indent=4)
 
         return True
     except Exception as exception:

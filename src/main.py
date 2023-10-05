@@ -174,23 +174,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             which_abbot = GPT(
                 which_bot_name, BOT_HANDLE, ATL_BITCOINER, bot_context, chat_id
             )
-        if not try_get(which_abbot, "started"):
-            return await message.reply_text(
-                "Hello! Thank you for talking to Abbot (@atl_bitlab_bot), A Bitcoin Bot for local communities! \n\n"
-                "Abbot is meant to provide education to local bitcoin communities and help community organizers with various tasks. \n\n"
-                "To start Abbot in a group chat, have a channel admin run /start \n\n"
-                "To start Abbot in a DM, simply run /start. \n\n"
-                "By running /start, you agree to our Terms & policies: https://atlbitlab.com/abbot/policies. \n\n"
-                "If you have multiple bots in one channel, you may need to run /start @atl_bitlab_bot to avoid bot confusion! \n\n"
-                "Thank you for using Abbot! We hope you enjoy your experience! \n\n"
-                "If you have questions, concerns, feature requests or find bugs, please contact @nonni_io or @ATLBitLab on Telegram."
-            )
-
         which_name = try_get(which_abbot, "name")
         which_handle = try_get(which_abbot, "handle")
         which_history_len = len(try_get(which_abbot, "chat_history", default=[]))
-        which_abbot.update_chat_history(dict(role="user", content=message_text))
-        which_abbot.update_abbots(chat_id, which_abbot)
         group_in_name = "group" in which_name
         reply_to_message = try_get(message, "reply_to_message")
         reply_to_message_from = try_get(reply_to_message, "from")
@@ -201,40 +187,55 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         debug(f"handle_message => all_message_data={all_message_data}")
         debug(f"handle_message => Message text={message_text}")
         debug(f"handle_message => bot_context={bot_context}")
-        if group_in_name:
-            debug(f"handle_message => group={group_in_name}")
-            if not reply_to_message:
-                debug(f"handle_message => failed check => not reply_to_message")
-                debug(f"handle_message => reply_to_message={reply_to_message}")
-                if (
-                    f"@{which_handle}" not in message_text
-                    and which_history_len % COUNT != 0
-                ):
-                    debug(
-                        f"handle_message => failed check => @{which_handle}"
-                        not in message_text
-                    )
-                    debug(f"handle_message => handle untagged, message={message_text}")
-                    debug(f"handle_message => {which_history_len} % {COUNT} != 0")
-                    return
-            elif not reply_to_message_from_bot:
-                debug(
-                    f"handle_message => failed check => not reply_to_message_from_bot"
-                )
-                debug(f"handle_message => reply_from_bot={reply_to_message_from_bot}")
-                debug(f"handle_message => reply_to_message={reply_to_message}")
+        bot_handle_in_message_text = f"@{which_handle}" in message_text
+        is_fifth_message = which_history_len % COUNT == 0
+        reply_to_which_abbot = reply_to_message_bot_username == which_handle
+        if not group_in_name:
+            debug(f"handle_message => not group_in_name")
+            debug(f"handle_message => which_name={which_name}")
+            return
+        elif not reply_to_message:
+            debug(f"handle_message => not reply_to_message")
+            debug(f"handle_message => reply_to_message={reply_to_message}")
+            if not bot_handle_in_message_text and not is_fifth_message:
+                debug(f"handle_message => not bot_handle_in_message_text")
+                debug(f"handle_message => handle untagged, message={message_text}")
+                debug(f"handle_message => is_fifth_message={is_fifth_message}")
                 return
-            elif reply_to_message_bot_username != which_handle:
-                debug(
-                    f"handle_message => failed check => reply_to_message_bot_username != which_handle"
-                )
-                debug(
-                    f"handle_message => reply_to_message_bot_username={reply_to_message_bot_username}"
-                )
-                debug(f"handle_message => which_handle={which_handle}")
-                return
-
+        elif not reply_to_message_from_bot:
+            debug(f"handle_message => not reply_to_message_from_bot")
+            debug(f"handle_message => reply_from_bot={reply_to_message_from_bot}")
+            debug(f"handle_message => reply_to_message={reply_to_message}")
+            return
+        elif not reply_to_which_abbot:
+            debug(f"handle_message => not reply_to_which_abbot")
+            debug(f"handle_message => reply_to_which_abbot={reply_to_which_abbot}")
+            debug(f"handle_message => which_handle={which_handle}")
+            return
+        which_abbot_started = try_get(which_abbot, "started")
+        debug(f"handle_message => which_abbot_started={which_abbot_started}")
+        if (
+            bot_handle_in_message_text or reply_to_which_abbot
+        ) and not which_abbot_started:
+            debug(f"handle_message => bot_tagged={bot_handle_in_message_text}")
+            debug(f"handle_message => or reply_to_which_abbot={reply_to_which_abbot}")
+            debug(f"handle_message => which_abbot_started={not which_abbot_started}")
+            return await message.reply_text(
+                "Hello! Thank you for talking to Abbot (@atl_bitlab_bot), A Bitcoin Bot for local communities! \n\n"
+                "Abbot is meant to provide education to local bitcoin communities and help community organizers with various tasks. \n\n"
+                "To start Abbot in a group chat, have a channel admin run /start \n\n"
+                "To start Abbot in a DM, simply run /start. \n\n"
+                "By running /start, you agree to our Terms & policies: https://atlbitlab.com/abbot/policies. \n\n"
+                "If you have multiple bots in one channel, you may need to run /start @atl_bitlab_bot to avoid bot confusion! \n\n"
+                "Thank you for using Abbot! We hope you enjoy your experience! \n\n"
+                "If you have questions, concerns, feature requests or find bugs, please contact @nonni_io or @ATLBitLab on Telegram."
+            )
+        if is_fifth_message and not which_abbot_started:
+            debug(f"handle_message => is_fifth_message={is_fifth_message}")
+            return
         debug(f"handle_message => All checks passed!")
+        which_abbot.update_chat_history(dict(role="user", content=message_text))
+        which_abbot.update_abbots(chat_id, which_abbot)
         answer = which_abbot.chat_completion()
         if not answer:
             status = which_abbot.stop()
@@ -838,6 +839,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         which_abbot.update_abbots(chat_id, which_abbot)
         update_optin_optout(OPTINOUT_FILEPATH, bot_context, chat_id, True)
         error_msg = f"Please try again later or contact @nonni_io"
+        await message.reply_text(f"Please wait while we unplug {BOT_NAME} from the Matrix")
         response = which_abbot.chat_completion()
         if not response:
             status = which_abbot.leash()
@@ -912,21 +914,17 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"/stop failed! No Abbot to stop! Have you run /start yet?"
                 "If so, please try again later or contact @nonni_io"
             )
-        update_optin_optout(OPTINOUT_FILEPATH, bot_context, chat_id, False)
         stopped = which_abbot.stop()
         if not stopped:
-            debug(f"stop => not stopped! which_abbot={which_abbot}, stopped={stopped}")
+            err_msg = (
+                f"stop => not stopped! which_abbot={which_abbot}, stopped={stopped}"
+            )
+            error(err_msg)
             await message.reply_text(
                 "/stop failed! Something went wrong. Please try again later or contact @nonni_io"
             )
-            return await context.bot.send_message(
-                chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
-            )
-        await context.bot.stop_poll(
-            chat_id=update.effective_chat.id,
-            message_id=update.effective_message.id,
-            text=f"{which_abbot.name} stopped! Use /start to restart {which_abbot.name}",
-        )
+            return await context.bot.send_message(chat_id=THE_CREATOR, text=err_msg)
+        update_optin_optout(OPTINOUT_FILEPATH, bot_context, chat_id, False)
     except Exception as exception:
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
