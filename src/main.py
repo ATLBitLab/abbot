@@ -190,28 +190,27 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         bot_handle_in_message_text = f"@{which_handle}" in message_text
         is_fifth_message = which_history_len % COUNT == 0
         reply_to_which_abbot = reply_to_message_bot_username == which_handle
-        if not group_in_name:
-            debug(f"handle_message => not group_in_name")
+        if group_in_name:
+            debug(f"handle_message => group_in_name")
             debug(f"handle_message => which_name={which_name}")
-            return
-        elif not reply_to_message:
-            debug(f"handle_message => not reply_to_message")
-            debug(f"handle_message => reply_to_message={reply_to_message}")
-            if not bot_handle_in_message_text and not is_fifth_message:
-                debug(f"handle_message => not bot_handle_in_message_text")
-                debug(f"handle_message => handle untagged, message={message_text}")
-                debug(f"handle_message => is_fifth_message={is_fifth_message}")
+            if not reply_to_message:
+                debug(f"handle_message => not reply_to_message")
+                debug(f"handle_message => reply_to_message={reply_to_message}")
+                if not bot_handle_in_message_text and not is_fifth_message:
+                    debug(f"handle_message => not bot_handle_in_message_text")
+                    debug(f"handle_message => handle untagged, message={message_text}")
+                    debug(f"handle_message => is_fifth_message={is_fifth_message}")
+                    return
+            elif not reply_to_message_from_bot:
+                debug(f"handle_message => not reply_to_message_from_bot")
+                debug(f"handle_message => reply_from_bot={reply_to_message_from_bot}")
+                debug(f"handle_message => reply_to_message={reply_to_message}")
                 return
-        elif not reply_to_message_from_bot:
-            debug(f"handle_message => not reply_to_message_from_bot")
-            debug(f"handle_message => reply_from_bot={reply_to_message_from_bot}")
-            debug(f"handle_message => reply_to_message={reply_to_message}")
-            return
-        elif not reply_to_which_abbot:
-            debug(f"handle_message => not reply_to_which_abbot")
-            debug(f"handle_message => reply_to_which_abbot={reply_to_which_abbot}")
-            debug(f"handle_message => which_handle={which_handle}")
-            return
+            elif not reply_to_which_abbot:
+                debug(f"handle_message => not reply_to_which_abbot")
+                debug(f"handle_message => reply_to_which_abbot={reply_to_which_abbot}")
+                debug(f"handle_message => which_handle={which_handle}")
+                return
         which_abbot_started = try_get(which_abbot, "started")
         debug(f"handle_message => which_abbot_started={which_abbot_started}")
         if (
@@ -243,7 +242,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             debug(f"handle_message => which_abbot={which_abbot} status={status}")
             await context.bot.send_message(
                 chat_id=THE_CREATOR,
-                text=f"{which_abbot.name} stopped ⛔️: Error={exception} ErrorMessage={error_msg}",
+                text=f"{which_abbot.name} stopped ⛔️: which_abbot={which_abbot} status={status}",
             )
         return await message.reply_text(answer)
     except Exception as exception:
@@ -776,44 +775,44 @@ async def abbot_rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        debug(f"handle_message => Raw update={update}")
+        debug(f"start => Raw update={update}")
         message: Message = try_get(update, "message") or try_get(
             update, "effective_message"
         )
         chat: Chat = try_get(message, "chat") or try_get(update, "effective_chat")
         user: User = try_get(message, "from_user")
         if not message:
-            debug(f"handle_message => Missing Message: {message}")
+            debug(f"start => Missing Message: {message}")
             return
         if not chat:
-            error(f"handle_message => Missing Chat: {chat}")
+            error(f"start => Missing Chat: {chat}")
             return
         if not user:
-            error(f"handle_message => Missing User: {user}")
+            error(f"start => Missing User: {user}")
             return
-        debug(f"handle_message => Message={message}")
-        debug(f"handle_message => Chat={chat}")
-        debug(f"handle_message => User={user}")
+        debug(f"start => Message={message}")
+        debug(f"start => Chat={chat}")
+        debug(f"start => User={user}")
         message_text = try_get(message, "text")
         chat_id = try_get(chat, "id")
         chat_type = try_get(chat, "type")
         user_id = try_get(user, "id")
         if not message_text:
-            debug(f"handle_message => Missing Message Text: {message_text}")
+            debug(f"start => Missing Message Text: {message_text}")
             return
         if not chat_id:
-            error(f"handle_message => Missing Chat ID: {chat_id}")
+            error(f"start => Missing Chat ID: {chat_id}")
             return
         if not chat_type:
-            error(f"handle_message => Missing Chat Type: {chat_type}")
+            error(f"start => Missing Chat Type: {chat_type}")
             return
         if not user_id:
-            debug(f"handle_message => Missing User ID: {user_id}")
+            debug(f"start => Missing User ID: {user_id}")
             return
-        debug(f"handle_message => message_text={message_text}")
-        debug(f"handle_message => chat_id={chat_id}")
-        debug(f"handle_message => chat_type={chat_type}")
-        debug(f"handle_message => user_id={user_id}")
+        debug(f"start => message_text={message_text}")
+        debug(f"start => chat_id={chat_id}")
+        debug(f"start => chat_type={chat_type}")
+        debug(f"start => user_id={user_id}")
         private_chat = chat_type == "private"
         if not private_chat:
             admins = await context.bot.get_chat_administrators(chat_id)
@@ -825,11 +824,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         bot_context = "group"
         creator_content = INIT_GROUP_MESSAGE
         if private_chat:
-            debug(f"handle_message => private_chat={private_chat}")
+            debug(f"start => private_chat={private_chat}")
             bot_context = "private"
             creator_content = INIT_PRIVATE_MESSAGE
-        debug(f"handle_message => bot_context={bot_context}")
-        debug(f"handle_message => creator_content={creator_content}")
+        debug(f"start => bot_context={bot_context}")
+        debug(f"start => creator_content={creator_content}")
         which_abbot = try_get(ABBOTS, chat_id)
         if not which_abbot:
             which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
@@ -842,16 +841,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 True,
             )
         if not which_abbot:
-            debug(f"handle_message => No abbot! Which Abbot: {which_abbot}")
+            debug(f"start => No abbot! Which Abbot: {which_abbot}")
             return await message.reply_text(
                 f"/start failed ... please try again later or contact @nonni_io"
             )
         which_name = which_abbot.name
         which_handle = which_abbot.handle
         which_history_len = len(which_abbot.chat_history)
-        debug(f"handle_message => which_name={which_name}")
-        debug(f"handle_message => which_handle={which_handle}")
-        debug(f"handle_message => which_history_len={which_history_len}")
+        debug(f"start => which_name={which_name}")
+        debug(f"start => which_handle={which_handle}")
+        debug(f"start => which_history_len={which_history_len}")
         started = which_abbot.start()
         if not started:
             raise Exception(f"Not started! started={started}")
@@ -868,13 +867,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             status = which_abbot.leash()
             response = f"{which_abbot.name} leashed={status} ⛔️! {error_msg}."
             await context.bot.send_message(
-                chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
+                chat_id=THE_CREATOR, text=f"status={status} response={response}"
             )
         await message.reply_text(response)
     except Exception as exception:
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-        error(f"handle_message => Error={exception}, ErrorMessage={error_msg}")
+        error(f"start => Error={exception}, ErrorMessage={error_msg}")
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
