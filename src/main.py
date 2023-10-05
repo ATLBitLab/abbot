@@ -175,7 +175,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         which_history_len = len(try_get(which_abbot, "chat_history", default=[]))
         group_in_name = "group" in which_name
         reply_to_message = try_get(message, "reply_to_message")
-        reply_to_message_text = try_get(reply_to_message, "text")
+        reply_to_message_text = try_get(reply_to_message, "text", default="")
         reply_to_message_from = try_get(reply_to_message, "from")
         reply_to_message_from_bot = try_get(reply_to_message_from, "is_bot")
         reply_to_message_bot_username = try_get(reply_to_message_from, "username")
@@ -254,16 +254,16 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 text=f"{which_abbot.name} stopped ⛔️: which_abbot={which_abbot} status={status} answer={answer}",
             )
         return await message.reply_text(answer)
-    except Exception:
+    except Exception as exception:
         status = which_abbot.stop()
-        # cause, traceback, args = deconstruct_error(exception)
-        # error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-        # error(f"handle_message => Error={exception}, ErrorMessage={error_msg}")
+        cause, traceback, args = deconstruct_error(exception)
+        error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
+        error(f"handle_message => Error={exception}, ErrorMessage={error_msg}")
         error(f"handle_message => which_abbot={which_abbot} status={status}")
-        raise Exception
-        # await context.bot.send_message(
-        #     chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
-        # )
+        await context.bot.send_message(
+            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
+        )
+        raise exception
 
 
 def clean_data():
@@ -389,6 +389,7 @@ async def both(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
+        raise exception
 
 
 def whitelist_gate(sender):
@@ -744,6 +745,7 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
+        raise exception
 
 
 async def abbot_rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -773,6 +775,7 @@ async def abbot_rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
+        raise exception
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -879,6 +882,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
+        raise exception
 
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -966,6 +970,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
+        raise exception
 
 
 if __name__ == "__main__":
