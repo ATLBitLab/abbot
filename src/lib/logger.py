@@ -19,12 +19,12 @@ errogger.addHandler(error_handler)
 
 
 def error(message=""):
-    message_formatted = f"[{now}] {__name__}: {message}\n"
+    message_formatted = f"[{now}] error - {__name__}: {message}\n"
     print(message_formatted)
     errogger.error(message_formatted)
 
 
 def debug(message=""):
-    message_formatted = f"[{now}] {__name__}: {message}\n"
+    message_formatted = f"[{now}] debug - {__name__}: {message}\n"
     print(message_formatted)
     debugger.debug(message_formatted)
