@@ -100,7 +100,7 @@ for private_chat in listdir(abspath("data/gpt/private")):
     ALL_ABBOTS.append(group_abbot)
 
 abbots = Abbots(ALL_ABBOTS)
-ABBOTS = abbots.get_bots()
+ABBOTS: Abbots.BOTS = abbots.get_bots()
 debug(f"main abbots => {abbots.__str__()}")
 
 from env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY
@@ -569,7 +569,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         exception.with_traceback(None)
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-        error(f"abbot_status => Error={exception}, ErrorMessage={error_msg}")
+        error(f"help => Error={exception}, ErrorMessage={error_msg}")
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
@@ -599,18 +599,35 @@ async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message: Message = try_get(update, "message") or try_get(
             update, "effective_message"
         )
-        chat = try_get(update, "effective_chat") or try_get(message, "chat")
+        chat: Chat = try_get(update, "effective_chat") or try_get(message, "chat")
+        user: User = try_get(message, "from_user")
+        if not user:
+            error(f"handle_message => Missing User: {user}")
+            return
         chat_type = try_get(chat, "type")
         private_chat = chat_type == "private"
         is_group_chat = chat_type == "group"
         chat_id = try_get(chat, "id")
-        sender = try_get(message, "from_user", "username")
-        debug(f"abbot_status => /status executed by {sender}")
-
-        if sender not in SUPER_DOOPER_ADMINS or sender:
-            cheek = CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))]
-            return await message.reply_text(cheek)
-
+        user_id = try_get(user, "id")
+        if not user_id:
+            debug(f"handle_message => Missing User ID: {user_id}")
+            return
+        """
+        if is_group_chat:
+            debug(f"abbot_status => /status executed by {user_id}")
+            admins = await context.bot.get_chat_administrators(chat_id)
+            admin_ids = [admin.user.id for admin in admins]
+            if user_id not in admin_ids:
+                return await message.reply_text(
+                    "Sorry, you are not an admin! Please ask an admin to run the /start command."
+                )
+        elif 
+        """
+        if user_id != THE_CREATOR:
+            return await message.reply_text(
+                "Sorry, you are not an admin! Please ask an admin to run the /start command."
+            )
+        """
         if private_chat:
             bot_context = "private"
         elif is_group_chat:
@@ -634,7 +651,8 @@ async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
             which_abbot.update_abbots(chat_id, which_abbot)
             debug(f"abbot_status => bot={which_abbot}")
         got_abbots = which_abbot.get_abbots()
-        for _, abbot in got_abbots.items():
+        """
+        for _, abbot in ABBOTS.items():
             status = json.dumps(abbot.status(), indent=4)
             debug(f"abbot_status => {abbot.name} status={status}")
             await message.reply_text(status)
@@ -839,7 +857,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         which_abbot.update_abbots(chat_id, which_abbot)
         update_optin_optout(OPTINOUT_FILEPATH, bot_context, chat_id, True)
         error_msg = f"Please try again later or contact @nonni_io"
-        await message.reply_text(f"Please wait while we unplug {BOT_NAME} from the Matrix")
+        await message.reply_text(
+            f"Please wait while we unplug {BOT_NAME} from the Matrix"
+        )
         response = which_abbot.chat_completion()
         if not response:
             status = which_abbot.leash()
@@ -851,7 +871,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as exception:
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-        error(f"abbot_status => Error={exception}, ErrorMessage={error_msg}")
+        error(f"handle_message => Error={exception}, ErrorMessage={error_msg}")
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
@@ -928,7 +948,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as exception:
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-        error(f"abbot_status => Error={exception}, ErrorMessage={error_msg}")
+        error(f"stop => Error={exception}, ErrorMessage={error_msg}")
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
