@@ -852,6 +852,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         debug(f"handle_message => which_name={which_name}")
         debug(f"handle_message => which_handle={which_handle}")
         debug(f"handle_message => which_history_len={which_history_len}")
+        started = which_abbot.start()
+        if not started:
+            raise Exception(f"Not started! started={started}")
         which_abbot.update_chat_history(dict(role="system", content=creator_content))
         which_abbot.update_chat_history(dict(role="user", content=message_text))
         which_abbot.update_abbots(chat_id, which_abbot)
@@ -928,16 +931,24 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 )
         debug(f"stop => /stop executed by {user} in group chat {chat_id}")
         which_abbot: GPT = try_get(ABBOTS, chat_id)
+        debug(f"stop => which_abbot={which_abbot}")
+
         if not which_abbot:
             debug(f"stop => No abbot! which_abbot={which_abbot}")
             return await message.reply_text(
                 f"/stop failed! No Abbot to stop! Have you run /start yet?"
                 "If so, please try again later or contact @nonni_io"
             )
-        stopped = which_abbot.stop()
-        if not stopped:
+        if not which_abbot.started:
+            debug(f"stop => Not started! which_abbot.started={which_abbot.started}")
+            return await message.reply_text(
+                f"/stop failed! No Abbot to stop! Have you run /start yet?"
+                "If so, please try again later or contact @nonni_io"
+            )
+        running = which_abbot.stop()
+        if running:
             err_msg = (
-                f"stop => not stopped! which_abbot={which_abbot}, stopped={stopped}"
+                f"stop => not stopped! which_abbot={which_abbot}, running={running}"
             )
             error(err_msg)
             await message.reply_text(
@@ -945,6 +956,9 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             return await context.bot.send_message(chat_id=THE_CREATOR, text=err_msg)
         update_optin_optout(OPTINOUT_FILEPATH, bot_context, chat_id, False)
+        await message.reply_text(
+            f"Thanks for using {BOT_NAME}. Use /start to restart at any time."
+        )
     except Exception as exception:
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
