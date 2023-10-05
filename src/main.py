@@ -48,9 +48,7 @@ from lib.utils import (
     qr_code,
     update_optin_optout,
 )
-
 from lib.logger import debug, error
-
 from telegram import Update, Message, Chat, User
 from telegram.ext.filters import BaseFilter
 from telegram.ext import (
@@ -59,15 +57,49 @@ from telegram.ext import (
     CommandHandler,
     MessageHandler,
 )
-
 from lib.api.strike import Strike
 from lib.gpt import GPT, Abbots
+from env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY
 
 PROMPT_ABBOT = GPT(f"p{BOT_NAME}", BOT_HANDLE, PROMPT_ASSISTANT, "prompt")
 SUMMARY_ABBOT = GPT(f"s{BOT_NAME}", BOT_HANDLE, SUMMARY_ASSISTANT, "summary")
 ALL_ABBOTS = [PROMPT_ABBOT, SUMMARY_ABBOT]
 
-from env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY
+for group_chat in listdir(abspath("data/gpt/group")):
+    if ".jsonl" not in group_chat:
+        continue
+    bot_context = "group"
+    chat_id = int(group_chat.split(".")[0])
+    abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
+    group_abbot = GPT(
+        abbot_name,
+        BOT_HANDLE,
+        ATL_BITCOINER,
+        bot_context,
+        chat_id,
+        chat_id in GROUP_OPTIN,
+    )
+    ALL_ABBOTS.append(group_abbot)
+
+for private_chat in listdir(abspath("data/gpt/private")):
+    if ".jsonl" not in private_chat:
+        continue
+    bot_context = "private"
+    chat_id = int(private_chat.split(".")[0])
+    abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
+    group_abbot = GPT(
+        abbot_name,
+        BOT_HANDLE,
+        ATL_BITCOINER,
+        bot_context,
+        chat_id,
+        chat_id in PRIVATE_OPTIN,
+    )
+    ALL_ABBOTS.append(group_abbot)
+
+abbots = Abbots(ALL_ABBOTS)
+ABBOTS: Abbots.BOTS = abbots.get_bots()
+debug(f"main abbots => {abbots.__str__()}")
 
 RAW_MESSAGE_JL_FILE = abspath("data/raw_messages.jsonl")
 MESSAGES_JL_FILE = abspath("data/messages.jsonl")
@@ -176,8 +208,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 debug(f"handle_message => not reply_to_message_from_bot")
                 debug(f"handle_message => reply_from_bot={reply_to_message_from_bot}")
                 debug(f"handle_message => not bot_handle_in_reply_to_message_text")
-                debug(f"handle_message => hanlde_in_reply_message_text={bot_handle_in_reply_to_message_text}")
-                debug(f"handle_message => reply_to_message_text={reply_to_message_text}")
+                debug(
+                    f"handle_message => hanlde_in_reply_message_text={bot_handle_in_reply_to_message_text}"
+                )
+                debug(
+                    f"handle_message => reply_to_message_text={reply_to_message_text}"
+                )
                 return
             elif not reply_to_which_abbot:
                 debug(f"handle_message => not reply_to_which_abbot")
@@ -186,9 +222,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 return
         which_abbot_started = try_get(which_abbot, "started")
         debug(f"handle_message => which_abbot_started={which_abbot_started}")
-        if (
-            bot_handle_in_message_text or reply_to_which_abbot
-        ) and not which_abbot_started:
+        if (bot_handle_in_message_text or reply_to_which_abbot) and (
+            not which_abbot_started and which_history_len == 1
+        ):
             debug(f"handle_message => bot_tagged={bot_handle_in_message_text}")
             debug(f"handle_message => or reply_to_which_abbot={reply_to_which_abbot}")
             debug(f"handle_message => which_abbot_started={not which_abbot_started}")
@@ -213,9 +249,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             status = which_abbot.stop()
             answer = "Sorry ... taking a nap. Hmu later."
             debug(f"handle_message => which_abbot={which_abbot} status={status}")
-            await context.bot.send_message(
+            return await context.bot.send_message(
                 chat_id=THE_CREATOR,
-                text=f"{which_abbot.name} stopped ⛔️: which_abbot={which_abbot} status={status}",
+                text=f"{which_abbot.name} stopped ⛔️: which_abbot={which_abbot} status={status} answer={answer}",
             )
         return await message.reply_text(answer)
     except Exception as exception:
@@ -839,7 +875,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not response:
             status = which_abbot.leash()
             response = f"{which_abbot.name} leashed={status} ⛔️! {error_msg}."
-            await context.bot.send_message(
+            return await context.bot.send_message(
                 chat_id=THE_CREATOR, text=f"status={status} response={response}"
             )
         await message.reply_text(response)
@@ -850,7 +886,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
-        await message.reply_text(f"Sorry ... taking a nap. Hmu later.")
 
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -943,46 +978,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 if __name__ == "__main__":
     TOKEN = TEST_BOT_TOKEN if DEV_MODE else BOT_TOKEN
-
     APPLICATION = ApplicationBuilder().token(TOKEN).build()
-    
-    for group_chat in listdir(abspath("data/gpt/group")):
-        if ".jsonl" not in group_chat:
-            continue
-        bot_context = "group"
-        chat_id = int(group_chat.split(".")[0])
-        abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
-        group_abbot = GPT(
-            abbot_name,
-            BOT_HANDLE,
-            ATL_BITCOINER,
-            bot_context,
-            chat_id,
-            chat_id in GROUP_OPTIN,
-        )
-        ALL_ABBOTS.append(group_abbot)
-
-    for private_chat in listdir(abspath("data/gpt/private")):
-        if ".jsonl" not in private_chat:
-            continue
-        bot_context = "private"
-        chat_id = int(private_chat.split(".")[0])
-        abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
-        group_abbot = GPT(
-            abbot_name,
-            BOT_HANDLE,
-            ATL_BITCOINER,
-            bot_context,
-            chat_id,
-            chat_id in PRIVATE_OPTIN,
-        )
-        ALL_ABBOTS.append(group_abbot)
-    
-    global abbots
-    abbots = Abbots(ALL_ABBOTS)
-    global ABBOTS
-    ABBOTS: Abbots.BOTS = abbots.get_bots()
-    debug(f"main abbots => {abbots.__str__()}")
     debug(f"{BOT_NAME} @{BOT_HANDLE} Initialized")
 
     help_handler = CommandHandler("help", help)
