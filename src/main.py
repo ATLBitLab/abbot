@@ -114,119 +114,147 @@ now = datetime.now()
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    debug(f"handle_message => Raw update={update}")
-    mpy = open(MESSAGES_PY_FILE, "a")
-    mpy.write(update.to_json())
-    mpy.write("\n")
-    mpy.close()
+    try:
+        debug(f"handle_message => Raw update={update}")
+        mpy = open(MESSAGES_PY_FILE, "a")
+        mpy.write(update.to_json())
+        mpy.write("\n")
+        mpy.close()
 
-    message: Message = try_get(update, "message") or try_get(
-        update, "effective_message"
-    )
-    chat: Chat = try_get(message, "chat") or try_get(update, "effective_chat")
-    if not message:
-        debug(f"handle_message => Missing Message: {message}")
-        return
-    if not chat:
-        debug(f"handle_message => Missing Chat: {chat}")
-        return
-    debug(f"handle_message => Message={message}")
-    debug(f"handle_message => Chat={chat}")
-    username = try_get(message, "from_user", "username")
-    date = (try_get(message, "date") or now).strftime("%m/%d/%Y")
-    name = try_get(chat, "first_name", default=username)
-    chat_id = try_get(chat, "id")
-    chat_type = try_get(chat, "type")
-    message_text = try_get(message, "text")
-    if not message_text:
-        debug(f"handle_message => Missing message text={message_text}")
-        return
-    private_chat = chat_type == "private"
-    if not private_chat:
-        chat_title = try_get(chat, "title", default="").lower().replace(" ", "")
-    if not private_chat:
-        debug(f"handle_message => private_chat={private_chat}")
-        message_dump = json.dumps(
-            {
-                "id": chat_id,
-                "type": chat_type,
-                "title": chat_title,
-                "from": username,
-                "text": message_text,
-                "name": name,
-                "date": date,
-                "new": True,
-            }
+        message: Message = try_get(update, "message") or try_get(
+            update, "effective_message"
         )
-        debug(f"handle_message => message_dump={message_dump}")
-        raw_messages_jsonl = open(RAW_MESSAGE_JL_FILE, "a")
-        raw_messages_jsonl.write(message_dump)
-        raw_messages_jsonl.write("\n")
-        raw_messages_jsonl.close()
-    bot_context = "group"
-    if private_chat:
-        bot_context = "private"
-        debug(f"handle_message => private_chat={private_chat}")
-    which_abbot: GPT = try_get(ABBOTS, chat_id)
-    if not which_abbot:
-        which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
-        which_abbot = GPT(
-            which_bot_name, BOT_HANDLE, ATL_BITCOINER, bot_context, chat_id
-        )
-    if not try_get(which_abbot, "started"):
-        return await message.reply_text(
-            "Hello! Thank you for talking to Abbot (@atl_bitlab_bot), A Bitcoin Bot for local communities! \n\n"
-            "Abbot is meant to provide education to local bitcoin communities and help community organizers with various tasks. \n\n"
-            "To start Abbot in a group chat, have a channel admin run /start \n\n"
-            "To start Abbot in a DM, simply run /start. \n\n"
-            "By running /start, you agree to our Terms & policies: https://atlbitlab.com/abbot/policies. \n\n"
-            "If you have multiple bots in one channel, you may need to run /start @atl_bitlab_bot to avoid bot confusion! \n\n"
-            "Thank you for using Abbot! We hope you enjoy your experience! \n\n"
-            "If you have questions, concerns, feature requests or find bugs, please contact @nonni_io or @ATLBitLab on Telegram."
-        )
+        chat: Chat = try_get(message, "chat") or try_get(update, "effective_chat")
+        if not message:
+            debug(f"handle_message => Missing Message: {message}")
+            return
+        if not chat:
+            debug(f"handle_message => Missing Chat: {chat}")
+            return
+        debug(f"handle_message => Message={message}")
+        debug(f"handle_message => Chat={chat}")
+        username = try_get(message, "from_user", "username")
+        date = (try_get(message, "date") or now).strftime("%m/%d/%Y")
+        name = try_get(chat, "first_name", default=username)
+        chat_id = try_get(chat, "id")
+        chat_type = try_get(chat, "type")
+        message_text = try_get(message, "text")
+        if not message_text:
+            debug(f"handle_message => Missing message text={message_text}")
+            return
+        private_chat = chat_type == "private"
+        if not private_chat:
+            chat_title = try_get(chat, "title", default="").lower().replace(" ", "")
+        if not private_chat:
+            debug(f"handle_message => private_chat={private_chat}")
+            message_dump = json.dumps(
+                {
+                    "id": chat_id,
+                    "type": chat_type,
+                    "title": chat_title,
+                    "from": username,
+                    "text": message_text,
+                    "name": name,
+                    "date": date,
+                    "new": True,
+                }
+            )
+            debug(f"handle_message => message_dump={message_dump}")
+            raw_messages_jsonl = open(RAW_MESSAGE_JL_FILE, "a")
+            raw_messages_jsonl.write(message_dump)
+            raw_messages_jsonl.write("\n")
+            raw_messages_jsonl.close()
+        bot_context = "group"
+        if private_chat:
+            bot_context = "private"
+            debug(f"handle_message => private_chat={private_chat}")
+        which_abbot: GPT = try_get(ABBOTS, chat_id)
+        if not which_abbot:
+            which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
+            which_abbot = GPT(
+                which_bot_name, BOT_HANDLE, ATL_BITCOINER, bot_context, chat_id
+            )
+        if not try_get(which_abbot, "started"):
+            return await message.reply_text(
+                "Hello! Thank you for talking to Abbot (@atl_bitlab_bot), A Bitcoin Bot for local communities! \n\n"
+                "Abbot is meant to provide education to local bitcoin communities and help community organizers with various tasks. \n\n"
+                "To start Abbot in a group chat, have a channel admin run /start \n\n"
+                "To start Abbot in a DM, simply run /start. \n\n"
+                "By running /start, you agree to our Terms & policies: https://atlbitlab.com/abbot/policies. \n\n"
+                "If you have multiple bots in one channel, you may need to run /start @atl_bitlab_bot to avoid bot confusion! \n\n"
+                "Thank you for using Abbot! We hope you enjoy your experience! \n\n"
+                "If you have questions, concerns, feature requests or find bugs, please contact @nonni_io or @ATLBitLab on Telegram."
+            )
 
-    which_name = try_get(which_abbot, "name")
-    which_handle = try_get(which_abbot, "handle")
-    which_history_len = len(try_get(which_abbot, "chat_history", default=[]))
-    which_abbot.update_chat_history(dict(role="user", content=message_text))
-    which_abbot.update_abbots(chat_id, which_abbot)
-    group_in_name = "group" in which_name
-    reply_to_message = try_get(message, "reply_to_message")
-    reply_to_message_from = try_get(reply_to_message, "from")
-    reply_to_message_from_bot = try_get(reply_to_message_from, "is_bot")
-    reply_to_message_bot_username = try_get(reply_to_message_from, "username")
-    all_message_data = try_get_telegram_message_data(message)
-    debug(f"handle_message => reply_to_message={reply_to_message}")
-    debug(f"handle_message => all_message_data={all_message_data}")
-    debug(f"handle_message => Message text={message_text}")
-    debug(f"handle_message => bot_context={bot_context}")
-    if group_in_name:
-        if not reply_to_message:
-            debug(f"handle_message => which_name={which_name}")
-            debug(f"handle_message => group={group_in_name} reply={reply_to_message}")
-            if (
-                f"@{which_handle}" not in message_text
-                and which_history_len % COUNT != 0
-            ):
-                debug(f"handle_message => handle untagged, message={message_text}")
-                debug(f"handle_message => {which_history_len} % {COUNT} != 0")
+        which_name = try_get(which_abbot, "name")
+        which_handle = try_get(which_abbot, "handle")
+        which_history_len = len(try_get(which_abbot, "chat_history", default=[]))
+        which_abbot.update_chat_history(dict(role="user", content=message_text))
+        which_abbot.update_abbots(chat_id, which_abbot)
+        group_in_name = "group" in which_name
+        reply_to_message = try_get(message, "reply_to_message")
+        reply_to_message_from = try_get(reply_to_message, "from")
+        reply_to_message_from_bot = try_get(reply_to_message_from, "is_bot")
+        reply_to_message_bot_username = try_get(reply_to_message_from, "username")
+        all_message_data = try_get_telegram_message_data(message)
+        debug(f"handle_message => reply_to_message={reply_to_message}")
+        debug(f"handle_message => all_message_data={all_message_data}")
+        debug(f"handle_message => Message text={message_text}")
+        debug(f"handle_message => bot_context={bot_context}")
+        if group_in_name:
+            debug(f"handle_message => group={group_in_name}")
+            if not reply_to_message:
+                debug(f"handle_message => failed check => not reply_to_message")
+                debug(f"handle_message => reply_to_message={reply_to_message}")
+                if (
+                    f"@{which_handle}" not in message_text
+                    and which_history_len % COUNT != 0
+                ):
+                    debug(
+                        f"handle_message => failed check => @{which_handle}"
+                        not in message_text
+                    )
+                    debug(f"handle_message => handle untagged, message={message_text}")
+                    debug(f"handle_message => {which_history_len} % {COUNT} != 0")
+                    return
+            elif not reply_to_message_from_bot:
+                debug(
+                    f"handle_message => failed check => not reply_to_message_from_bot"
+                )
+                debug(f"handle_message => reply_from_bot={reply_to_message_from_bot}")
+                debug(f"handle_message => reply_to_message={reply_to_message}")
                 return
-        elif not reply_to_message_from_bot:
-            debug(f"handle_message => reply_from_bot={reply_to_message_from_bot}")
-            debug(f"handle_message => reply_to_message={reply_to_message}")
-            return
-        elif reply_to_message_bot_username != which_handle:
-            msg = f"handle_message => bot_username != which_handle={reply_to_message_bot_username != which_handle}"
-            debug(msg)
-            debug(f"handle_message => bot_username={reply_to_message_bot_username}")
-            debug(f"handle_message => which_handle={which_handle}")
-            return
+            elif reply_to_message_bot_username != which_handle:
+                debug(
+                    f"handle_message => failed check => reply_to_message_bot_username != which_handle"
+                )
+                debug(
+                    f"handle_message => reply_to_message_bot_username={reply_to_message_bot_username}"
+                )
+                debug(f"handle_message => which_handle={which_handle}")
+                return
 
-    debug(f"handle_message => All checks passed!")
-    error = f"Please try again later. {which_abbot.name} leashed ⛔️"
-    answer = which_abbot.chat_completion()
-    response = error if not answer else answer
-    return await message.reply_text(response)
+        debug(f"handle_message => All checks passed!")
+        answer = which_abbot.chat_completion()
+        if not answer:
+            status = which_abbot.stop()
+            answer = "Sorry ... taking a nap. Hmu later."
+            debug(f"handle_message => which_abbot={which_abbot} status={status}")
+            await context.bot.send_message(
+                chat_id=THE_CREATOR,
+                text=f"{which_abbot.name} stopped ⛔️: Error={exception} ErrorMessage={error_msg}",
+            )
+        return await message.reply_text(answer)
+    except Exception as exception:
+        status = which_abbot.stop()
+        cause, traceback, args = deconstruct_error(exception)
+        error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
+        error(f"handle_message => Error={exception}, ErrorMessage={error_msg}")
+        error(f"handle_message => which_abbot={which_abbot} status={status}")
+        await context.bot.send_message(
+            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
+        )
+        await message.reply_text(f"Sorry ... taking a nap. Hmu later.")
 
 
 def clean_data():
@@ -877,20 +905,19 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     "Sorry, you are not an admin! Please ask an admin to run the /stop command."
                 )
         debug(f"stop => /stop executed by {user} in group chat {chat_id}")
+        which_abbot: GPT = try_get(ABBOTS, chat_id)
         if not which_abbot:
-            debug(f"stop => No abbot! Which Abbot: {which_abbot}")
+            debug(f"stop => No abbot! which_abbot={which_abbot}")
             return await message.reply_text(
                 f"/stop failed! No Abbot to stop! Have you run /start yet?"
                 "If so, please try again later or contact @nonni_io"
             )
         update_optin_optout(OPTINOUT_FILEPATH, bot_context, chat_id, False)
-        which_abbot: GPT = try_get(ABBOTS, chat_id)
         stopped = which_abbot.stop()
         if not stopped:
-            debug(f"stop => No abbot! Which Abbot: {which_abbot}")
+            debug(f"stop => not stopped! which_abbot={which_abbot}, stopped={stopped}")
             await message.reply_text(
-                f"/stop failed! No Abbot to stop! Have you run /start yet?"
-                "If so, please try again later or contact @nonni_io"
+                "/stop failed! Something went wrong. Please try again later or contact @nonni_io"
             )
             return await context.bot.send_message(
                 chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
