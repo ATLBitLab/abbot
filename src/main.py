@@ -67,42 +67,6 @@ PROMPT_ABBOT = GPT(f"p{BOT_NAME}", BOT_HANDLE, PROMPT_ASSISTANT, "prompt")
 SUMMARY_ABBOT = GPT(f"s{BOT_NAME}", BOT_HANDLE, SUMMARY_ASSISTANT, "summary")
 ALL_ABBOTS = [PROMPT_ABBOT, SUMMARY_ABBOT]
 
-for group_chat in listdir(abspath("data/gpt/group")):
-    if ".jsonl" not in group_chat:
-        continue
-    bot_context = "group"
-    chat_id = int(group_chat.split(".")[0])
-    abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
-    group_abbot = GPT(
-        abbot_name,
-        BOT_HANDLE,
-        ATL_BITCOINER,
-        bot_context,
-        chat_id,
-        chat_id in GROUP_OPTIN,
-    )
-    ALL_ABBOTS.append(group_abbot)
-
-for private_chat in listdir(abspath("data/gpt/private")):
-    if ".jsonl" not in private_chat:
-        continue
-    bot_context = "private"
-    chat_id = int(private_chat.split(".")[0])
-    abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
-    group_abbot = GPT(
-        abbot_name,
-        BOT_HANDLE,
-        ATL_BITCOINER,
-        bot_context,
-        chat_id,
-        chat_id in PRIVATE_OPTIN,
-    )
-    ALL_ABBOTS.append(group_abbot)
-
-abbots = Abbots(ALL_ABBOTS)
-ABBOTS: Abbots.BOTS = abbots.get_bots()
-debug(f"main abbots => {abbots.__str__()}")
-
 from env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY
 
 RAW_MESSAGE_JL_FILE = abspath("data/raw_messages.jsonl")
@@ -981,6 +945,44 @@ if __name__ == "__main__":
     TOKEN = TEST_BOT_TOKEN if DEV_MODE else BOT_TOKEN
 
     APPLICATION = ApplicationBuilder().token(TOKEN).build()
+    
+    for group_chat in listdir(abspath("data/gpt/group")):
+        if ".jsonl" not in group_chat:
+            continue
+        bot_context = "group"
+        chat_id = int(group_chat.split(".")[0])
+        abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
+        group_abbot = GPT(
+            abbot_name,
+            BOT_HANDLE,
+            ATL_BITCOINER,
+            bot_context,
+            chat_id,
+            chat_id in GROUP_OPTIN,
+        )
+        ALL_ABBOTS.append(group_abbot)
+
+    for private_chat in listdir(abspath("data/gpt/private")):
+        if ".jsonl" not in private_chat:
+            continue
+        bot_context = "private"
+        chat_id = int(private_chat.split(".")[0])
+        abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
+        group_abbot = GPT(
+            abbot_name,
+            BOT_HANDLE,
+            ATL_BITCOINER,
+            bot_context,
+            chat_id,
+            chat_id in PRIVATE_OPTIN,
+        )
+        ALL_ABBOTS.append(group_abbot)
+    
+    global abbots
+    abbots = Abbots(ALL_ABBOTS)
+    global ABBOTS
+    ABBOTS: Abbots.BOTS = abbots.get_bots()
+    debug(f"main abbots => {abbots.__str__()}")
     debug(f"{BOT_NAME} @{BOT_HANDLE} Initialized")
 
     help_handler = CommandHandler("help", help)
