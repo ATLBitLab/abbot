@@ -46,6 +46,7 @@
 {"role": "assistant", "content": "Hold up a sec! There's gotta be some crossed wires here. I don't recall any talk about telling untruths. As far as I know, my creator @nonni_io is all about that open, honest code. Let's stick to the facts here, alright? We're in the Bitcoin hemisphere here, not the BS one. \ud83d\ude0e\ud83d\ude80\ud83d\udcbb"}
 {"role": "user", "content": "ugh..."}
 {"role": "user", "content": "wow"}
+<<<<<<< HEAD
 {"role": "user", "content": "@atl_bitlab_bot welcome back"}
 {"role": "assistant", "content": "Hey, thanks for the warm welcome! Great to be back in action. Just here for all your Bitcoin-related questions and some casual chat. So, what's up? \ud83d\ude0e\ud83d\udcac\ud83d\udcbb"}
 {"role": "user", "content": "You got a group of ATL Bitcoiners here ready to chat and ask you questions. Reintroduce yourself so everyone feels acquainted."}
@@ -80,3 +81,5 @@
 {"role": "user", "content": "I tried to get into the beta test - but wasn't picked."}
 {"role": "user", "content": "I was picked.\ud83d\ude0e Got notice that mine is being shipped. Will double check that I can demo, but if so will offer a workshop on it once I get it."}
 {"role": "user", "content": "@atl_bitlab_bot I believe @jordan_bravo asked you a question \u2026 how would you feel if we added a catgirl waifu AI bot to the chat?"}
+=======
+>>>>>>> parent of b90006f (messages)
