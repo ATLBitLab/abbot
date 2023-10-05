@@ -1,7 +1,7 @@
 help_menu_message = """Welcome to ATL BitLab Bot!
 Available Commands
 1. /start
-    Description: Tell ATL BItLab bot to begin listening to messages in this channel
+    Description: Start Abbot in your DM or channel
 2. /summary
     Description: Produce daily summaries in a time frame
     Arguments:
