@@ -71,6 +71,7 @@ for group_chat in listdir(abspath("data/gpt/group")):
     bot_context = "group"
     chat_id = int(group_chat.split(".")[0])
     abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
+    debug(f"main => chat_id={chat_id} abbot_name={abbot_name}")
     group_abbot = GPT(
         abbot_name,
         BOT_HANDLE,
