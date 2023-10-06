@@ -193,9 +193,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         debug(f"handle_message => Message text={message_text}")
         debug(f"handle_message => bot_context={bot_context}")
 
-        bot_handle_in_message_text = f"@{which_handle}" in (
-            reply_to_message_text,
-            message_text,
+        bot_handle_in_message_text = (
+            f"@{which_handle}" in reply_to_message_text
+            or f"@{which_handle}" in message_text
         )
         is_fifth_message = which_history_len % COUNT == 0
         reply_to_which_abbot = reply_to_message_bot_username == which_handle
