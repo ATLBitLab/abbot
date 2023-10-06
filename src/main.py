@@ -224,9 +224,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             debug(f"handle_message => which_name={which_name}")
             if (
                 not bot_handle_in_message_text
-                and not reply_to_which_abbot
-                and not reply_to_message_from_bot
                 and not is_fifth_message
+                and not reply_to_message_from_bot
+                or not reply_to_which_abbot
             ):
                 debug(f"handle_message => did not tag Abbot in message")
                 debug(f"handle_message => message={message_text}")
