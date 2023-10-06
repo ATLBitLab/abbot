@@ -185,22 +185,20 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         debug(f"handle_message => Message text={message_text}")
         debug(f"handle_message => bot_context={bot_context}")
         bot_handle_in_message_text = f"@{which_handle}" in message_text
-        bot_handle_in_reply_to_message_text = (
-            f"@{which_handle}" in reply_to_message_text
+        bot_handle_in_reply_to_message_text = f"@{which_handle}" in (
+            reply_to_message_text,
+            message_text,
         )
         is_fifth_message = which_history_len % COUNT == 0
         reply_to_which_abbot = reply_to_message_bot_username == which_handle
         if group_in_name:
             debug(f"handle_message => group_in_name")
             debug(f"handle_message => which_name={which_name}")
-            if not reply_to_message:
-                debug(f"handle_message => not reply_to_message")
-                debug(f"handle_message => reply_to_message={reply_to_message}")
-                if not bot_handle_in_message_text and not is_fifth_message:
-                    debug(f"handle_message => not bot_handle_in_message_text")
-                    debug(f"handle_message => handle untagged, message={message_text}")
-                    debug(f"handle_message => is_fifth_message={is_fifth_message}")
-                    return
+            if not bot_handle_in_message_text and not is_fifth_message:
+                debug(f"handle_message => not bot_handle_in_message_text")
+                debug(f"handle_message => handle untagged, message={message_text}")
+                debug(f"handle_message => is_fifth_message={is_fifth_message}")
+                return
             elif (
                 not reply_to_message_from_bot or not bot_handle_in_reply_to_message_text
             ):
