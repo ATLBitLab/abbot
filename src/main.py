@@ -160,65 +160,46 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             raw_messages_jsonl.write(message_dump)
             raw_messages_jsonl.write("\n")
             raw_messages_jsonl.close()
+
         bot_context = "group"
         if private_chat:
             bot_context = "private"
             debug(f"handle_message => private_chat={private_chat}")
+
         which_abbot: GPT = try_get(ABBOTS, chat_id)
         if not which_abbot:
             which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
             which_abbot = GPT(
                 which_bot_name, BOT_HANDLE, ATL_BITCOINER, bot_context, chat_id
             )
+
+        which_abbot_started = try_get(which_abbot, "started")
         which_name = try_get(which_abbot, "name")
         which_handle = try_get(which_abbot, "handle")
         which_history_len = len(try_get(which_abbot, "chat_history", default=[]))
+
         group_in_name = "group" in which_name
+
         reply_to_message = try_get(message, "reply_to_message")
         reply_to_message_text = try_get(reply_to_message, "text", default="")
         reply_to_message_from = try_get(reply_to_message, "from")
         reply_to_message_from_bot = try_get(reply_to_message_from, "is_bot")
         reply_to_message_bot_username = try_get(reply_to_message_from, "username")
         all_message_data = try_get_telegram_message_data(message)
+
         debug(f"handle_message => reply_to_message={reply_to_message}")
         debug(f"handle_message => all_message_data={all_message_data}")
         debug(f"handle_message => Message text={message_text}")
         debug(f"handle_message => bot_context={bot_context}")
-        bot_handle_in_message_text = f"@{which_handle}" in message_text
-        bot_handle_in_reply_to_message_text = f"@{which_handle}" in (
+
+        bot_handle_in_message_text = f"@{which_handle}" in (
             reply_to_message_text,
             message_text,
         )
         is_fifth_message = which_history_len % COUNT == 0
         reply_to_which_abbot = reply_to_message_bot_username == which_handle
-        if group_in_name:
-            debug(f"handle_message => group_in_name")
-            debug(f"handle_message => which_name={which_name}")
-            if not bot_handle_in_message_text and not is_fifth_message:
-                debug(f"handle_message => not bot_handle_in_message_text")
-                debug(f"handle_message => handle untagged, message={message_text}")
-                debug(f"handle_message => is_fifth_message={is_fifth_message}")
-                return
-            elif (
-                not reply_to_message_from_bot or not bot_handle_in_reply_to_message_text
-            ):
-                debug(f"handle_message => not reply_to_message_from_bot")
-                debug(f"handle_message => reply_from_bot={reply_to_message_from_bot}")
-                debug(f"handle_message => not bot_handle_in_reply_to_message_text")
-                debug(
-                    f"handle_message => hanlde_in_reply_message_text={bot_handle_in_reply_to_message_text}"
-                )
-                debug(
-                    f"handle_message => reply_to_message_text={reply_to_message_text}"
-                )
-                return
-            elif not reply_to_which_abbot:
-                debug(f"handle_message => not reply_to_which_abbot")
-                debug(f"handle_message => reply_to_which_abbot={reply_to_which_abbot}")
-                debug(f"handle_message => which_handle={which_handle}")
-                return
-        which_abbot_started = try_get(which_abbot, "started")
         debug(f"handle_message => which_abbot_started={which_abbot_started}")
+
         if (bot_handle_in_message_text or reply_to_which_abbot) and (
             not which_abbot_started and which_history_len == 1
         ):
@@ -235,12 +216,33 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "Thank you for using Abbot! We hope you enjoy your experience! \n\n"
                 "If you have questions, concerns, feature requests or find bugs, please contact @nonni_io or @ATLBitLab on Telegram."
             )
-        if is_fifth_message and not which_abbot_started:
-            debug(f"handle_message => is_fifth_message={is_fifth_message}")
-            return
-        debug(f"handle_message => All checks passed!")
         which_abbot.update_chat_history(dict(role="user", content=message_text))
         which_abbot.update_abbots(chat_id, which_abbot)
+        if group_in_name:
+            debug(f"handle_message => group_in_name")
+            debug(f"handle_message => which_name={which_name}")
+            if (
+                not bot_handle_in_message_text
+                and not reply_to_which_abbot
+                and not reply_to_message_from_bot
+                and not is_fifth_message
+            ):
+                debug(f"handle_message => did not tag Abbot in message")
+                debug(f"handle_message => message={message_text}")
+                debug(f"handle_message => reply_to_message={reply_to_message_text}")
+
+                debug(f"handle_message => did not reply to Abbot message")
+                debug(f"handle_message => reply_to_which_abbot={reply_to_which_abbot}")
+                debug(f"handle_message => which_handle={which_handle}")
+
+                debug(f"handle_message => reply is not from a bot")
+                debug(f"handle_message => reply_from_bot={reply_to_message_from_bot}")
+
+                debug(f"handle_message => message is not multiple of 5")
+                debug(f"handle_message => which_history_len={which_history_len}")
+                return
+
+        debug(f"handle_message => All checks passed!")
         answer = which_abbot.chat_completion()
         if not answer:
             status = which_abbot.stop()
