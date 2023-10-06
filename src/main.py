@@ -202,8 +202,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     debug(f"handle_message => is_fifth_message={is_fifth_message}")
                     return
             elif (
-                not reply_to_message_from_bot
-                and not bot_handle_in_reply_to_message_text
+                not reply_to_message_from_bot or not bot_handle_in_reply_to_message_text
             ):
                 debug(f"handle_message => not reply_to_message_from_bot")
                 debug(f"handle_message => reply_from_bot={reply_to_message_from_bot}")
