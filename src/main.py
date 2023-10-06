@@ -189,22 +189,25 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         all_message_data = try_get_telegram_message_data(message)
 
         debug(f"handle_message => reply_to_message={reply_to_message}")
-        debug(f"handle_message => all_message_data={all_message_data}")
         debug(f"handle_message => Message text={message_text}")
         debug(f"handle_message => bot_context={bot_context}")
-
-        bot_handle_in_message_text = (
-            f"@{which_handle}" in reply_to_message_text
-            or f"@{which_handle}" in message_text
-        )
+        debug(f"handle_message => all_message_data={all_message_data}")
+        full_handle = f"@{which_handle}"
         is_fifth_message = which_history_len % COUNT == 0
         reply_to_which_abbot = reply_to_message_bot_username == which_handle
         debug(f"handle_message => which_abbot_started={which_abbot_started}")
 
-        if (bot_handle_in_message_text or reply_to_which_abbot) and (
-            not which_abbot_started and which_history_len == 1
-        ):
-            debug(f"handle_message => bot_tagged={bot_handle_in_message_text}")
+        if (
+            full_handle in message_text
+            or full_handle in reply_to_message_text
+            or reply_to_which_abbot
+        ) and (not which_abbot_started and which_history_len == 1):
+            debug(
+                f"handle_message => full_handle={full_handle} in message_text={message_text}"
+            )
+            debug(
+                f"handle_message => full_handle={full_handle} in reply_to_message_text={reply_to_message_text}"
+            )
             debug(f"handle_message => or reply_to_which_abbot={reply_to_which_abbot}")
             debug(f"handle_message => which_abbot_started={not which_abbot_started}")
             return await message.reply_text(
@@ -217,17 +220,33 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "Thank you for using Abbot! We hope you enjoy your experience! \n\n"
                 "If you have questions, concerns, feature requests or find bugs, please contact @nonni_io or @ATLBitLab on Telegram."
             )
+
         which_abbot.update_chat_history(dict(role="user", content=message_text))
         which_abbot.update_abbots(chat_id, which_abbot)
         if group_in_name:
             debug(f"handle_message => group_in_name")
             debug(f"handle_message => which_name={which_name}")
             if (
-                not bot_handle_in_message_text
-                and not is_fifth_message
-                and not reply_to_message_from_bot
-                or not reply_to_which_abbot
+                full_handle in message_text
+                or full_handle in reply_to_message_text
+                or is_fifth_message
+                or reply_to_message_from_bot
+                or reply_to_which_abbot
             ):
+                debug(f"handle_message => All checks passed!")
+                answer = which_abbot.chat_completion()
+                if not answer:
+                    status = which_abbot.stop()
+                    answer = "Sorry ... taking a nap. Hmu later."
+                    debug(
+                        f"handle_message => which_abbot={which_abbot} status={status}"
+                    )
+                    return await context.bot.send_message(
+                        chat_id=THE_CREATOR,
+                        text=f"{which_abbot.name} stopped ⛔️: which_abbot={which_abbot} status={status} answer={answer}",
+                    )
+                return await message.reply_text(answer)
+            else:
                 debug(f"handle_message => did not tag Abbot in message")
                 debug(f"handle_message => message={message_text}")
                 debug(f"handle_message => reply_to_message={reply_to_message_text}")
@@ -241,19 +260,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
                 debug(f"handle_message => message is not multiple of 5")
                 debug(f"handle_message => which_history_len={which_history_len}")
-                return
 
-        debug(f"handle_message => All checks passed!")
-        answer = which_abbot.chat_completion()
-        if not answer:
-            status = which_abbot.stop()
-            answer = "Sorry ... taking a nap. Hmu later."
-            debug(f"handle_message => which_abbot={which_abbot} status={status}")
-            return await context.bot.send_message(
-                chat_id=THE_CREATOR,
-                text=f"{which_abbot.name} stopped ⛔️: which_abbot={which_abbot} status={status} answer={answer}",
-            )
-        return await message.reply_text(answer)
     except Exception as exception:
         status = which_abbot.stop()
         cause, traceback, args = deconstruct_error(exception)
