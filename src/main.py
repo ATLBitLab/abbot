@@ -200,7 +200,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if (
             full_handle in message_text
             or full_handle in reply_to_message_text
-            or reply_to_which_abbot
+            or (reply_to_message_from_bot and reply_to_which_abbot)
         ) and (not which_abbot_started and which_history_len == 1):
             debug(
                 f"handle_message => full_handle={full_handle} in message_text={message_text}"
@@ -230,8 +230,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 full_handle in message_text
                 or full_handle in reply_to_message_text
                 or is_fifth_message
-                or reply_to_message_from_bot
-                or reply_to_which_abbot
+                or (reply_to_message_from_bot and reply_to_which_abbot)
             ):
                 debug(f"handle_message => All checks passed!")
                 answer = which_abbot.chat_completion()
