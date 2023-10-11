@@ -9,5 +9,4 @@ env.py
 *.gz
 messages.py
 private_abbot.json
-src/data/gpt/private/*
 ignore/
