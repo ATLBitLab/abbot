@@ -18,13 +18,13 @@ error_handler.setLevel(ERROR)
 errogger.addHandler(error_handler)
 
 
-def error(message=""):
+def error_abbot(message=""):
     message_formatted = f"[{now}] error - {__name__}: {message}\n"
     print(message_formatted)
     errogger.error(message_formatted)
 
 
-def debug(message=""):
+def debug_abbot(message=""):
     message_formatted = f"[{now}] debug - {__name__}: {message}\n"
     print(message_formatted)
     debugger.debug(message_formatted)

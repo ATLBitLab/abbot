@@ -1,10 +1,12 @@
+from functools import wraps
 import json
 from io import open
 from requests import request
 from datetime import datetime, timedelta
 from qrcode import make
 from io import BytesIO
-from lib.logger import error
+from lib.logger import debug_abbot, error_abbot
+from io import BytesIO
 
 TELEGRAM_MESSAGE_FIELDS = [
     "audio",
@@ -90,7 +92,7 @@ def http_request(headers, method, url, json=None):
         return Exception(f"Request Failed: {e}")
 
 
-def qr_code(data):
+def qr_code(data: str) -> BytesIO:
     qr = make(data)
     bio = BytesIO()
     qr.save(bio, "PNG")
@@ -125,5 +127,22 @@ def update_optin_optout(
 
         return True
     except Exception as exception:
-        error(f"context {context} not found in optinout_data.")
+        error_abbot(f"context {context} not found in optinout_data.")
         raise exception
+
+
+def trycatch(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        try:
+            # ---- Success ----
+            return fn(*args, **kwargs)
+        except Exception as error:
+            debug_abbot(f"abbot => /prompt Error: {error}")
+            raise error
+
+    return wrapper
+
+
+def deconstruct_error(error):
+    return try_gets(error, keys=["__cause__", "__context__", "__traceback__", "args"])
