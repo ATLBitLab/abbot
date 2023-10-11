@@ -10,3 +10,4 @@ env.py
 messages.py
 private_abbot.json
 ignore/
+src/data/gpt/private/*
