@@ -68,7 +68,7 @@ PROMPT_ABBOT = GPT(f"p{BOT_NAME}", BOT_HANDLE, PROMPT_ASSISTANT, "prompt")
 SUMMARY_ABBOT = GPT(f"s{BOT_NAME}", BOT_HANDLE, SUMMARY_ASSISTANT, "summary")
 ALL_ABBOTS = [PROMPT_ABBOT, SUMMARY_ABBOT]
 
-for group_chat in listdir(abspath("data/gpt/group")):
+for group_chat in listdir(abspath("src/data/gpt/group")):
     if ".jsonl" not in group_chat:
         continue
     bot_context = "group"
@@ -85,7 +85,7 @@ for group_chat in listdir(abspath("data/gpt/group")):
     )
     ALL_ABBOTS.append(group_abbot)
 
-for private_chat in listdir(abspath("data/gpt/private")):
+for private_chat in listdir(abspath("src/data/gpt/private")):
     if ".jsonl" not in private_chat:
         continue
     bot_context = "private"
@@ -105,11 +105,11 @@ abbots = Abbots(ALL_ABBOTS)
 ABBOTS: Abbots.BOTS = abbots.get_bots()
 debug_abbot(f"main {ARW} abbots {ARW} {abbots.__str__()}")
 
-RAW_MESSAGE_JL_FILE = abspath("data/raw_messages.jsonl")
-MESSAGES_JL_FILE = abspath("data/messages.jsonl")
-SUMMARY_LOG_FILE = abspath("data/backup/summaries.txt")
-MESSAGES_PY_FILE = abspath("data/backup/messages.py")
-PROMPTS_BY_DAY_FILE = abspath("data/backup/prompts_by_day.py")
+RAW_MESSAGE_JL_FILE = abspath("src/data/raw_messages.jsonl")
+MESSAGES_JL_FILE = abspath("src/data/messages.jsonl")
+SUMMARY_LOG_FILE = abspath("src/data/backup/summaries.txt")
+MESSAGES_PY_FILE = abspath("src/data/backup/messages.py")
+PROMPTS_BY_DAY_FILE = abspath("src/data/backup/prompts_by_day.py")
 now = datetime.now()
 
 

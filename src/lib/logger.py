@@ -6,14 +6,14 @@ now = datetime.now().date()
 
 debugger = getLogger("abbot_debugger")
 debugger.setLevel(DEBUG)
-debug_handler = FileHandler(abspath("data/debug.log"))
+debug_handler = FileHandler(abspath("src/data/debug.log"))
 debug_handler.setLevel(DEBUG)
 debugger.addHandler(debug_handler)
 
 
 errogger = getLogger("abbot_errogger")
 errogger.setLevel(ERROR)
-error_handler = FileHandler(abspath("data/error.log"))
+error_handler = FileHandler(abspath("src/data/error.log"))
 error_handler.setLevel(ERROR)
 errogger.addHandler(error_handler)
 

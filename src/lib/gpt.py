@@ -82,7 +82,7 @@ class GPT(Abbots):
         self.count: int = count
         self.chat_history_token_count: int = None
 
-        chat_history_abs_filepath: AnyStr @ abspath = abspath(f"data/gpt/{context}")
+        chat_history_abs_filepath: AnyStr @ abspath = abspath(f"src/data/gpt/{context}")
         self.chat_history_file_path: str = (
             f"{chat_history_abs_filepath}/{chat_id}.jsonl"
             if chat_id

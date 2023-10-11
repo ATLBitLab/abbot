@@ -43,11 +43,11 @@ CHEEKY_RESPONSES = [
     "Do not pass go, do not collect $200",
 ]
 PITHY_RESPONSES = ["Sorry, I'm taking a nap, ttyl."]
-OPTINOUT_FILEPATH = abspath("data/optin_optout.json")
+OPTINOUT_FILEPATH = abspath("src/data/optin_optout.json")
 OPT_IN_OUT = json.load(open(OPTINOUT_FILEPATH, "r"))
 GROUP_OPTIN = try_get(OPT_IN_OUT, "group")
 PRIVATE_OPTIN = try_get(OPT_IN_OUT, "private")
 COUNT = 5
 SEARCH_KWS = ["search", "lookup"]
 URL_REGEX = r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
-CHAT_HISTORY_BASE_FILEPATH = f"data/gpt"
+CHAT_HISTORY_BASE_FILEPATH = f"src/data/gpt"
