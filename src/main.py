@@ -269,7 +269,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
-        raise exception
 
 
 def clean_data():
