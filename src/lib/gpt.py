@@ -155,6 +155,21 @@ class GPT(Abbots):
         except Exception as exception:
             error(f"Error: chat_completion => exception={exception}")
             return None
+    
+    def chat_history_completion(self) -> str | Exception:
+        try:
+            start_index = len(self.chat_history) / 2
+            response = openai.ChatCompletion.create(
+                model=self.model,
+                messages=self.chat_history[start_index:],
+            )
+            answer = try_get(response, "choices", 0, "message", "content")
+            response_dict = dict(role="assistant", content=answer)
+            self.update_chat_history(response_dict)
+            return answer
+        except Exception as exception:
+            error(f"chat_history_completion => exception={exception}")
+            raise exception
 
     def update_abbots(self, chat_id: str | int, bot: object) -> None:
         try:

@@ -233,7 +233,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 or (reply_to_message_from_bot and reply_to_which_abbot)
             ):
                 debug(f"handle_message => All checks passed!")
-                answer = which_abbot.chat_completion()
+                answer = which_abbot.chat_history_completion()
                 if not answer:
                     status = which_abbot.stop()
                     answer = "Sorry ... taking a nap. Hmu later."
@@ -872,7 +872,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await message.reply_text(
             f"Please wait while we unplug {BOT_NAME} from the Matrix"
         )
-        response = which_abbot.chat_completion()
+        response = which_abbot.chat_history_completion()
         if not response:
             status = which_abbot.leash()
             response = f"{which_abbot.name} leashed={status} ⛔️! {error_msg}."
