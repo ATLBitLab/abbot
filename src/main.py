@@ -182,7 +182,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         group_in_name = "group" in which_name
 
         reply_to_message = try_get(message, "reply_to_message")
-        reply_to_message_text = try_get(reply_to_message, "text", default="")
+        reply_to_message_text = try_get(reply_to_message, "text", default="") or ""
         reply_to_message_from = try_get(reply_to_message, "from")
         reply_to_message_from_bot = try_get(reply_to_message_from, "is_bot")
         reply_to_message_bot_username = try_get(reply_to_message_from, "username")
