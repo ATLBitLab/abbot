@@ -11,33 +11,7 @@ from lib.utils import try_get
 
 import openai
 
-
-class Abbots:
-    BOTS: dict = dict()
-
-    def __init__(self, abbots: list):
-        bots: dict = dict()
-        for abbot in abbots:
-            name = try_get(abbot, "chat_id")
-            bots[name] = abbot
-        self.BOTS.update(bots)
-        print("gpt => Abbots => self.BOTS", self.BOTS.keys())
-
-    def __str__(self) -> str:
-        _str_ = f"\nAbbots(BOTS="
-        BOTS = self.BOTS.values()
-        for bot in BOTS:
-            _str_ += f"{bot.__str__()})\n"
-        return f"{_str_.rstrip()})\n"
-
-    def __repr__(self) -> str:
-        return f"Abbots(BOTS={self.BOTS})"
-
-    def get_bots(self) -> dict:
-        return self.BOTS
-
-
-class GPT(Abbots):
+class Abbit:
     def __init__(
         self,
         name: str,
@@ -70,14 +44,14 @@ class GPT(Abbots):
 
     def __str__(self) -> str:
         return (
-            f"GPT(model={self.model}, name={self.name}, "
+            f"Abbit(model={self.model}, name={self.name}, "
             f"handle={self.handle}, context={self.context}, "
             f"chat_id={self.chat_id}, started={self.started}"
         )
 
     def __repr__(self) -> str:
         return (
-            f"GPT(model={self.model}, name={self.name}, handle={self.handle}, "
+            f"Abbit(model={self.model}, name={self.name}, handle={self.handle}, "
             f"context={self.context}, personality={self.personality}, chat_history={self.chat_history}, "
             f"unleashed={self.unleashed}, started={self.started})"
         )
@@ -155,17 +129,6 @@ class GPT(Abbots):
         except Exception as exception:
             error(f"Error: chat_completion => exception={exception}")
             return None
-
-    def update_abbots(self, chat_id: str | int, bot: object) -> None:
-        try:
-            Abbots.BOTS[chat_id] = bot
-            debug(f"update_abbots => chat_id={chat_id}")
-        except Exception as exception:
-            error(f"Error: update_abbots => exception={exception}")
-            raise exception
-
-    def get_abbots(self) -> Abbots.BOTS:
-        return Abbots.BOTS
 
     def get_chat_history(self) -> list:
         return self.chat_history

@@ -58,62 +58,20 @@ from telegram.ext import (
     MessageHandler,
 )
 from lib.api.strike import Strike
-from lib.gpt import GPT, Abbots
+from lib.gpt import GPT
 from env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY
 
-PROMPT_ABBOT = GPT(f"p{BOT_NAME}", BOT_HANDLE, PROMPT_ASSISTANT, "prompt")
-SUMMARY_ABBOT = GPT(f"s{BOT_NAME}", BOT_HANDLE, SUMMARY_ASSISTANT, "summary")
-ALL_ABBOTS = [PROMPT_ABBOT, SUMMARY_ABBOT]
-
-for group_chat in listdir(abspath("src/data/gpt/group")):
-    if ".jsonl" not in group_chat:
-        continue
-    bot_context = "group"
-    chat_id = int(group_chat.split(".")[0])
-    abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
-    debug(f"main => chat_id={chat_id} abbot_name={abbot_name}")
-    group_abbot = GPT(
-        abbot_name,
-        BOT_HANDLE,
-        ATL_BITCOINER,
-        bot_context,
-        chat_id,
-        chat_id in GROUP_OPTIN,
-    )
-    ALL_ABBOTS.append(group_abbot)
-
-for private_chat in listdir(abspath("src/data/gpt/private")):
-    if ".jsonl" not in private_chat:
-        continue
-    bot_context = "private"
-    chat_id = int(private_chat.split(".")[0])
-    abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
-    group_abbot = GPT(
-        abbot_name,
-        BOT_HANDLE,
-        ATL_BITCOINER,
-        bot_context,
-        chat_id,
-        chat_id in PRIVATE_OPTIN,
-    )
-    ALL_ABBOTS.append(group_abbot)
-
-abbots = Abbots(ALL_ABBOTS)
-ABBOTS: Abbots.BOTS = abbots.get_bots()
-debug(f"main abbots => {abbots.__str__()}")
-
 RAW_MESSAGE_JL_FILE = abspath("src/data/raw_messages.jsonl")
-MESSAGES_JL_FILE = abspath("src/data/messages.jsonl")
-SUMMARY_LOG_FILE = abspath("src/data/backup/summaries.txt")
-MESSAGES_PY_FILE = abspath("src/data/backup/messages.py")
-PROMPTS_BY_DAY_FILE = abspath("src/data/backup/prompts_by_day.py")
 now = datetime.now()
+
+def rand_num():
+    return randrange(len(CHEEKY_RESPONSES))
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         debug(f"handle_message => Raw update={update}")
-        mpy = open(MESSAGES_PY_FILE, "a")
+        mpy = open(RAW_MESSAGE_JL_FILE, "a")
         mpy.write(update.to_json())
         mpy.write("\n")
         mpy.close()
@@ -269,82 +227,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
-
-
-def clean_data():
-    try:
-        debug(f"clean_data => Deduping messages")
-        seen = set()
-        raw_open = open(RAW_MESSAGE_JL_FILE, "r")
-        messages_open = open(MESSAGES_JL_FILE, "w")
-        with raw_open as infile, messages_open as outfile:
-            for line in infile:
-                obj_hash = hash(json.dumps(obj, sort_keys=True))
-                debug(f"clean_data => line={line}")
-                try:
-                    obj = json.loads(obj)
-                except Exception as exception:
-                    cause, traceback, args = deconstruct_error(exception)
-                    exception_msg = (
-                        f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-                    )
-                    debug(
-                        f"clean_data => Exception={exception}, ExceptionMessage={exception_msg}"
-                    )
-                    continue
-                if obj_hash not in seen:
-                    seen.add(obj_hash)
-                    # get and clean text
-                    obj_text = try_get(obj, "text")
-                    apos_in_text = "'" in obj_text
-                    obj_title = try_get(obj, "title")
-                    title_has_spaces = " " in obj_title
-                    obj_date = try_get(obj, "date")
-                    plus_in_date = "+" in obj_date
-                    t_in_date = "T" in obj_date
-                    plus_and_t = plus_in_date and t_in_date
-                    if not obj_text:
-                        continue
-                    elif apos_in_text:
-                        obj = try_set(obj, obj_text.replace("'", ""), "text")
-                    if not obj_title:
-                        continue
-                    elif title_has_spaces:
-                        clean_title = try_get(
-                            CHAT_TITLE_TO_SHORT_TITLE,
-                            obj_title,
-                            default=obj_title.lower().replace(" ", ""),
-                        )
-                        obj = try_set(obj, clean_title, "title")
-                    if not obj_date:
-                        continue
-                    elif plus_and_t:
-                        obj = try_set(
-                            obj,
-                            obj_date.replace("+", " ").replace("T", " ").split(" ")[0],
-                            "date",
-                        )
-                    elif plus_in_date:
-                        obj = try_set(
-                            obj, obj_date.replace("+", " ").split(" ")[0], "date"
-                        )
-                    elif t_in_date:
-                        obj = try_set(
-                            obj, obj_date.replace("T", " ").split(" ")[0], "date"
-                        )
-
-                    outfile.write(json.dumps(obj))
-                    outfile.write("\n")
-        infile.close()
-        outfile.close()
-        debug(f"clean_data => Deduping done")
-        return True
-    except Exception as exception:
-        raise exception
-
-
-def rand_num():
-    return randrange(len(CHEEKY_RESPONSES))
 
 
 async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE, both: bool = False):
