@@ -98,7 +98,6 @@ class GPT(Abbots):
             return chat_history_file
         except Exception as exception:
             error(f"_create_history => exception={exception}")
-            exit(1)
 
     def _open_history(self) -> TextIOWrapper:
         try:
@@ -107,7 +106,6 @@ class GPT(Abbots):
             return open(self.chat_history_file_path, "a+")
         except Exception as exception:
             error(f"_open_history => exception={exception}")
-            exit(1)
 
     def _close_history(self) -> None:
         self.chat_history_file.close()
@@ -126,7 +124,6 @@ class GPT(Abbots):
         except Exception as exception:
             error(f"chat_id={self.chat_id} message={message}")
             error(f"_inflate_history => exception={exception}")
-            exit(1)
 
     def all_status(self) -> dict:
         status = dict(
@@ -170,7 +167,7 @@ class GPT(Abbots):
         self.unleashed = False
         return self.unleashed
 
-    def update_chat_history(self, chat_message: dict(role=str, content=str)) -> None:
+    def update_chat_history(self, chat_message: dict) -> None:
         try:
             if not chat_message:
                 return
@@ -179,7 +176,6 @@ class GPT(Abbots):
             self.chat_history_len += 1
         except Exception as exception:
             error(f"update_chat_history => exception={exception}")
-            exit(1)
 
     def chat_completion(self) -> str | None:
         try:
@@ -216,10 +212,11 @@ class GPT(Abbots):
             debug(
                 f"chat_history_completion {YD} token_count={chat_history_token_count}"
             )
+            index = self.chat_history_len / 2
             if chat_history_token_count > 2500:
                 chat_context = [
                     self.gpt_system,
-                    self.chat_history[self.chat_history_len / 2 :],
+                    self.chat_history[index:],
                 ]
             response = openai.ChatCompletion.create(
                 model=self.model,

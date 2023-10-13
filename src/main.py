@@ -224,22 +224,22 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "Thank you for using Abbot! We hope you enjoy your experience! \n\n"
                 "If you have questions, concerns, feature requests or find bugs, please contact @nonni_io or @ATLBitLab on Telegram."
             )
-        '''
+        """
         if full_handle in message_text or reply_to_which_abbot:
-                if which_history_len == 1 and which_history_system:
-                    debug(f"handle_message => Abbot tagged {message_text}")
-                    debug(f"handle_message => Reply to Abbot {reply_to_message_text}")
-                    debug(f"handle_message => History is 1 {which_history_len}")
-                else:
-                    debug(f"handle_message => history_len={which_history_len}")
-                    debug(f"handle_message => history_system={which_history_system}")
-                    return
+            if which_history_len == 1 and which_history_system:
+                debug(f"handle_message => Abbot tagged {message_text}")
+                debug(f"handle_message => Reply to Abbot {reply_to_message_text}")
+                debug(f"handle_message => History is 1 {which_history_len}")
             else:
-                debug(f"handle_message => full_handle={full_handle}")
-                debug(f"handle_message => message_text={message_text}")
-                debug(f"handle_message => reply_to_abbot={reply_to_which_abbot}")
+                debug(f"handle_message => history_len={which_history_len}")
+                debug(f"handle_message => history_system={which_history_system}")
                 return
-        '''
+        else:
+            debug(f"handle_message => full_handle={full_handle}")
+            debug(f"handle_message => message_text={message_text}")
+            debug(f"handle_message => reply_to_abbot={reply_to_which_abbot}")
+            return
+        """
         answer = None
         which_abbot.update_chat_history(dict(role="user", content=message_text))
         which_abbot.update_abbots(chat_id, which_abbot)
@@ -287,8 +287,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         status = which_abbot.status()
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-        error(f"handle_message => Error={exception}, ErrorMessage={error_msg}")
-        error(f"handle_message => which_abbot={which_abbot} status={status}")
+        debug(f"handle_message => Error={exception}, ErrorMessage={error_msg}")
+        debug(f"handle_message => which_abbot={which_abbot} status={status}")
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
@@ -887,7 +887,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         started = which_abbot.start()
         if not started:
             raise Exception(f"Not started! started={started}")
-        which_abbot.update_chat_history(dict(role="system", content=creator_content))
         which_abbot.update_chat_history(dict(role="user", content=message_text))
         which_abbot.update_abbots(chat_id, which_abbot)
         update_optin_optout(OPTINOUT_FILEPATH, bot_context, chat_id, True)
