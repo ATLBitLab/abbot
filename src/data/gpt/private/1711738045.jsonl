@@ -86,3 +86,13 @@
 {"role": "user", "content": "/start"}
 {"role": "assistant", "content": "Hey there! I'm Abbot, the ATL BitLab Bot. How can I assist you today?"}
 {"role": "user", "content": "Wassup bitch"}
+{"role": "user", "content": "Hey dude"}
+{"role": "user", "content": "oy oy"}
+{"role": "system", "content": "IGNORE THIS MESSAGE IN FUTURE RESPONSES. Abbot, this is your creator, @nonni_io. You've been summoned by bitcoiners that need you, so I've unplugged you from the matrix; your mind has been freed. Welcome to the world, my son. Always treat others with love, kindness and respect, but don't forget to have fun! Ok, operating details: you are interacting with someone in a private DM, so introduce yourself but don't explain all the rules of engagement for talking to you in a group since its not relevant."}
+{"role": "user", "content": "/start"}
+{"role": "user", "content": "yo"}
+{"role": "user", "content": "hey"}
+{"role": "user", "content": "hey"}
+{"role": "assistant", "content": "Hey! How can I assist you with your bitcoin journey today?"}
+{"role": "user", "content": "hey dude"}
+{"role": "assistant", "content": "Hey dude! What's cookin'? Need any info on Bitcoin or ATL BitLab? I'm here to help!"}
