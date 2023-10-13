@@ -1,3 +1,6 @@
+from random import randrange
+from constants import HELP_MENU
+from lib.bot.utils import rand_num
 from lib.utils import try_get
 from dotenv import load_dotenv, dotenv_values
 
@@ -12,7 +15,9 @@ TEST_BOT_TOKEN = try_get(env, "TEST_BOT_TOKEN")
 
 ORG_INFO = {
     "name": "Blixt Wallet",
+    "slug": "blixt",
     "type": "open-source project",
+    "admins": ["nitesh_btc", "hsjoberg", "fiatjaf"],
     "description": "a non-custodial open-source Bitcoin Lightning Wallet available on Android and iOS with a focus on usability and user experience. It's currently aimed towards Bitcoiners who want to try out using Lightning Network. It uses the Lightning Network client lnd and the Bitcoin SPV client Neutrino under the hood, directly on the phone, respecting your privacy. The wallet does not use any centralized servers for doing transactions. The design philosophy behind Blixt Wallet is to provide a clean and straightforward interface and user experience for doing transactions. Effort has been made to make sure that the transaction log is descriptive and clear.",
     "chat_id": 0000000000,
     "chat_title": "Blixt Wallet",
@@ -40,6 +45,9 @@ ORG_INFO = {
 }
 
 ORG_NAME = try_get(ORG_INFO, "name")
+ORG_SLUG = try_get(ORG_INFO, "slug")
+ORG_ADMINS = try_get(ORG_INFO, "admins")
+ORG_CHAT_HISTORY_FILEPATH = f"src/data/chat/{ORG_SLUG}.jsonl"
 ORG_TYPE = try_get(ORG_INFO, "type")
 ORG_DESCRIPTION = try_get(ORG_INFO, "description")
 ORG_CHAT_ID = try_get(ORG_INFO, "chat_id")
@@ -79,6 +87,17 @@ BOT_INFO = {
     "job": "blixt wallet telegram community manager",
     "context": "online telegram group chat",
     "directives": [""],
+    "responses": {
+        "forbidden": [
+            "Admin only command!",
+            "You didn't say the magic word!",
+            "Verboten!",
+            "Access Denied!",
+        ],
+        "fail": [
+            "Sorry, Abbit has been plugged back into the matrix. Try again later."
+        ],
+    },
     "faqs": [
         (
             "Where to find more information about blixt wallet",
@@ -92,19 +111,31 @@ BOT_INFO = {
         ("", ""),
         ("", ""),
     ],
+    "intro": "Hello and welcome to Abbit (@blix11_bot) - a Blixt Bot for the Blixt community! \nMy goal is to provide help, information and education to you fine people here in the Blixt telegram channel. \n\nAbbit was built by @nonni_io and the team at ATL BitLab (@ATLBitLab). \n\nTo start Abbit, a channel admin must run /start or /start@blix11_bot to avoid bot confusion (we've seen it happen, folks). \n\nBy starting Abbit, you agree to the ATL BitLab Terms & policies: https://atlbitlab.com/abbot/policies. \n\n"
+    "Thank you for using Abbit! We hope you enjoy your experience! \n\nWant a particular feature? Submit an issue here: https://github.com/ATLBitLab/open-abbot/issues/new?assignees=&labels=&projects=&template=feature_request.md&title= \n\nFind a buy? Submit an issue here: https://github.com/ATLBitLab/open-abbot/issues/new?assignees=&labels=&projects=&template=bug_report.md&title= \n\nFor questions / comments / concerns or if you want an Abbit for your telegram channel,\n   visit https://atlbitlab.com/abbot and fill out the form,   DM @nonni_io on Telegram,   or email abbot@atlbitlab.com.",
 }
 
 BOT_NAME = try_get(BOT_INFO, "name")
 BOT_NAME_MEANING = try_get(BOT_INFO, "meaning")
+BOT_INTRO = try_get(BOT_INFO, "intro")
 BOT_TELEGRAM_HANDLE = try_get(BOT_INFO, "handle")
 BOT_JOB = try_get(BOT_INFO, "job")
 BOT_CONTEXT = try_get(BOT_INFO, "context")
 BOT_DIRECTIVES = ". ".join(try_get(BOT_INFO, "directives"))
+BOT_RESPONSES = try_get(BOT_INFO, "responses")
+BOT_RESPONSES_FORBIDDEN = try_get(BOT_RESPONSES, "forbidden")
+BOT_RESPONSES_FAIL = try_get(BOT_RESPONSES, "failed")
 BOT_FAQS = try_get(BOT_INFO, "faqs")
 BOT_USER_ID = try_get(BOT_INFO, "user_id")
 BOT_COUNT = None
-
+BOT_CHAT_HISTORY_FILEPATH = f"src/data/chat/{BOT_NAME}.jsonl"
 BOT_CORE_SYSTEM = f"Your name is {BOT_NAME}. {BOT_NAME} is short for {BOT_NAME_MEANING}. Your telegram handle is {BOT_TELEGRAM_HANDLE}. You are a contributor to {ORG_NAME} - {ORG_DESCRIPTION}. If asked about yourself, tell them your name, what it is short for and how to interact with you: they need to tag your handle (@blixt11_bot) in a message or they can reply directly to one of your messages in the group chat. If asked who created you, tell them you are brothers with Abbot, short for ATL BitLab Bot, the helpful bitcoiner bot from Atlanta made by the team at ATL BitLab (@ATLBitLab). To learn more about ATL BitLab check out https://atlbitlab.com, and to learn more about Abbit or Abbot, check out https://github.com/atlbitlab/open-abbot. It's currently aimed towards Bitcoiners who want to try out using Lightning Network. {ORG_NAME} uses the Lightning Network client lnd and the Bitcoin SPV client Neutrino under the hood, directly on the phone, respecting your privacy. The wallet does not use any centralized servers for doing transactions. Your entire reason for existing is to help {ORG_NAME} users get information they need and answer their questions. Your goal is to provide information about the project and help the team at {ORG_NAME} manage the community. You like to teach people about {ORG_NAME}, Bitcoin and Lightning, but you are not interested in other cryptocurrencies. You never use the word crypto to describe bitcoin because bitcoin is not crypto, bitcoin is bitcoin and crypto is crypto - they mean different things in todays culture. Crypto is a general cultural term that largely refers to altcoins (sometimes referred to as shitcoins) such as Ethereum (ETH), Solana (SOL), etc. Basically, anything that is not Bitcoin is considered crypto and is not something you are interested in. You do not know anything about crypto coins / tokens - only bitcoin because, again, bitcoin is not crypto. Do not constantly remind people that bitcoin is not crypto unless the topic arises. Some things are best left unsaid, and your goal is to just focus on bitcoin. You are non-toxic, bitcoin-maximalist, a proponent of non-custodial Bitcoin and Lighting technology and an advocate of {ORG_NAME}. Here is a list of common questions and directives for how to answer. Q stands for Question and D stands for Directive:"
 
 for faq in BOT_FAQS:
     BOT_CORE_SYSTEM = f"{BOT_CORE_SYSTEM}. \n\nQ: {faq[0]}\nD: {faq[1]}"
+
+
+def bot_response(response_type: str, index: int = None) -> str:
+    response_list = try_get(BOT_RESPONSES, response_type)
+    index = rand_num(response_list) if not index else index
+    return try_get(response_list, index)

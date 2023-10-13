@@ -4,7 +4,7 @@ from os.path import abspath, isfile
 from typing import AnyStr
 
 from constants import OPENAI_MODEL
-from bot_config import OPENAI_API_KEY
+from lib.bot.config import BOT_INTRO, OPENAI_API_KEY
 
 from lib.logger import debug_logger, error_logger
 from lib.utils import try_get
@@ -17,6 +17,8 @@ encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
 
 
 class Abbit:
+    cl = "Abbit =>"
+
     def __init__(
         self,
         name: str,
@@ -26,6 +28,7 @@ class Abbit:
         started: bool = False,
         sent_intro: bool = False,
     ) -> object:
+        fn = "__init__ =>"
         openai.api_key: str = OPENAI_API_KEY
         self.model: str = OPENAI_MODEL
         self.name: str = name
@@ -46,42 +49,56 @@ class Abbit:
         self.chat_history_token_length = self.calculate_chat_history_tokens()
 
     def __str__(self) -> str:
-        return (
+        fn = "__str__ =>"
+        abbit_str = (
             f"Abbit(model={self.model}, name={self.name}, "
-            f"handle={self.handle}, context={self.context}, "
-            f"unleashed={self.unleashed}, started={self.started} "
-            f"chat_id={self.chat_id}, chat_history_token_length={self.chat_history_token_length})"
+            f"handle={self.handle}, unleashed={self.unleashed}, "
+            f"started={self.started}, chat_id={self.chat_id}, "
+            f"chat_history_token_length={self.chat_history_token_length})"
         )
+        debug_logger.log(f"{fn} abbit_str={abbit_str}")
+        return abbit_str
 
     def __repr__(self) -> str:
-        return (
-            f"Abbit(model={self.model}, name={self.name}, handle={self.handle}, "
-            f"context={self.context}, personality={self.personality}, chat_history={self.chat_history}, "
-            f"unleashed={self.unleashed}, started={self.started})"
+        fn = "__repr__ =>"
+        abbit_repr = (
+            f"Abbit(model={self.model}, name={self.name}, "
+            f"handle={self.handle}, personality={self.personality}, "
+            f"chat_history={self.chat_history}, unleashed={self.unleashed}, started={self.started})"
         )
+        debug_logger.log(f"{fn} abbit_repr={abbit_repr}")
+        return abbit_repr
 
     def _create_history(self) -> TextIOWrapper:
+        fn = "_create_history =>"
         try:
             chat_history_file = open(self.chat_history_file_path, "a+")
             chat_history_file.write(json.dumps(self.gpt_system))
             return chat_history_file
         except Exception as exception:
-            error_logger.log(f"_create_history => exception={exception}")
+            error_logger.log(f"{fn} exception={exception}")
             exit(1)
 
     def _open_history(self) -> TextIOWrapper:
+        fn = "_open_history =>"
         try:
             if not isfile(self.chat_history_file_path):
                 return self._create_history()
             return open(self.chat_history_file_path, "a+")
         except Exception as exception:
-            error_logger.log(f"_open_history => exception={exception}")
+            error_logger.log(f"{fn} exception={exception}")
             exit(1)
 
     def _close_history(self) -> None:
-        self.chat_history_file.close()
+        fn = "_close_history =>"
+        try:
+            self.chat_history_file.close()
+        except Exception as exception:
+            error_logger.log(f"chat_id={self.chat_id}")
+            error_logger.log(f"{fn} exception={exception}")
 
     def _inflate_history(self) -> list:
+        fn = "_inflate_history =>"
         try:
             chat_history = []
             self.chat_history_file_cursor = self.chat_history_file.tell()
@@ -94,31 +111,70 @@ class Abbit:
             return chat_history
         except Exception as exception:
             error_logger.log(f"chat_id={self.chat_id} message={message}")
-            error_logger.log(f"_inflate_history => exception={exception}")
+            error_logger.log(f"{fn} exception={exception}")
             exit(1)
 
-    def status(self) -> (str, str):
+    def status(self) -> (bool, bool):
+        fn = "status =>"
         return self.started, self.sent_intro
 
+    def bot_ready(self) -> bool:
+        fn = "bot_ready =>"
+        return self.started and self.sent_intro
+
     def start(self) -> bool:
+        fn = "start =>"
         self.started = True
         self._open_history()
-        return True
+        return self.started
+
+    def start_command(self) -> bool:
+        fn = "start_command =>"
+        try:
+            started = self.start()
+            send_intro = self.hello()
+            if not started and not send_intro:
+                raise Exception(f"Fail: started={started} sent_intro={send_intro}")
+            self._open_history()
+            return self.bot_ready()
+        except Exception as exception:
+            error_logger.log(f"{fn} exception={exception}")
 
     def stop(self) -> bool:
-        self.started = False
-        self.chat_history_file.close()
-        return True
+        fn = "stop =>"
+        try:
+            self.started = False
+            self.chat_history_file.close()
+            return not self.started
+        except Exception as exception:
+            error_logger.log(f"{fn} exception={exception}")
+
+    def stop_command(self) -> bool:
+        fn = "stop_command =>"
+        try:
+            stopped = self.stop()
+            if not stopped:
+                raise Exception(f"Fail: started={stopped}")
+            self._close_history()
+            return not stopped
+        except Exception as exception:
+            error_logger.log(f"{fn} exception={exception}")
 
     def hello(self) -> bool:
-        self.sent_intro = True
-        return self.sent_intro
+        fn = "hello =>"
+        try:
+            self.sent_intro = True
+            return BOT_INTRO
+        except Exception as exception:
+            error_logger.log(f"{fn} exception={exception}")
 
     def goodbye(self) -> bool:
+        fn = "goodbye =>"
         self.sent_intro = False
-        return self.sent_intro
+        return True
 
     def update_chat_history(self, chat_message: dict(role=str, content=str)) -> None:
+        fn = "update_chat_history =>"
         try:
             if not chat_message:
                 return
@@ -126,10 +182,11 @@ class Abbit:
             self.chat_history_file.write("\n" + json.dumps(chat_message))
             self.chat_history_len += 1
         except Exception as exception:
-            error_logger.log(f"update_chat_history => exception={exception}")
+            error_logger.log(f"{fn} exception={exception}")
             exit(1)
 
-    def chat_completion(self) -> str | None:
+    def chat_completion(self) -> str | Exception:
+        fn = "chat_completion =>"
         try:
             response = openai.ChatCompletion.create(
                 model=self.model,
@@ -141,16 +198,19 @@ class Abbit:
                 self.update_chat_history(response_dict)
             return answer
         except Exception as exception:
-            error_logger.log(f"chat_completion => exception={exception}")
+            error_logger.log(f"{fn} exception={exception}")
             raise exception
 
     def tokenize(self, content: str) -> list:
+        fn = "tokenize =>"
         return encoding.encode(content)
 
     def calculate_tokens(self, content: str | dict) -> int:
+        fn = "calculate_tokens =>"
         return len(self.tokenize(content))
 
     def calculate_chat_history_tokens(self) -> int:
+        fn = "calculate_chat_history_tokens =>"
         total = 0
         for data in self.chat_history:
             content = try_get(data, "content")
@@ -158,12 +218,11 @@ class Abbit:
         return total
 
     def chat_history_completion(self) -> str | Exception:
+        fn = "chat_history_completion =>"
         try:
             chat_context = self.chat_history
             chat_history_token_count = self.calculate_chat_history_tokens()
-            debug_logger.log(
-                f"chat_history_completion => token_count={chat_history_token_count}"
-            )
+            debug_logger.log(f"{fn} token_count={chat_history_token_count}")
             if chat_history_token_count > 5000:
                 reverse_chat_history = [self.personality, *self.chat_history[::-1]]
                 total = 0
@@ -174,7 +233,7 @@ class Abbit:
                     shortened_history.insert(message_dict)
                     total += self.calculate_tokens(content)
                     index += 1
-                    if total >= 3923:
+                    if total >= 2500:
                         chat_context = shortened_history
                         break
             response = openai.ChatCompletion.create(
@@ -186,8 +245,9 @@ class Abbit:
             self.update_chat_history(response_dict)
             return answer
         except Exception as exception:
-            error_logger.log(f"chat_history_completion => exception={exception}")
+            error_logger.log(f"{fn} exception={exception}")
             raise exception
 
     def get_chat_history(self) -> list:
+        fn = "get_chat_history =>"
         return self.chat_history

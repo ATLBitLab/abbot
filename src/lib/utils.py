@@ -4,7 +4,7 @@ from requests import request
 from datetime import datetime, timedelta
 from qrcode import make
 from io import BytesIO
-from lib.logger import error
+from lib.logger import error_logger
 
 TELEGRAM_MESSAGE_FIELDS = [
     "audio",
@@ -64,6 +64,7 @@ def try_get_telegram_message_data(telegram_message):
     return {f"{key}": try_get(telegram_message, key) for key in TELEGRAM_MESSAGE_FIELDS}
 
 
+# keys=["__cause__", "__traceback__", "args"]
 def try_gets(obj, keys=[], return_type="list", **kwargs):
     additional_keys = kwargs.pop("keys", None)
     keys = [*keys, *additional_keys] if additional_keys else keys
@@ -121,5 +122,5 @@ def update_optin_optout(
 
         return True
     except Exception as exception:
-        error(f"context {context} not found in optinout_data.")
+        error_logger.log(f"context {context} not found in optinout_data.")
         raise exception

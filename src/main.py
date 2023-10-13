@@ -3,7 +3,7 @@ from sys import argv
 ARGS = argv[1:]
 DEV_MODE = "-d" in ARGS or "--dev" in ARGS
 
-from bot_config import (
+from lib.bot.config import (
     BOT_TOKEN,
     TEST_BOT_TOKEN,
     BOT_NAME,
