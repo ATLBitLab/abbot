@@ -21,7 +21,7 @@ from bot import handle_mention, handle_message, start, stop
 try:
     TOKEN = TEST_BOT_TOKEN if DEV_MODE else BOT_TOKEN
     APPLICATION = ApplicationBuilder().token(TOKEN).build()
-    debug_logger.log_message(f"{BOT_NAME} {BOT_TELEGRAM_HANDLE} Initialized")
+    debug_logger.log(f"{BOT_NAME} {BOT_TELEGRAM_HANDLE} Initialized")
     help_handler = CommandHandler("help", help)
     stop_handler = CommandHandler("stop", stop)
     start_handler = CommandHandler("start", start)
@@ -33,11 +33,9 @@ try:
     APPLICATION.add_handler(start_handler)
     APPLICATION.add_handler(message_handler)
 
-    debug_logger.log_message(f"{BOT_NAME} {BOT_TELEGRAM_HANDLE} Polling")
+    debug_logger.log(f"{BOT_NAME} {BOT_TELEGRAM_HANDLE} Polling")
     APPLICATION.run_polling()
 except Exception as exception:
     cause, traceback, args = deconstruct_error(exception)
     error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-    error_logger.log_message(
-        f"handle_message => Error={exception}, ErrorMessage={error_msg}"
-    )
+    error_logger.log(f"handle_message => Error={exception}, ErrorMessage={error_msg}")
