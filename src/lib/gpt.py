@@ -219,7 +219,7 @@ class GPT(Abbots):
             if chat_history_token_count > 2500:
                 chat_context = [
                     self.gpt_system,
-                    self.chat_history[len(self.chat_history_len) / 2 :],
+                    self.chat_history[self.chat_history_len / 2 :],
                 ]
             response = openai.ChatCompletion.create(
                 model=self.model,
