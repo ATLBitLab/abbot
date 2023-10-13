@@ -216,19 +216,11 @@ class GPT(Abbots):
             debug(
                 f"chat_history_completion {YD} token_count={chat_history_token_count}"
             )
-            if chat_history_token_count > 5000:
-                reverse_chat_history = [self.personality, *self.chat_history[::-1]]
-                total = 0
-                index = 0
-                shortened_history = [self.personality]
-                for message_dict in reverse_chat_history:
-                    content = try_get(message_dict, "content")
-                    shortened_history.insert(1, message_dict)
-                    total += self.calculate_tokens(content)
-                    index += 1
-                    if total >= 3923:
-                        chat_context = shortened_history
-                        break
+            if chat_history_token_count > 2500:
+                chat_context = [
+                    self.gpt_system,
+                    self.chat_history[len(self.chat_history_len) / 2 :],
+                ]
             response = openai.ChatCompletion.create(
                 model=self.model,
                 messages=chat_context,
@@ -254,3 +246,19 @@ class GPT(Abbots):
 
     def get_chat_history(self) -> list:
         return self.chat_history
+
+
+"""
+reverse_chat_history = [self.personality, *self.chat_history[::-1]]
+                total = 0
+                index = 0
+                shortened_history = [self.personality]
+                for message_dict in reverse_chat_history:
+                    content = try_get(message_dict, "content")
+                    shortened_history.insert(1, message_dict)
+                    total += self.calculate_tokens(content)
+                    index += 1
+                    if total >= 2500:
+                        chat_context = shortened_history
+                        break
+"""
