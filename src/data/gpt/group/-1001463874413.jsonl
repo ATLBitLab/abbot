@@ -80,3 +80,5 @@
 {"role": "user", "content": "Very positive energy here"}
 {"role": "user", "content": "/transactions@lntxbot"}
 {"role": "assistant", "content": "Hey there! It looks like you're trying to interact with the LNTXBot, specifically regarding transactions. The LNTXBot is a popular bot that facilitates Lightning Network transactions on Telegram. To access its transaction functionality, you can follow the format \"/transactions\" and include any specific command or parameter after it, as needed. Give it a go and see what options the LNTXBot offers for your Lightning Network needs! \ud83c\udf29\ufe0f\ud83d\udcb8\ud83d\udca1"}
+{"role": "user", "content": "https://twitter.com/BitcoinNewsCom/status/1712150049394741748?t=RAi0OFDvbntOL0s-0dM94Q&s=19"}
+{"role": "user", "content": "https://twitter.com/BitcoinNewsCom/status/1712150049394741748?t=RAi0OFDvbntOL0s-0dM94Q&s=19"}
