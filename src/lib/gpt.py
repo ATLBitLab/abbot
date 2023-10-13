@@ -50,7 +50,7 @@ class GPT(Abbots):
         context: str,
         chat_id: int = None,
         started: bool = False,
-        sent_intro: bool = False
+        sent_intro: bool = False,
     ) -> object:
         openai.api_key: str = OPENAI_API_KEY
         self.model: str = OPENAI_MODEL
@@ -153,15 +153,15 @@ class GPT(Abbots):
         self.unleashed = self.started
         self.chat_history_file.close()
         return self.started
-    
+
     def knock(self) -> bool:
         self.sent_intro = True
         return self.sent_intro
-    
+
     def fuck_off(self) -> bool:
         self.sent_intro = False
         return self.sent_intro
-    
+
     def unleash(self) -> bool:
         self.unleashed = True
         return self.unleashed
@@ -223,7 +223,7 @@ class GPT(Abbots):
                 shortened_history = [self.personality]
                 for message_dict in reverse_chat_history:
                     content = try_get(message_dict, "content")
-                    shortened_history.insert(message_dict)
+                    shortened_history.insert(1, message_dict)
                     total += self.calculate_tokens(content)
                     index += 1
                     if total >= 3923:
