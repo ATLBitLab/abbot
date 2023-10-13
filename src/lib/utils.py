@@ -19,10 +19,6 @@ TELEGRAM_MESSAGE_FIELDS = [
 ]
 
 
-def now_date():
-    return datetime.now().date()
-
-
 def get_dates(lookback=7):
     return [
         (
