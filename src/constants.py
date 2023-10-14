@@ -1,7 +1,6 @@
 import json
 from io import open
 from os.path import abspath
-from lib.utils import try_get
 
 PROGRAM = "main.py"
 BOT_NAME = "Abbot"
