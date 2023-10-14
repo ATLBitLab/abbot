@@ -8,6 +8,7 @@ from lib.bot.config import BOT_INTRO, OPENAI_API_KEY, BOT_CHAT_HISTORY_FILEPATH
 from lib.logger import debug_logger, error_logger
 from lib.utils import try_get
 
+from lib.exceptions import AbbitException, try_except
 import openai
 import tiktoken
 

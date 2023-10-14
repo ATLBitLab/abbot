@@ -1,25 +1,14 @@
+from traceback import extract_tb, extract_stack
 from functools import wraps
 from telegram.ext import ContextTypes
 from telegram import Message, Update, Chat, User
 from lib.bot.config import ORG_CHAT_ID, ORG_CHAT_TITLE
+from lib.bot.exceptions.AbbitException import try_except
 from lib.utils import try_get, try_gets
 from lib.logger import debug_logger, error_logger
 from datetime import datetime
 
 now = datetime.now().date()
-
-
-def trycatch(fn):
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        try:
-            # ---- Success ----
-            return fn(*args, **kwargs)
-        except Exception as error:
-            debug_logger.log(f"abbot => /prompt Error: {error}")
-            raise error
-
-    return wrapper
 
 
 async def get_chat_admins(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -> dict:
@@ -51,31 +40,28 @@ def parse_message(update: Update) -> Message:
         raise exception
 
 
+BASE_KEYS = ["text", "date"]
+
+
+@try_except
 def parse_message_data(
-    message: Message, keys: list = ["text", "date"], **kwargs
+    message: Message, keys: list = BASE_KEYS, **kwargs
 ) -> bool | dict:
     fn = "parse_message_data =>"
-    try:
-        additional_keys = kwargs.pop("keys", None)
-        if additional_keys:
-            keys = [*keys, *additional_keys]
-        message_data = {
-            f"{key}: ${(try_get(message, key) or now).strftime('%m/%d/%Y')}"
-            if key == "date"
-            else f"{key}: ${try_get(message, key)}"
-            for key in keys
-            if key != "date"
-        }
-        if len(message_data) < len(keys):
-            debug_logger.log(f"{fn} parsed values < number of keys: {message_data}")
-            return False
-        return message_data
-    except Exception as exception:
-        error_logger.log(f"{fn} Raw exception={exception}")
-        cause, traceback, args = deconstruct_error(exception)
-        error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-        error_logger.log(f"{fn} Error={exception}, ErrorMessage={error_msg}")
-        raise exception
+    additional_keys = kwargs.pop("keys", None)
+    if additional_keys:
+        keys = [*keys, *additional_keys]
+    message_data = {
+        f"{key}: ${(try_get(message, key) or now).strftime('%m/%d/%Y')}"
+        if key == "date"
+        else f"{key}: ${try_get(message, key)}"
+        for key in keys
+        if key != "date"
+    }
+    if len(message_data) < len(keys):
+        debug_logger.log(f"{fn} parsed values < number of keys: {message_data}")
+        return False
+    return message_data
 
 
 def parse_chat(update: Update, message: Message) -> Chat:
