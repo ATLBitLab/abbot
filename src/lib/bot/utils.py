@@ -1,5 +1,4 @@
 from functools import wraps
-from random import randrange
 from telegram.ext import ContextTypes
 from telegram import Message, Update, Chat, User
 from lib.bot.config import ORG_CHAT_ID, ORG_CHAT_TITLE
@@ -8,10 +7,6 @@ from lib.logger import debug_logger, error_logger
 from datetime import datetime
 
 now = datetime.now().date()
-
-
-def rand_num(input: list):
-    return randrange(len(input))
 
 
 def trycatch(fn):
@@ -56,12 +51,12 @@ def parse_message(update: Update) -> Message:
         raise exception
 
 
-def parse_message_data(message: Message, keys: list, **kwargs) -> bool | dict:
+def parse_message_data(
+    message: Message, keys: list = ["text", "date"], **kwargs
+) -> bool | dict:
     fn = "parse_message_data =>"
     try:
         additional_keys = kwargs.pop("keys", None)
-        if not keys:
-            keys = ["text", "date"]
         if additional_keys:
             keys = [*keys, *additional_keys]
         message_data = {

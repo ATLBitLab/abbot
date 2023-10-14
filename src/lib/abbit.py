@@ -1,10 +1,9 @@
 import json
 from io import TextIOWrapper, open
 from os.path import abspath, isfile
-from typing import AnyStr
 
 from constants import OPENAI_MODEL
-from lib.bot.config import BOT_INTRO, OPENAI_API_KEY
+from lib.bot.config import BOT_INTRO, OPENAI_API_KEY, BOT_CHAT_HISTORY_FILEPATH
 
 from lib.logger import debug_logger, error_logger
 from lib.utils import try_get
@@ -39,9 +38,7 @@ class Abbit:
         self.started: bool = started
         self.unleashed: bool = started
         self.sent_intro: bool = sent_intro
-        self.chat_history_file_path: AnyStr @ abspath = abspath(
-            f"src/data/{name}.jsonl"
-        )
+        self.chat_history_file_path = abspath(BOT_CHAT_HISTORY_FILEPATH)
         self.chat_history_file: TextIOWrapper = self._open_history()
         self.chat_history_file_cursor: int = self.chat_history_file.tell()
         self.chat_history: list = self._inflate_history()
@@ -77,7 +74,6 @@ class Abbit:
             return chat_history_file
         except Exception as exception:
             error_logger.log(f"{fn} exception={exception}")
-            exit(1)
 
     def _open_history(self) -> TextIOWrapper:
         fn = "_open_history =>"
@@ -87,7 +83,6 @@ class Abbit:
             return open(self.chat_history_file_path, "a+")
         except Exception as exception:
             error_logger.log(f"{fn} exception={exception}")
-            exit(1)
 
     def _close_history(self) -> None:
         fn = "_close_history =>"
@@ -112,7 +107,6 @@ class Abbit:
         except Exception as exception:
             error_logger.log(f"chat_id={self.chat_id} message={message}")
             error_logger.log(f"{fn} exception={exception}")
-            exit(1)
 
     def status(self) -> (bool, bool):
         fn = "status =>"
@@ -121,6 +115,10 @@ class Abbit:
     def bot_ready(self) -> bool:
         fn = "bot_ready =>"
         return self.started and self.sent_intro
+
+    def intro_sent(self) -> bool:
+        fn = "intro_sent =>"
+        return self.sent_intro
 
     def start(self) -> bool:
         fn = "start =>"
@@ -183,7 +181,6 @@ class Abbit:
             self.chat_history_len += 1
         except Exception as exception:
             error_logger.log(f"{fn} exception={exception}")
-            exit(1)
 
     def chat_completion(self) -> str | Exception:
         fn = "chat_completion =>"
