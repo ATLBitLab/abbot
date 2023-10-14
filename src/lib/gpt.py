@@ -4,8 +4,8 @@ from io import TextIOWrapper, open
 from os.path import abspath, isfile
 from typing import AnyStr
 
-from constants import OPENAI_MODEL, YD
-from env import OPENAI_API_KEY
+from bot_constants import OPENAI_MODEL, YD
+from bot_env import OPENAI_API_KEY
 
 from lib.logger import debug, error
 from lib.utils import try_except, try_get

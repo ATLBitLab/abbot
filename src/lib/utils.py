@@ -7,7 +7,7 @@ from requests import request
 from datetime import datetime, timedelta
 from qrcode import make
 from io import BytesIO
-from constants import OPTIN_OUT_FILE, OPTINOUT_FILEPATH
+from bot_constants import OPTIN_OUT_FILE, OPTINOUT_FILEPATH
 from lib.logger import error
 
 TELEGRAM_MESSAGE_FIELDS = [
@@ -31,8 +31,7 @@ def try_except(fn):
             # ---- Success ----
             return fn(*args, **kwargs)
         except Exception as exception:
-            exception.__traceback__ = traceback.extract_tb(exception.__traceback__)
-            error(f"{fn} exception={exception} traceback={exception.__traceback__}")
+            error(f"{fn} exception={exception}")
             raise
 
     return wrapper
