@@ -104,6 +104,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         debug_logger.log(f"{fn} reply_to_message_from={reply_to_message_from}")
         debug_logger.log(f"{fn} reply_from_bot={reply_to_message_from_bot}")
         debug_logger.log(f"{fn} reply_bot_username={reply_to_message_bot_handle}")
+        abbit_tagged = BOT_TELEGRAM_HANDLE in message_text
+        reply_to_abbit = reply_to_message_bot_handle == abbit.handle
         started, sent_intro = abbit.status()
         if abbit_tagged or reply_to_abbit:
             if not started and not sent_intro:
@@ -122,8 +124,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 }
                 debug_logger.log(f"{fn} abbit_message={abbit_message}")
                 abbit.update_chat_history(abbit_message)
-                abbit_tagged = BOT_TELEGRAM_HANDLE in message_text
-                reply_to_abbit = reply_to_message_bot_handle == abbit.handle
+
                 return await handle_mention(update, context)
 
     except Exception as exception:
