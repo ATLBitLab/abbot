@@ -42,12 +42,13 @@ from uuid import uuid4
 from datetime import datetime
 from lib.utils import (
     get_dates,
+    opt_in,
+    opt_out,
     try_get,
     try_get_telegram_message_data,
     try_gets,
     try_set,
     qr_code,
-    update_optin_optout,
 )
 from lib.logger import debug, error
 from telegram import Update, Message, Chat, User
@@ -877,7 +878,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             raise Exception(f"Not started! started={started}")
         which_abbot.update_chat_history(dict(role="user", content=message_text))
         which_abbot.update_abbots(chat_id, which_abbot)
-        update_optin_optout(OPTINOUT_FILEPATH, bot_context, chat_id, True)
+        opt_in(OPTINOUT_FILEPATH, bot_context, chat_id, True)
         error_msg = f"Please try again later or contact @nonni_io"
         await message.reply_text(
             f"Please wait while we unplug {BOT_NAME} from the Matrix"
@@ -975,7 +976,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "/stop failed! Something went wrong. Please try again later or contact @nonni_io"
             )
             return await context.bot.send_message(chat_id=THE_CREATOR, text=err_msg)
-        update_optin_optout(OPTINOUT_FILEPATH, bot_context, chat_id, False)
+        opt_out(OPTINOUT_FILEPATH, bot_context, chat_id, False)
         await message.reply_text(
             f"Thanks for using {BOT_NAME}. Use /start to restart at any time."
         )

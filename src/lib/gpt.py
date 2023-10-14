@@ -4,7 +4,7 @@ from io import TextIOWrapper, open
 from os.path import abspath, isfile
 from typing import AnyStr
 
-from constants import OPENAI_MODEL, YD
+from constants import OPENAI_MODEL
 from env import OPENAI_API_KEY
 
 from lib.logger import debug, error

@@ -6,27 +6,14 @@ from pynostr.key import PrivateKey
 from pynostr.relay_manager import RelayManager
 from pynostr.filters import FiltersList, Filters
 from pynostr.event import EventKind
+from env import BOT_NPUB, BOT_PUB_HEX, BOT_SEC_HEX
 
 
 class Nostr:
-    RELAYS = [
-        "wss://eden.nostr.land",
-        "wss://nostr.fmt.wiz.biz",
-        "wss://relay.damus.io",
-        "wss://nostr-pub.wellorder.net",
-        "wss://relay.nostr.info",
-        "wss://offchain.pub",
-        "wss://nos.lol",
-        "wss://brb.io",
-        "wss://relay.snort.social",
-        "wss://relay.current.fyi",
-        "wss://nostr.relayer.se",
-    ]
-
     def __init__(self, sec_key: str) -> None:
         assert (sec_key is not None, "Nostr secret key must be supplied")
-        self.sec_key = sec_key
-        private_key = PrivateKey(unhexlify(sec_key))
+        self.sec_key = self.BOT_SEC_HEX
+        private_key = PrivateKey(unhexlify(BOT_SEC_HEX))
         public_key = private_key.public_key
 
     def subscribe(self):
@@ -43,10 +30,6 @@ class Nostr:
             event_msg = relay_manager.message_pool.get_event()
             print(event_msg.event.content)
         relay_manager.close_all_relay_connections()
-
-    """
-
-    """
 
 
 """

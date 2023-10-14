@@ -47,4 +47,14 @@ OPTIN_OUT_FILE = json.load(open(OPTINOUT_FILEPATH, "a+"))
 GROUP_OPTIN = OPTIN_OUT_FILE["group"]
 PRIVATE_OPTIN = OPTIN_OUT_FILE["private"]
 COUNT = 5
-YD = "=>"
+RELAYS = [
+    "wss://booger.pro",
+    "wss://nos.lol/",
+    "wss://relay.bitcoinpark.com/",
+    "wss://relay.damus.io",
+    "wss://relay.damus.io/",
+    "wss://nostr-pub.wellorder.net/",
+    "wss://relay.primal.net",
+    "wss://nostr.terminus.money/",
+    "wss://relay.snort.social/",
+]
