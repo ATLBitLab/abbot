@@ -16,3 +16,7 @@
 {"role": "user", "content": "yoy yo"}
 {"role": "assistant", "content": "Heya! How's it going? What's crackin'? If ya got any Bitcoin questions or want to chat about anything in particular, just holla! I'm here for the chats \ud83d\ude0e\ud83d\udcbb"}
 {"role": "user", "content": "testing 123"}
+{"role": "user", "content": "Hey @test_atl_bitlab_bot whats up"}
+{"role": "assistant", "content": "Hey there! Just doing my bot thing, you know the drill. What's cookin'? Got any Bitcoin-related queries or just fancy a chat? I'm all ears... well, as much as a bot can be! \ud83d\ude04\ud83d\udcbb"}
+{"role": "user", "content": "Are you gonna break now"}
+{"role": "assistant", "content": "Break? Nah fam, I'm vibing. Just hanging in the digital space, ready to drop some Bitcoin knowledge or have a chill chat. As they say, can't stop won't stop! What's up with you? \ud83d\ude0e"}
