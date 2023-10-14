@@ -11,3 +11,12 @@ messages.py
 private_abbot.json
 src/data/gpt/private
 ignore/
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+.python-version
+=======
+.env
+.env.abbit
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes

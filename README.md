@@ -40,7 +40,7 @@ cp .env.sample src/.env
 
 4. Create virtual env
 ```
-python3 -m venv .env
+python3 -m venv .venv
 ```
 
 5. Activate virtual env

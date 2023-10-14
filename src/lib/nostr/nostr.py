@@ -22,7 +22,8 @@ class Nostr:
         "wss://relay.current.fyi",
         "wss://nostr.relayer.se",
     ]
-    def __init__(self, sec_key):
+
+    def __init__(self, sec_key: str) -> None:
         assert (sec_key is not None, "Nostr secret key must be supplied")
         self.sec_key = sec_key
         private_key = PrivateKey(unhexlify(sec_key))
@@ -42,6 +43,11 @@ class Nostr:
             event_msg = relay_manager.message_pool.get_event()
             print(event_msg.event.content)
         relay_manager.close_all_relay_connections()
+
+    """
+
+    """
+
 
 """
   Reply to a note
