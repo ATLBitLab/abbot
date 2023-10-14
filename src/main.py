@@ -1,3 +1,7 @@
+from lib.nostr.nip4 import nip4
+from lib.nostr.nostr import Nostr
+from env import NOSTR_NPUB, NOSTR_PUB, NOSTR_SEC
+
 # from functools import wraps
 # from sys import argv
 
@@ -990,9 +994,11 @@
 
 
 if __name__ == "__main__":
-    from lib.nostr.nip4 import nip4
 
-    nip4()
+    # nip4()
+    nostr = Nostr(NOSTR_SEC)
+    nostr.sendDM()
+
     # TOKEN = TEST_BOT_TOKEN if DEV_MODE else BOT_TOKEN
     # APPLICATION = ApplicationBuilder().token(TOKEN).build()
     # debug(f"{BOT_NAME} @{BOT_HANDLE} Initialized")
