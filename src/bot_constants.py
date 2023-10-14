@@ -57,3 +57,5 @@ RELAYS = [
     "wss://nostr.terminus.money/",
     "wss://relay.snort.social/",
 ]
+BOT_NPUB = "npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk"
+BOT_PUB_HEX = "6e52798e9229f84e290a803e6d286c3d6cc279901ab694bb0b9d8ff7bba71dd1"

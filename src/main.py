@@ -1,5 +1,7 @@
 import asyncio
 from sys import argv
+from lib.nostr.nip4 import nip4
+from lib.nostr.nostr import Nostr
 
 ARGS = argv[1:]
 CLEAN = "-c" in ARGS or "--clean" in ARGS
@@ -990,6 +992,9 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 if __name__ == "__main__":
+    nostr = Nostr()
+    nostr.subscribe()
+
     TOKEN = TEST_BOT_TOKEN if DEV_MODE else BOT_TOKEN
     APPLICATION = ApplicationBuilder().token(TOKEN).build()
     debug(f"{BOT_NAME} @{BOT_HANDLE} Initialized")
