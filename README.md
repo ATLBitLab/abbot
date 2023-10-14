@@ -40,7 +40,7 @@ cp .env.sample src/.env
 
 4. Create virtual env
 ```
-python3 -m venv .venv
+python -m venv .venv
 ```
 
 5. Activate virtual env
@@ -56,7 +56,7 @@ pip3 install -r requirements.txt
 7. If you created a test bot per the #requirements section, you can run the test bot
 ```
 cd src
-python3 cli.py --dev
+python main.py --dev
 ```
 
 8. Go to your telegram and DM your bot! That's it!

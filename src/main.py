@@ -1,3 +1,4 @@
+import asyncio
 from sys import argv
 
 ARGS = argv[1:]
@@ -6,7 +7,7 @@ SUMMARY = "-s" in ARGS or "--summary" in ARGS
 DEV_MODE = "-d" in ARGS or "--dev" in ARGS
 CLEAN_SUMMARY = CLEAN and SUMMARY
 
-from constants import (
+from bot_constants import (
     BOT_NAME,
     BOT_HANDLE,
     COUNT,
@@ -30,7 +31,6 @@ BOT_HANDLE = f"test_{BOT_HANDLE}" if DEV_MODE else BOT_HANDLE
 import re
 import json
 import time
-import traceback
 from io import open
 from os import listdir
 from os.path import abspath
@@ -60,7 +60,7 @@ from telegram.ext import (
 )
 from lib.api.strike import Strike
 from lib.gpt import GPT, Abbots
-from env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY
+from bot_env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY
 
 PROMPT_ABBOT = GPT(f"p{BOT_NAME}", BOT_HANDLE, PROMPT_ASSISTANT, "prompt")
 SUMMARY_ABBOT = GPT(f"s{BOT_NAME}", BOT_HANDLE, SUMMARY_ASSISTANT, "summary")
