@@ -28,9 +28,10 @@ from constants import (
 BOT_NAME = f"t{BOT_NAME}" if DEV_MODE else BOT_NAME
 BOT_HANDLE = f"test_{BOT_HANDLE}" if DEV_MODE else BOT_HANDLE
 
+import re
 import json
 import time
-import re
+import traceback
 from io import open
 from os import listdir
 from os.path import abspath
@@ -608,19 +609,6 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
         raise exception
-
-
-def trycatch(fn):
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        try:
-            # ---- Success ----
-            return fn(*args, **kwargs)
-        except Exception as error:
-            debug(f"abbot => /prompt Error: {error}")
-            raise error
-
-    return wrapper
 
 
 def deconstruct_error(error):

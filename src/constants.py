@@ -22,7 +22,7 @@ CHAT_TITLE_TO_SHORT_TITLE = {
     "ATL BitLab": "atlbitlab",
     "ATL BitLab Party 2023": "atlbitlabparty2023",
     "Weekly Newsletter Content": "weeklynewslettercontent",
-    "BitMiami": "bitmiami"
+    "BitMiami": "bitmiami",
 }
 CHAT_ID_TO_CHAT_TITLE = {
     "-1001204119993": "Atlanta BitDevs Discussion",
@@ -31,7 +31,7 @@ CHAT_ID_TO_CHAT_TITLE = {
     "-1001961459761": "ATL BitLab Party 2023",
     "-1001608254734": "ATL BitLab",
     "-911601159": "Weekly Newsletter Content",
-    "-1001463874413": "BitMiami"
+    "-1001463874413": "BitMiami",
 }
 SUPER_DOOPER_ADMINS = ["nonni_io", "sbddesign", "alex_lewin"]
 CHEEKY_RESPONSES = [
@@ -43,8 +43,8 @@ CHEEKY_RESPONSES = [
 ]
 PITHY_RESPONSES = ["Sorry, I'm taking a nap, ttyl."]
 OPTINOUT_FILEPATH = abspath("src/data/optin_optout.json")
-ABBOTS_JSON = json.load(open(OPTINOUT_FILEPATH, "r"))
-GROUP_OPTIN = try_get(ABBOTS_JSON, "group")
-PRIVATE_OPTIN = try_get(ABBOTS_JSON, "private")
+OPTIN_OUT_FILE = json.load(open(OPTINOUT_FILEPATH, "a+"))
+GROUP_OPTIN = try_get(OPTIN_OUT_FILE, "group")
+PRIVATE_OPTIN = try_get(OPTIN_OUT_FILE, "private")
 COUNT = 5
 YD = "=>"

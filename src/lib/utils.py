@@ -1,9 +1,13 @@
+from functools import wraps
 import json
 from io import open
+from logging import debug
+import traceback
 from requests import request
 from datetime import datetime, timedelta
 from qrcode import make
 from io import BytesIO
+from constants import OPTIN_OUT_FILE, OPTINOUT_FILEPATH
 from lib.logger import error
 
 TELEGRAM_MESSAGE_FIELDS = [
@@ -19,10 +23,26 @@ TELEGRAM_MESSAGE_FIELDS = [
 ]
 
 
+def try_except(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        fn = "try_except => wrapper =>"
+        try:
+            # ---- Success ----
+            return fn(*args, **kwargs)
+        except Exception as exception:
+            exception.__traceback__ = traceback.extract_tb(exception.__traceback__)
+            error(f"{fn} exception={exception} traceback={exception.__traceback__}")
+            raise
+
+    return wrapper
+
+
 def now_date():
     return datetime.now().date()
 
 
+@try_except
 def get_dates(lookback=7):
     return [
         (
@@ -32,6 +52,7 @@ def get_dates(lookback=7):
     ]
 
 
+@try_except
 def try_set(obj, value, *keys, **kwargs):
     default = kwargs.pop("default", None)
     if kwargs:
@@ -48,6 +69,7 @@ def try_set(obj, value, *keys, **kwargs):
     return obj
 
 
+@try_except
 def try_get(obj, *fields, **kwargs):
     default = kwargs.pop("default", None)
     if kwargs:
@@ -64,10 +86,12 @@ def try_get(obj, *fields, **kwargs):
     return obj
 
 
+@try_except
 def try_get_telegram_message_data(telegram_message):
     return {f"{key}": try_get(telegram_message, key) for key in TELEGRAM_MESSAGE_FIELDS}
 
 
+@try_except
 def try_gets(obj, keys=[], return_type="list", **kwargs):
     additional_keys = kwargs.pop("keys", None)
     keys = [*keys, *additional_keys] if additional_keys else keys
@@ -78,6 +102,7 @@ def try_gets(obj, keys=[], return_type="list", **kwargs):
     )
 
 
+@try_except
 def http_request(headers, method, url, json=None):
     try:
         return request(
@@ -90,6 +115,7 @@ def http_request(headers, method, url, json=None):
         return Exception(f"Request Failed: {e}")
 
 
+@try_except
 def qr_code(data):
     qr = make(data)
     bio = BytesIO()
@@ -98,32 +124,23 @@ def qr_code(data):
     return bio
 
 
-def update_optin_optout(
-    file_path: str, context: str, chat_id: int, opt_in: bool
-) -> bool:
-    try:
-        """
-        Update the JSON file at `file_path` by adding `chat_id` to the array associated with `context`.
-        """
-        # Read the existing data
-        optinout_data = json.load(open(file_path, "r"))
+@try_except
+def opt_in(context: str, chat_id: int) -> bool:
+    fn = "opt_in => "
+    optinout_list = OPTIN_OUT_FILE[context]
+    if chat_id not in optinout_list:
+        debug(f"{fn} chat_id={chat_id} opting in")
+        optinout_list.append(chat_id)
+        json.dump(OPTIN_OUT_FILE, OPTINOUT_FILEPATH, indent=4)
+    return True
 
-        # Add the new value to the appropriate context
-        change_made = False
-        optinout_list = optinout_data[context]
-        if opt_in and chat_id not in optinout_list:
-            optinout_list.append(chat_id)
-            change_made = True
-        elif not opt_in and chat_id in optinout_list:
-            optinout_list.remove(chat_id)
-            change_made = True
 
-        # Write the updated optinout_data back to the file
-        if change_made:
-            with open(file_path, "w") as file:
-                json.dump(optinout_data, file, indent=4)
-
-        return True
-    except Exception as exception:
-        error(f"context {context} not found in optinout_data.")
-        raise exception
+@try_except
+def opt_out(context: str, chat_id: int) -> bool:
+    fn = "opt_out =>"
+    optinout_list = OPTIN_OUT_FILE[context]
+    if chat_id in optinout_list:
+        debug(f"{fn} chat_id={chat_id} opting out")
+        optinout_list.remove(chat_id)
+        json.dump(OPTIN_OUT_FILE, OPTINOUT_FILEPATH, indent=4)
+    return True

@@ -1,4 +1,5 @@
 import json
+import traceback
 from io import TextIOWrapper, open
 from os.path import abspath, isfile
 from typing import AnyStr
@@ -98,6 +99,7 @@ class GPT(Abbots):
             return chat_history_file
         except Exception as exception:
             error(f"_create_history => exception={exception}")
+            error(f"_create_history => traceback={traceback.print_exc()}")
 
     def _open_history(self) -> TextIOWrapper:
         try:
@@ -106,6 +108,7 @@ class GPT(Abbots):
             return open(self.chat_history_file_path, "a+")
         except Exception as exception:
             error(f"_open_history => exception={exception}")
+            error(f"_open_history => traceback={traceback.print_exc()}")
 
     def _close_history(self) -> None:
         self.chat_history_file.close()
@@ -123,6 +126,7 @@ class GPT(Abbots):
             return chat_history
         except Exception as exception:
             error(f"chat_id={self.chat_id} message={message}")
+            error(f"_inflate_history => traceback={traceback.print_exc()}")
             error(f"_inflate_history => exception={exception}")
 
     def all_status(self) -> dict:
@@ -176,21 +180,7 @@ class GPT(Abbots):
             self.chat_history_len += 1
         except Exception as exception:
             error(f"update_chat_history => exception={exception}")
-
-    def chat_completion(self) -> str | None:
-        try:
-            response = openai.ChatCompletion.create(
-                model=self.model,
-                messages=self.chat_history,
-            )
-            answer = try_get(response, "choices", 0, "message", "content")
-            response_dict = dict(role="assistant", content=answer)
-            if answer:
-                self.update_chat_history(response_dict)
-            return answer
-        except Exception as exception:
-            error(f"Error: chat_completion => exception={exception}")
-            raise exception
+            error(f"update_chat_history => traceback={traceback.print_exc()}")
 
     def tokenize(self, content: str) -> list:
         return encoding.encode(content)
@@ -205,14 +195,29 @@ class GPT(Abbots):
             total += self.calculate_tokens(content)
         return total
 
+    def chat_completion(self) -> str | None:
+        try:
+            response = openai.ChatCompletion.create(
+                model=self.model,
+                messages=self.chat_history,
+            )
+            answer = try_get(response, "choices", 0, "message", "content")
+            response_dict = dict(role="assistant", content=answer)
+            if answer:
+                self.update_chat_history(response_dict)
+            return answer
+        except Exception as exception:
+            error(f"chat_completion => exception={exception}")
+            traceback_str = traceback.format_exc()
+            error(f"chat_completion => traceback={traceback_str}")
+            raise exception
+
     def chat_history_completion(self) -> str | Exception:
         try:
             chat_context = self.chat_history
             chat_history_token_count = self.calculate_chat_history_tokens()
-            debug(
-                f"chat_history_completion {YD} token_count={chat_history_token_count}"
-            )
-            index = self.chat_history_len / 2
+            debug(f"chat_history_completion => token_count={chat_history_token_count}")
+            index = self.chat_history_len // 2
             if chat_history_token_count > 2500:
                 chat_context = [
                     self.gpt_system,
@@ -228,6 +233,7 @@ class GPT(Abbots):
             return answer
         except Exception as exception:
             error(f"chat_history_completion => exception={exception}")
+            error(f"chat_history_completion => traceback={traceback.print_exc()}")
             raise exception
 
     def update_abbots(self, chat_id: str | int, bot: object) -> None:
@@ -235,7 +241,8 @@ class GPT(Abbots):
             Abbots.BOTS[chat_id] = bot
             debug(f"update_abbots => chat_id={chat_id}")
         except Exception as exception:
-            error(f"Error: update_abbots => exception={exception}")
+            error(f"update_abbots => exception={exception}")
+            error(f"update_abbots => traceback={traceback.print_exc()}")
             raise exception
 
     def get_abbots(self) -> Abbots.BOTS:
@@ -243,19 +250,3 @@ class GPT(Abbots):
 
     def get_chat_history(self) -> list:
         return self.chat_history
-
-
-"""
-reverse_chat_history = [self.personality, *self.chat_history[::-1]]
-                total = 0
-                index = 0
-                shortened_history = [self.personality]
-                for message_dict in reverse_chat_history:
-                    content = try_get(message_dict, "content")
-                    shortened_history.insert(1, message_dict)
-                    total += self.calculate_tokens(content)
-                    index += 1
-                    if total >= 2500:
-                        chat_context = shortened_history
-                        break
-"""
