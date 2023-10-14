@@ -10,5 +10,5 @@ env.py
 messages.py
 private_abbot.json
 src/data/gpt/private
-src/data/gpt/group/-1001717918574.jsonl
 ignore/
+.env.abbit

@@ -1,15 +1,20 @@
 import json
+import traceback
 from io import TextIOWrapper, open
 from os.path import abspath, isfile
 from typing import AnyStr
 
-from constants import OPENAI_MODEL
-from env import OPENAI_API_KEY
+from bot_constants import OPENAI_MODEL, YD
+from bot_env import OPENAI_API_KEY
 
 from lib.logger import debug, error
-from lib.utils import try_get
+from lib.utils import try_except, try_get
 
 import openai
+import tiktoken
+
+encoding = tiktoken.get_encoding("cl100k_base")
+encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
 
 
 class Abbots:
@@ -46,6 +51,7 @@ class GPT(Abbots):
         context: str,
         chat_id: int = None,
         started: bool = False,
+        sent_intro: bool = False,
     ) -> object:
         openai.api_key: str = OPENAI_API_KEY
         self.model: str = OPENAI_MODEL
@@ -57,8 +63,9 @@ class GPT(Abbots):
         self.chat_id: str = chat_id
         self.started: bool = started
         self.unleashed: bool = started
+        self.sent_intro: bool = sent_intro
 
-        chat_history_abs_filepath: AnyStr @ abspath = abspath(f"data/gpt/{context}")
+        chat_history_abs_filepath: AnyStr @ abspath = abspath(f"src/data/gpt/{context}")
         self.chat_history_file_path: str = (
             f"{chat_history_abs_filepath}/{chat_id}.jsonl"
             if chat_id
@@ -67,12 +74,15 @@ class GPT(Abbots):
         self.chat_history_file: TextIOWrapper = self._open_history()
         self.chat_history_file_cursor: int = self.chat_history_file.tell()
         self.chat_history: list = self._inflate_history()
+        self.chat_history_len = len(self.chat_history)
+        self.chat_history_token_length = self.calculate_chat_history_tokens()
 
     def __str__(self) -> str:
         return (
             f"GPT(model={self.model}, name={self.name}, "
             f"handle={self.handle}, context={self.context}, "
-            f"chat_id={self.chat_id}, started={self.started}"
+            f"unleashed={self.unleashed}, started={self.started} "
+            f"chat_id={self.chat_id}, chat_history_token_length={self.chat_history_token_length})"
         )
 
     def __repr__(self) -> str:
@@ -84,10 +94,10 @@ class GPT(Abbots):
 
     def _create_history(self) -> TextIOWrapper:
         chat_history_file = open(self.chat_history_file_path, "a+")
-        chat_history_file.write(f"{json.dumps(self.gpt_system)}\n")
+        chat_history_file.write(json.dumps(self.gpt_system))
         return chat_history_file
 
-    def _open_history(self) -> TextIOWrapper:
+    def _open_history(self):
         if not isfile(self.chat_history_file_path):
             return self._create_history()
         return open(self.chat_history_file_path, "a+")
@@ -106,7 +116,7 @@ class GPT(Abbots):
         self.chat_history_file.seek(self.chat_history_file_cursor)
         return chat_history
 
-    def status(self) -> dict:
+    def all_status(self) -> dict:
         status = dict(
             name=self.name,
             started=self.started,
@@ -116,6 +126,9 @@ class GPT(Abbots):
             return status
         status.update(dict(chat_id=self.chat_id))
         return status
+
+    def status(self) -> dict:
+        return self.__str__()
 
     def start(self) -> bool:
         self.started = True
@@ -129,6 +142,14 @@ class GPT(Abbots):
         self.chat_history_file.close()
         return self.started
 
+    def knock(self) -> bool:
+        self.sent_intro = True
+        return self.sent_intro
+
+    def fuck_off(self) -> bool:
+        self.sent_intro = False
+        return self.sent_intro
+
     def unleash(self) -> bool:
         self.unleashed = True
         return self.unleashed
@@ -137,32 +158,52 @@ class GPT(Abbots):
         self.unleashed = False
         return self.unleashed
 
-    def update_chat_history(self, chat_message: dict(role=str, content=str)) -> None:
+    def update_chat_history(self, chat_message: dict) -> None:
+        if not chat_message:
+            return
         self.chat_history.append(chat_message)
-        self.chat_history_file.write(f"{json.dumps(chat_message)}\n")
+        self.chat_history_file.write("\n" + json.dumps(chat_message))
+        self.chat_history_len += 1
+
+    def tokenize(self, content: str) -> list:
+        return encoding.encode(content)
+
+    def calculate_tokens(self, content: str | dict) -> int:
+        return len(self.tokenize(content))
+
+    def calculate_chat_history_tokens(self) -> int:
+        total = 0
+        for data in self.chat_history:
+            content = try_get(data, "content")
+            total += self.calculate_tokens(content)
+        return total
 
     def chat_completion(self) -> str | None:
-        try:
-            response = openai.ChatCompletion.create(
-                model=self.model,
-                messages=self.chat_history,
-            )
-            answer = try_get(response, "choices", 0, "message", "content")
-            response_dict = dict(role="assistant", content=answer)
-            if answer:
-                self.update_chat_history(response_dict)
-            return answer
-        except Exception as exception:
-            error(f"Error: chat_completion => exception={exception}")
-            return None
+        response = openai.ChatCompletion.create(
+            model=self.model,
+            messages=self.chat_history,
+        )
+        answer = try_get(response, "choices", 0, "message", "content")
+        response_dict = dict(role="assistant", content=answer)
+        if answer:
+            self.update_chat_history(response_dict)
+        return answer
+
+    def chat_history_completion(self) -> str | Exception:
+        chat_history_token_count = self.calculate_chat_history_tokens()
+        debug(f"chat_history_completion => token_count={chat_history_token_count}")
+        response = openai.ChatCompletion.create(
+            model=self.model,
+            messages=self.chat_history,
+        )
+        answer = try_get(response, "choices", 0, "message", "content")
+        response_dict = dict(role="assistant", content=answer)
+        self.update_chat_history(response_dict)
+        return answer
 
     def update_abbots(self, chat_id: str | int, bot: object) -> None:
-        try:
-            Abbots.BOTS[chat_id] = bot
-            debug(f"update_abbots => chat_id={chat_id}")
-        except Exception as exception:
-            error(f"Error: update_abbots => exception={exception}")
-            raise exception
+        Abbots.BOTS[chat_id] = bot
+        debug(f"update_abbots => chat_id={chat_id}")
 
     def get_abbots(self) -> Abbots.BOTS:
         return Abbots.BOTS

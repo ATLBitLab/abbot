@@ -1,4 +1,3 @@
-from functools import wraps
 from sys import argv
 
 ARGS = argv[1:]
@@ -7,7 +6,7 @@ SUMMARY = "-s" in ARGS or "--summary" in ARGS
 DEV_MODE = "-d" in ARGS or "--dev" in ARGS
 CLEAN_SUMMARY = CLEAN and SUMMARY
 
-from constants import (
+from bot_constants import (
     BOT_NAME,
     BOT_HANDLE,
     COUNT,
@@ -28,9 +27,9 @@ from constants import (
 BOT_NAME = f"t{BOT_NAME}" if DEV_MODE else BOT_NAME
 BOT_HANDLE = f"test_{BOT_HANDLE}" if DEV_MODE else BOT_HANDLE
 
+import re
 import json
 import time
-import re
 from io import open
 from os import listdir
 from os.path import abspath
@@ -41,16 +40,15 @@ from uuid import uuid4
 from datetime import datetime
 from lib.utils import (
     get_dates,
+    opt_in,
+    opt_out,
     try_get,
     try_get_telegram_message_data,
     try_gets,
     try_set,
     qr_code,
-    update_optin_optout,
 )
-
 from lib.logger import debug, error
-
 from telegram import Update, Message, Chat, User
 from telegram.ext.filters import BaseFilter
 from telegram.ext import (
@@ -59,21 +57,56 @@ from telegram.ext import (
     CommandHandler,
     MessageHandler,
 )
-
 from lib.api.strike import Strike
 from lib.gpt import GPT, Abbots
+from bot_env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY
 
 PROMPT_ABBOT = GPT(f"p{BOT_NAME}", BOT_HANDLE, PROMPT_ASSISTANT, "prompt")
 SUMMARY_ABBOT = GPT(f"s{BOT_NAME}", BOT_HANDLE, SUMMARY_ASSISTANT, "summary")
 ALL_ABBOTS = [PROMPT_ABBOT, SUMMARY_ABBOT]
 
-from env import BOT_TOKEN, TEST_BOT_TOKEN, STRIKE_API_KEY
+for gc in listdir(abspath("src/data/gpt/group")):
+    if ".jsonl" not in gc:
+        continue
+    bot_context = "group"
+    chat_id = int(gc.split(".")[0])
+    abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
+    debug(f"main => chat_id={chat_id} abbot_name={abbot_name}")
+    group_abbot = GPT(
+        abbot_name,
+        BOT_HANDLE,
+        ATL_BITCOINER,
+        bot_context,
+        chat_id,
+        chat_id in GROUP_OPTIN,
+    )
+    ALL_ABBOTS.append(group_abbot)
 
-RAW_MESSAGE_JL_FILE = abspath("data/raw_messages.jsonl")
-MESSAGES_JL_FILE = abspath("data/messages.jsonl")
-SUMMARY_LOG_FILE = abspath("data/backup/summaries.txt")
-MESSAGES_PY_FILE = abspath("data/backup/messages.py")
-PROMPTS_BY_DAY_FILE = abspath("data/backup/prompts_by_day.py")
+for pm in listdir(abspath("src/data/gpt/private")):
+    if ".jsonl" not in pm:
+        continue
+    bot_context = "private"
+    chat_id = int(pm.split(".")[0])
+    abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
+    group_abbot = GPT(
+        abbot_name,
+        BOT_HANDLE,
+        ATL_BITCOINER,
+        bot_context,
+        chat_id,
+        chat_id in PRIVATE_OPTIN,
+    )
+    ALL_ABBOTS.append(group_abbot)
+
+abbots = Abbots(ALL_ABBOTS)
+ABBOTS: Abbots.BOTS = abbots.get_bots()
+debug(f"main abbots => {abbots.__str__()}")
+
+RAW_MESSAGE_JL_FILE = abspath("src/data/raw_messages.jsonl")
+MESSAGES_JL_FILE = abspath("src/data/messages.jsonl")
+SUMMARY_LOG_FILE = abspath("src/data/backup/summaries.txt")
+MESSAGES_PY_FILE = abspath("src/data/backup/messages.py")
+PROMPTS_BY_DAY_FILE = abspath("src/data/backup/prompts_by_day.py")
 now = datetime.now()
 
 
@@ -106,11 +139,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not message_text:
             debug(f"handle_message => Missing message text={message_text}")
             return
-        private_chat = chat_type == "private"
-        if not private_chat:
+        debug(f"handle_message => Message text={message_text}")
+        is_private_chat = chat_type == "private"
+        is_group_chat = chat_type == "group"
+        bot_context = "group"
+        if is_group_chat or not is_private_chat:
             chat_title = try_get(chat, "title", default="").lower().replace(" ", "")
-        if not private_chat:
-            debug(f"handle_message => private_chat={private_chat}")
+            debug(f"handle_message => not is_private_chat={not is_private_chat}")
+            debug(f"handle_message => is_group_chat={is_group_chat}")
             message_dump = json.dumps(
                 {
                     "id": chat_id,
@@ -128,70 +164,56 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             raw_messages_jsonl.write(message_dump)
             raw_messages_jsonl.write("\n")
             raw_messages_jsonl.close()
-        bot_context = "group"
-        if private_chat:
+        else:
             bot_context = "private"
-            debug(f"handle_message => private_chat={private_chat}")
+            debug(f"handle_message => is_private_chat={is_private_chat}")
+        debug(f"handle_message => bot_context={bot_context}")
+
         which_abbot: GPT = try_get(ABBOTS, chat_id)
         if not which_abbot:
             which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
             which_abbot = GPT(
                 which_bot_name, BOT_HANDLE, ATL_BITCOINER, bot_context, chat_id
             )
+
+        which_abbot_started = try_get(which_abbot, "started") == True
         which_name = try_get(which_abbot, "name")
         which_handle = try_get(which_abbot, "handle")
+        which_history = try_get(which_abbot, "chat_history")
+        which_history_system = try_get(which_history, 0, "role") == "system"
         which_history_len = len(try_get(which_abbot, "chat_history", default=[]))
         group_in_name = "group" in which_name
         reply_to_message = try_get(message, "reply_to_message")
-        reply_to_message_text = try_get(reply_to_message, "text")
+        reply_to_message_text = try_get(reply_to_message, "text", default="") or ""
         reply_to_message_from = try_get(reply_to_message, "from")
         reply_to_message_from_bot = try_get(reply_to_message_from, "is_bot")
         reply_to_message_bot_username = try_get(reply_to_message_from, "username")
         all_message_data = try_get_telegram_message_data(message)
-        debug(f"handle_message => reply_to_message={reply_to_message}")
-        debug(f"handle_message => all_message_data={all_message_data}")
-        debug(f"handle_message => Message text={message_text}")
-        debug(f"handle_message => bot_context={bot_context}")
-        bot_handle_in_message_text = f"@{which_handle}" in message_text
-        bot_handle_in_reply_to_message_text = (
-            f"@{which_handle}" in reply_to_message_text
-        )
-        is_fifth_message = which_history_len % COUNT == 0
-        reply_to_which_abbot = reply_to_message_bot_username == which_handle
-        if group_in_name:
-            debug(f"handle_message => group_in_name")
-            debug(f"handle_message => which_name={which_name}")
-            if not reply_to_message:
-                debug(f"handle_message => not reply_to_message")
-                debug(f"handle_message => reply_to_message={reply_to_message}")
-                if not bot_handle_in_message_text and not is_fifth_message:
-                    debug(f"handle_message => not bot_handle_in_message_text")
-                    debug(f"handle_message => handle untagged, message={message_text}")
-                    debug(f"handle_message => is_fifth_message={is_fifth_message}")
-                    return
-            elif (
-                not reply_to_message_from_bot
-                and not bot_handle_in_reply_to_message_text
-            ):
-                debug(f"handle_message => not reply_to_message_from_bot")
-                debug(f"handle_message => reply_from_bot={reply_to_message_from_bot}")
-                debug(f"handle_message => not bot_handle_in_reply_to_message_text")
-                debug(f"handle_message => hanlde_in_reply_message_text={bot_handle_in_reply_to_message_text}")
-                debug(f"handle_message => reply_to_message_text={reply_to_message_text}")
-                return
-            elif not reply_to_which_abbot:
-                debug(f"handle_message => not reply_to_which_abbot")
-                debug(f"handle_message => reply_to_which_abbot={reply_to_which_abbot}")
-                debug(f"handle_message => which_handle={which_handle}")
-                return
-        which_abbot_started = try_get(which_abbot, "started")
+
         debug(f"handle_message => which_abbot_started={which_abbot_started}")
-        if (
-            bot_handle_in_message_text or reply_to_which_abbot
-        ) and not which_abbot_started:
-            debug(f"handle_message => bot_tagged={bot_handle_in_message_text}")
-            debug(f"handle_message => or reply_to_which_abbot={reply_to_which_abbot}")
-            debug(f"handle_message => which_abbot_started={not which_abbot_started}")
+        debug(f"handle_message => which_name={which_name}")
+        debug(f"handle_message => which_handle={which_handle}")
+
+        debug(f"handle_message => which_history_system={which_history_system}")
+        debug(f"handle_message => which_history_len={which_history_len}")
+
+        debug(f"handle_message => reply_to_message={reply_to_message}")
+        debug(f"handle_message => reply_to_message_text={reply_to_message_text}")
+        debug(f"handle_message => reply_to_message_from={reply_to_message_from}")
+        debug(f"handle_message => reply_from_bot={reply_to_message_from_bot}")
+        debug(f"handle_message => reply_bot_username={reply_to_message_bot_username}")
+        debug(f"handle_message => all_message_data={all_message_data}")
+
+        full_handle = f"@{which_handle}"
+        is_modulo_message = which_history_len % COUNT == 0
+        reply_to_which_abbot = reply_to_message_bot_username == which_handle
+        knocked = which_abbot.sent_intro == True
+
+        if not which_abbot_started and not knocked:
+            debug(f"handle_message => Abbot not started")
+            debug(f"which_abbot={which_abbot.__str__()}")
+            debug(f"handle_message => abbot_not_started={which_abbot_started}")
+            which_abbot.knock()
             return await message.reply_text(
                 "Hello! Thank you for talking to Abbot (@atl_bitlab_bot), A Bitcoin Bot for local communities! \n\n"
                 "Abbot is meant to provide education to local bitcoin communities and help community organizers with various tasks. \n\n"
@@ -202,32 +224,74 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "Thank you for using Abbot! We hope you enjoy your experience! \n\n"
                 "If you have questions, concerns, feature requests or find bugs, please contact @nonni_io or @ATLBitLab on Telegram."
             )
-        if is_fifth_message and not which_abbot_started:
-            debug(f"handle_message => is_fifth_message={is_fifth_message}")
+        """
+        if full_handle in message_text or reply_to_which_abbot:
+            if which_history_len == 1 and which_history_system:
+                debug(f"handle_message => Abbot tagged {message_text}")
+                debug(f"handle_message => Reply to Abbot {reply_to_message_text}")
+                debug(f"handle_message => History is 1 {which_history_len}")
+            else:
+                debug(f"handle_message => history_len={which_history_len}")
+                debug(f"handle_message => history_system={which_history_system}")
+                return
+        else:
+            debug(f"handle_message => full_handle={full_handle}")
+            debug(f"handle_message => message_text={message_text}")
+            debug(f"handle_message => reply_to_abbot={reply_to_which_abbot}")
             return
-        debug(f"handle_message => All checks passed!")
+        """
+        answer = None
         which_abbot.update_chat_history(dict(role="user", content=message_text))
         which_abbot.update_abbots(chat_id, which_abbot)
-        answer = which_abbot.chat_completion()
+        if group_in_name:
+            debug(f"handle_message => group_in_name")
+            debug(f"handle_message => which_name={which_name}")
+            if (
+                full_handle in message_text
+                or full_handle in reply_to_message_text
+                or is_modulo_message
+                or reply_to_which_abbot
+            ):
+                debug(f"handle_message => All checks passed!")
+                answer = which_abbot.chat_history_completion()
+            else:
+                debug(f"handle_message => did not tag Abbot in messages")
+                debug(f"handle_message => message={message_text}")
+                debug(f"handle_message => reply_to_message={reply_to_message_text}")
+
+                debug(f"handle_message => reply is not from a bot")
+                debug(f"handle_message => reply_from_bot={reply_to_message_from_bot}")
+
+                debug(f"handle_message => did not reply to Abbot message")
+                debug(f"handle_message => reply_to_which_abbot={reply_to_which_abbot}")
+                debug(f"handle_message => which_handle={which_handle}")
+
+                debug(f"handle_message => message is not multiple of 5")
+                debug(f"handle_message => which_history_len={which_history_len}")
+        else:
+            debug(f"handle_message => is private, not group_in_name")
+            answer = which_abbot.chat_history_completion()
+
         if not answer:
             status = which_abbot.stop()
-            answer = "Sorry ... taking a nap. Hmu later."
             debug(f"handle_message => which_abbot={which_abbot} status={status}")
-            await context.bot.send_message(
+            return await context.bot.send_message(
                 chat_id=THE_CREATOR,
-                text=f"{which_abbot.name} stopped ⛔️: which_abbot={which_abbot} status={status}",
+                text=f"{which_abbot.name} completion failed ⛔️: which_abbot={which_abbot} status={status} answer={answer}",
             )
         return await message.reply_text(answer)
+
     except Exception as exception:
-        status = which_abbot.stop()
+        if not which_abbot:
+            status = "unknown"
+        status = which_abbot.status()
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-        error(f"handle_message => Error={exception}, ErrorMessage={error_msg}")
-        error(f"handle_message => which_abbot={which_abbot} status={status}")
+        debug(f"handle_message => Error={exception}, ErrorMessage={error_msg}")
+        debug(f"handle_message => which_abbot={which_abbot} status={status}")
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
-        await message.reply_text(f"Sorry ... taking a nap. Hmu later.")
 
 
 def clean_data():
@@ -330,7 +394,6 @@ async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE, both: bool =
             await context.bot.send_message(
                 chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
             )
-            await message.reply_text(f"Sorry ... taking a nap. Hmu later.")
         raise exception
 
 
@@ -354,7 +417,7 @@ async def both(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
-        await message.reply_text(f"Sorry ... taking a nap. Hmu later.")
+        raise exception
 
 
 def whitelist_gate(sender):
@@ -451,7 +514,6 @@ async def summary(
             await context.bot.send_message(
                 chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
             )
-            await message.reply_text(f"Sorry ... taking a nap. Hmu later.")
         raise exception
 
 
@@ -545,21 +607,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
-        await message.reply_text(f"Sorry ... taking a nap. Hmu later.")
         raise exception
-
-
-def trycatch(fn):
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        try:
-            # ---- Success ----
-            return fn(*args, **kwargs)
-        except Exception as error:
-            debug(f"abbot => /prompt Error: {error}")
-            raise error
-
-    return wrapper
 
 
 def deconstruct_error(error):
@@ -636,7 +684,6 @@ async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
-        await message.reply_text(f"Sorry ... taking a nap. Hmu later.")
         raise exception
 
 
@@ -713,7 +760,7 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
-        await message.reply_text(f"Sorry ... taking a nap. Hmu later.")
+        raise exception
 
 
 async def abbot_rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -743,7 +790,7 @@ async def abbot_rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
-        await message.reply_text(f"Sorry ... taking a nap. Hmu later.")
+        raise exception
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -827,30 +874,30 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         started = which_abbot.start()
         if not started:
             raise Exception(f"Not started! started={started}")
-        which_abbot.update_chat_history(dict(role="system", content=creator_content))
         which_abbot.update_chat_history(dict(role="user", content=message_text))
         which_abbot.update_abbots(chat_id, which_abbot)
-        update_optin_optout(OPTINOUT_FILEPATH, bot_context, chat_id, True)
+        opt_in(OPTINOUT_FILEPATH, bot_context, chat_id, True)
         error_msg = f"Please try again later or contact @nonni_io"
         await message.reply_text(
             f"Please wait while we unplug {BOT_NAME} from the Matrix"
         )
-        response = which_abbot.chat_completion()
+        response = which_abbot.chat_history_completion()
         if not response:
             status = which_abbot.leash()
             response = f"{which_abbot.name} leashed={status} ⛔️! {error_msg}."
-            await context.bot.send_message(
+            return await context.bot.send_message(
                 chat_id=THE_CREATOR, text=f"status={status} response={response}"
             )
         await message.reply_text(response)
     except Exception as exception:
+        error(f"start => Raw exception={exception}")
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
         error(f"start => Error={exception}, ErrorMessage={error_msg}")
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
-        await message.reply_text(f"Sorry ... taking a nap. Hmu later.")
+        raise exception
 
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -927,7 +974,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "/stop failed! Something went wrong. Please try again later or contact @nonni_io"
             )
             return await context.bot.send_message(chat_id=THE_CREATOR, text=err_msg)
-        update_optin_optout(OPTINOUT_FILEPATH, bot_context, chat_id, False)
+        opt_out(OPTINOUT_FILEPATH, bot_context, chat_id, False)
         await message.reply_text(
             f"Thanks for using {BOT_NAME}. Use /start to restart at any time."
         )
@@ -938,51 +985,12 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
-        await message.reply_text(f"Sorry ... taking a nap. Hmu later.")
+        raise exception
 
 
 if __name__ == "__main__":
     TOKEN = TEST_BOT_TOKEN if DEV_MODE else BOT_TOKEN
-
     APPLICATION = ApplicationBuilder().token(TOKEN).build()
-    
-    for group_chat in listdir(abspath("data/gpt/group")):
-        if ".jsonl" not in group_chat:
-            continue
-        bot_context = "group"
-        chat_id = int(group_chat.split(".")[0])
-        abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
-        group_abbot = GPT(
-            abbot_name,
-            BOT_HANDLE,
-            ATL_BITCOINER,
-            bot_context,
-            chat_id,
-            chat_id in GROUP_OPTIN,
-        )
-        ALL_ABBOTS.append(group_abbot)
-
-    for private_chat in listdir(abspath("data/gpt/private")):
-        if ".jsonl" not in private_chat:
-            continue
-        bot_context = "private"
-        chat_id = int(private_chat.split(".")[0])
-        abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
-        group_abbot = GPT(
-            abbot_name,
-            BOT_HANDLE,
-            ATL_BITCOINER,
-            bot_context,
-            chat_id,
-            chat_id in PRIVATE_OPTIN,
-        )
-        ALL_ABBOTS.append(group_abbot)
-    
-    global abbots
-    abbots = Abbots(ALL_ABBOTS)
-    global ABBOTS
-    ABBOTS: Abbots.BOTS = abbots.get_bots()
-    debug(f"main abbots => {abbots.__str__()}")
     debug(f"{BOT_NAME} @{BOT_HANDLE} Initialized")
 
     help_handler = CommandHandler("help", help)

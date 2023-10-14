@@ -1,9 +1,13 @@
+from functools import wraps
 import json
 from io import open
+from logging import debug
+import traceback
 from requests import request
 from datetime import datetime, timedelta
 from qrcode import make
 from io import BytesIO
+from bot_constants import OPTIN_OUT_FILE, OPTINOUT_FILEPATH
 from lib.logger import error
 
 TELEGRAM_MESSAGE_FIELDS = [
@@ -17,6 +21,20 @@ TELEGRAM_MESSAGE_FIELDS = [
     "video_note",
     "caption",
 ]
+
+
+def try_except(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        fn = "try_except => wrapper =>"
+        try:
+            # ---- Success ----
+            return fn(*args, **kwargs)
+        except Exception as exception:
+            error(f"{fn} exception={exception}")
+            raise
+
+    return wrapper
 
 
 def now_date():
@@ -98,32 +116,21 @@ def qr_code(data):
     return bio
 
 
-def update_optin_optout(
-    file_path: str, context: str, chat_id: int, opt_in: bool
-) -> bool:
-    try:
-        """
-        Update the JSON file at `file_path` by adding `chat_id` to the array associated with `context`.
-        """
-        # Read the existing data
-        optinout_data = json.load(open(file_path, "r"))
+def opt_in(context: str, chat_id: int) -> bool:
+    fn = "opt_in => "
+    optinout_list = OPTIN_OUT_FILE[context]
+    if chat_id not in optinout_list:
+        debug(f"{fn} chat_id={chat_id} opting in")
+        optinout_list.append(chat_id)
+        json.dump(OPTIN_OUT_FILE, OPTINOUT_FILEPATH, indent=4)
+    return True
 
-        # Add the new value to the appropriate context
-        change_made = False
-        optinout_list = optinout_data[context]
-        if opt_in and chat_id not in optinout_list:
-            optinout_list.append(chat_id)
-            change_made = True
-        elif not opt_in and chat_id in optinout_list:
-            optinout_list.remove(chat_id)
-            change_made = True
 
-        # Write the updated optinout_data back to the file
-        if change_made:
-            with open(file_path, "w") as file:
-                json.dump(optinout_data, file, indent=4)
-
-        return True
-    except Exception as exception:
-        error(f"context {context} not found in optinout_data.")
-        raise exception
+def opt_out(context: str, chat_id: int) -> bool:
+    fn = "opt_out =>"
+    optinout_list = OPTIN_OUT_FILE[context]
+    if chat_id in optinout_list:
+        debug(f"{fn} chat_id={chat_id} opting out")
+        optinout_list.remove(chat_id)
+        json.dump(OPTIN_OUT_FILE, OPTINOUT_FILEPATH, indent=4)
+    return True
