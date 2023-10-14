@@ -1,4 +1,4 @@
-import time
+import asyncio
 import uuid
 from binascii import unhexlify
 
@@ -16,7 +16,7 @@ class Nostr:
         private_key = PrivateKey(unhexlify(BOT_SEC_HEX))
         public_key = private_key.public_key
 
-    def subscribe(self):
+    async def subscribe(self):
         relay_manager = RelayManager(timeout=2)
         for relay in self.RELAYS:
             relay_manager.add_relay(relay)

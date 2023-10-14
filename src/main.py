@@ -1,4 +1,3 @@
-from functools import wraps
 from sys import argv
 
 ARGS = argv[1:]
