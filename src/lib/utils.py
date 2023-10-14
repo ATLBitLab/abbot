@@ -41,7 +41,6 @@ def now_date():
     return datetime.now().date()
 
 
-@try_except
 def get_dates(lookback=7):
     return [
         (
@@ -51,7 +50,6 @@ def get_dates(lookback=7):
     ]
 
 
-@try_except
 def try_set(obj, value, *keys, **kwargs):
     default = kwargs.pop("default", None)
     if kwargs:
@@ -68,7 +66,6 @@ def try_set(obj, value, *keys, **kwargs):
     return obj
 
 
-@try_except
 def try_get(obj, *fields, **kwargs):
     default = kwargs.pop("default", None)
     if kwargs:
@@ -85,12 +82,10 @@ def try_get(obj, *fields, **kwargs):
     return obj
 
 
-@try_except
 def try_get_telegram_message_data(telegram_message):
     return {f"{key}": try_get(telegram_message, key) for key in TELEGRAM_MESSAGE_FIELDS}
 
 
-@try_except
 def try_gets(obj, keys=[], return_type="list", **kwargs):
     additional_keys = kwargs.pop("keys", None)
     keys = [*keys, *additional_keys] if additional_keys else keys
@@ -101,7 +96,6 @@ def try_gets(obj, keys=[], return_type="list", **kwargs):
     )
 
 
-@try_except
 def http_request(headers, method, url, json=None):
     try:
         return request(
@@ -114,7 +108,6 @@ def http_request(headers, method, url, json=None):
         return Exception(f"Request Failed: {e}")
 
 
-@try_except
 def qr_code(data):
     qr = make(data)
     bio = BytesIO()
@@ -123,7 +116,6 @@ def qr_code(data):
     return bio
 
 
-@try_except
 def opt_in(context: str, chat_id: int) -> bool:
     fn = "opt_in => "
     optinout_list = OPTIN_OUT_FILE[context]
@@ -134,7 +126,6 @@ def opt_in(context: str, chat_id: int) -> bool:
     return True
 
 
-@try_except
 def opt_out(context: str, chat_id: int) -> bool:
     fn = "opt_out =>"
     optinout_list = OPTIN_OUT_FILE[context]
