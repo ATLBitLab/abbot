@@ -1,6 +1,5 @@
 import asyncio
 from sys import argv
-from lib.nostr.nip4 import nip4
 from lib.nostr.nostr import Nostr
 
 ARGS = argv[1:]
@@ -991,37 +990,35 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
         raise exception
 
 
-if __name__ == "__main__":
-    nostr = Nostr()
-    nostr.subscribe()
+nostr = Nostr()
+nostr.subscribe()
+# TOKEN = TEST_BOT_TOKEN if DEV_MODE else BOT_TOKEN
+# APPLICATION = ApplicationBuilder().token(TOKEN).build()
+# debug(f"{BOT_NAME} @{BOT_HANDLE} Initialized")
 
-    TOKEN = TEST_BOT_TOKEN if DEV_MODE else BOT_TOKEN
-    APPLICATION = ApplicationBuilder().token(TOKEN).build()
-    debug(f"{BOT_NAME} @{BOT_HANDLE} Initialized")
+# help_handler = CommandHandler("help", help)
+# stop_handler = CommandHandler("stop", stop)
+# summary_handler = CommandHandler("summary", summary)
+# prompt_handler = CommandHandler("prompt", abbot)
+# clean_handler = CommandHandler("clean", clean)
+# clean_summary_handler = CommandHandler("both", both)
+# unleash_handler = CommandHandler("unleash", unleash_the_abbot)
+# status_handler = CommandHandler("status", abbot_status)
+# rules_handler = CommandHandler("rules", abbot_rules)
+# start_handler = CommandHandler("start", start)
+# message_handler = MessageHandler(BaseFilter(), handle_message)
 
-    help_handler = CommandHandler("help", help)
-    stop_handler = CommandHandler("stop", stop)
-    summary_handler = CommandHandler("summary", summary)
-    prompt_handler = CommandHandler("prompt", abbot)
-    clean_handler = CommandHandler("clean", clean)
-    clean_summary_handler = CommandHandler("both", both)
-    unleash_handler = CommandHandler("unleash", unleash_the_abbot)
-    status_handler = CommandHandler("status", abbot_status)
-    rules_handler = CommandHandler("rules", abbot_rules)
-    start_handler = CommandHandler("start", start)
-    message_handler = MessageHandler(BaseFilter(), handle_message)
+# APPLICATION.add_handler(help_handler)
+# APPLICATION.add_handler(stop_handler)
+# APPLICATION.add_handler(summary_handler)
+# APPLICATION.add_handler(prompt_handler)
+# APPLICATION.add_handler(clean_handler)
+# APPLICATION.add_handler(clean_summary_handler)
+# APPLICATION.add_handler(unleash_handler)
+# APPLICATION.add_handler(status_handler)
+# APPLICATION.add_handler(rules_handler)
+# APPLICATION.add_handler(start_handler)
+# APPLICATION.add_handler(message_handler)
 
-    APPLICATION.add_handler(help_handler)
-    APPLICATION.add_handler(stop_handler)
-    APPLICATION.add_handler(summary_handler)
-    APPLICATION.add_handler(prompt_handler)
-    APPLICATION.add_handler(clean_handler)
-    APPLICATION.add_handler(clean_summary_handler)
-    APPLICATION.add_handler(unleash_handler)
-    APPLICATION.add_handler(status_handler)
-    APPLICATION.add_handler(rules_handler)
-    APPLICATION.add_handler(start_handler)
-    APPLICATION.add_handler(message_handler)
-
-    debug(f"{BOT_NAME} @{BOT_HANDLE} Polling")
-    APPLICATION.run_polling()
+# debug(f"{BOT_NAME} @{BOT_HANDLE} Polling")
+# APPLICATION.run_polling()
