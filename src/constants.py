@@ -44,7 +44,7 @@ CHEEKY_RESPONSES = [
 PITHY_RESPONSES = ["Sorry, I'm taking a nap, ttyl."]
 OPTINOUT_FILEPATH = abspath("src/data/optin_optout.json")
 OPTIN_OUT_FILE = json.load(open(OPTINOUT_FILEPATH, "a+"))
-GROUP_OPTIN = try_get(OPTIN_OUT_FILE, "group")
-PRIVATE_OPTIN = try_get(OPTIN_OUT_FILE, "private")
+GROUP_OPTIN = OPTIN_OUT_FILE["group"]
+PRIVATE_OPTIN = OPTIN_OUT_FILE["private"]
 COUNT = 5
 YD = "=>"
