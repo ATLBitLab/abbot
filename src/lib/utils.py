@@ -7,8 +7,7 @@ from requests import request
 from datetime import datetime, timedelta
 from qrcode import make
 from io import BytesIO
-from bot_constants import OPTIN_OUT_FILE, OPTINOUT_FILEPATH
-from lib.logger import error
+from lib.logger import error_logger
 
 TELEGRAM_MESSAGE_FIELDS = [
     "audio",
@@ -21,24 +20,6 @@ TELEGRAM_MESSAGE_FIELDS = [
     "video_note",
     "caption",
 ]
-
-
-def try_except(fn):
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        fn = "try_except => wrapper =>"
-        try:
-            # ---- Success ----
-            return fn(*args, **kwargs)
-        except Exception as exception:
-            error(f"{fn} exception={exception}")
-            raise
-
-    return wrapper
-
-
-def now_date():
-    return datetime.now().date()
 
 
 def get_dates(lookback=7):
@@ -86,6 +67,7 @@ def try_get_telegram_message_data(telegram_message):
     return {f"{key}": try_get(telegram_message, key) for key in TELEGRAM_MESSAGE_FIELDS}
 
 
+# keys=["__cause__", "__traceback__", "args"]
 def try_gets(obj, keys=[], return_type="list", **kwargs):
     additional_keys = kwargs.pop("keys", None)
     keys = [*keys, *additional_keys] if additional_keys else keys
@@ -126,11 +108,12 @@ def opt_in(context: str, chat_id: int) -> bool:
     return True
 
 
-def opt_out(context: str, chat_id: int) -> bool:
-    fn = "opt_out =>"
-    optinout_list = OPTIN_OUT_FILE[context]
-    if chat_id in optinout_list:
-        debug(f"{fn} chat_id={chat_id} opting out")
-        optinout_list.remove(chat_id)
-        json.dump(OPTIN_OUT_FILE, OPTINOUT_FILEPATH, indent=4)
-    return True
+        # Write the updated optinout_data back to the file
+        if change_made:
+            with open(file_path, "w") as file:
+                json.dump(optinout_data, file, indent=4)
+
+        return True
+    except Exception as exception:
+        error_logger.log(f"context {context} not found in optinout_data.")
+        raise exception
