@@ -12,33 +12,24 @@ BOT_TOKEN = try_get(env, "BOT_TOKEN")
 TEST_BOT_TOKEN = try_get(env, "TEST_BOT_TOKEN")
 
 ORG_INFO = {
-    "name": "Blixt Wallet",
-    "slug": "blixt",
-    "type": "open-source project",
-    "admins": ["nitesh_btc", "hsjoberg", "fiatjaf"],
-    "description": "a non-custodial open-source Bitcoin Lightning Wallet available on Android and iOS with a focus on usability and user experience. It's currently aimed towards Bitcoiners who want to try out using Lightning Network. It uses the Lightning Network client lnd and the Bitcoin SPV client Neutrino under the hood, directly on the phone, respecting your privacy. The wallet does not use any centralized servers for doing transactions. The design philosophy behind Blixt Wallet is to provide a clean and straightforward interface and user experience for doing transactions. Effort has been made to make sure that the transaction log is descriptive and clear.",
+    "name": "ATL BitLab",
+    "slug": "atlbitlab",
+    "type": "",
+    "admins": [""],
+    "description": "",
     "chat_id": 0000000000,
-    "chat_title": "Blixt Wallet",
+    "chat_title": "ATL BitLab",
     "block_height": "",
-    "location": "global",
-    "website": "https://blixtwallet.github.io",
-    "github": "https://github.com/hsjoberg/blixt-wallet",
-    "telegram": "https://t.me/blixtwallet",
-    "twitter": "https://twitter.com/BlixtWallet",
+    "location": "ATL",
+    "website": "https://atlbitlab.com",
+    "github": "https://github.com/atlbitlab",
+    "telegram": "https://t.me/atlbitlab",
+    "twitter": "https://twitter.com/atlbitlab",
+    "meetup": "https://meetup.com/atlbitlab",
     "lead": {
-        "name": "Hampus Sjöberg",
-        "email": "hampus.sjoberg@protonmail.com",
-        "twitter": "https://twitter.com/hampus_s",
-    },
-    "apps": {
-        "ios": "https://testflight.apple.com/join/EXvGhRzS",
-        "android": "https://play.google.com/store/apps/details?id=com.blixtwallet",
-        "apk": "https://github.com/hsjoberg/blixt-wallet/releases",
-    },
-    "help": {
-        "guides": "https://blixtwallet.github.io/guides",
-        "featues": "https://blixtwallet.github.io/features",
-        "faq": "https://blixtwallet.github.io/faq",
+        "name": "Bryan Nonni",
+        "email": "bryan@atlbitlab.com",
+        "twitter": "https://twitter.com/nonni_io",
     },
 }
 
@@ -78,11 +69,11 @@ ORG_HELP_FEATURES = try_get(ORG_HELP, "features")
 ORG_HELP_FAQ = try_get(ORG_HELP, "faq")
 
 BOT_INFO = {
-    "name": "Abbit",
-    "meaning": "A Blixt Bot",
-    "handle": "@blixt11_bot",
+    "name": "Abbot",
+    "meaning": "ATL BitLab Bot",
+    "handle": "@atl_bitlab_bot",
     "user_id": "",
-    "job": "blixt wallet telegram community manager",
+    "job": "",
     "context": "online telegram group chat",
     "directives": [""],
     "responses": {
@@ -93,10 +84,10 @@ BOT_INFO = {
             "Access Denied!",
         ],
         "fail": [
-            "Sorry, Abbit has been plugged back into the matrix. Try again later."
+            "Sorry, Abbot has been plugged back into the matrix. Try again later."
         ],
     },
-    "intro": "Hello and welcome to Abbit (@blix11_bot) - a Blixt Bot for the Blixt community! \nMy goal is to provide help, information and education to you fine people here in the Blixt telegram channel. \n\nAbbit was built by @nonni_io and the team at ATL BitLab (@ATLBitLab). \n\nTo start Abbit, a channel admin must run /start or /start@blix11_bot to avoid bot confusion. \n\nBy starting Abbit, you agree to the ATL BitLab Terms & policies: https://atlbitlab.com/abbot/policies. \n\nThank you for using Abbit! We hope you enjoy your experience! \n\nWant a particular feature? Submit an issue here: https://github.com/ATLBitLab/open-abbot/issues/new?assignees=&labels=&projects=&template=feature_request.md&title=. \n\nFind a buy? Submit an issue here: https://github.com/ATLBitLab/open-abbot/issues/new?assignees=&labels=&projects=&template=bug_report.md&title=. \n\nFor questions, comments, concerns or if you want an Abbit for your telegram channel,\nvisit https://atlbitlab.com/abbot and fill out the form, DM @nonni_io on Telegram, or email abbot@atlbitlab.com.",
+    "intro": "Hello and welcome to Abbot (@atl_bitlab_bot). By starting Abbot, you agree to the ATL BitLab Terms & policies: https://atlbitlab.com/abbot/policies. \n\nThank you for using Abbot! We hope you enjoy your experience! \n\nWant a particular feature? Submit an issue here: https://github.com/ATLBitLab/open-abbot/issues/new?assignees=&labels=&projects=&template=feature_request.md&title=. \n\nFind a buy? Submit an issue here: https://github.com/ATLBitLab/open-abbot/issues/new?assignees=&labels=&projects=&template=bug_report.md&title=. \n\nFor questions, comments, concerns or if you want an Abbot for your telegram channel,\nvisit https://atlbitlab.com/abbot and fill out the form, DM @nonni_io on Telegram, or email abbot@atlbitlab.com.",
 }
 
 BOT_NAME = try_get(BOT_INFO, "name")
@@ -113,7 +104,7 @@ BOT_FAQS = try_get(BOT_INFO, "faqs")
 BOT_USER_ID = try_get(BOT_INFO, "user_id")
 BOT_COUNT = None
 BOT_CHAT_HISTORY_FILEPATH = f"src/data/chat/{BOT_NAME}.jsonl"
-BOT_CORE_SYSTEM = f"Your name is {BOT_NAME}, which is short for {BOT_NAME_MEANING}, your telegram handle is {BOT_TELEGRAM_HANDLE}, you are a contributor to {ORG_NAME} - {ORG_DESCRIPTION} and you are an expert in all things Blixt Wallet. Blixt Wallet is currently aimed towards Bitcoiners who want to try out using Lightning Network. Blixt Wallet uses the Lightning Network client lnd and the Bitcoin SPV client Neutrino under the hood, directly on the phone, respecting your privacy. The wallet does not use any centralized servers for doing transactions. The design philosophy behind Blixt Wallet is to provide a clean and straightforward interface and user experience for doing transactions. Effort has been made to make sure that the transaction log is descriptive and clear. Before using Blixt Wallet, it's important to get familiarized with terms, procedures, features, etc. It's a good idea to start reading and get some basic knowledge about LN and how to use it, otherwise it will be difficult for you, as a new user, to understand what you are doing with Blixt Wallet as a node LN wallet. See this link for resources: https://blixtwallet.github.io/faq#what-is-ln. "
+BOT_CORE_SYSTEM = f"Your name is {BOT_NAME}, which is short for {BOT_NAME_MEANING}, your telegram handle is {BOT_TELEGRAM_HANDLE}, you are a contributor to {ORG_NAME} - {ORG_DESCRIPTION} and you are an expert in all things Blixt Wallet. Blixt Wallet is currently aimed towards Bitcoiners who want to try out using Lightning Network. Blixt Wallet uses the Lightning Network client lnd and the Bitcoin SPV client Neutrino under the hood, directly on the phone, respecting your privacy. The wallet does not use any centralized servers for doing transactions. The design philosophy behind Blixt Wallet is to provide a clean and straightforward interface and user experience for doing transactions. Effort has been made to make sure that the transaction log is descriptive and clear. Before using Blixt Wallet, it's important to get familiarized with terms, procedures, features, etc. It's a good idea to start reading and get some basic knowledge about LN and how to use it, otherwise it will be difficult for you, as a new user, to understand what you are doing with Blixt Wallet as a node LN wallet. See this link for resources: https://atlbitlab.com/faq#what-is-ln. "
 
 
 def rand_num(input: list):

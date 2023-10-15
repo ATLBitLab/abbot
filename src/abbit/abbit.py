@@ -4,7 +4,7 @@ import tiktoken
 
 from io import TextIOWrapper, open
 from os.path import abspath, isfile
-from abbot.exceptions.AbbitException import try_except
+from abbot.exceptions.AbbotException import try_except
 
 from constants import OPENAI_MODEL
 from config import BOT_INTRO, OPENAI_API_KEY, BOT_CHAT_HISTORY_FILEPATH
@@ -16,8 +16,8 @@ encoding = tiktoken.get_encoding("cl100k_base")
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
 
 
-class Abbit:
-    cl = "Abbit =>"
+class Abbot:
+    cl = "Abbot =>"
 
     def __init__(
         self,
@@ -47,24 +47,24 @@ class Abbit:
 
     def __str__(self) -> str:
         fn = "__str__ =>"
-        abbit_str = (
-            f"Abbit(model={self.model}, name={self.name}, "
+        abbot_str = (
+            f"Abbot(model={self.model}, name={self.name}, "
             f"handle={self.handle}, unleashed={self.unleashed}, "
             f"started={self.started}, chat_id={self.chat_id}, "
             f"chat_history_token_length={self.chat_history_token_length})"
         )
-        debug_logger.log(f"{fn} abbit_str={abbit_str}")
-        return abbit_str
+        debug_logger.log(f"{fn} abbot_str={abbot_str}")
+        return abbot_str
 
     def __repr__(self) -> str:
         fn = "__repr__ =>"
-        abbit_repr = (
-            f"Abbit(model={self.model}, name={self.name}, "
+        abbot_repr = (
+            f"Abbot(model={self.model}, name={self.name}, "
             f"handle={self.handle}, personality={self.personality}, "
             f"chat_history={self.chat_history}, unleashed={self.unleashed}, started={self.started})"
         )
-        debug_logger.log(f"{fn} abbit_repr={abbit_repr}")
-        return abbit_repr
+        debug_logger.log(f"{fn} abbot_repr={abbot_repr}")
+        return abbot_repr
 
     def _create_history(self) -> TextIOWrapper:
         fn = "_create_history =>"
