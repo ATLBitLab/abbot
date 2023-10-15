@@ -181,32 +181,56 @@ class Abbit:
             total += self.calculate_tokens(content)
         return total
 
-    def chat_history_completion(self) -> str | Exception:
+    @try_except
+    def chat_history_completion(self) -> str | None:
         fn = "chat_history_completion =>"
-        chat_context = self.chat_history
+        debug_logger.log(fn)
         chat_history_token_count = self.calculate_chat_history_tokens()
         debug_logger.log(f"{fn} token_count={chat_history_token_count}")
-        if chat_history_token_count > 5000:
-            reverse_chat_history = [self.personality, *self.chat_history[::-1]]
-            total = 0
-            index = 0
-            shortened_history = [self.personality]
-            for message_dict in reverse_chat_history:
-                content = try_get(message_dict, "content")
-                shortened_history.insert(message_dict)
-                total += self.calculate_tokens(content)
-                index += 1
-                if total >= 2500:
-                    chat_context = shortened_history
-                    break
+        messages = [self.gpt_system]
+        debug_logger.log(f"{fn} messages={messages}")
+        messages.extend(self.chat_history)
+        debug_logger.log(f"{fn} messages={messages}")
         response = openai.ChatCompletion.create(
             model=self.model,
-            messages=chat_context,
+            messages=messages,
         )
+        debug_logger.log(f"{fn} response={response}")
         answer = try_get(response, "choices", 0, "message", "content")
+        debug_logger.log(f"{fn} answer={answer}")
         response_dict = dict(role="assistant", content=answer)
+        debug_logger.log(f"{fn} answer={answer}")
+        debug_logger.log(f"{fn} chat_history[-1]={self.chat_history[-1]}")
         self.update_chat_history(response_dict)
+        debug_logger.log(f"{fn} chat_history[-1]={self.chat_history[-1]}")
         return answer
+
+    # def chat_history_completion(self) -> str | Exception:
+    #     fn = "chat_history_completion =>"
+    #     chat_context = self.chat_history
+    #     chat_history_token_count = self.calculate_chat_history_tokens()
+    #     debug_logger.log(f"{fn} token_count={chat_history_token_count}")
+    #     if chat_history_token_count > 5000:
+    #         reverse_chat_history = [self.personality, *self.chat_history[::-1]]
+    #         total = 0
+    #         index = 0
+    #         shortened_history = [self.personality]
+    #         for message_dict in reverse_chat_history:
+    #             content = try_get(message_dict, "content")
+    #             shortened_history.insert(message_dict)
+    #             total += self.calculate_tokens(content)
+    #             index += 1
+    #             if total >= 2500:
+    #                 chat_context = shortened_history
+    #                 break
+    #     response = openai.ChatCompletion.create(
+    #         model=self.model,
+    #         messages=chat_context,
+    #     )
+    #     answer = try_get(response, "choices", 0, "message", "content")
+    #     response_dict = dict(role="assistant", content=answer)
+    #     self.update_chat_history(response_dict)
+    #     return answer
 
     def get_chat_history(self) -> list:
         fn = "get_chat_history =>"
