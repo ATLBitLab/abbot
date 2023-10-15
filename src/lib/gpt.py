@@ -1,20 +1,12 @@
 import json
+from subprocess import run, CalledProcessError
 import time
 from io import TextIOWrapper, open
 from os.path import abspath, isfile
 import traceback
 from typing import AnyStr
 
-from traceback import (
-    print_exc,
-    print_exception,
-    print_list,
-    print_stack,
-    print_tb,
-    extract_stack,
-    extract_tb,
-)
-from bot_constants import OPENAI_MODEL, YD
+from bot_constants import BOT_NAME, OPENAI_MODEL
 from bot_env import OPENAI_API_KEY
 
 from lib.logger import debug, error
@@ -134,6 +126,17 @@ class GPT(Abbots):
             chat_history.append(json.loads(message))
         self.chat_history_file.seek(self.chat_history_file_cursor)
         return chat_history[1:]
+
+    def kill_process(self) -> int:
+        fn = "kill_process:"
+        try:
+            service = BOT_NAME.lower()
+            run(["sudo", "systemctl", "stop", service], check=True)
+            debug(f"{fn} Successfully stopped {service}")
+            return True
+        except CalledProcessError as exception:
+            error(f"Error stopping {service}: {exception}")
+            raise exception
 
     def all_status(self) -> dict:
         status = dict(

@@ -275,8 +275,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not answer:
             if which_abbot.sleep(10):
                 await message.reply_text(
-                    "Sorry, I was taking a quick nap 😴."
-                    "Still a lil groggy 🥴."
+                    "Sorry, I was taking a quick nap 😴." "Still a lil groggy 🥴."
                 )
             debug(f"handle_message => which_abbot={which_abbot}")
             return await context.bot.send_message(
@@ -989,11 +988,32 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
         raise exception
 
 
+async def kill(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        fn = "kill:"
+        message: Message = try_get(update, "message")
+        chat: Chat = try_get(message, "chat")
+        chat_id: int = try_get(chat, "id")
+        user: User = try_get(message, "from_user")
+        user_id: int = try_get(user, "id")
+        if user_id != THE_CREATOR:
+            return
+        abbot: GPT = try_get(ABBOTS, THE_CREATOR)
+        abbot.kill_process()
+    except Exception as exception:
+        error(f"kill => exception={exception}")
+        await context.bot.send_message(
+            chat_id=THE_CREATOR, text=f"{fn} exception: {exception}"
+        )
+        raise exception
+
+
 if __name__ == "__main__":
     TOKEN = TEST_BOT_TOKEN if DEV_MODE else BOT_TOKEN
     APPLICATION = ApplicationBuilder().token(TOKEN).build()
     debug(f"{BOT_NAME} @{BOT_HANDLE} Initialized")
 
+    kill_handler = CommandHandler("kill", kill)
     help_handler = CommandHandler("help", help)
     stop_handler = CommandHandler("stop", stop)
     summary_handler = CommandHandler("summary", summary)
@@ -1006,6 +1026,7 @@ if __name__ == "__main__":
     start_handler = CommandHandler("start", start)
     message_handler = MessageHandler(BaseFilter(), handle_message)
 
+    APPLICATION.add_handler(kill_handler)
     APPLICATION.add_handler(help_handler)
     APPLICATION.add_handler(stop_handler)
     APPLICATION.add_handler(summary_handler)
