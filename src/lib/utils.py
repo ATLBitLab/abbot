@@ -1,10 +1,10 @@
 import json
-from requests import request
-from datetime import datetime, timedelta
-from qrcode import make
 from io import BytesIO
+from qrcode import make
+from functools import wraps
+from requests import request
 from bot_constants import OPT_INOUT_FILE, OPT_INOUT_FILEPATH
-from lib.logger import debug_logger
+from lib.logger import debug_logger, error_logger
 
 TELEGRAM_MESSAGE_FIELDS = [
     "audio",
@@ -19,13 +19,18 @@ TELEGRAM_MESSAGE_FIELDS = [
 ]
 
 
-def get_dates(lookback=7):
-    return [
-        (
-            (datetime.now() - timedelta(days=1)).date() - timedelta(days=i - 1)
-        ).isoformat()
-        for i in range(lookback, 0, -1)
-    ]
+def try_except(fn):
+    print("try_except", fn)
+
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        try:
+            return fn(*args, **kwargs)
+        except Exception as exception:
+            error_logger.log(f"try_except => exception={exception}")
+            raise
+
+    return wrapper
 
 
 def try_set(obj, value, *keys, **kwargs):
