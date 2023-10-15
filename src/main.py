@@ -1,11 +1,11 @@
 from sys import argv
 
-from abbot.exceptions.AbbitException import try_except
+from bot.exceptions.AbbotException import try_except
 
 ARGS = argv[1:]
 DEV_MODE = "-d" in ARGS or "--dev" in ARGS
 
-from abbot.config import (
+from bot.config import (
     BOT_TOKEN,
     TEST_BOT_TOKEN,
     BOT_NAME,
@@ -18,7 +18,7 @@ from telegram.ext import (
     CommandHandler,
     MessageHandler,
 )
-from abbot.handlers import handle_mention, handle_message, start, stop
+from bot.handlers import handle_mention, handle_message, start, stop
 
 
 @try_except

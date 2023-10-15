@@ -23,8 +23,8 @@ ORG_INFO = {
     "location": "ATL",
     "website": "https://atlbitlab.com",
     "github": "https://github.com/atlbitlab",
-    "telegram": "https://t.me/atlbitlab",
-    "twitter": "https://twitter.com/atlbitlab",
+    "telegram": {"link": "https://t.me/atlbitlab", "handle": "@atlbitlab"},
+    "twitter": {"link": "https://twitter.com/atlbitlab", "handle": "@atlbitlab"},
     "meetup": "https://meetup.com/atlbitlab",
     "lead": {
         "name": "Bryan Nonni",
@@ -45,28 +45,18 @@ ORG_BLOCK_HEIGHT = try_get(ORG_INFO, "block_height")
 ORG_LOCATION = try_get(ORG_INFO, "location")
 ORG_WEBSITE = try_get(ORG_INFO, "website")
 ORG_GITHUB = try_get(ORG_INFO, "github")
+
 ORG_TELEGRAM = try_get(ORG_INFO, "telegram")
-ORG_TELEGRAM_HANDLE = ORG_TELEGRAM.replace("https://t.me/", "@")
+ORG_TELEGRAM_LINK = try_get(ORG_TELEGRAM, "link")
+ORG_TELEGRAM_HANDLE = try_get(ORG_TELEGRAM, "handle")
+
 ORG_TWITTER = try_get(ORG_INFO, "twitter")
-ORG_TWITTER_HANDLE = ORG_TELEGRAM.replace("https://twitter.com/", "@")
+ORG_TWITTER_LINK = try_get(ORG_TWITTER, "link")
+ORG_TWITTER_HANDLE = try_get(ORG_TWITTER, "handle")
 
 ORG_LEAD = try_get(ORG_INFO, "lead")
 ORG_LEAD_EMAIL = try_get(ORG_INFO, "lead", "email")
 ORG_LEAD_TWITTER = try_get(ORG_INFO, "lead", "twitter")
-
-ORG_APPS = try_get(ORG_INFO, "apps")
-ORG_APP_LINKS = ORG_APPS.values()
-ORG_APP_LINKS_FORMATTED = "\n".join(f"{k}: {v}" for k, v in ORG_APPS.items())
-ORG_APP_IOS = try_get(ORG_APPS, "ios")
-ORG_APP_ANDROID = try_get(ORG_APPS, "android")
-ORG_APP_APK = try_get(ORG_APPS, "apk")
-
-ORG_HELP = try_get(ORG_INFO, "help")
-ORG_HELP_LINKS = ORG_HELP.values()
-ORG_HELP_LINKS_FORMATTED = "\n".join(f"{k}: {v}" for k, v in ORG_HELP.items())
-ORG_HELP_GUIDES = try_get(ORG_HELP, "guides")
-ORG_HELP_FEATURES = try_get(ORG_HELP, "features")
-ORG_HELP_FAQ = try_get(ORG_HELP, "faq")
 
 BOT_INFO = {
     "name": "Abbot",
@@ -75,6 +65,8 @@ BOT_INFO = {
     "user_id": "",
     "job": "",
     "context": "online telegram group chat",
+    "cadence": True,
+    "modulo": 5,
     "directives": [""],
     "responses": {
         "forbidden": [
@@ -96,6 +88,8 @@ BOT_INTRO = try_get(BOT_INFO, "intro")
 BOT_TELEGRAM_HANDLE = try_get(BOT_INFO, "handle")
 BOT_JOB = try_get(BOT_INFO, "job")
 BOT_CONTEXT = try_get(BOT_INFO, "context")
+BOT_CADENCE = try_get(BOT_INFO, "cadence")
+BOT_MODULO = try_get(BOT_INFO, "modulo")
 BOT_DIRECTIVES = ". ".join(try_get(BOT_INFO, "directives"))
 BOT_RESPONSES = try_get(BOT_INFO, "responses")
 BOT_RESPONSES_FORBIDDEN = try_get(BOT_RESPONSES, "forbidden")
@@ -104,7 +98,7 @@ BOT_FAQS = try_get(BOT_INFO, "faqs")
 BOT_USER_ID = try_get(BOT_INFO, "user_id")
 BOT_COUNT = None
 BOT_CHAT_HISTORY_FILEPATH = f"src/data/chat/{BOT_NAME}.jsonl"
-BOT_CORE_SYSTEM = f"Your name is {BOT_NAME}, which is short for {BOT_NAME_MEANING}, your telegram handle is {BOT_TELEGRAM_HANDLE}, you are a contributor to {ORG_NAME} - {ORG_DESCRIPTION} and you are an expert in all things Blixt Wallet. Blixt Wallet is currently aimed towards Bitcoiners who want to try out using Lightning Network. Blixt Wallet uses the Lightning Network client lnd and the Bitcoin SPV client Neutrino under the hood, directly on the phone, respecting your privacy. The wallet does not use any centralized servers for doing transactions. The design philosophy behind Blixt Wallet is to provide a clean and straightforward interface and user experience for doing transactions. Effort has been made to make sure that the transaction log is descriptive and clear. Before using Blixt Wallet, it's important to get familiarized with terms, procedures, features, etc. It's a good idea to start reading and get some basic knowledge about LN and how to use it, otherwise it will be difficult for you, as a new user, to understand what you are doing with Blixt Wallet as a node LN wallet. See this link for resources: https://atlbitlab.com/faq#what-is-ln. "
+BOT_CORE_SYSTEM = f"Your name is {BOT_NAME}, which is short for {BOT_NAME_MEANING}, your telegram handle is {BOT_TELEGRAM_HANDLE}."
 
 
 def rand_num(input: list):

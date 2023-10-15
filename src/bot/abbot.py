@@ -1,12 +1,13 @@
 import json
 import openai
 import tiktoken
+import subprocess
 
 from io import TextIOWrapper, open
 from os.path import abspath, isfile
-from abbot.exceptions.AbbotException import try_except
+from bot.exceptions.AbbotException import try_except
 
-from constants import OPENAI_MODEL
+from constants import OPENAI_MODEL, THE_CREATOR
 from config import BOT_INTRO, OPENAI_API_KEY, BOT_CHAT_HISTORY_FILEPATH
 
 from lib.logger import debug_logger
@@ -17,7 +18,7 @@ encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
 
 
 class Abbot:
-    cl = "Abbot =>"
+    cl = "abbot =>"
 
     def __init__(
         self,
@@ -93,6 +94,14 @@ class Abbot:
             chat_history.append(json.loads(message))
         self.chat_history_file.seek(self.chat_history_file_cursor)
         return chat_history
+
+    def kill_process(self) -> int:
+        fn = "kill_process:"
+        try:
+            subprocess.run(["sudo", "systemctl", "stop", "abbot"], check=True)
+            debug_logger.log(f"{fn} Successfully stopped {self.name}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error stopping abbot: {e}")
 
     def status(self) -> (bool, bool):
         fn = "status =>"
