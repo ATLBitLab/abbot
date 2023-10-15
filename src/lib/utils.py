@@ -19,18 +19,18 @@ TELEGRAM_MESSAGE_FIELDS = [
 ]
 
 
-def try_except(fn):
-    print("try_except", fn)
+# def try_except(fn):
+#     print("try_except", fn)
 
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        try:
-            return fn(*args, **kwargs)
-        except Exception as exception:
-            error_logger.log(f"try_except => exception={exception}")
-            raise
+#     @wraps(fn)
+#     def wrapper(*args, **kwargs):
+#         try:
+#             return fn(*args, **kwargs)
+#         except Exception as exception:
+#             error_logger.log(f"try_except => exception={exception}")
+#             raise
 
-    return wrapper
+#     return wrapper
 
 
 def try_set(obj, value, *keys, **kwargs):

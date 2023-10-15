@@ -1,17 +1,16 @@
 import json
-import traceback
-from io import TextIOWrapper, open
-from os.path import abspath, isfile
-
-from bot_constants import OPENAI_MODEL
-from lib.bot.config import BOT_INTRO, OPENAI_API_KEY, BOT_CHAT_HISTORY_FILEPATH
-
-from lib.logger import debug_logger, error_logger
-from lib.utils import try_get
-
-from lib.exceptions import AbbitException, try_except
 import openai
 import tiktoken
+
+from io import TextIOWrapper, open
+from os.path import abspath, isfile
+from abbot.exceptions.AbbitException import try_except
+
+from constants import OPENAI_MODEL
+from config import BOT_INTRO, OPENAI_API_KEY, BOT_CHAT_HISTORY_FILEPATH
+
+from lib.logger import debug_logger
+from lib.utils import try_get
 
 encoding = tiktoken.get_encoding("cl100k_base")
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
@@ -125,15 +124,11 @@ class Abbit:
     def stop(self) -> bool:
         fn = "stop =>"
         self.started = False
-        self.chat_history_file.close()
         return not self.started
 
     def stop_command(self) -> bool:
         fn = "stop_command =>"
-        stopped = self.stop()
-        if not stopped:
-            raise Exception(f"Fail: started={stopped}")
-        return not stopped
+        return not self.stop()
 
     def hello(self) -> bool:
         fn = "hello =>"
@@ -204,33 +199,6 @@ class Abbit:
         self.update_chat_history(response_dict)
         debug_logger.log(f"{fn} chat_history[-1]={self.chat_history[-1]}")
         return answer
-
-    # def chat_history_completion(self) -> str | Exception:
-    #     fn = "chat_history_completion =>"
-    #     chat_context = self.chat_history
-    #     chat_history_token_count = self.calculate_chat_history_tokens()
-    #     debug_logger.log(f"{fn} token_count={chat_history_token_count}")
-    #     if chat_history_token_count > 5000:
-    #         reverse_chat_history = [self.personality, *self.chat_history[::-1]]
-    #         total = 0
-    #         index = 0
-    #         shortened_history = [self.personality]
-    #         for message_dict in reverse_chat_history:
-    #             content = try_get(message_dict, "content")
-    #             shortened_history.insert(message_dict)
-    #             total += self.calculate_tokens(content)
-    #             index += 1
-    #             if total >= 2500:
-    #                 chat_context = shortened_history
-    #                 break
-    #     response = openai.ChatCompletion.create(
-    #         model=self.model,
-    #         messages=chat_context,
-    #     )
-    #     answer = try_get(response, "choices", 0, "message", "content")
-    #     response_dict = dict(role="assistant", content=answer)
-    #     self.update_chat_history(response_dict)
-    #     return answer
 
     def get_chat_history(self) -> list:
         fn = "get_chat_history =>"

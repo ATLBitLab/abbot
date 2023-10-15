@@ -1,5 +1,5 @@
 from functools import wraps
-from traceback import extract_stack
+from traceback import extract_stack, format_exc
 from lib.logger import error_logger
 
 
@@ -15,14 +15,12 @@ def try_except(fn):
     def wrapper(*args, **kwargs):
         try:
             return fn(*args, **kwargs)
-        except Exception as exception:
-            stack_data = extract_stack()[:-1]  # Exclude the current frame
+        except AbbitException as exception:
+            stack_data = extract_stack()[:-1]
             traceback_info = format_exc()
-            error_message = f"An error occurred: {exception}"
-            custom_exception = CustomException(
-                error_message, stack_data, traceback_info
-            )
-            error_logger.log(f"Error: {custom_exception}")
+            error_message = f"AbbitException: {exception}"
+            custom_exception = AbbitException(error_message, stack_data, traceback_info)
+            error_logger.log(custom_exception)
             raise custom_exception
 
     return wrapper

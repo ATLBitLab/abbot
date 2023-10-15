@@ -5,8 +5,9 @@ from os.path import abspath
 
 from telegram.ext import ContextTypes
 from telegram import Chat, Message, Update, User
+from abbot.exceptions.AbbitException import try_except
 
-from lib.bot.config import (
+from config import (
     ORG_CHAT_ID,
     BOT_NAME,
     BOT_TELEGRAM_HANDLE,
@@ -15,7 +16,7 @@ from lib.bot.config import (
     ORG_CHAT_HISTORY_FILEPATH,
     bot_response,
 )
-from lib.bot.utils import (
+from utils import (
     deconstruct_error,
     get_chat_admins,
     parse_message,
@@ -25,9 +26,9 @@ from lib.bot.utils import (
     parse_user,
     parse_user_data,
 )
-from lib.abbit import Abbit
+from abbit import Abbit
 from lib.utils import try_get
-from bot_constants import HELP_MENU, THE_CREATOR
+from constants import HELP_MENU, THE_CREATOR
 from lib.logger import debug_logger, error_logger
 
 now = datetime.now()
@@ -36,106 +37,98 @@ ORG_CHAT_FILEPATH = abspath(ORG_CHAT_HISTORY_FILEPATH)
 MATRIX_IMG_FILEPATH = abspath("assets/unplugging_matrix.jpg")
 
 
+@try_except
 async def handle_mention(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    fn = "handle_mention"
     debug_logger.log(update)
     debug_logger.log(context)
     answer = abbit.chat_history_completion()
     if not answer:
-        stopped = abbit.stop()
-        debug_logger.log(f"handle_message => abbit={abbit} stopped={stopped}")
-        update.message.reply_text(
-            "Something went wrong. Please try again or contact @ATLBitLab"
-        )
+        debug_logger.log(f"{fn}: abbit={abbit}")
+        update.message.reply_text("⛔️ An error occured, contact @nonni_io for help🥴")
         return await context.bot.send_message(
             chat_id=THE_CREATOR,
-            text=f"{abbit.name} completion failed ⛔️: abbit={abbit} stopped={stopped} answer={answer}",
+            text=f"{abbit.name} completion failed ⛔️: abbit={abbit} answer={answer}",
         )
     return await update.message.reply_text(answer)
 
 
+@try_except
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "handle_message =>"
-    try:
-        message: Message = parse_message(update)
-        message_data: dict = parse_message_data(message)
-        message_text: str = try_get(message_data, "text")
-        message_date: str = try_get(message_data, "date")
-        debug_logger.log(f"{fn} message={message}")
-        debug_logger.log(f"{fn} message_data={message_data}")
-        debug_logger.log(f"{fn} message_text={message_text}")
-        debug_logger.log(f"{fn} message_date={message_date}")
-        chat: Chat = parse_chat(update, message)
-        chat_data: dict = parse_chat_data(chat)
-        chat_id: int = try_get(chat_data, "chat_id", default=ORG_CHAT_ID)
-        chat_title: str = try_get(chat_data, "chat_title", default=ORG_CHAT_TITLE)
-        debug_logger.log(f"{fn} chat={chat}")
-        debug_logger.log(f"{fn} chat_data={chat_data}")
-        debug_logger.log(f"{fn} chat_id={chat_id}")
-        debug_logger.log(f"{fn} chat_title={chat_title}")
-        user: User = parse_user(message)
-        user_data: dict = parse_user_data(user)
-        user_id: int = try_get(user_data, "user_id")
-        username: str = try_get(user_data, "username")
-        debug_logger.log(f"{fn} user={user}")
-        debug_logger.log(f"{fn} user_data={user_data}")
-        debug_logger.log(f"{fn} user_id={user_id}")
-        debug_logger.log(f"{fn} username={username}")
-        blixt_message = json.dumps(
-            {
-                "message_text": message_text,
-                "message_date": message_date,
-                "chat_id": chat_id,
-                "chat_title": chat_title,
-                "user_id": user_id,
-                "username": username,
+    message: Message = parse_message(update)
+    message_data: dict = parse_message_data(message)
+    message_text: str = try_get(message_data, "text")
+    message_date: str = try_get(message_data, "date")
+    debug_logger.log(f"{fn} message={message}")
+    debug_logger.log(f"{fn} message_data={message_data}")
+    debug_logger.log(f"{fn} message_text={message_text}")
+    debug_logger.log(f"{fn} message_date={message_date}")
+    chat: Chat = parse_chat(update, message)
+    chat_data: dict = parse_chat_data(chat)
+    chat_id: int = try_get(chat_data, "chat_id", default=ORG_CHAT_ID)
+    chat_title: str = try_get(chat_data, "chat_title", default=ORG_CHAT_TITLE)
+    debug_logger.log(f"{fn} chat={chat}")
+    debug_logger.log(f"{fn} chat_data={chat_data}")
+    debug_logger.log(f"{fn} chat_id={chat_id}")
+    debug_logger.log(f"{fn} chat_title={chat_title}")
+    user: User = parse_user(message)
+    user_data: dict = parse_user_data(user)
+    user_id: int = try_get(user_data, "user_id")
+    username: str = try_get(user_data, "username")
+    debug_logger.log(f"{fn} user={user}")
+    debug_logger.log(f"{fn} user_data={user_data}")
+    debug_logger.log(f"{fn} user_id={user_id}")
+    debug_logger.log(f"{fn} username={username}")
+    blixt_message = json.dumps(
+        {
+            "message_text": message_text,
+            "message_date": message_date,
+            "chat_id": chat_id,
+            "chat_title": chat_title,
+            "user_id": user_id,
+            "username": username,
+        }
+    )
+    debug_logger.log(f"{fn} blixt_message={blixt_message}")
+    blixt_chat = open(ORG_CHAT_FILEPATH, "a")
+    blixt_chat.write(blixt_message + "\n")
+    blixt_chat.close()
+    reply_to_message = try_get(message, "reply_to_message")
+    reply_to_message_text = try_get(reply_to_message, "text", default="") or ""
+    reply_to_message_from = try_get(reply_to_message, "from")
+    reply_to_message_from_bot = try_get(reply_to_message_from, "is_bot")
+    reply_to_message_bot_handle = try_get(reply_to_message_from, "username")
+    debug_logger.log(f"{fn} reply_to_message={reply_to_message}")
+    debug_logger.log(f"{fn} reply_to_message_text={reply_to_message_text}")
+    debug_logger.log(f"{fn} reply_to_message_from={reply_to_message_from}")
+    debug_logger.log(f"{fn} reply_from_bot={reply_to_message_from_bot}")
+    debug_logger.log(f"{fn} reply_bot_username={reply_to_message_bot_handle}")
+    abbit_tagged = BOT_TELEGRAM_HANDLE in message_text
+    reply_to_abbit = reply_to_message_bot_handle == abbit.handle
+    started, sent_intro = abbit.status()
+    if abbit_tagged or reply_to_abbit:
+        if not started and not sent_intro:
+            debug_logger.log(f"{fn} Abbot not ready")
+            debug_logger.log(f"{fn} sent_intro={sent_intro}")
+            debug_logger.log(f"{fn} started={started}")
+            debug_logger.log(f"{fn} abbit={abbit.__str__()}")
+            hello = abbit.hello()
+            hello = "".join(hello)
+            debug_logger.log(f"{fn} hello={hello}")
+            return await update.message.reply_text(hello)
+        elif started and sent_intro:
+            abbit_message = {
+                "role": "user",
+                "content": f"{message_text} from {username} on {message_date}",
             }
-        )
-        debug_logger.log(f"{fn} blixt_message={blixt_message}")
-        blixt_chat = open(ORG_CHAT_FILEPATH, "a")
-        blixt_chat.write(blixt_message + "\n")
-        blixt_chat.close()
-        reply_to_message = try_get(message, "reply_to_message")
-        reply_to_message_text = try_get(reply_to_message, "text", default="") or ""
-        reply_to_message_from = try_get(reply_to_message, "from")
-        reply_to_message_from_bot = try_get(reply_to_message_from, "is_bot")
-        reply_to_message_bot_handle = try_get(reply_to_message_from, "username")
-        debug_logger.log(f"{fn} reply_to_message={reply_to_message}")
-        debug_logger.log(f"{fn} reply_to_message_text={reply_to_message_text}")
-        debug_logger.log(f"{fn} reply_to_message_from={reply_to_message_from}")
-        debug_logger.log(f"{fn} reply_from_bot={reply_to_message_from_bot}")
-        debug_logger.log(f"{fn} reply_bot_username={reply_to_message_bot_handle}")
-        abbit_tagged = BOT_TELEGRAM_HANDLE in message_text
-        reply_to_abbit = reply_to_message_bot_handle == abbit.handle
-        started, sent_intro = abbit.status()
-        if abbit_tagged or reply_to_abbit:
-            if not started and not sent_intro:
-                debug_logger.log(f"{fn} Abbot not ready")
-                debug_logger.log(f"{fn} sent_intro={sent_intro}")
-                debug_logger.log(f"{fn} started={started}")
-                debug_logger.log(f"{fn} abbit={abbit.__str__()}")
-                hello = abbit.hello()
-                hello = "".join(hello)
-                debug_logger.log(f"{fn} hello={hello}")
-                return await update.message.reply_text(hello)
-            elif started and sent_intro:
-                abbit_message = {
-                    "role": "user",
-                    "content": f"{message_text} from {username} on {message_date}",
-                }
-                debug_logger.log(f"{fn} abbit_message={abbit_message}")
-                abbit.update_chat_history(abbit_message)
+            debug_logger.log(f"{fn} abbit_message={abbit_message}")
+            abbit.update_chat_history(abbit_message)
 
-                return await handle_mention(update, context)
-
-    except Exception as exception:
-        status = abbit.status()
-        cause, traceback, args = deconstruct_error(exception)
-        error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-        error_logger.log(f"{fn} Error={exception}, ErrorMessage={error_msg}")
-        error_logger.log(f"{fn} abbit={abbit} status={status}")
-        await context.bot.send_message(chat_id=THE_CREATOR, text=exception)
+            return await handle_mention(update, context)
 
 
+@try_except
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "help =>"
     try:
@@ -160,6 +153,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         raise exception
 
 
+@try_except
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "start =>"
     try:
@@ -218,6 +212,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         raise exception
 
 
+@try_except
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "stop =>"
     try:

@@ -54,10 +54,10 @@ class BotLogger:
         self._error(message) if self.level == "error" else self._debug(message)
 
     def _error(self, message: str):
-        error_log.error(message, exc_info=1)
+        error_log.exception(message)
 
     def _debug(self, message: str):
-        debug_log.debug(message, exc_info=1)
+        debug_log.debug(message)
 
 
 error_logger = BotLogger("error")
