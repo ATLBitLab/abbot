@@ -2,7 +2,6 @@ from functools import wraps
 import json
 from io import open
 from logging import debug
-import traceback
 from requests import request
 from datetime import datetime, timedelta
 from qrcode import make
@@ -24,14 +23,16 @@ TELEGRAM_MESSAGE_FIELDS = [
 
 
 def try_except(fn):
+    print("try_except", fn)
+
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        fn = "try_except => wrapper =>"
         try:
-            # ---- Success ----
+            print("*args", *args)
+            print("*kwargs", *kwargs)
             return fn(*args, **kwargs)
         except Exception as exception:
-            error(f"{fn} exception={exception}")
+            error(f"try_except => exception={exception}")
             raise
 
     return wrapper

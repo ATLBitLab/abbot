@@ -1,9 +1,19 @@
 import json
-import traceback
+import time
 from io import TextIOWrapper, open
 from os.path import abspath, isfile
+import traceback
 from typing import AnyStr
 
+from traceback import (
+    print_exc,
+    print_exception,
+    print_list,
+    print_stack,
+    print_tb,
+    extract_stack,
+    extract_tb,
+)
 from bot_constants import OPENAI_MODEL, YD
 from bot_env import OPENAI_API_KEY
 
@@ -15,6 +25,15 @@ import tiktoken
 
 encoding = tiktoken.get_encoding("cl100k_base")
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
+
+
+def handle_exception(fn: str, e: Exception):
+    error(f"{fn} exception:\n{e}")
+    debug(f"{fn} exception:\n{e}")
+    traceback.print_exc()
+    tb = traceback.format_exc()
+    error(f"{fn} traceback:\n{tb}")
+    debug(f"{fn} traceback:\n{tb}")
 
 
 class Abbots:
@@ -114,7 +133,7 @@ class GPT(Abbots):
                 continue
             chat_history.append(json.loads(message))
         self.chat_history_file.seek(self.chat_history_file_cursor)
-        return chat_history
+        return chat_history[1:]
 
     def all_status(self) -> dict:
         status = dict(
@@ -139,8 +158,20 @@ class GPT(Abbots):
     def stop(self) -> bool:
         self.started = False
         self.unleashed = self.started
-        self.chat_history_file.close()
         return self.started
+
+    def get_started(self) -> bool:
+        return self.started
+
+    def get_sent_intro(self) -> bool:
+        return self.sent_intro
+
+    def get_chat_id(self) -> int:
+        return self.chat_id
+
+    def sleep(self, t: int) -> str:
+        time.sleep(t)
+        return True
 
     def knock(self) -> bool:
         self.sent_intro = True
@@ -178,6 +209,7 @@ class GPT(Abbots):
             total += self.calculate_tokens(content)
         return total
 
+    @try_except
     def chat_completion(self) -> str | None:
         response = openai.ChatCompletion.create(
             model=self.model,
@@ -189,17 +221,32 @@ class GPT(Abbots):
             self.update_chat_history(response_dict)
         return answer
 
+    @try_except
     def chat_history_completion(self) -> str | Exception:
+        # try:
+        fn = "chat_history_completion =>"
+        debug(fn)
         chat_history_token_count = self.calculate_chat_history_tokens()
-        debug(f"chat_history_completion => token_count={chat_history_token_count}")
+        debug(f"{fn} token_count={chat_history_token_count}")
+        messages = [self.gpt_system]
+        debug(f"{fn} messages={messages}")
+        messages.extend(self.chat_history)
+        debug(f"{fn} messages={messages}")
         response = openai.ChatCompletion.create(
             model=self.model,
-            messages=self.chat_history,
+            messages=messages,
         )
+        debug(f"{fn} response={response}")
         answer = try_get(response, "choices", 0, "message", "content")
+        debug(f"{fn} answer={answer}")
         response_dict = dict(role="assistant", content=answer)
+        debug(f"{fn} answer={answer}")
+        debug(f"{fn} chat_history[-1]={self.chat_history[-1]}")
         self.update_chat_history(response_dict)
+        debug(f"{fn} chat_history[-1]={self.chat_history[-1]}")
         return answer
+        # except Exception as exception:
+        #     handle_exception(exception)
 
     def update_abbots(self, chat_id: str | int, bot: object) -> None:
         Abbots.BOTS[chat_id] = bot

@@ -273,22 +273,23 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             answer = which_abbot.chat_history_completion()
 
         if not answer:
-            status = which_abbot.stop()
-            debug(f"handle_message => which_abbot={which_abbot} status={status}")
+            if which_abbot.sleep(10):
+                await message.reply_text(
+                    "Sorry, I was taking a quick nap 😴."
+                    "Still a lil groggy 🥴."
+                )
+            debug(f"handle_message => which_abbot={which_abbot}")
             return await context.bot.send_message(
                 chat_id=THE_CREATOR,
-                text=f"{which_abbot.name} completion failed ⛔️: which_abbot={which_abbot} status={status} answer={answer}",
+                text=f"{which_abbot.name} completion failed ⛔️: which_abbot={which_abbot} answer={answer}",
             )
         return await message.reply_text(answer)
 
     except Exception as exception:
-        if not which_abbot:
-            status = "unknown"
-        status = which_abbot.status()
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
         debug(f"handle_message => Error={exception}, ErrorMessage={error_msg}")
-        debug(f"handle_message => which_abbot={which_abbot} status={status}")
+        debug(f"handle_message => which_abbot={which_abbot}")
         await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
         )
