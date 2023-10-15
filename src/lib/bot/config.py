@@ -1,5 +1,5 @@
 from random import randrange
-from constants import HELP_MENU
+from bot_constants import HELP_MENU
 from lib.utils import try_get
 from dotenv import load_dotenv, dotenv_values
 

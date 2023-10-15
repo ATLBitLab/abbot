@@ -27,7 +27,7 @@ from lib.bot.utils import (
 )
 from lib.abbit import Abbit
 from lib.utils import try_get
-from constants import HELP_MENU, THE_CREATOR
+from bot_constants import HELP_MENU, THE_CREATOR
 from lib.logger import debug_logger, error_logger
 
 now = datetime.now()

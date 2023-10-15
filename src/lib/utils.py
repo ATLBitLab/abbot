@@ -1,13 +1,10 @@
-from functools import wraps
 import json
-from io import open
-from logging import debug
-import traceback
 from requests import request
 from datetime import datetime, timedelta
 from qrcode import make
 from io import BytesIO
-from lib.logger import error_logger
+from bot_constants import OPT_INOUT_FILE, OPT_INOUT_FILEPATH
+from lib.logger import debug_logger
 
 TELEGRAM_MESSAGE_FIELDS = [
     "audio",
@@ -67,7 +64,6 @@ def try_get_telegram_message_data(telegram_message):
     return {f"{key}": try_get(telegram_message, key) for key in TELEGRAM_MESSAGE_FIELDS}
 
 
-# keys=["__cause__", "__traceback__", "args"]
 def try_gets(obj, keys=[], return_type="list", **kwargs):
     additional_keys = kwargs.pop("keys", None)
     keys = [*keys, *additional_keys] if additional_keys else keys
@@ -100,20 +96,19 @@ def qr_code(data):
 
 def opt_in(context: str, chat_id: int) -> bool:
     fn = "opt_in => "
-    optinout_list = OPTIN_OUT_FILE[context]
+    optinout_list: list = OPT_INOUT_FILE[context]
     if chat_id not in optinout_list:
-        debug(f"{fn} chat_id={chat_id} opting in")
+        debug_logger.log(f"{fn} chat_id={chat_id} opting in")
         optinout_list.append(chat_id)
-        json.dump(OPTIN_OUT_FILE, OPTINOUT_FILEPATH, indent=4)
+        json.dump(OPT_INOUT_FILE, OPT_INOUT_FILEPATH, indent=4)
     return True
 
 
-        # Write the updated optinout_data back to the file
-        if change_made:
-            with open(file_path, "w") as file:
-                json.dump(optinout_data, file, indent=4)
-
-        return True
-    except Exception as exception:
-        error_logger.log(f"context {context} not found in optinout_data.")
-        raise exception
+def opt_out(context: str, chat_id: int) -> bool:
+    fn = "opt_out =>"
+    optinout_list: list = OPT_INOUT_FILE[context]
+    if chat_id in optinout_list:
+        debug_logger.log(f"{fn} chat_id={chat_id} opting out")
+        optinout_list.remove(chat_id)
+        json.dump(OPT_INOUT_FILE, OPT_INOUT_FILEPATH, indent=4)
+    return True

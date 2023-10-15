@@ -3,7 +3,7 @@ import traceback
 from io import TextIOWrapper, open
 from os.path import abspath, isfile
 
-from constants import OPENAI_MODEL
+from bot_constants import OPENAI_MODEL
 from lib.bot.config import BOT_INTRO, OPENAI_API_KEY, BOT_CHAT_HISTORY_FILEPATH
 
 from lib.logger import debug_logger, error_logger

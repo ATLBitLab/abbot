@@ -1,9 +1,11 @@
+import io
 from os.path import abspath
 
 I = 0
 OPENAI_MODEL = "gpt-4"
 THE_CREATOR = 1711738045
-OPTINOUT_FILEPATH = abspath("src/data/optin_optout.json")
+OPT_INOUT_FILEPATH = abspath("src/data/optin_optout.json")
+OPT_INOUT_FILE = io.open(OPT_INOUT_FILEPATH, "r+")
 HELP_MENU = """""Welcome to Abbit!
 Available Commands
 1. /start
