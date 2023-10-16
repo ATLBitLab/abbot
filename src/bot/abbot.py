@@ -4,7 +4,7 @@ import tiktoken
 
 from io import TextIOWrapper, open
 from os.path import abspath, isfile
-from abbot.exceptions.abbot_exception import try_except
+from bot.exceptions.abbot_exception import try_except
 
 from constants import OPENAI_MODEL
 from config import BOT_INTRO, OPENAI_API_KEY, BOT_CHAT_HISTORY_FILEPATH

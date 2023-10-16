@@ -20,11 +20,12 @@ from telegram.ext import (
 )
 from abbot.handlers import handle_mention, handle_message, start, stop
 
+TOKEN = TEST_BOT_TOKEN if DEV_MODE else BOT_TOKEN
+APPLICATION = ApplicationBuilder().token(TOKEN).build()
+
 
 @try_except
 def main():
-    TOKEN = TEST_BOT_TOKEN if DEV_MODE else BOT_TOKEN
-    APPLICATION = ApplicationBuilder().token(TOKEN).build()
     debug_logger.log(f"{BOT_NAME} {BOT_TELEGRAM_HANDLE} Initialized")
     help_handler = CommandHandler("help", help)
     stop_handler = CommandHandler("stop", stop)

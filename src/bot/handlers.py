@@ -25,13 +25,13 @@ from utils import (
     parse_user,
     parse_user_data,
 )
-from abbit import Abbit
+from bot.abbot import Abbot
 from lib.utils import try_get
 from constants import HELP_MENU, THE_CREATOR
 from lib.logger import debug_logger, error_logger
 
 now = datetime.now()
-abbit: Abbit = Abbit(BOT_NAME, BOT_TELEGRAM_HANDLE, BOT_CORE_SYSTEM, ORG_CHAT_ID)
+abbot: Abbot = Abbot(BOT_NAME, BOT_TELEGRAM_HANDLE, BOT_CORE_SYSTEM, ORG_CHAT_ID)
 ORG_CHAT_FILEPATH = abspath(ORG_CHAT_HISTORY_FILEPATH)
 MATRIX_IMG_FILEPATH = abspath("assets/unplugging_matrix.jpg")
 
@@ -41,13 +41,13 @@ async def handle_mention(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "handle_mention:"
     debug_logger.log(update)
     debug_logger.log(context)
-    answer = abbit.chat_history_completion()
+    answer = abbot.chat_history_completion()
     if not answer:
-        debug_logger.log(f"{fn} abbit={abbit}")
+        debug_logger.log(f"{fn} abbot={abbot}")
         update.message.reply_text("⛔️ An error occured, contact @nonni_io for help🥴")
         return await context.bot.send_message(
             chat_id=THE_CREATOR,
-            text=f"{abbit.name} completion failed ⛔️: abbit={abbit} answer={answer}",
+            text=f"{abbot.name} completion failed ⛔️: abbot={abbot} answer={answer}",
         )
     return await update.message.reply_text(answer)
 
@@ -104,15 +104,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     debug_logger.log(f"{fn} reply_from_bot={reply_to_message_from_bot}")
     debug_logger.log(f"{fn} reply_bot_username={reply_to_message_bot_handle}")
     abbit_tagged = BOT_TELEGRAM_HANDLE in message_text
-    reply_to_abbit = reply_to_message_bot_handle == abbit.handle
-    started, sent_intro = abbit.status()
+    reply_to_abbit = reply_to_message_bot_handle == abbot.handle
+    started, sent_intro = abbot.status()
     if abbit_tagged or reply_to_abbit:
         if not started and not sent_intro:
             debug_logger.log(f"{fn} Abbot not ready")
             debug_logger.log(f"{fn} sent_intro={sent_intro}")
             debug_logger.log(f"{fn} started={started}")
-            debug_logger.log(f"{fn} abbit={abbit.__str__()}")
-            hello = abbit.hello()
+            debug_logger.log(f"{fn} abbot={abbot.__str__()}")
+            hello = abbot.hello()
             hello = "".join(hello)
             debug_logger.log(f"{fn} hello={hello}")
             return await update.message.reply_text(hello)
@@ -122,7 +122,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "content": f"{message_text} from {username} on {message_date}",
             }
             debug_logger.log(f"{fn} abbit_message={abbit_message}")
-            abbit.update_chat_history(abbit_message)
+            abbot.update_chat_history(abbit_message)
 
             return await handle_mention(update, context)
     elif chat_his:
@@ -167,9 +167,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         debug_logger.log(f"{fn} {k}={v}")
     if not is_chat_admin:
         return await update.message.reply_text(bot_response("forbidden", 0))
-    start_intro = abbit.start_command()
+    start_intro = abbot.start_command()
     if not start_intro:
-        msg = f"started={abbit.started} sent_intro={abbit.sent_intro}"
+        msg = f"started={abbot.started} sent_intro={abbot.sent_intro}"
         error_logger.log(msg)
         raise Exception(f"failed to start: {msg}")
     abbit_message = dict(
@@ -177,18 +177,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         content=f"{message_text} from {username} on {message_date}",
     )
     debug_logger.log(f"{fn} abbit_message={abbit_message}")
-    abbit.update_chat_history(abbit_message)
+    abbot.update_chat_history(abbit_message)
     await message.reply_photo(
         MATRIX_IMG_FILEPATH, f"Unplugging {BOT_NAME} from the Matrix"
     )
-    response = abbit.chat_history_completion()
+    response = abbot.chat_history_completion()
     if not response:
-        abbit.stop()
-        response = f"{abbit.name} start failed ⛔️! {bot_response('fail', 0)}."
-        abbit_str = abbit.__str__()
-        error_logger.log(f"{fn} abbit={abbit_str}")
+        abbot.stop()
+        response = f"{abbot.name} start failed ⛔️! {bot_response('fail', 0)}."
+        abbit_str = abbot.__str__()
+        error_logger.log(f"{fn} abbot={abbit_str}")
         await context.bot.send_message(
-            chat_id=THE_CREATOR, text=f"abbit={abbit_str} response={response}"
+            chat_id=THE_CREATOR, text=f"abbot={abbit_str} response={response}"
         )
     await message.reply_text(response)
 
@@ -220,16 +220,16 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # check sender is chat admin
     if not is_chat_admin:
         return await update.message.reply_text(bot_response("forbidden", 0))
-    started = abbit.started
+    started = abbot.started
     if not started:
-        debug_logger.log(f"{fn} Abbit not started! abbit.started={abbit.started}")
+        debug_logger.log(f"{fn} Abbot not started! abbot.started={abbot.started}")
         return await message.reply_text(
-            f"/stop failed! Abbit not started! Have you run /start yet?"
+            f"/stop failed! Abbot not started! Have you run /start yet?"
             "If so, please try again later or contact @nonni_io"
         )
-    stopped = abbit.stop()
+    stopped = abbot.stop_command()
     if not stopped:
-        err_msg = f"{fn} not stopped! abbit={abbit}, stopped={stopped}"
+        err_msg = f"{fn} not stopped! abbot={abbot}, stopped={stopped}"
         error_logger.log(err_msg)
         await message.reply_text(
             "/stop failed! Something went wrong."
