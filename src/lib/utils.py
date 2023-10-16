@@ -22,32 +22,15 @@ TELEGRAM_MESSAGE_FIELDS = [
 
 
 def try_except(fn):
-    print("try_except", fn)
-
     @wraps(fn)
     def wrapper(*args, **kwargs):
         try:
-            print("*args", *args)
-            print("*kwargs", *kwargs)
             return fn(*args, **kwargs)
         except Exception as exception:
             error(f"try_except => exception={exception}")
             raise
 
     return wrapper
-
-
-def now_date():
-    return datetime.now().date()
-
-
-def get_dates(lookback=7):
-    return [
-        (
-            (datetime.now() - timedelta(days=1)).date() - timedelta(days=i - 1)
-        ).isoformat()
-        for i in range(lookback, 0, -1)
-    ]
 
 
 def try_set(obj, value, *keys, **kwargs):

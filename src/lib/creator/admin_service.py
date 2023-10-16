@@ -1,7 +1,7 @@
 from subprocess import run, CalledProcessError
 import time
 
-from lib.utils import try_get
+from lib.utils import try_except, try_get
 from ..logger import debug, error
 from bot_constants import BOT_NAME, THE_CREATOR
 
@@ -58,6 +58,7 @@ class AdminService:
             error(f"Error stopping {service}: {exception}")
             raise exception
 
+    @try_except
     def kill_service(self) -> Exception:
         fn = "kill_service:"
         exception = Exception("Plugging Abbot back into the matrix!")

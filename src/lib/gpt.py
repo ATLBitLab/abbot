@@ -170,7 +170,7 @@ class GPT(Abbots):
 
     def fuck_off(self) -> bool:
         self.sent_intro = False
-        return self.sent_intro
+        return not self.sent_intro
 
     def unleash(self) -> bool:
         self.unleashed = True

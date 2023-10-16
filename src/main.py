@@ -16,7 +16,7 @@ from os.path import abspath
 from random import randrange
 from help_menu import help_menu_message
 from uuid import uuid4
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from telegram import Update, Message, Chat, User
 from telegram.ext.filters import BaseFilter
@@ -47,10 +47,8 @@ from bot_constants import (
     BOT_NAME,
     BOT_HANDLE,
     COUNT,
-    GROUP_OPTIN,
     INIT_GROUP_MESSAGE,
     INIT_PRIVATE_MESSAGE,
-    PRIVATE_OPTIN,
     SUMMARY_ASSISTANT,
     PROMPT_ASSISTANT,
     THE_CREATOR,
@@ -98,7 +96,7 @@ for content, config in zip(GROUP_CHAT_CONTENT_FILES, GROUP_CHAT_CONFIG_FILES):
         ATL_BITCOINER,
         bot_context,
         chat_id,
-        bool(try_get(config_json, "consent"))
+        bool(try_get(config_json, "consent")),
     )
     ALL_ABBOTS.append(group_abbot)
 
@@ -115,7 +113,7 @@ for content, config in zip(PRIVATE_CHAT_CONTENT_FILES, PRIVATE_CHAT_CONFIG_FILES
         ATL_BITCOINER,
         bot_context,
         chat_id,
-        bool(try_get(config_json, "consent"))
+        bool(try_get(config_json, "consent")),
     )
     ALL_ABBOTS.append(group_abbot)
 
@@ -190,7 +188,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 which_bot_name, BOT_HANDLE, ATL_BITCOINER, bot_context, chat_id
             )
 
-        which_abbot_started = try_get(which_abbot, "started") == True
         which_name = try_get(which_abbot, "name")
         which_handle = try_get(which_abbot, "handle")
         which_history = try_get(which_abbot, "chat_history")
@@ -204,7 +201,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_to_message_bot_username = try_get(reply_to_message_from, "username")
         all_message_data = try_get_telegram_message_data(message)
 
-        debug(f"handle_message => which_abbot_started={which_abbot_started}")
         debug(f"handle_message => which_name={which_name}")
         debug(f"handle_message => which_handle={which_handle}")
 
@@ -221,34 +217,32 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         full_handle = f"@{which_handle}"
         is_modulo_message = which_history_len % COUNT == 0
         reply_to_which_abbot = reply_to_message_bot_username == which_handle
-        knocked = which_abbot.sent_intro == True
-
-        if not which_abbot_started and not knocked:
-            debug(f"handle_message => Abbot not started")
-            debug(f"which_abbot={which_abbot.__str__()}")
-            debug(f"handle_message => abbot_not_started={which_abbot_started}")
-            which_abbot.knock()
-            return await message.reply_text(
-                "Hello! Thank you for talking to Abbot (@atl_bitlab_bot), A Bitcoin Bot for local communities! \n\n"
-                "Abbot is meant to provide education to local bitcoin communities and help community organizers with various tasks. \n\n"
-                "To start Abbot in a group chat, have a channel admin run /start \n\n"
-                "To start Abbot in a DM, simply run /start. \n\n"
-                "By running /start, you agree to our Terms & policies: https://atlbitlab.com/abbot/policies. \n\n"
-                "If you have multiple bots in one channel, you may need to run /start @atl_bitlab_bot to avoid bot confusion! \n\n"
-                "Thank you for using Abbot! We hope you enjoy your experience! \n\n"
-                "If you have questions, concerns, feature requests or find bugs, please contact @nonni_io or @ATLBitLab on Telegram."
-            )
-
         which_abbot.update_chat_history(dict(role="user", content=message_text))
         which_abbot.update_abbots(chat_id, which_abbot)
-        if is_group_chat and started:
+        if not which_abbot.get_started():
+            if not which_abbot.get_sent_intro():
+                debug(f"handle_message => Abbot not started")
+                debug(f"which_abbot={which_abbot.__str__()}")
+                intro_sent = which_abbot.knock()
+                debug(f"intro_sent={intro_sent}")
+                return await message.reply_text(
+                    "Hello! Thank you for talking to Abbot (@atl_bitlab_bot), A Bitcoin Bot for local communities! \n\n"
+                    "Abbot is meant to provide education to local bitcoin communities and help community organizers with various tasks. \n\n"
+                    "To start Abbot in a group chat, have a channel admin run /start \n\n"
+                    "To start Abbot in a DM, simply run /start. \n\n"
+                    "By running /start, you agree to our Terms & policies: https://atlbitlab.com/abbot/policies. \n\n"
+                    "If you have multiple bots in one channel, you may need to run /start @atl_bitlab_bot to avoid bot confusion! \n\n"
+                    "Thank you for using Abbot! We hope you enjoy your experience! \n\n"
+                    "If you have questions, concerns, feature requests or find bugs, please contact @nonni_io or @ATLBitLab on Telegram."
+                )
+        if is_group_chat:
             debug(f"handle_message => group_in_name")
             debug(f"handle_message => which_name={which_name}")
             if full_handle not in message_text:
                 return
             if not reply_to_which_abbot:
                 return
-            if full_handle not in reply_to_message_text
+            if full_handle not in reply_to_message_text:
                 return
             if is_modulo_message:
                 return
@@ -468,7 +462,12 @@ async def summary(
         if arg_len > 3:
             return await message.reply_text("Bad args: too many args")
         date_regex = "^\d{4}-\d{2}-\d{2}$"
-        dates = get_dates()
+        dates = [
+            (
+                (datetime.now() - timedelta(days=1)).date() - timedelta(days=i - 1)
+            ).isoformat()
+            for i in range(7, 0, -1)
+        ]
         chat = try_get(args, 0).replace(" ", "").lower()
         if chat != "atlantabitdevs":
             return await message.reply_text("Bad args: Expecting 'atlantabitdevs'")
@@ -942,8 +941,8 @@ async def plug_into_matrix(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_id: int = try_get(update, "message", "from_user", "id")
         if user_id != THE_CREATOR:
             return
-        admin: Admin = Admin(user_id, chat_id)
-        admin.start_abbot_process()
+        admin: AdminService = AdminService(user_id, chat_id)
+        admin.stop_service()
     except Exception as exception:
         error(f"{fn} => exception={exception}")
         await context.bot.send_message(
@@ -958,8 +957,28 @@ async def unplug_from_matrix(update: Update, context: ContextTypes.DEFAULT_TYPE)
         chat_id: int = try_get(update, "message", "chat", "id")
         user_id: int = try_get(update, "message", "from_user", "id")
 
-        admin: Admin = Admin(user_id, chat_id)
-        admin.start_abbot_process()
+        admin: AdminService = AdminService(user_id, chat_id)
+        admin.start_service()
+    except Exception as exception:
+        error(f"{fn} => exception={exception}")
+        await context.bot.send_message(
+            chat_id=THE_CREATOR, text=f"{fn} exception: {exception}"
+        )
+        raise exception
+
+
+async def kill(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        fn = "kill:"
+        message: Message = try_get(update, "message")
+        chat: Chat = try_get(message, "chat")
+        chat_id: int = try_get(chat, "id")
+        user: User = try_get(message, "from_user")
+        user_id: int = try_get(user, "id")
+        if user_id != THE_CREATOR:
+            return
+        admin: AdminService = AdminService(user_id, chat_id)
+        admin.kill_service()
     except Exception as exception:
         error(f"{fn} => exception={exception}")
         await context.bot.send_message(
@@ -990,7 +1009,7 @@ async def nap(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 kill_handler = CommandHandler("unplug", unplug_from_matrix)
 revive_handler = CommandHandler("plugin", plug_into_matrix)
-help_handler = CommandHandler("nap", nap, Text)
+help_handler = CommandHandler("nap", nap)
 help_handler = CommandHandler("help", help)
 stop_handler = CommandHandler("stop", stop)
 summary_handler = CommandHandler("summary", summary)
