@@ -1,6 +1,6 @@
 from sys import argv
 
-from abbot.exceptions.AbbitException import try_except
+from abbot.exceptions.abbot_exception import try_except
 
 ARGS = argv[1:]
 DEV_MODE = "-d" in ARGS or "--dev" in ARGS
