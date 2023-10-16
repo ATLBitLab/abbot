@@ -3,7 +3,7 @@ from functools import wraps
 from telegram.ext import ContextTypes
 from telegram import Message, Update, Chat, User
 from lib.bot.config import ORG_CHAT_ID, ORG_CHAT_TITLE
-from lib.bot.exceptions.AbbitException import try_except
+from lib.bot.exceptions.abbot_exception import try_except
 from lib.utils import try_get, try_gets
 from lib.logger import debug_logger, error_logger
 from datetime import datetime
