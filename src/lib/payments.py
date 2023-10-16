@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
-from lib.api.reqs import http_request
-from lib.utils import try_get
+from .utils import http_request, try_get
 
 
 class Processor(ABC):

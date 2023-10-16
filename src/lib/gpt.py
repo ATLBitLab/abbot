@@ -1,16 +1,15 @@
 import json
-from subprocess import run, CalledProcessError
 import time
 from io import TextIOWrapper, open
 from os.path import abspath, isfile
 import traceback
 from typing import AnyStr
 
-from bot_constants import BOT_NAME, OPENAI_MODEL
+from bot_constants import OPENAI_MODEL
 from bot_env import OPENAI_API_KEY
 
-from lib.logger import debug, error
-from lib.utils import try_except, try_get
+from .logger import debug, error
+from .utils import try_except, try_get
 
 import openai
 import tiktoken
@@ -127,17 +126,6 @@ class GPT(Abbots):
         self.chat_history_file.seek(self.chat_history_file_cursor)
         return chat_history[1:]
 
-    def kill_process(self) -> int:
-        fn = "kill_process:"
-        try:
-            service = BOT_NAME.lower()
-            run(["sudo", "systemctl", "stop", service], check=True)
-            debug(f"{fn} Successfully stopped {service}")
-            return True
-        except CalledProcessError as exception:
-            error(f"Error stopping {service}: {exception}")
-            raise exception
-
     def all_status(self) -> dict:
         status = dict(
             name=self.name,
@@ -161,7 +149,7 @@ class GPT(Abbots):
     def stop(self) -> bool:
         self.started = False
         self.unleashed = self.started
-        return self.started
+        return not self.started
 
     def get_started(self) -> bool:
         return self.started

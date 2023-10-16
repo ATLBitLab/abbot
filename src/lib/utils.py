@@ -1,13 +1,12 @@
-from functools import wraps
 import json
-from io import open
+from functools import wraps
 from logging import debug
 from requests import request
 from datetime import datetime, timedelta
 from qrcode import make
 from io import BytesIO
 from bot_constants import OPTIN_OUT_FILE, OPTINOUT_FILEPATH
-from lib.logger import error
+from .logger import error
 
 TELEGRAM_MESSAGE_FIELDS = [
     "audio",
