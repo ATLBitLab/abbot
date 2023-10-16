@@ -18,21 +18,6 @@ TELEGRAM_MESSAGE_FIELDS = [
     "caption",
 ]
 
-
-# def try_except(fn):
-#     print("try_except", fn)
-
-#     @wraps(fn)
-#     def wrapper(*args, **kwargs):
-#         try:
-#             return fn(*args, **kwargs)
-#         except Exception as exception:
-#             error_logger.log(f"try_except => exception={exception}")
-#             raise
-
-#     return wrapper
-
-
 def try_set(obj, value, *keys, **kwargs):
     default = kwargs.pop("default", None)
     if kwargs:

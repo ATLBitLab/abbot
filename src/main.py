@@ -1,11 +1,11 @@
 from sys import argv
 
-from abbot.exceptions.abbot_exception import try_except
+from lib.bot.exceptions.abbot_exception import try_except
 
 ARGS = argv[1:]
 DEV_MODE = "-d" in ARGS or "--dev" in ARGS
 
-from abbot.config import (
+from lib.bot.config import (
     BOT_TOKEN,
     TEST_BOT_TOKEN,
     BOT_NAME,
@@ -18,7 +18,7 @@ from telegram.ext import (
     CommandHandler,
     MessageHandler,
 )
-from abbot.handlers import handle_mention, handle_message, start, stop
+from lib.bot.handlers import handle_mention, handle_message, start, stop
 
 TOKEN = TEST_BOT_TOKEN if DEV_MODE else BOT_TOKEN
 APPLICATION = ApplicationBuilder().token(TOKEN).build()
