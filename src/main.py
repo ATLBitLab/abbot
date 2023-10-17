@@ -1,11 +1,5 @@
 from sys import argv
 
-ARGS = argv[1:]
-CLEAN = "-c" in ARGS or "--clean" in ARGS
-SUMMARY = "-s" in ARGS or "--summary" in ARGS
-DEV_MODE = "-d" in ARGS or "--dev" in ARGS
-CLEAN_SUMMARY = CLEAN and SUMMARY
-
 import re
 import json
 import time
@@ -32,7 +26,6 @@ from lib.utils import (
     try_gets,
     try_set,
     qr_code,
-    try_get_telegram_message_data,
 )
 from lib.logger import debug, error
 from lib.creator.admin_service import AdminService
@@ -46,8 +39,6 @@ from bot_constants import (
     COUNT,
     INIT_GROUP_MESSAGE,
     INIT_PRIVATE_MESSAGE,
-    SUMMARY_ASSISTANT,
-    PROMPT_ASSISTANT,
     THE_CREATOR,
     ATL_BITCOINER,
     CHAT_TITLE_TO_SHORT_TITLE,
@@ -61,64 +52,6 @@ SUMMARY_LOG_FILE = abspath("src/data/backup/summaries.txt")
 MESSAGES_PY_FILE = abspath("src/data/backup/messages.py")
 PROMPTS_BY_DAY_FILE = abspath("src/data/backup/prompts_by_day.py")
 now = datetime.now()
-
-TOKEN = TEST_BOT_TOKEN if DEV_MODE else BOT_TOKEN
-APPLICATION = ApplicationBuilder().token(TOKEN).build()
-debug(f"{BOT_NAME} @{BOT_HANDLE} Initialized")
-
-BOT_NAME = f"t{BOT_NAME}" if DEV_MODE else BOT_NAME
-BOT_HANDLE = f"test_{BOT_HANDLE}" if DEV_MODE else BOT_HANDLE
-ALL_ABBOTS = []
-
-GROUP_CHAT_CONTENT_FILES = sorted(listdir(abspath("src/data/chat/group/content")))
-GROUP_CHAT_CONFIG_FILES = sorted(listdir(abspath("src/data/chat/group/config")))
-PRIVATE_CHAT_CONTENT_FILES = sorted(listdir(abspath("src/data/chat/private/content")))
-PRIVATE_CHAT_CONFIG_FILES = sorted(listdir(abspath("src/data/chat/private/config")))
-
-
-for content, config in zip(GROUP_CHAT_CONTENT_FILES, GROUP_CHAT_CONFIG_FILES):
-    if ".jsonl" not in content or ".json" not in config:
-        continue
-    bot_context = "group"
-    chat_id = int(content.split(".")[0])
-    abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
-    config_file = open(abspath(config), "r")
-    config_json = json.load(config_file)
-    debug(f"main => chat_id={chat_id} abbot_name={abbot_name}")
-    group_abbot = GPT(
-        abbot_name,
-        BOT_HANDLE,
-        ATL_BITCOINER,
-        bot_context,
-        chat_id,
-        bool(try_get(config_json, "consent")),
-    )
-    ALL_ABBOTS.append(group_abbot)
-    config_file.close()
-
-for content, config in zip(PRIVATE_CHAT_CONTENT_FILES, PRIVATE_CHAT_CONFIG_FILES):
-    if ".jsonl" not in content or ".json" not in config:
-        continue
-    bot_context = "private"
-    chat_id = int(content.split(".")[0])
-    abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
-    config_file = open(abspath(config), "r")
-    config_json = json.load(config_file)
-    group_abbot = GPT(
-        abbot_name,
-        BOT_HANDLE,
-        ATL_BITCOINER,
-        bot_context,
-        chat_id,
-        bool(try_get(config_json, "consent")),
-    )
-    ALL_ABBOTS.append(group_abbot)
-    config_file.close()
-
-abbots = Abbots(ALL_ABBOTS)
-ABBOTS: Abbots.BOTS = abbots.get_bots()
-debug(f"main abbots => {abbots.__str__()}")
-
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
@@ -239,12 +172,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return await message.reply_text(answer)
 
     except Exception as exception:
-        cause, traceback, args = deconstruct_error(exception)
-        error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-        debug(f"handle_message => Error={exception}, ErrorMessage={error_msg}")
+        debug(f"handle_message => Error={exception}")
         debug(f"handle_message => which_abbot={which_abbot}")
         await context.bot.send_message(
-            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
+            chat_id=THE_CREATOR, text=f"Error={exception}"
         )
 
 
@@ -261,7 +192,6 @@ def clean_data():
                 try:
                     obj = json.loads(obj)
                 except Exception as exception:
-                    cause, traceback, args = deconstruct_error(exception)
                     exception_msg = (
                         f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
                     )
@@ -319,225 +249,6 @@ def clean_data():
     except Exception as exception:
         raise exception
 
-
-def rand_num():
-    return randrange(len(CHEEKY_RESPONSES))
-
-
-async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE, both: bool = False):
-    try:
-        message = (
-            try_get(update, "message")
-            or try_get(update, "effective_message")
-            or update.message
-        )
-        sender = try_get(message, "from_user", "username")
-        debug(f"clean => /clean executed by {sender}")
-        if not message or not sender:
-            debug(f"clean => message={message} sender={sender} undefined")
-            return await message.reply_text()
-        elif sender not in SUPER_DOOPER_ADMINS:
-            debug(f"clean => sender={sender} not whitelisted")
-            return await message.reply_text(CHEEKY_RESPONSES[rand_num()])
-        return clean_data()
-    except Exception as exception:
-        if not both:
-            cause, traceback, args = deconstruct_error(exception)
-            error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}\n"
-            debug(f"clean => Error={exception}, ErrorMessage={error_msg}")
-            await context.bot.send_message(
-                chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
-            )
-        raise exception
-
-
-async def both(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    try:
-        message = (
-            try_get(update, "message")
-            or try_get(update, "effective_message")
-            or update.message
-        )
-        await message.reply_text("Cleaning ... please wait")
-        await clean(update, context, both=True)
-        await message.reply_text("Cleaning done!")
-        await message.reply_text("Generating summaries ... please wait")
-        await summary(update, context, both=True)
-
-    except Exception as exception:
-        cause, traceback, args = deconstruct_error(exception)
-        error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-        debug(f"both => Error={exception}, ErrorMessage={error_msg}")
-        await context.bot.send_message(
-            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
-        )
-        raise exception
-
-
-def whitelist_gate(sender):
-    return sender not in SUPER_DOOPER_ADMINS
-
-
-def summarize_messages(chat, days=None):
-    try:
-        summaries = []
-        prompts_by_day = {k: "" for k in days}
-        for day in days:
-            prompt_content = ""
-            messages_file = open(RAW_MESSAGE_JL_FILE, "r")
-            for line in messages_file.readlines():
-                message = json.loads(line)
-                message_date = try_get(message, "date")
-                message_title = try_get(message, "title")
-                if day == message_date and chat == message_title:
-                    text = try_get(message, "text")
-                    sender = try_get(message, "from")
-                    message = f"{sender} said {text} on {message_date}\n"
-                    prompt_content += message
-            if prompt_content == "":
-                continue
-            prompts_by_day[day] = prompt_content
-        messages_file.close()
-        prompts_by_day_file = open(PROMPTS_BY_DAY_FILE, "w")
-        prompts_by_day_dump = json.dumps(prompts_by_day)
-        prompts_by_day_file.write(prompts_by_day_dump)
-        prompts_by_day_file.close()
-        debug(f"summarize_messages => Prompts by day = {prompts_by_day_dump}")
-        summary_file = open(SUMMARY_LOG_FILE, "a")
-        prompt = "Summarize the text after the asterisk. Split into paragraphs where appropriate. Do not mention the asterisk. * \n"
-        for day, content in prompts_by_day.items():
-            SUMMARY_ABBOT.update_chat_history(f"{prompt}{content}")
-            SUMMARY_ABBOT.update_abbots("prompt", SUMMARY_ABBOT)
-        answer = SUMMARY_ABBOT.chat_completion()
-        debug(f"summarize_messages => OpenAI Response = {answer}")
-        summary = f"Summary {day}:\n{answer.strip()}"
-        summary_file.write(f"{summary}\n--------------------------------\n\n")
-        summaries.append(summary)
-        summary_file.close()
-        return summaries
-    except Exception as exception:
-        debug(f"summarize_messages => error: {exception}")
-        raise exception
-
-
-async def summary(
-    update: Update, context: ContextTypes.DEFAULT_TYPE, both: bool = False
-):
-    try:
-        message = update.effective_message
-        sender = message.from_user.username
-        debug(f"summary => /summary executed by {sender}")
-        if whitelist_gate(sender):
-            return await message.reply_text(
-                CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))],
-            )
-        args = try_get(context, "args")
-        arg_len = len(args)
-        if arg_len > 3:
-            return await message.reply_text("Bad args: too many args")
-        date_regex = "^\d{4}-\d{2}-\d{2}$"
-        dates = [
-            (
-                (datetime.now() - timedelta(days=1)).date() - timedelta(days=i - 1)
-            ).isoformat()
-            for i in range(7, 0, -1)
-        ]
-        chat = try_get(args, 0).replace(" ", "").lower()
-        if chat != "atlantabitdevs":
-            return await message.reply_text("Bad args: Expecting 'atlantabitdevs'")
-        response_message = f"Generating {chat} summary for {dates}"
-        if arg_len == 2:
-            date = try_get(args, 1)
-            if not re.search(date_regex, date):
-                error = f"Bad args: for 2 args, expecting '/command <chatname> <date>', received {''.join(args)}; e.g. /summary atlantabitdevs 2023-01-01"
-                return await message.reply_text(error)
-            dates = [date]
-            response_message = f"Generating {chat} summary for {dates}"
-        elif arg_len == 3:
-            dates = try_get(args[1:])
-            response_message = f"Generating {chat} summary for {dates}"
-            for date in dates:
-                if not re.search(date_regex, date):
-                    error = f"Bad args: expecting '/summary <chatname> <date> <date>', received {''.join(args)}; e.g. /summary atlantabitdevs 2023-01-01 2023-01-03"
-                    return await message.reply_text(error)
-        else:
-            response_message = f"Generating {chat} summary for {dates}"
-        await message.reply_text(response_message)
-        await message.reply_text(summarize_messages(chat, dates))
-        return True
-    except Exception as exception:
-        if not both:
-            cause, traceback, args = deconstruct_error(exception)
-            error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-            debug(f"summary => Error={exception}, ErrorMessage={error_msg}")
-            await context.bot.send_message(
-                chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
-            )
-        raise exception
-
-
-async def abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    try:
-        sender = update.effective_message.from_user.username
-        message = update.effective_message
-        debug(f"abbot => /prompt executed => sender={sender} message={message}")
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id, text="Working on your request"
-        )
-        args = context.args
-        debug(f"abbot => args: {args}")
-        if len(args) <= 0:
-            return await context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text="Error: You didn't provide a prompt",
-            )
-        prompt = " ".join(args)
-        strike = Strike(
-            STRIKE_API_KEY,
-            str(uuid4()),
-            f"ATL BitLab Bot: Payer => {sender}, Prompt => {prompt}",
-        )
-        invoice, expiration = strike.invoice()
-        qr = qr_code(invoice)
-        await context.bot.send_photo(
-            chat_id=update.effective_chat.id,
-            photo=qr,
-            caption=f"Please pay the invoice to get the answer to the question:\n{prompt}",
-        )
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text=f"`{invoice}`",
-            parse_mode="MarkdownV2",
-        )
-        while not strike.paid():
-            if expiration == 0:
-                strike.expire_invoice()
-                return await context.bot.send_message(
-                    chat_id=update.effective_chat.id,
-                    text=f"Invoice expired. Retry?",
-                )
-            if expiration % 10 == 7:
-                await context.bot.send_message(
-                    chat_id=update.effective_chat.id,
-                    text=f"Invoice expires in {expiration} seconds",
-                )
-            expiration -= 1
-            time.sleep(1)
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id,
-            text=f"Thank you for supporting ATL BitLab!",
-        )
-        PROMPT_ABBOT.update_message_content(prompt)
-        answer = PROMPT_ABBOT.chat_completion()
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id, text=f"{answer}"
-        )
-        debug(f"abbot => Answer: {answer}")
-    except Exception as error:
-        debug(f"abbot => /prompt Error: {error}")
-        await message.reply_text(f"Error: {error}")
-
-
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         message: Message = try_get(update, "message") or try_get(
@@ -559,70 +270,26 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if private_chat:
             await message.reply_text(help_menu_message)
     except Exception as exception:
-        exception.with_traceback(None)
-        cause, traceback, args = deconstruct_error(exception)
-        error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-        error(f"help => Error={exception}, ErrorMessage={error_msg}")
+        error(f"help => Error={exception}")
         await context.bot.send_message(
-            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
+            chat_id=THE_CREATOR, text=f"Error={exception}"
         )
         raise exception
 
 
-def deconstruct_error(error):
-    return try_gets(error, keys=["__cause__", "__traceback__", "args"])
-
-
-async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        message: Message = try_get(update, "message") or try_get(
-            update, "effective_message"
-        )
-        chat: Chat = try_get(update, "effective_chat") or try_get(message, "chat")
-        user: User = try_get(message, "from_user")
-        if not user:
-            error(f"handle_message => Missing User: {user}")
-            return
-        chat_type = try_get(chat, "type")
-        user_id = try_get(user, "id")
-        if not user_id:
-            debug(f"handle_message => Missing User ID: {user_id}")
-            return
-        if user_id != THE_CREATOR:
-            return await message.reply_text(
-                "Sorry, you are not an admin! Please ask an admin to run the /start command."
-            )
-        for _, abbot in ABBOTS.items():
-            status = json.dumps(abbot.status(), indent=4)
-            debug(f"abbot_status => {abbot.name} status={status}")
-            await message.reply_text(status)
-    except Exception as exception:
-        exception.with_traceback(None)
-        cause, traceback, args = deconstruct_error(exception)
-        error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-        error(f"abbot_status => Error={exception}, ErrorMessage={error_msg}")
-        await context.bot.send_message(
-            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
-        )
-        raise exception
-
-
-async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    try:
-        args = try_get(context, "args")
-        message: Message = (
-            try_get(update, "message")
-            or try_get(update, "effective_message")
-            or update.message
-        )
+        message: Message = try_get(update, "message")
         message_text = try_get(message, "text")
         chat = try_get(update, "effective_chat") or try_get(message, "chat")
+        if not message or not chat:
+            raise Exception(f"Error: unleash: message={message} or chat={chat} missing")
         chat_type = try_get(chat, "type")
         private_chat = chat_type == "private"
         is_group_chat = chat_type == "group"
         chat_id = try_get(chat, "id")
         sender = try_get(message, "from_user", "username")
-        debug(f"unleash_the_abbot => /unleash {args} executed by {sender}")
+        debug(f"unleash => /unleash {args} executed by {sender}")
         if sender not in SUPER_DOOPER_ADMINS:
             cheek = CHEEKY_RESPONSES[randrange(len(CHEEKY_RESPONSES))]
             return await message.reply_text(cheek)
@@ -637,7 +304,7 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         LEASH = ("0", "False", "Off")
         UNLEASH_LEASH = (*UNLEASH, *LEASH)
         bot_status = try_get(args, 0, default="False").capitalize()
-        debug(f"unleash_the_abbot => bot_status={bot_status}")
+        debug(f"unleash => bot_status={bot_status}")
         if bot_status not in UNLEASH_LEASH:
             return await message.reply_text(
                 f"Bad arg: expecting one of {UNLEASH_LEASH}"
@@ -646,7 +313,7 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
             bot_context = "private"
         elif is_group_chat:
             bot_context = "group"
-        debug(f"unleash_the_abbot => bot_context={bot_context}")
+        debug(f"unleash => bot_context={bot_context}")
         which_abbot = try_get(ABBOTS, chat_id)
         if not which_abbot:
             bot_name = (
@@ -662,7 +329,7 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 chat_id,
                 True,
             )
-            debug(f"unleash_the_abbot => abbot={which_abbot}")
+            debug(f"unleash => abbot={which_abbot}")
         if bot_status in UNLEASH:
             unleashed = which_abbot.unleash()
         else:
@@ -671,19 +338,17 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         which_abbot.update_abbots(chat_id, which_abbot)
         response = "unleashed ✅" if unleashed else "leashed ⛔️"
         which_abbot_name = which_abbot.name
-        debug(f"unleash_the_abbot => {which_abbot_name} {response}")
+        debug(f"unleash => {which_abbot_name} {response}")
         return await message.reply_text(f"{which_abbot_name} {response}")
     except Exception as exception:
-        cause, traceback, args = deconstruct_error(exception)
-        error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-        error(f"abbot_status => Error={exception}, ErrorMessage={error_msg}")
+        error(f"statuses => Error={exception}")
         await context.bot.send_message(
-            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
+            chat_id=THE_CREATOR, text=f"Error={exception}"
         )
         raise exception
 
 
-async def abbot_rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         message: Message = try_get(update, "message") or try_get(
             update, "effective_message"
@@ -692,7 +357,7 @@ async def abbot_rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id = try_get(chat, "id")
         sender = try_get(message, "from_user", "username")
         debug(
-            f"abbot_rules => /rules executed by {sender} - chat={chat} chat_id={chat_id}"
+            f"rules => /rules executed by {sender} - chat={chat} chat_id={chat_id}"
         )
         await message.reply_text(
             "Hey! The name's Abbot but you can think of me as your go-to guide for all things Bitcoin. AKA the virtual Bitcoin whisperer. 😉\n\n"
@@ -704,11 +369,9 @@ async def abbot_rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Ready. Set. Stack Sats! 🚀"
         )
     except Exception as exception:
-        cause, traceback, args = deconstruct_error(exception)
-        error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-        error(f"abbot_status => Error={exception}, ErrorMessage={error_msg}")
+        error(f"statuses => Error={exception}")
         await context.bot.send_message(
-            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
+            chat_id=THE_CREATOR, text=f"Error={exception}"
         )
         raise exception
 
@@ -810,11 +473,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await message.reply_text(response)
     except Exception as exception:
         error(f"start => Raw exception={exception}")
-        cause, traceback, args = deconstruct_error(exception)
-        error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-        error(f"start => Error={exception}, ErrorMessage={error_msg}")
+        error(f"start => Error={exception}")
         await context.bot.send_message(
-            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
+            chat_id=THE_CREATOR, text=f"Error={exception}"
         )
         raise exception
 
@@ -897,18 +558,16 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"Thanks for using {BOT_NAME}. Use /start to restart at any time."
         )
     except Exception as exception:
-        cause, traceback, args = deconstruct_error(exception)
-        error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-        error(f"stop => Error={exception}, ErrorMessage={error_msg}")
+        error(f"stop => Error={exception}")
         await context.bot.send_message(
-            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
+            chat_id=THE_CREATOR, text=f"Error={exception}"
         )
         raise exception
 
 
-async def plug_into_matrix(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def _admin_plugin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        fn = "plug_into_matrix:"
+        fn = "_admin_plugin:"
         chat_id: int = try_get(update, "message", "chat", "id")
         user_id: int = try_get(update, "message", "from_user", "id")
         if user_id != THE_CREATOR:
@@ -923,9 +582,9 @@ async def plug_into_matrix(update: Update, context: ContextTypes.DEFAULT_TYPE):
         raise exception
 
 
-async def unplug_from_matrix(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def _admin_unplug(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        fn = "unplug_from_matrix:"
+        fn = "_admin_unplug:"
         chat_id: int = try_get(update, "message", "chat", "id")
         user_id: int = try_get(update, "message", "from_user", "id")
 
@@ -939,9 +598,9 @@ async def unplug_from_matrix(update: Update, context: ContextTypes.DEFAULT_TYPE)
         raise exception
 
 
-async def kill(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def _admin_kill(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        fn = "kill:"
+        fn = "_admin_kill:"
         message: Message = try_get(update, "message")
         chat: Chat = try_get(message, "chat")
         chat_id: int = try_get(chat, "id")
@@ -959,9 +618,9 @@ async def kill(update: Update, context: ContextTypes.DEFAULT_TYPE):
         raise exception
 
 
-async def nap(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def _admin_nap(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        fn = "nap:"
+        fn = "_admin_nap:"
         message: Message = try_get(update, "message")
         chat: Chat = try_get(message, "chat")
         chat_id: int = try_get(chat, "id")
@@ -979,29 +638,107 @@ async def nap(update: Update, context: ContextTypes.DEFAULT_TYPE):
         raise exception
 
 
-kill_handler = CommandHandler("unplug", unplug_from_matrix)
-revive_handler = CommandHandler("plugin", plug_into_matrix)
-help_handler = CommandHandler("nap", nap)
+async def _admin_status(update: Update, context: ContextTypes.DEFAULT_TYPE, abbots: Abbots):
+    try:
+        fn = "status:"
+        message: Message = try_get(update, "message")
+        user: User = try_get(message, "from_user")
+        user_id: int = try_get(user, "id")
+        if user_id != THE_CREATOR:
+            return
+        abbots_dict: dict = abbots.get_bots()
+        for bot in abbots_dict:
+            abbot: GPT = bot
+            status_data = json.dumps(abbot.get_status(), indent=4)
+            debug(f"statuses => {abbot.name} status_data={status_data}")
+            await message.reply_text(status_data)
+    except Exception as exception:
+        error(f"{fn} => exception={exception}")
+        await context.bot.send_message(
+            chat_id=THE_CREATOR, text=f"{fn} exception: {exception}"
+        )
+        raise exception
+
+ARGS = argv[1:]
+CLEAN = "-c" in ARGS or "--clean" in ARGS
+SUMMARY = "-s" in ARGS or "--summary" in ARGS
+DEV_MODE = "-d" in ARGS or "--dev" in ARGS
+CLEAN_SUMMARY = CLEAN and SUMMARY
+
+TOKEN = TEST_BOT_TOKEN if DEV_MODE else BOT_TOKEN
+APPLICATION = ApplicationBuilder().token(TOKEN).build()
+debug(f"{BOT_NAME} @{BOT_HANDLE} Initialized")
+
+BOT_NAME = f"t{BOT_NAME}" if DEV_MODE else BOT_NAME
+BOT_HANDLE = f"test_{BOT_HANDLE}" if DEV_MODE else BOT_HANDLE
+ALL_ABBOTS = []
+
+GROUP_CONTENT_FILE_PATH = abspath("src/data/chat/group/content")
+GROUP_CONFIG_FILE_PATH = abspath("src/data/chat/group/config")
+GROUP_CONTENT_FILES = sorted(listdir(GROUP_CONTENT_FILE_PATH))
+GROUP_CONFIG_FILES = sorted(listdir(GROUP_CONFIG_FILE_PATH))
+
+PRIVATE_CONTENT_FILE_PATH = abspath("src/data/chat/private/content")
+PRIVATE_CONFIG_FILE_PATH = abspath("src/data/chat/private/config")
+PRIVATE_CONTENT_FILES = sorted(listdir(PRIVATE_CONTENT_FILE_PATH))
+PRIVATE_CONFIG_FILES = sorted(listdir(PRIVATE_CONFIG_FILE_PATH))
+
+for content, config in zip(GROUP_CONTENT_FILES, GROUP_CONFIG_FILES):
+    if ".jsonl" not in content or ".json" not in config:
+        continue
+    bot_context = "group"
+    chat_id = int(content.split(".")[0])
+    abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
+    config_json = json.load(open(f"{GROUP_CONFIG_FILE_PATH}/{config}", "r"))
+    debug(f"main => chat_id={chat_id} abbot_name={abbot_name}")
+    group_abbot = GPT(
+        abbot_name,
+        BOT_HANDLE,
+        ATL_BITCOINER,
+        bot_context,
+        chat_id,
+        bool(try_get(config_json, "consent")),
+    )
+    ALL_ABBOTS.append(group_abbot)
+
+for content, config in zip(PRIVATE_CONTENT_FILES, PRIVATE_CONFIG_FILES):
+    if ".jsonl" not in content or ".json" not in config:
+        continue
+    bot_context = "private"
+    chat_id = int(content.split(".")[0])
+    abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
+    config_json = json.load(open(f"{PRIVATE_CONFIG_FILE_PATH}/{config}", "r"))
+    group_abbot = GPT(
+        abbot_name,
+        BOT_HANDLE,
+        ATL_BITCOINER,
+        bot_context,
+        chat_id,
+        bool(try_get(config_json, "consent")),
+    )
+    ALL_ABBOTS.append(group_abbot)
+
+abbots = Abbots(ALL_ABBOTS)
+ABBOTS: Abbots.BOTS = abbots.get_bots()
+debug(f"main abbots => {abbots.__str__()}")
+
+kill_handler = CommandHandler("unplug", _admin_unplug)
+revive_handler = CommandHandler("plugin", _admin_plugin)
+help_handler = CommandHandler("nap", _admin_nap)
+status_handler = CommandHandler("status", _admin_status(abbots))
+
+
 help_handler = CommandHandler("help", help)
-stop_handler = CommandHandler("stop", stop)
-summary_handler = CommandHandler("summary", summary)
-prompt_handler = CommandHandler("prompt", abbot)
-clean_handler = CommandHandler("clean", clean)
-clean_summary_handler = CommandHandler("both", both)
-unleash_handler = CommandHandler("unleash", unleash_the_abbot)
-status_handler = CommandHandler("status", abbot_status)
-rules_handler = CommandHandler("rules", abbot_rules)
+rules_handler = CommandHandler("rules", rules)
 start_handler = CommandHandler("start", start)
+stop_handler = CommandHandler("stop", stop)
+unleash_handler = CommandHandler("unleash", unleash)
 message_handler = MessageHandler(BaseFilter(), handle_message)
 
 APPLICATION.add_handler(kill_handler)
 APPLICATION.add_handler(revive_handler)
 APPLICATION.add_handler(help_handler)
 APPLICATION.add_handler(stop_handler)
-APPLICATION.add_handler(summary_handler)
-APPLICATION.add_handler(prompt_handler)
-APPLICATION.add_handler(clean_handler)
-APPLICATION.add_handler(clean_summary_handler)
 APPLICATION.add_handler(unleash_handler)
 APPLICATION.add_handler(status_handler)
 APPLICATION.add_handler(rules_handler)

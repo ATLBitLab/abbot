@@ -58,7 +58,7 @@ class GPT(Abbots):
         handle: str,
         personality: str,
         context: str,
-        chat_id: int = None,
+        chat_id: int,
         started: bool = False,
         sent_intro: bool = False,
         unleashed: bool = False,
@@ -74,7 +74,9 @@ class GPT(Abbots):
         self.started: bool = started
         self.unleashed: bool = unleashed
         self.sent_intro: bool = sent_intro
-        self.chat_history_file_path: AnyStr @ abspath = abspath(f"src/data/gpt/{context}")
+        self.chat_config: dict = json.load(open(abspath(f"src/data/chat/{context}/config/{chat_id}.json"), "r+"))
+        self._init_abbot_state()
+        self.chat_history_file_path: AnyStr @ abspath = abspath(f"src/data/chat/{context}/content/{chat_id}.jsonl")
         self.chat_history_file: TextIOWrapper = self._open_history()
         self.chat_history: list = self._inflate_history()
         self.chat_history_len = len(self.chat_history)
@@ -99,7 +101,11 @@ class GPT(Abbots):
     def to_json(self):
         return self.__dict__
         
-
+    def _init_abbot_state(self):
+        self.started = self.chat_config.started
+        self.unleashed = self.chat_config.unleashed
+        self.sent_intro = self.chat_config.sent_intro
+    
     def _create_history(self) -> TextIOWrapper:
         chat_history_file = open(self.chat_history_file_path, "a+")
         chat_history_file.write(json.dumps(self.gpt_system))
@@ -109,9 +115,6 @@ class GPT(Abbots):
         if not isfile(self.chat_history_file_path):
             return self._create_history()
         return open(self.chat_history_file_path, "a+")
-
-    def _close_history(self) -> None:
-        self.chat_history_file.close()
 
     def _inflate_history(self) -> list:
         chat_history = []
@@ -124,19 +127,14 @@ class GPT(Abbots):
         self.chat_history_file.seek(self.chat_history_file_cursor)
         return chat_history[1:]
 
-    def all_status(self) -> dict:
+    def get_status(self) -> dict:
         status = dict(
             name=self.name,
             started=self.started,
             unleashed=self.unleashed,
         )
-        if not self.chat_id:
-            return status
         status.update(dict(chat_id=self.chat_id))
         return status
-
-    def status(self) -> dict:
-        return self.__str__()
 
     def start(self) -> bool:
         self.started = True

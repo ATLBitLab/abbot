@@ -26,8 +26,6 @@ class AdminService:
         status: str = status,
         status_code: int = status_code,
     ):
-        assert (user_id == THE_CREATOR, "forbidden")
-        assert (chat_id == THE_CREATOR, "forbidden")
         self.user_id = user_id
         self.chat_id = chat_id
         self.status = status
@@ -58,7 +56,6 @@ class AdminService:
             error(f"Error stopping {service}: {exception}")
             raise exception
 
-    @try_except
     def kill_service(self) -> Exception:
         fn = "kill_service:"
         exception = Exception("Plugging Abbot back into the matrix!")
