@@ -28,14 +28,11 @@ from telegram.ext import (
 )
 
 from lib.utils import (
-    get_dates,
-    opt_in,
-    opt_out,
     try_get,
-    try_get_telegram_message_data,
     try_gets,
     try_set,
     qr_code,
+    try_get_telegram_message_data,
 )
 from lib.logger import debug, error
 from lib.creator.admin_service import AdminService
@@ -54,7 +51,6 @@ from bot_constants import (
     THE_CREATOR,
     ATL_BITCOINER,
     CHAT_TITLE_TO_SHORT_TITLE,
-    OPTINOUT_FILEPATH,
     SUPER_DOOPER_ADMINS,
     CHEEKY_RESPONSES,
 )
@@ -72,12 +68,10 @@ debug(f"{BOT_NAME} @{BOT_HANDLE} Initialized")
 
 BOT_NAME = f"t{BOT_NAME}" if DEV_MODE else BOT_NAME
 BOT_HANDLE = f"test_{BOT_HANDLE}" if DEV_MODE else BOT_HANDLE
-PROMPT_ABBOT = GPT(f"p{BOT_NAME}", BOT_HANDLE, PROMPT_ASSISTANT, "prompt")
-SUMMARY_ABBOT = GPT(f"s{BOT_NAME}", BOT_HANDLE, SUMMARY_ASSISTANT, "summary")
-ALL_ABBOTS = [PROMPT_ABBOT, SUMMARY_ABBOT]
+ALL_ABBOTS = []
 
 GROUP_CHAT_CONTENT_FILES = sorted(listdir(abspath("src/data/chat/group/content")))
-GROUP_CHAT_CONFIG_FILES = sorted(listdir(abspath("config")))
+GROUP_CHAT_CONFIG_FILES = sorted(listdir(abspath("src/data/chat/group/config")))
 PRIVATE_CHAT_CONTENT_FILES = sorted(listdir(abspath("src/data/chat/private/content")))
 PRIVATE_CHAT_CONFIG_FILES = sorted(listdir(abspath("src/data/chat/private/config")))
 
@@ -88,7 +82,8 @@ for content, config in zip(GROUP_CHAT_CONTENT_FILES, GROUP_CHAT_CONFIG_FILES):
     bot_context = "group"
     chat_id = int(content.split(".")[0])
     abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
-    config_json = json.load(abspath(open(config, "r")))
+    config_file = open(abspath(config), "r")
+    config_json = json.load(config_file)
     debug(f"main => chat_id={chat_id} abbot_name={abbot_name}")
     group_abbot = GPT(
         abbot_name,
@@ -99,6 +94,7 @@ for content, config in zip(GROUP_CHAT_CONTENT_FILES, GROUP_CHAT_CONFIG_FILES):
         bool(try_get(config_json, "consent")),
     )
     ALL_ABBOTS.append(group_abbot)
+    config_file.close()
 
 for content, config in zip(PRIVATE_CHAT_CONTENT_FILES, PRIVATE_CHAT_CONFIG_FILES):
     if ".jsonl" not in content or ".json" not in config:
@@ -106,7 +102,8 @@ for content, config in zip(PRIVATE_CHAT_CONTENT_FILES, PRIVATE_CHAT_CONFIG_FILES
     bot_context = "private"
     chat_id = int(content.split(".")[0])
     abbot_name = f"{bot_context}{BOT_NAME}{chat_id}"
-    config_json = json.load(abspath(open(config, "r")))
+    config_file = open(abspath(config), "r")
+    config_json = json.load(config_file)
     group_abbot = GPT(
         abbot_name,
         BOT_HANDLE,
@@ -116,6 +113,7 @@ for content, config in zip(PRIVATE_CHAT_CONTENT_FILES, PRIVATE_CHAT_CONFIG_FILES
         bool(try_get(config_json, "consent")),
     )
     ALL_ABBOTS.append(group_abbot)
+    config_file.close()
 
 abbots = Abbots(ALL_ABBOTS)
 ABBOTS: Abbots.BOTS = abbots.get_bots()
@@ -124,12 +122,6 @@ debug(f"main abbots => {abbots.__str__()}")
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        debug(f"handle_message => Raw update={update}")
-        mpy = open(MESSAGES_PY_FILE, "a")
-        mpy.write(update.to_json())
-        mpy.write("\n")
-        mpy.close()
-
         message: Message = try_get(update, "message") or try_get(
             update, "effective_message"
         )
@@ -156,26 +148,27 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         is_group_chat = chat_type == "group"
         bot_context = "group"
         if is_group_chat or not is_private_chat:
-            chat_title = try_get(chat, "title", default="").lower().replace(" ", "")
-            debug(f"handle_message => not is_private_chat={not is_private_chat}")
-            debug(f"handle_message => is_group_chat={is_group_chat}")
-            message_dump = json.dumps(
-                {
-                    "id": chat_id,
-                    "type": chat_type,
-                    "title": chat_title,
-                    "from": username,
-                    "text": message_text,
-                    "name": name,
-                    "date": date,
-                    "new": True,
-                }
-            )
-            debug(f"handle_message => message_dump={message_dump}")
-            raw_messages_jsonl = open(RAW_MESSAGE_JL_FILE, "a")
-            raw_messages_jsonl.write(message_dump)
-            raw_messages_jsonl.write("\n")
-            raw_messages_jsonl.close()
+            if BOT_HANDLE != "test_atl_bitlab_bot":
+                chat_title: str = try_get(chat, "title", default="").lower().replace(" ", "")
+                debug(f"handle_message => not is_private_chat={not is_private_chat}")
+                debug(f"handle_message => is_group_chat={is_group_chat}")
+                message_dump = json.dumps(
+                    {
+                        "id": chat_id,
+                        "type": chat_type,
+                        "title": chat_title,
+                        "from": username,
+                        "text": message_text,
+                        "name": name,
+                        "date": date,
+                        "new": True,
+                    }
+                )
+                debug(f"handle_message => message_dump={message_dump}")
+                raw_messages_jsonl = open(RAW_MESSAGE_JL_FILE, "a")
+                raw_messages_jsonl.write(message_dump)
+                raw_messages_jsonl.write("\n")
+                raw_messages_jsonl.close()
         else:
             bot_context = "private"
             debug(f"handle_message => is_private_chat={is_private_chat}")
@@ -190,29 +183,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         which_name = try_get(which_abbot, "name")
         which_handle = try_get(which_abbot, "handle")
-        which_history = try_get(which_abbot, "chat_history")
-        which_history_system = try_get(which_history, 0, "role") == "system"
         which_history_len = len(try_get(which_abbot, "chat_history", default=[]))
-        group_in_name = "group" in which_name
         reply_to_message = try_get(message, "reply_to_message")
         reply_to_message_text = try_get(reply_to_message, "text", default="") or ""
         reply_to_message_from = try_get(reply_to_message, "from")
-        reply_to_message_from_bot = try_get(reply_to_message_from, "is_bot")
         reply_to_message_bot_username = try_get(reply_to_message_from, "username")
-        all_message_data = try_get_telegram_message_data(message)
-
-        debug(f"handle_message => which_name={which_name}")
-        debug(f"handle_message => which_handle={which_handle}")
-
-        debug(f"handle_message => which_history_system={which_history_system}")
-        debug(f"handle_message => which_history_len={which_history_len}")
-
-        debug(f"handle_message => reply_to_message={reply_to_message}")
-        debug(f"handle_message => reply_to_message_text={reply_to_message_text}")
-        debug(f"handle_message => reply_to_message_from={reply_to_message_from}")
-        debug(f"handle_message => reply_from_bot={reply_to_message_from_bot}")
-        debug(f"handle_message => reply_bot_username={reply_to_message_bot_username}")
-        debug(f"handle_message => all_message_data={all_message_data}")
 
         full_handle = f"@{which_handle}"
         is_modulo_message = which_history_len % COUNT == 0
@@ -223,16 +198,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if not which_abbot.get_sent_intro():
                 debug(f"handle_message => Abbot not started")
                 debug(f"which_abbot={which_abbot.__str__()}")
-                intro_sent = which_abbot.knock()
+                intro_sent = which_abbot.introduce()
                 debug(f"intro_sent={intro_sent}")
                 return await message.reply_text(
-                    "Hello! Thank you for talking to Abbot (@atl_bitlab_bot), A Bitcoin Bot for local communities! \n\n"
-                    "Abbot is meant to provide education to local bitcoin communities and help community organizers with various tasks. \n\n"
-                    "To start Abbot in a group chat, have a channel admin run /start \n\n"
-                    "To start Abbot in a DM, simply run /start. \n\n"
-                    "By running /start, you agree to our Terms & policies: https://atlbitlab.com/abbot/policies. \n\n"
-                    "If you have multiple bots in one channel, you may need to run /start @atl_bitlab_bot to avoid bot confusion! \n\n"
-                    "Thank you for using Abbot! We hope you enjoy your experience! \n\n"
+                    "Thank you for talking to Abbot (@atl_bitlab_bot), a bitcoiner bot for bitcoin communities, by the Atlanta Bitcoin community!\n"
+                    "Abbot is meant to provide education to local bitcoin communities and help community organizers with various tasks.\n"
+                    "- To start Abbot in a group chat, have a channel admin run /start\n"
+                    "- To start Abbot in a DM, simply run /start.\n\n"
+                    "By running /start, you agree to our Terms & policies: https://atlbitlab.com/abbot/policies.\n"
+                    "If you have multiple bots in one channel, you may need to run /start@atl_bitlab_bot to avoid bot confusion!\n"
                     "If you have questions, concerns, feature requests or find bugs, please contact @nonni_io or @ATLBitLab on Telegram."
                 )
         if is_group_chat:
@@ -822,7 +796,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             raise Exception(f"Not started! started={started}")
         which_abbot.update_chat_history(dict(role="user", content=message_text))
         which_abbot.update_abbots(chat_id, which_abbot)
-        opt_in(OPTINOUT_FILEPATH, bot_context, chat_id, True)
         error_msg = f"Please try again later or contact @nonni_io"
         await message.reply_text(
             f"Please wait while we unplug {BOT_NAME} from the Matrix"
@@ -920,7 +893,6 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "/stop failed! Something went wrong. Please try again later or contact @nonni_io"
             )
             return await context.bot.send_message(chat_id=THE_CREATOR, text=err_msg)
-        opt_out(OPTINOUT_FILEPATH, bot_context, chat_id, False)
         await message.reply_text(
             f"Thanks for using {BOT_NAME}. Use /start to restart at any time."
         )

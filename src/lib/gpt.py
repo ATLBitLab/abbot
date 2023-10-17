@@ -14,7 +14,6 @@ from .utils import try_except, try_get
 import openai
 import tiktoken
 
-encoding = tiktoken.get_encoding("cl100k_base")
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
 
 
@@ -62,6 +61,7 @@ class GPT(Abbots):
         chat_id: int = None,
         started: bool = False,
         sent_intro: bool = False,
+        unleashed: bool = False,
     ) -> object:
         openai.api_key: str = OPENAI_API_KEY
         self.model: str = OPENAI_MODEL
@@ -72,27 +72,21 @@ class GPT(Abbots):
         self.gpt_system: dict = dict(role="system", content=personality)
         self.chat_id: str = chat_id
         self.started: bool = started
-        self.unleashed: bool = started
+        self.unleashed: bool = unleashed
         self.sent_intro: bool = sent_intro
-
-        chat_history_abs_filepath: AnyStr @ abspath = abspath(f"src/data/gpt/{context}")
-        self.chat_history_file_path: str = (
-            f"{chat_history_abs_filepath}/{chat_id}.jsonl"
-            if chat_id
-            else f"{chat_history_abs_filepath}/{context}_abbot.jsonl"
-        )
+        self.chat_history_file_path: AnyStr @ abspath = abspath(f"src/data/gpt/{context}")
         self.chat_history_file: TextIOWrapper = self._open_history()
-        self.chat_history_file_cursor: int = self.chat_history_file.tell()
         self.chat_history: list = self._inflate_history()
         self.chat_history_len = len(self.chat_history)
-        self.chat_history_token_length = self.calculate_chat_history_tokens()
+        self.chat_history_tokens = self.calculate_chat_history_tokens()
+        self.chat_history_file_cursor: int = self.chat_history_file.tell()
 
     def __str__(self) -> str:
         return (
             f"GPT(model={self.model}, name={self.name}, "
             f"handle={self.handle}, context={self.context}, "
             f"unleashed={self.unleashed}, started={self.started} "
-            f"chat_id={self.chat_id}, chat_history_token_length={self.chat_history_token_length})"
+            f"chat_id={self.chat_id}, chat_history_tokens={self.chat_history_tokens})"
         )
 
     def __repr__(self) -> str:
@@ -101,6 +95,10 @@ class GPT(Abbots):
             f"context={self.context}, personality={self.personality}, chat_history={self.chat_history}, "
             f"unleashed={self.unleashed}, started={self.started})"
         )
+
+    def to_json(self):
+        return self.__dict__
+        
 
     def _create_history(self) -> TextIOWrapper:
         chat_history_file = open(self.chat_history_file_path, "a+")
@@ -164,7 +162,7 @@ class GPT(Abbots):
         time.sleep(t)
         return True
 
-    def knock(self) -> bool:
+    def introduce(self) -> bool:
         self.sent_intro = True
         return self.sent_intro
 

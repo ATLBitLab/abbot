@@ -2,10 +2,9 @@ import json
 from functools import wraps
 from logging import debug
 from requests import request
-from datetime import datetime, timedelta
+from os.path import abspath
 from qrcode import make
 from io import BytesIO
-from bot_constants import OPTIN_OUT_FILE, OPTINOUT_FILEPATH
 from .logger import error
 
 TELEGRAM_MESSAGE_FIELDS = [
@@ -100,20 +99,20 @@ def qr_code(data):
 
 
 def opt_in(context: str, chat_id: int) -> bool:
-    fn = "opt_in => "
-    optinout_list = OPTIN_OUT_FILE[context]
-    if chat_id not in optinout_list:
-        debug(f"{fn} chat_id={chat_id} opting in")
-        optinout_list.append(chat_id)
-        json.dump(OPTIN_OUT_FILE, OPTINOUT_FILEPATH, indent=4)
+    fn = "opt_in:"
+    config_file_name = f"src/data/chat/{context}/config/{chat_id}.json"
+    debug(f"{fn} config_file_name={config_file_name}")
+    config_file_path = abspath(config_file_name)
+    with open(config_file_path, 'w') as config:
+        json.dump({"started": True, "sent_intro": False}, config)
     return True
 
 
 def opt_out(context: str, chat_id: int) -> bool:
-    fn = "opt_out =>"
-    optinout_list = OPTIN_OUT_FILE[context]
-    if chat_id in optinout_list:
-        debug(f"{fn} chat_id={chat_id} opting out")
-        optinout_list.remove(chat_id)
-        json.dump(OPTIN_OUT_FILE, OPTINOUT_FILEPATH, indent=4)
+    fn = "opt_out:"
+    config_file_name = f"src/data/chat/{context}/config/{chat_id}.json"
+    debug(f"{fn} config_file_name={config_file_name}")
+    config_file_path = abspath(config_file_name)
+    with open(config_file_path, 'w') as config:
+        json.dump({"started": False, "sent_intro": True}, config)
     return True

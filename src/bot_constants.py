@@ -41,9 +41,5 @@ CHEEKY_RESPONSES = [
     "Do not pass go, do not collect $200",
 ]
 PITHY_RESPONSES = ["Sorry, I'm taking a nap, ttyl."]
-OPTINOUT_FILEPATH = abspath("src/data/optin_optout.json")
-OPTIN_OUT_FILE = json.load(open(OPTINOUT_FILEPATH, "r+"))
-GROUP_OPTIN = OPTIN_OUT_FILE["group"]
-PRIVATE_OPTIN = OPTIN_OUT_FILE["private"]
 COUNT = 5
 YD = "=>"
