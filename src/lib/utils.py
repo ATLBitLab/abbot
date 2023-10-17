@@ -6,6 +6,8 @@ from os.path import abspath
 from qrcode import make
 from io import BytesIO
 from .logger import error
+from telegram.ext import ContextTypes
+    
 
 TELEGRAM_MESSAGE_FIELDS = [
     "audio",
@@ -116,3 +118,8 @@ def opt_out(context: str, chat_id: int) -> bool:
     with open(config_file_path, 'w') as config:
         json.dump({"started": False, "sent_intro": True}, config)
     return True
+
+async def sender_is_group_admin(context: ContextTypes.DEFAULT_TYPE, chat_id: int, user_id: int):
+    admins = await context.bot.get_chat_administrators(chat_id)
+    admin_ids = [admin.user.id for admin in admins]
+    return user_id in admin_ids

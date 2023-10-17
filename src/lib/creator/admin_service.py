@@ -3,7 +3,7 @@ import time
 
 from lib.utils import try_except, try_get
 from ..logger import debug, error
-from bot_constants import BOT_NAME, THE_CREATOR
+from src.lib.bot.constants import BOT_NAME, THE_CREATOR
 
 SERVICE_STATUSES = {
     -1: "unknown",
