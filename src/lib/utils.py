@@ -1,14 +1,12 @@
-from functools import wraps
 import json
-from io import open
+from functools import wraps
 from logging import debug
-import traceback
 from requests import request
 from datetime import datetime, timedelta
 from qrcode import make
 from io import BytesIO
 from bot_constants import OPTIN_OUT_FILE, OPTINOUT_FILEPATH
-from lib.logger import error
+from .logger import error
 
 TELEGRAM_MESSAGE_FIELDS = [
     "audio",
@@ -26,28 +24,13 @@ TELEGRAM_MESSAGE_FIELDS = [
 def try_except(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        fn = "try_except => wrapper =>"
         try:
-            # ---- Success ----
             return fn(*args, **kwargs)
         except Exception as exception:
-            error(f"{fn} exception={exception}")
+            error(f"try_except => exception={exception}")
             raise
 
     return wrapper
-
-
-def now_date():
-    return datetime.now().date()
-
-
-def get_dates(lookback=7):
-    return [
-        (
-            (datetime.now() - timedelta(days=1)).date() - timedelta(days=i - 1)
-        ).isoformat()
-        for i in range(lookback, 0, -1)
-    ]
 
 
 def try_set(obj, value, *keys, **kwargs):

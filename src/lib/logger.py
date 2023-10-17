@@ -2,7 +2,7 @@ from os.path import abspath
 from logging import getLogger, FileHandler, DEBUG, ERROR
 from datetime import datetime
 
-now = datetime.now().date()
+now = datetime.now()
 
 debugger = getLogger("abbot_debugger")
 debugger.setLevel(DEBUG)
