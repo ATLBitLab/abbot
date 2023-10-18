@@ -5,7 +5,7 @@ from os.path import abspath
 
 from telegram.ext import ContextTypes
 from telegram import Chat, Message, Update, User
-from abbot.exceptions.AbbitException import try_except
+from exceptions.abbot_exception import AbbotException, try_except
 
 from config import (
     ORG_CHAT_ID,
