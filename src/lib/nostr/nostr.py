@@ -1,7 +1,7 @@
 import time
 import uuid
 from binascii import unhexlify
-
+import pynostr
 from pynostr.key import PrivateKey
 from pynostr.relay_manager import RelayManager
 from pynostr.filters import FiltersList, Filters
@@ -22,6 +22,7 @@ class Nostr:
         "wss://relay.current.fyi",
         "wss://nostr.relayer.se",
     ]
+
     def __init__(self, sec_key):
         assert (sec_key is not None, "Nostr secret key must be supplied")
         self.sec_key = sec_key
@@ -42,6 +43,12 @@ class Nostr:
             event_msg = relay_manager.message_pool.get_event()
             print(event_msg.event.content)
         relay_manager.close_all_relay_connections()
+
+    """
+        def create_note(kind, data):
+            parse(data)
+    """
+
 
 """
   Reply to a note

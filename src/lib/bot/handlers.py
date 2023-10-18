@@ -7,11 +7,13 @@ from datetime import datetime
 from telegram import Update, Message, Chat, User
 from telegram.ext import ContextTypes
 
-from lib.utils import sender_is_group_admin, try_get
-from lib.logger import debug_logger, error_logger
-from lib.admin.admin_service import AdminService
-from src.lib.abbot import GPT, Abbots
-from lib.bot.config import BOT_NAME, BOT_TELEGRAM_HANDLE, BOT_CORE_SYSTEM
+from utils import sender_is_group_admin, try_get
+from logger import debug_logger, error_logger
+from admin.admin_service import AdminService
+from .abbot import GPT, Abbots
+from .config import BOT_NAME, BOT_TELEGRAM_HANDLE, BOT_CORE_SYSTEM
+from .exceptions.abbot_exception import try_except, AbbotException
+from constants import THE_CREATOR
 
 RAW_MESSAGE_JL_FILE = abspath("src/data/raw_messages.jsonl")
 MATRIX_IMG_FILEPATH = abspath("src/assets/unplugging_matrix.jpg")
