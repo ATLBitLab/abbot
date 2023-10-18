@@ -4,10 +4,10 @@ venv = ".venv"
 pythonVersion = "3.11"
 
 [tool.ruff]
-line-length = 88
+line-length = 120
 target-version = "py311"
 
 [tool.black]
-line-length = 88
+line-length = 120
 target-version = ["py311"]
 
