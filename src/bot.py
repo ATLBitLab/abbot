@@ -10,7 +10,7 @@ from telegram.ext import ContextTypes
 from lib.utils import sender_is_group_admin, try_except, try_get
 from lib.logger import debug_logger, error_logger
 from lib.creator.admin_service import AdminService
-from lib.gpt import GPT, Abbots
+from src.lib.abbot import GPT, Abbots
 from lib.bot.constants import BOT_NAME, BOT_HANDLE, COUNT, THE_CREATOR, ATL_BITCOINER
 
 RAW_MESSAGE_JL_FILE = abspath("src/data/raw_messages.jsonl")
