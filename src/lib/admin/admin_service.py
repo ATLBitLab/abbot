@@ -1,9 +1,15 @@
 from subprocess import run, CalledProcessError
 import time
 
+<<<<<<< Updated upstream
 from lib.utils import try_except, try_get
 from ..logger import debug, error
 from src.lib.bot.constants import BOT_NAME, THE_CREATOR
+=======
+from lib.utils import try_get
+from lib.logger import debug_logger, error_logger
+from lib.bot.config import BOT_NAME
+>>>>>>> Stashed changes
 
 SERVICE_STATUSES = {
     -1: "unknown",

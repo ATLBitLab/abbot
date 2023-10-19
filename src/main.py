@@ -7,7 +7,7 @@ from telegram.ext import (
 )
 from lib.logger import debug_logger
 from lib.bot.config import BOT_NAME, BOT_TELEGRAM_HANDLE, BOT_TOKEN, TEST_BOT_TOKEN
-from bot import (
+from lib.bot.handlers import (
     start,
     stop,
     rules,
