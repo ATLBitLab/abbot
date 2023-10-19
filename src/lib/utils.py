@@ -1,11 +1,13 @@
 import json
-from io import BytesIO
-from qrcode import make
-from os.path import abspath
+from functools import wraps
+from logging import debug
 from requests import request
-from .logger import debug_logger
+from os.path import abspath
+from qrcode import make
+from io import BytesIO
+from .logger import error
 from telegram.ext import ContextTypes
-
+    
 
 TELEGRAM_MESSAGE_FIELDS = [
     "audio",
@@ -18,6 +20,18 @@ TELEGRAM_MESSAGE_FIELDS = [
     "video_note",
     "caption",
 ]
+
+
+def try_except(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        try:
+            return fn(*args, **kwargs)
+        except Exception as exception:
+            error(f"try_except => exception={exception}")
+            raise
+
+    return wrapper
 
 
 def try_set(obj, value, *keys, **kwargs):
@@ -89,9 +103,9 @@ def qr_code(data):
 def opt_in(context: str, chat_id: int) -> bool:
     fn = "opt_in:"
     config_file_name = f"src/data/chat/{context}/config/{chat_id}.json"
-    debug_logger.log(f"{fn} config_file_name={config_file_name}")
+    debug(f"{fn} config_file_name={config_file_name}")
     config_file_path = abspath(config_file_name)
-    with open(config_file_path, "w") as config:
+    with open(config_file_path, 'w') as config:
         json.dump({"started": True, "sent_intro": False}, config)
     return True
 
@@ -99,12 +113,11 @@ def opt_in(context: str, chat_id: int) -> bool:
 def opt_out(context: str, chat_id: int) -> bool:
     fn = "opt_out:"
     config_file_name = f"src/data/chat/{context}/config/{chat_id}.json"
-    debug_logger.log(f"{fn} config_file_name={config_file_name}")
+    debug(f"{fn} config_file_name={config_file_name}")
     config_file_path = abspath(config_file_name)
-    with open(config_file_path, "w") as config:
+    with open(config_file_path, 'w') as config:
         json.dump({"started": False, "sent_intro": True}, config)
     return True
-
 
 async def sender_is_group_admin(context: ContextTypes.DEFAULT_TYPE, chat_id: int, user_id: int):
     admins = await context.bot.get_chat_administrators(chat_id)

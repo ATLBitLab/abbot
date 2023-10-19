@@ -1,28 +1,36 @@
 import json
 import time
-import openai
-import tiktoken
-import traceback
-from typing import AnyStr
-from .utils import try_get
 from io import TextIOWrapper, open
 from os.path import abspath, isfile
+import traceback
+from typing import AnyStr
 
+<<<<<<< HEAD:src/lib/abbot.py
 from constants import OPENAI_MODEL
 from .logger import debug_logger, error_logger
 from bot.config import BOT_COUNT, OPENAI_API_KEY
 from bot.exceptions.abbot_exeption import try_except
+=======
+from src.lib.bot.constants import COUNT, OPENAI_MODEL
+from bot_env import OPENAI_API_KEY
+
+from .logger import debug, error
+from .utils import try_except, try_get
+
+import openai
+import tiktoken
+>>>>>>> parent of 5d8f1ba (updates):src/lib/gpt.py
 
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
 
 
 def handle_exception(fn: str, e: Exception):
-    error_logger.log(f"{fn} exception:\n{e}")
-    debug_logger.log(f"{fn} exception:\n{e}")
+    error(f"{fn} exception:\n{e}")
+    debug(f"{fn} exception:\n{e}")
     traceback.print_exc()
     tb = traceback.format_exc()
-    error_logger.log(f"{fn} traceback:\n{tb}")
-    debug_logger.log(f"{fn} traceback:\n{tb}")
+    error(f"{fn} traceback:\n{tb}")
+    debug(f"{fn} traceback:\n{tb}")
 
 
 class Config:
@@ -84,8 +92,13 @@ class Abbot(Config, Bots):
         self.config = Config(**self.config_json)
         self.started: bool = Config.started
         self.unleashed: bool = Config.unleashed
+<<<<<<< HEAD:src/lib/abbot.py
         self.count = BOT_COUNT if self.unleashed else None
         self.introduced: bool = Config.introduced
+=======
+        self.count = COUNT if self.unleashed else None
+        self.sent_intro: bool = Config.sent_intro
+>>>>>>> parent of 5d8f1ba (updates):src/lib/gpt.py
 
         self.chat_history_file_path: AnyStr @ abspath = abspath(f"src/data/chat/{context}/content/{chat_id}.jsonl")
         self.chat_history_file: TextIOWrapper = self._open_history()
@@ -201,7 +214,7 @@ class Abbot(Config, Bots):
     def unleash(self) -> bool:
         fn = "unleash:"
         Config.unleashed = True
-        self.count = BOT_COUNT
+        self.count = COUNT
         return self.unleashed
 
     def leash(self) -> bool:
@@ -287,31 +300,41 @@ class Abbot(Config, Bots):
 
     @try_except
     def chat_history_completion(self) -> str | Exception:
+<<<<<<< HEAD:src/lib/abbot.py
         fn = "chat_history_completion:"
         debug_logger.log(fn)
+=======
+        fn = "chat_history_completion =>"
+        debug(fn)
+>>>>>>> parent of 5d8f1ba (updates):src/lib/gpt.py
         chat_history_token_count = self.calculate_chat_history_tokens()
-        debug_logger.log(f"{fn} token_count={chat_history_token_count}")
+        debug(f"{fn} token_count={chat_history_token_count}")
         messages = [self.gpt_system]
-        debug_logger.log(f"{fn} messages={messages}")
+        debug(f"{fn} messages={messages}")
         messages.extend(self.chat_history)
-        debug_logger.log(f"{fn} messages={messages}")
+        debug(f"{fn} messages={messages}")
         response = openai.ChatCompletion.create(
             model=self.model,
             messages=messages,
         )
-        debug_logger.log(f"{fn} response={response}")
+        debug(f"{fn} response={response}")
         answer = try_get(response, "choices", 0, "message", "content")
-        debug_logger.log(f"{fn} answer={answer}")
+        debug(f"{fn} answer={answer}")
         response_dict = dict(role="assistant", content=answer)
-        debug_logger.log(f"{fn} answer={answer}")
-        debug_logger.log(f"{fn} chat_history[-1]={self.chat_history[-1]}")
+        debug(f"{fn} answer={answer}")
+        debug(f"{fn} chat_history[-1]={self.chat_history[-1]}")
         self.update_chat_history(response_dict)
-        debug_logger.log(f"{fn} chat_history[-1]={self.chat_history[-1]}")
+        debug(f"{fn} chat_history[-1]={self.chat_history[-1]}")
         return answer
 
     def update_abbots(self, chat_id: str | int, bot: object) -> None:
+<<<<<<< HEAD:src/lib/abbot.py
         Bots.abbots[chat_id] = bot
         debug_logger.log(f"update_abbots: chat_id={chat_id}")
+=======
+        Abbots.abbots[chat_id] = bot
+        debug(f"update_abbots => chat_id={chat_id}")
+>>>>>>> parent of 5d8f1ba (updates):src/lib/gpt.py
 
     def get_abbots(self) -> Bots.abbots:
         return Bots.abbots

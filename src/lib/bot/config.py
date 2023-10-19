@@ -30,13 +30,18 @@ PINECONE_API_KEY = env.get("PINECONE_API_KEY")
 ORG_INFO = {
     "name": "ATL BitLab",
     "slug": "atlbitlab",
-    "type": "for-profit llc",
+    "type": "for-profile llc",
     "admins": ["nonni_io", "sbddesign"],
     "description": "Atlanta's bitcoin hackerspace. Est. block #738919. Participant in the Bitcoin Hackerspace Network https://bitcoin.hackerspace.network.",
+<<<<<<< HEAD
     "chats": [{"id": -1967724028, "title": "ATL BitLab", "id": -1608254734, "title": "ATL BitLab Members"}],
     "chat_title": "ATL BitLab",
+=======
+    "chat_id": 0000000000,
+    "chat_title": "Blixt Wallet",
+>>>>>>> parent of 5d8f1ba (updates)
     "block_height": "738919",
-    "location": "Atlanta",
+    "location": "global",
     "website": "https://atlbitlab.com",
     "github": "https://github.com/atlbitlab",
     "telegram": "https://t.me/atlbitlab",
@@ -114,7 +119,11 @@ BOT_INFO = {
         ],
         "fail": ["Sorry, Abbot has been plugged back into the matrix. Try again later."],
     },
+<<<<<<< HEAD
     "intro": "Hello and welcome to Abbot (@atl_bitlab_bot). By starting Abbot, you agree to the ATL BitLab Terms & policies: https://atlbitlab.com/abbot/policies.\nThank you for using Abbot! We hope you enjoy your experience!\nWant a particular feature? Submit an issue here: https://github.com/ATLBitLab/open-abbot/issues/new?assignees=&labels=&projects=&template=feature_request.md&title=.\nFind a buy? Submit an issue here: https://github.com/ATLBitLab/open-abbot/issues/new?assignees=&labels=&projects=&template=bug_report.md&title=.\nFor questions, comments, concerns or if you want an Abbot for your telegram channel,\nvisit https://atlbitlab.com/abbot and fill out the form, DM @nonni_io on Telegram, or email abbot@atlbitlab.com.",
+=======
+    "intro": "Hello and welcome to Abbit (@blix11_bot) - a Blixt Bot for the Blixt community! \nMy goal is to provide help, information and education to you fine people here in the Blixt telegram channel. \n\nAbbit was built by @nonni_io and the team at ATL BitLab (@ATLBitLab). \n\nTo start Abbit, a channel admin must run /start or /start@blix11_bot to avoid bot confusion. \n\nBy starting Abbit, you agree to the ATL BitLab Terms & policies: https://atlbitlab.com/abbot/policies. \n\nThank you for using Abbit! We hope you enjoy your experience! \n\nWant a particular feature? Submit an issue here: https://github.com/ATLBitLab/open-abbot/issues/new?assignees=&labels=&projects=&template=feature_request.md&title=. \n\nFind a buy? Submit an issue here: https://github.com/ATLBitLab/open-abbot/issues/new?assignees=&labels=&projects=&template=bug_report.md&title=. \n\nFor questions, comments, concerns or if you want an Abbit for your telegram channel,\nvisit https://atlbitlab.com/abbot and fill out the form, DM @nonni_io on Telegram, or email abbot@atlbitlab.com.",
+>>>>>>> parent of 5d8f1ba (updates)
 }
 
 BOT_NAME = try_get(BOT_INFO, "name")
