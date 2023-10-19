@@ -1,51 +1,28 @@
 import json
 import time
-<<<<<<< Updated upstream:src/lib/gpt.py
-=======
 import openai
 import tiktoken
 import traceback
-
 from typing import AnyStr
->>>>>>> Stashed changes:src/lib/abbot.py
+from .utils import try_get
 from io import TextIOWrapper, open
 from os.path import abspath, isfile
-import traceback
-from typing import AnyStr
 
-<<<<<<< HEAD:src/lib/abbot.py
 from constants import OPENAI_MODEL
-<<<<<<< Updated upstream:src/lib/gpt.py
 from .logger import debug_logger, error_logger
 from bot.config import BOT_COUNT, OPENAI_API_KEY
 from bot.exceptions.abbot_exeption import try_except
-=======
-from src.lib.bot.constants import COUNT, OPENAI_MODEL
-from bot_env import OPENAI_API_KEY
-
-from .logger import debug, error
-from .utils import try_except, try_get
-
-import openai
-import tiktoken
->>>>>>> parent of 5d8f1ba (updates):src/lib/gpt.py
-=======
-from lib.logger import debug_logger, error_logger
-from lib.utils import try_get
-from lib.bot.config import OPENAI_API_KEY
-from lib.bot.exceptions.abbot_exception import AbbotException, try_except
->>>>>>> Stashed changes:src/lib/abbot.py
 
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
 
 
 def handle_exception(fn: str, e: Exception):
-    error(f"{fn} exception:\n{e}")
-    debug(f"{fn} exception:\n{e}")
+    error_logger.log(f"{fn} exception:\n{e}")
+    debug_logger.log(f"{fn} exception:\n{e}")
     traceback.print_exc()
     tb = traceback.format_exc()
-    error(f"{fn} traceback:\n{tb}")
-    debug(f"{fn} traceback:\n{tb}")
+    error_logger.log(f"{fn} traceback:\n{tb}")
+    debug_logger.log(f"{fn} traceback:\n{tb}")
 
 
 class Config:
@@ -115,20 +92,11 @@ class Abbot(Config, Bots):
         # handle case of new chat
         self.config_file: TextIOWrapper = open(self.config_file_path, "r+")
         self.config_json: dict = json.load(self.config_file)
-<<<<<<< Updated upstream:src/lib/gpt.py
         self.config = Config(**self.config_json)
-        self.started: bool = Config.started
-        self.unleashed: bool = Config.unleashed
-<<<<<<< HEAD:src/lib/abbot.py
-        self.count = BOT_COUNT if self.unleashed else None
-        self.introduced: bool = Config.introduced
-=======
-        self.count = COUNT if self.unleashed else None
-        self.sent_intro: bool = Config.sent_intro
->>>>>>> parent of 5d8f1ba (updates):src/lib/gpt.py
-=======
-        self.config: Config = Config(**self.config_json)
->>>>>>> Stashed changes:src/lib/abbot.py
+        self.started: bool = self.config.started
+        self.unleashed: bool = self.config.unleashed
+        self.count = self.config.count if self.unleashed else None
+        self.introduced: bool = self.config.introduced
 
         self.chat_history_file_path: AnyStr @ abspath = abspath(f"src/data/chat/{context}/content/{chat_id}.jsonl")
         self.chat_history_file: TextIOWrapper = self._open_history()
@@ -140,9 +108,10 @@ class Abbot(Config, Bots):
     def __str__(self) -> str:
         fn = "__str__:"
         abbot_str = (
-            f"Abbot(name={self.name}, handle={self.handle}, chat_id={self.chat_id}, "
-            f"unleashed={self.config.unleashed}, started={self.config.started}, introduced={self.config.introduced}, "
-            f"chat_history_tokens={self.chat_history_tokens}, chat_history_len={self.chat_history_len})"
+            f"Abbot(model={self.model}, name={self.name}, "
+            f"handle={self.handle}, unleashed={self.unleashed}, "
+            f"started={self.started}, chat_id={self.chat_id}, "
+            f"chat_history_token_length={self.chat_history_token_length})"
         )
         debug_logger.log(f"{fn} abbot_str={abbot_str}")
         return abbot_str
@@ -152,7 +121,7 @@ class Abbot(Config, Bots):
         abbot_repr = (
             f"Abbot(model={self.model}, name={self.name}, "
             f"handle={self.handle}, personality={self.personality}, "
-            f"chat_history={self.chat_history}, unleashed={self.config.unleashed}, started={self.config.started})"
+            f"chat_history={self.chat_history}, unleashed={self.unleashed}, started={self.started})"
         )
         debug_logger.log(f"{fn} abbot_repr={abbot_repr}")
         return abbot_repr
@@ -189,6 +158,11 @@ class Abbot(Config, Bots):
 
     def get_config(self) -> dict:
         return self.config.to_dict()
+
+    def get_chat_id(self) -> int:
+        fn = "get_chat_id:"
+        debug_logger.log(fn)
+        return self.chat_id
 
     def update_config(self, new_config: dict):
         self.config.update_config(new_config)
@@ -288,66 +262,16 @@ class Abbot(Config, Bots):
         debug_logger.log(f"{fn} unleashed={leashed} count={count}")
         return leashed, count
 
-    def get_chat_id(self) -> int:
-        fn = "get_chat_id:"
-        debug_logger.log(fn)
-        return self.chat_id
-
     def sleep(self, t: int) -> str:
         fn = "sleep:"
         debug_logger.log(fn)
         time.sleep(t)
         return True
 
-<<<<<<< Updated upstream:src/lib/gpt.py
-    def unleash(self) -> bool:
-        fn = "unleash:"
-        Config.unleashed = True
-        self.count = COUNT
-        return self.unleashed
-
-    def leash(self) -> bool:
-        fn = "leash:"
-        Config.unleashed = False
-        self.count = None
-        return not self.unleashed
-
-=======
->>>>>>> Stashed changes:src/lib/abbot.py
     def get_chat_history(self) -> list:
         fn = "get_chat_history:"
         debug_logger.log(fn)
         return self.chat_history
-
-    def update_chat_history(self, chat_message: dict(role=str, content=str)) -> None:
-        fn = "update_chat_history:"
-        debug_logger.log(fn)
-        if not chat_message:
-            return
-        self.chat_history.append(chat_message)
-        self.chat_history_file.write("\n" + json.dumps(chat_message))
-        self.chat_history_len += 1
-        self.chat_history_tokens += len(self.tokenize(try_get(chat_message, "content")))
-        return self.chat_history_tokens
-
-    def tokenize(self, content: str) -> list:
-        return encoding.encode(content)
-
-    def calculate_tokens(self, content: str | dict) -> int:
-        return len(self.tokenize(content))
-
-    def chat_completion(self) -> str | Exception:
-        fn = "chat_completion:"
-        debug_logger.log(fn)
-        response = openai.ChatCompletion.create(
-            model=self.model,
-            messages=self.chat_history,
-        )
-        answer = try_get(response, "choices", 0, "message", "content")
-        response_dict = dict(role="assistant", content=answer)
-        if answer:
-            self.update_chat_history(response_dict)
-        return answer
 
     def tokenize(self, content: str) -> list:
         fn = "tokenize:"
@@ -367,6 +291,17 @@ class Abbot(Config, Bots):
             content = try_get(data, "content")
             total += self.calculate_tokens(content)
         return total
+
+    def update_chat_history(self, chat_message: dict(role=str, content=str)) -> None:
+        fn = "update_chat_history:"
+        debug_logger.log(fn)
+        if not chat_message:
+            return
+        self.chat_history.append(chat_message)
+        self.chat_history_file.write("\n" + json.dumps(chat_message))
+        self.chat_history_len += 1
+        self.chat_history_tokens += len(self.tokenize(try_get(chat_message, "content")))
+        return self.chat_history_tokens
 
     @try_except
     def chat_completion(self) -> str | None:
@@ -389,56 +324,26 @@ class Abbot(Config, Bots):
 
     @try_except
     def chat_history_completion(self) -> str | Exception:
-<<<<<<< HEAD:src/lib/abbot.py
         fn = "chat_history_completion:"
         debug_logger.log(fn)
-<<<<<<< Updated upstream:src/lib/gpt.py
-=======
-        fn = "chat_history_completion =>"
-        debug(fn)
->>>>>>> parent of 5d8f1ba (updates):src/lib/gpt.py
-        chat_history_token_count = self.calculate_chat_history_tokens()
-        debug(f"{fn} token_count={chat_history_token_count}")
-        messages = [self.gpt_system]
-        debug(f"{fn} messages={messages}")
-        messages.extend(self.chat_history)
-        debug(f"{fn} messages={messages}")
-=======
         messages = [self.gpt_system]
         history = self.chat_history
         if self.chat_history_tokens > 5000:
             index = self.chat_history_len // 2
             history = history[index:]
         messages.extend(history)
->>>>>>> Stashed changes:src/lib/abbot.py
         response = openai.ChatCompletion.create(
             model=self.model,
             messages=messages,
         )
-<<<<<<< Updated upstream:src/lib/gpt.py
-        debug(f"{fn} response={response}")
-        answer = try_get(response, "choices", 0, "message", "content")
-        debug(f"{fn} answer={answer}")
-        response_dict = dict(role="assistant", content=answer)
-        debug(f"{fn} answer={answer}")
-        debug(f"{fn} chat_history[-1]={self.chat_history[-1]}")
-        self.update_chat_history(response_dict)
-        debug(f"{fn} chat_history[-1]={self.chat_history[-1]}")
-=======
         answer = try_get(response, "choices", 0, "message", "content")
         response_dict = dict(role="assistant", content=answer)
         self.update_chat_history(response_dict)
->>>>>>> Stashed changes:src/lib/abbot.py
         return answer
 
     def update_abbots(self, chat_id: str | int, bot: object) -> None:
-<<<<<<< HEAD:src/lib/abbot.py
         Bots.abbots[chat_id] = bot
         debug_logger.log(f"update_abbots: chat_id={chat_id}")
-=======
-        Abbots.abbots[chat_id] = bot
-        debug(f"update_abbots => chat_id={chat_id}")
->>>>>>> parent of 5d8f1ba (updates):src/lib/gpt.py
 
     def get_abbots(self) -> Bots.abbots:
         return Bots.abbots

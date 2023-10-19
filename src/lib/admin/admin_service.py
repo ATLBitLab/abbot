@@ -9,6 +9,9 @@ from src.lib.bot.constants import BOT_NAME, THE_CREATOR
 from lib.utils import try_get
 from lib.logger import debug_logger, error_logger
 from lib.bot.config import BOT_NAME
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 SERVICE_STATUSES = {

@@ -10,7 +10,7 @@ from telegram.ext import ContextTypes
 from lib.utils import sender_is_group_admin, try_get
 from lib.logger import debug_logger, error_logger
 from lib.admin.admin_service import AdminService
-from lib.abbot import Abbot, Bots
+from src.lib.abbot import Abbot, Bots
 from lib.bot.exceptions.abbot_exception import try_except, AbbotException
 from lib.bot.config import BOT_NAME, BOT_TELEGRAM_HANDLE, BOT_CORE_SYSTEM, ORG_CHAT_ID, ORG_CHAT_TITLE
 from lib.bot.utils import (
