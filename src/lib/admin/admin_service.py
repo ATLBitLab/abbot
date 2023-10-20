@@ -2,7 +2,7 @@ import time
 from subprocess import run, CalledProcessError
 
 from lib.utils import try_get
-from lib.bot.config import BOT_NAME
+from lib.abbot.config import BOT_NAME
 from lib.logger import debug_logger, error_logger
 
 

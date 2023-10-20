@@ -1,4 +1,3 @@
-import asyncio
 from sys import argv
 from telegram.ext.filters import BaseFilter
 from telegram.ext import (
@@ -8,38 +7,34 @@ from telegram.ext import (
 )
 from lib.logger import debug_logger
 from lib.utils import try_get
-from lib.bot.config import AbbotConfig
-from lib.bot.handlers import (
+from lib.abbot.config import AbbotConfig, AbbotEnv, setup_abbot_config
+from lib.abbot.handlers import (
     leash,
     start,
     stop,
     rules,
+    help,
     unleash,
-    admin_kill,
     admin_nap,
+    admin_kill,
     admin_plugin,
     admin_status,
     admin_unplug,
     handle_message,
 )
 
-ARGS = argv[1:]
-DEV_MODE = "-d" in ARGS or "--dev" in ARGS
-
 if __name__ == "__main__":
-    abbot_config = AbbotConfig(DEV_MODE)
-    BOT_CONFIG = abbot_config.init_config()
-    BOT_NAME = try_get(BOT_CONFIG, "BOT_NAME")
-    BOT_TELEGRAM_HANDLE = try_get(BOT_CONFIG, "BOT_TELEGRAM_HANDLE")
-    BOT_TOKEN: str = try_get(BOT_CONFIG, "BOT_TOKEN")
-    assert BOT_NAME != None, "BOT_NAME required!"
-    assert BOT_TELEGRAM_HANDLE != None, "BOT_TELEGRAM_HANDLE required!"
-    assert BOT_TOKEN != None, "BOT_TOKEN required!"
+    ARGS = argv[1:]
+    DEV_MODE = "-d" in ARGS or "--dev" in ARGS
 
-    debug_logger.log(f"Initializing {BOT_NAME} @{BOT_TELEGRAM_HANDLE}")
-    APPLICATION = ApplicationBuilder().token(BOT_TOKEN).build()
+    abbot_env_config: dict = bot_env_config.get_bot_env()
+    BOT_NAME: str = try_get(abbot_env_config, "BOT_NAME")
+    BOT_TG_HANDLE: str = try_get(abbot_env_config, "BOT_TG_HANDLE")
+    BOT_TG_TOKEN: str = try_get(abbot_env_config, "BOT_TG_TOKEN")
 
-    debug_logger.log(f"{BOT_NAME} @{BOT_TELEGRAM_HANDLE} Initialized")
+    debug_logger.log(f"Initializing {abbot_env_config} @{BOT_TG_HANDLE}")
+    APPLICATION = ApplicationBuilder().token(BOT_TG_TOKEN).build()
+    debug_logger.log(f"{BOT_NAME} @{BOT_TG_HANDLE} Initialized")
 
     _unplug_handler = CommandHandler("unplug", admin_unplug)
     _plugin_handler = CommandHandler("plugin", admin_plugin)
@@ -68,5 +63,5 @@ if __name__ == "__main__":
     message_handler = MessageHandler(BaseFilter(), handle_message)
     APPLICATION.add_handler(message_handler)
 
-    debug_logger.log(f"{BOT_NAME} @{BOT_TELEGRAM_HANDLE} Polling")
+    debug_logger.log(f"{BOT_NAME} @{BOT_TG_HANDLE} Polling")
     APPLICATION.run_polling()

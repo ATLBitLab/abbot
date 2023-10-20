@@ -1,5 +1,6 @@
 import json
 from io import open
+from sys import argv
 from os import listdir
 from os.path import abspath
 
@@ -11,9 +12,9 @@ from lib.abbot import Abbot, Bots
 from lib.admin.admin_service import AdminService
 from lib.logger import debug_logger, error_logger
 from lib.utils import sender_is_group_admin, try_get
-from lib.bot.exceptions.abbot_exception import try_except, AbbotException
-from lib.bot.config import BOT_NAME, BOT_TELEGRAM_HANDLE, BOT_CORE_SYSTEM, ORG_CHAT_ID, ORG_CHAT_TITLE
-from lib.bot.utils import (
+from src.lib.abbot.exceptions.exception import try_except, AbbotException
+from lib.abbot.config import AbbotConfig
+from lib.abbot.utils import (
     parse_chat,
     parse_chat_data,
     parse_message,
@@ -39,6 +40,15 @@ PRIVATE_CONTENT_FILE_PATH = abspath("src/data/chat/private/content")
 PRIVATE_CONFIG_FILE_PATH = abspath("src/data/chat/private/config")
 PRIVATE_CONTENT_FILES = sorted(listdir(PRIVATE_CONTENT_FILE_PATH))
 PRIVATE_CONFIG_FILES = sorted(listdir(PRIVATE_CONFIG_FILE_PATH))
+
+ARGS = argv[1:]
+DEV_MODE = "-d" in ARGS or "--dev" in ARGS
+
+bot_env_config: AbbotConfig = setup_bot_env_config(DEV_MODE)
+bot_env_info: dict = bot_env_config.get_bot_env()
+BOT_NAME = try_get(bot_env_info, "BOT_NAME")
+BOT_TG_HANDLE = try_get(bot_env_info, "BOT_TG_HANDLE")
+BOT_TG_TOKEN = try_get(bot_env_info, "BOT_TG_TOKEN")
 
 for content, config in zip(GROUP_CONTENT_FILES, GROUP_CONFIG_FILES):
     if ".jsonl" not in content or ".json" not in config:
@@ -117,20 +127,17 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # log all data for debugging
     abbot_context = "group"
+
     all_data: dict = dict(**message_data, **chat_data, **user_data)
     for k, v in all_data.items():
         debug_logger.log(f"{fn} {k}={v}")
 
+    abbot_message = dict(role="user", content=message_text)
     if is_group_chat and "test" not in BOT_TELEGRAM_HANDLE:
         debug_logger.log(f"{fn} is_group_chat={is_group_chat}")
         debug_logger.log(f"{fn} test not in BOT_TELEGRAM_HANDLE={BOT_TELEGRAM_HANDLE}")
         message_dump = json.dumps(
-            {
-                "message": {**message_data},
-                "chat": {**chat_data},
-                "user": {**user_data},
-                "abbot": {"role": "user", "content": message_text},
-            }
+            {"message": {**message_data}, "chat": {**chat_data}, "user": {**user_data}, "abbot": abbot_message}
         )
         debug_logger.log(f"{fn} message_dump={message_dump}")
         raw_messages_jsonl = open(RAW_MESSAGE_JL_FILE, "a")
@@ -178,6 +185,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_reply_from = try_get(message_reply, "from")
     replied_to_abbot = try_get(message_reply_from, "username") == handle
     if is_private_chat:
+        abbot.update_chat_history()
         debug_logger.log(f"{fn} is private, not group_in_name")
         answer = abbot.chat_history_completion()
     else:

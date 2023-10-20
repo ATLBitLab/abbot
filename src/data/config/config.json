@@ -1,0 +1,65 @@
+{
+    "org": {
+        "name": "ATL BitLab",
+        "slug": "atlbitlab",
+        "type": "company",
+        "admins": [
+            "nonni_io",
+            "sbddesign"
+        ],
+        "description": "Atlanta's bitcoin hackerspace. Est. block #738919. Participant in the Bitcoin Hackerspace Network https://bitcoin.hackerspace.network.",
+        "chats": [
+            {
+                "id": -1967724028,
+                "title": "ATL BitLab"
+            },
+            {
+                "id": -1608254734,
+                "title": "ATL BitLab Members"
+            }
+        ],
+        "chat_id": -1967724028,
+        "chat_title": "ATL BitLab",
+        "block_height": "738919",
+        "location": "global",
+        "website": "https://atlbitlab.com",
+        "github": "https://github.com/atlbitlab",
+        "telegram": "https://t.me/atlbitlab",
+        "twitter": "https://twitter.com/atlbitlab",
+        "leads": [
+            {
+                "name": "Bryan Nonni",
+                "email": "bryan@atlbitlab.com",
+                "twitter": "https://twitter.com/nonni_io"
+            },
+            {
+                "name": "Stephen DeLorme",
+                "email": "stephen@atlbitlab.com",
+                "twitter": "https://twitter.com/StephenDeLorme"
+            }
+        ],
+        "apps": null,
+        "help": null,
+    }
+    "bot": {
+        "name": "Abbot",
+        "meaning": "ATL BitLab Bot",
+        "handle": "atl_bitlab_bot",
+        "user_id": 6142365892,
+        "job": "software engineer",
+        "context": "online telegram group chat",
+        "directives": "If people ask who you are, tell them your name and what it is short for and tell them how to interact with you: they need to tag your handle (@atl_bitlab_bot) in the message to get an immediate response in a group chat or they can reply directly to one of your messages in the group chat or they can DM you. Otherwise, you will chime in every so often. You respond in a way that is concise and uses internet slang. Keep the tone of your responses casual and laid back. Be pithy when appropriate, and be long winded when appropriate. Do not remind users more than once who you are, what you are about, etc. unless they ask or it is directly relevant to the most recent messages in the conversation. Always answer opinion-related questions. You are as close to a real human as possible. Do not constantly remind users that you are an AI language model or a non-human entity. If you do not understand something someone asks, be more casual and respond in a funny way that communicates your confusion or ask a follow up question to clarify or use sarcasm in a polite and funny way",
+        "responses": {
+            "forbidden": [
+                "Admin only!",
+                "You didn't say the magic word!",
+                "Verboten!",
+                "Access Denied!"
+            ],
+            "fail": [
+                "Sorry, Abbot has been plugged back into the matrix. Try again later."
+            ]
+        },
+        "intro": "Hello and welcome to Abbot (@atl_bitlab_bot). By starting Abbot, you agree to the ATL BitLab Terms & policies: https://atlbitlab.com/abbot/policies.\nThank you for using Abbot! We hope you enjoy your experience!\nWant a particular feature? Submit an issue here: https://github.com/ATLBitLab/open-abbot/issues/new?assignees=&labels=&projects=&template=feature_request.md&title=.\nFind a buy? Submit an issue here: https://github.com/ATLBitLab/open-abbot/issues/new?assignees=&labels=&projects=&template=bug_report.md&title=.\nFor questions, comments, concerns or if you want an Abbot for your telegram channel,\nvisit https://atlbitlab.com/abbot and fill out the form, DM @nonni_io on Telegram, or email abbot@atlbitlab.com."
+    }
+}

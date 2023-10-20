@@ -1,12 +1,12 @@
 import json
-from functools import wraps
-from logging import debug
-from requests import request
-from os.path import abspath
+
 from qrcode import make
-from io import BytesIO
-from lib.logger import debug_logger, error_logger
+from os.path import abspath
+from io import BytesIO, open
+from requests import request
+
 from telegram.ext import ContextTypes
+from lib.logger import debug_logger, error_logger
 
 
 TELEGRAM_MESSAGE_FIELDS = [
@@ -112,3 +112,7 @@ async def sender_is_group_admin(context: ContextTypes.DEFAULT_TYPE, chat_id: int
     admins = await context.bot.get_chat_administrators(chat_id)
     admin_ids = [admin.user.id for admin in admins]
     return user_id in admin_ids
+
+
+def json_loader(filepath: str, mode: str = "r"):
+    return json.load(open(abspath(filepath), mode))

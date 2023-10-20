@@ -1,6 +1,7 @@
+CONFIG_JSON_FILEPATH = "data/config/config.json"
 OPENAI_MODEL = "gpt-4"
 THE_CREATOR = 1711738045
-HELP_MENU = """""Welcome to Abbot!
+HELP_MENU = """Welcome to Abbot!
 Available Commands
 1. /start
     Description: Start Abbot in your channel. Channel admin only.

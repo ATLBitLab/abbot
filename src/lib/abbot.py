@@ -10,8 +10,8 @@ from os.path import abspath, isfile
 
 from constants import OPENAI_MODEL
 from lib.logger import debug_logger, error_logger
-from lib.bot.config import OPENAI_API_KEY
-from lib.bot.exceptions.abbot_exception import AbbotException, try_except
+from lib.abbot.config import OPENAI_API_KEY
+from src.lib.abbot.exceptions.exception import AbbotException, try_except
 
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
 
