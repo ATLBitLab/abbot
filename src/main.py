@@ -6,8 +6,10 @@ from telegram.ext import (
     MessageHandler,
 )
 from lib.logger import debug_logger
-from lib.bot.config import BOT_NAME, BOT_TELEGRAM_HANDLE, BOT_TOKEN, TEST_BOT_TOKEN
+from lib.utils import try_get
+from lib.bot.config import AbbotConfig
 from lib.bot.handlers import (
+    leash,
     start,
     stop,
     rules,
@@ -24,13 +26,19 @@ ARGS = argv[1:]
 DEV_MODE = "-d" in ARGS or "--dev" in ARGS
 
 if __name__ == "__main__":
-    TOKEN = TEST_BOT_TOKEN if DEV_MODE else BOT_TOKEN
-    APPLICATION = ApplicationBuilder().token(TOKEN).build()
+    abbot_config = AbbotConfig(DEV_MODE)
+    BOT_CONFIG = abbot_config.init_config()
+    BOT_NAME = try_get(BOT_CONFIG, "BOT_NAME")
+    BOT_TELEGRAM_HANDLE = try_get(BOT_CONFIG, "BOT_TELEGRAM_HANDLE")
+    BOT_TOKEN: str = try_get(BOT_CONFIG, "BOT_TOKEN")
+    assert BOT_NAME != None, "BOT_NAME required!"
+    assert BOT_TELEGRAM_HANDLE != None, "BOT_TELEGRAM_HANDLE required!"
+    assert BOT_TOKEN != None, "BOT_TOKEN required!"
 
-    BOT_NAME = f"t{BOT_NAME}" if DEV_MODE else BOT_NAME
-    BOT_HANDLE = f"test_{BOT_TELEGRAM_HANDLE}" if DEV_MODE else BOT_TELEGRAM_HANDLE
+    debug_logger.log(f"Initializing {BOT_NAME} @{BOT_TELEGRAM_HANDLE}")
+    APPLICATION = ApplicationBuilder().token(BOT_TOKEN).build()
 
-    debug_logger.log(f"{BOT_NAME} @{BOT_HANDLE} Initialized")
+    debug_logger.log(f"{BOT_NAME} @{BOT_TELEGRAM_HANDLE} Initialized")
 
     _unplug_handler = CommandHandler("unplug", admin_unplug)
     _plugin_handler = CommandHandler("plugin", admin_plugin)
@@ -48,14 +56,16 @@ if __name__ == "__main__":
     start_handler = CommandHandler("start", start)
     stop_handler = CommandHandler("stop", stop)
     unleash_handler = CommandHandler("unleash", unleash)
+    leash_handler = CommandHandler("leash", leash)
     APPLICATION.add_handler(help_handler)
     APPLICATION.add_handler(rules_handler)
     APPLICATION.add_handler(start_handler)
     APPLICATION.add_handler(stop_handler)
     APPLICATION.add_handler(unleash_handler)
+    APPLICATION.add_handler(leash_handler)
 
     message_handler = MessageHandler(BaseFilter(), handle_message)
     APPLICATION.add_handler(message_handler)
 
-    debug_logger.log(f"{BOT_NAME} @{BOT_HANDLE} Polling")
+    debug_logger.log(f"{BOT_NAME} @{BOT_TELEGRAM_HANDLE} Polling")
     APPLICATION.run_polling()

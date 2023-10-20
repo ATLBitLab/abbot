@@ -9,9 +9,9 @@ from io import TextIOWrapper, open
 from os.path import abspath, isfile
 
 from constants import OPENAI_MODEL
-from .logger import debug_logger, error_logger
-from bot.config import BOT_COUNT, OPENAI_API_KEY
-from bot.exceptions.abbot_exeption import try_except
+from lib.logger import debug_logger, error_logger
+from lib.bot.config import OPENAI_API_KEY
+from lib.bot.exceptions.abbot_exception import AbbotException, try_except
 
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
 
@@ -42,18 +42,19 @@ class Config:
         return self.__dict__
 
     def update_config(self, data: dict):
-        self.__dict__.update(data)
-        return self.__dict__
+        config_dict = self.to_dict()
+        config_dict.update(data)
 
 
 class Bots:
+    cl: str = "Bots:"
     abbots: dict = dict()
 
     def __init__(self, bots: list):
         for bot in bots:
             name = try_get(bot, "chat_id")
             self.abbots[name] = bot
-        print("gpt: Bots: self.abbots", self.abbots.keys())
+        print("gpt: Bots: self.abbots", self.abbots)
 
     def __str__(self) -> str:
         _str_ = f"\nAbbots(abbots="
@@ -69,6 +70,11 @@ class Bots:
 
     def to_dict(self) -> dict:
         return self.__dict__
+
+    def update_abbots(self, chat_id: str | int, bot: object) -> None:
+        fn: str = "update_abbots:"
+        self.abbots[chat_id] = bot
+        debug_logger.log(f"{self.cl} {fn} update_abbots: chat_id={chat_id}")
 
 
 class Abbot(Config, Bots):
@@ -90,13 +96,13 @@ class Abbot(Config, Bots):
 
         self.config_file_path: AnyStr @ abspath = abspath(f"src/data/chat/{context}/config/{chat_id}.json")
         # handle case of new chat
-        self.config_file: TextIOWrapper = open(self.config_file_path, "r+")
+        self.config_file: TextIOWrapper = self._open_config()
         self.config_json: dict = json.load(self.config_file)
         self.config = Config(**self.config_json)
-        self.started: bool = self.config.started
-        self.unleashed: bool = self.config.unleashed
-        self.count = self.config.count if self.unleashed else None
-        self.introduced: bool = self.config.introduced
+        # self.started: bool = self.config.started
+        # self.introduced: bool = self.config.introduced
+        # self.unleashed: bool = self.config.unleashed
+        # self.count: int | None = self.config.count if self.config.unleashed else None
 
         self.chat_history_file_path: AnyStr @ abspath = abspath(f"src/data/chat/{context}/content/{chat_id}.jsonl")
         self.chat_history_file: TextIOWrapper = self._open_history()
@@ -108,10 +114,8 @@ class Abbot(Config, Bots):
     def __str__(self) -> str:
         fn = "__str__:"
         abbot_str = (
-            f"Abbot(model={self.model}, name={self.name}, "
-            f"handle={self.handle}, unleashed={self.unleashed}, "
-            f"started={self.started}, chat_id={self.chat_id}, "
-            f"chat_history_token_length={self.chat_history_token_length})"
+            f"Abbot(model={self.model}, name={self.name}, handle={self.handle}, chat_id={self.chat_id}, chat_history_tokens={self.chat_history_tokens}"
+            f"started={self.config.started}, unleashed={self.config.unleashed}, )"
         )
         debug_logger.log(f"{fn} abbot_str={abbot_str}")
         return abbot_str
@@ -119,9 +123,10 @@ class Abbot(Config, Bots):
     def __repr__(self) -> str:
         fn = "__repr__:"
         abbot_repr = (
-            f"Abbot(model={self.model}, name={self.name}, "
+            f"Abbot(chat_id={self.chat_id}, name={self.name}, "
             f"handle={self.handle}, personality={self.personality}, "
-            f"chat_history={self.chat_history}, unleashed={self.unleashed}, started={self.started})"
+            f"chat_history_len={self.chat_history_len}, chat_history_tokens={self.chat_history_tokens}"
+            f"self.config={self.config})"
         )
         debug_logger.log(f"{fn} abbot_repr={abbot_repr}")
         return abbot_repr
@@ -142,6 +147,23 @@ class Abbot(Config, Bots):
             return self._create_history()
         return open(self.chat_history_file_path, "a+")
 
+    def _create_config(self) -> TextIOWrapper:
+        fn = "_create_config:"
+        new_chat_config_file = open(self.config_file_path, "w+")
+        debug_logger.log(f"{fn} at {self.config_file_path}")
+        config = dict(started=False, unleashed=False, introduced=False, count=None)
+        json.dump(config, new_chat_config_file)
+        new_chat_config_file.close()
+        return open(self.config_file_path, "r+")
+
+    def _open_config(self) -> TextIOWrapper:
+        fn = "_open_config:"
+        debug_logger.log(f"{fn} at {self.config_file_path}")
+        debug_logger.log(f"isfile(self.config_file_path)={isfile(self.config_file_path)}")
+        if not isfile(self.config_file_path):
+            return self._create_config()
+        return open(self.config_file_path, "r+")
+
     def _inflate_history(self) -> list:
         fn = "_inflate_history:"
         debug_logger.log(f"{fn} at {self.chat_history_file_path}")
@@ -153,77 +175,37 @@ class Abbot(Config, Bots):
                 continue
             chat_history.append(json.loads(message))
         self.chat_history_file.seek(self.chat_history_file_cursor)
-        debug_logger.log(f"{fn} chat_history={chat_history}")
+        debug_logger.log(f"{fn} chat_history={try_get(chat_history, 0)}")
         return chat_history
 
     def get_config(self) -> dict:
         return self.config.to_dict()
 
+    def update_config(self, new_config: dict):
+        fn = "update_config:"
+        debug_logger.log(f"{fn} chat_id={self.chat_id}")
+        self.config.update_config(new_config)
+        self.config_file.seek(0)
+        self.config_file.write(json.dumps(self.config.to_dict()))
+        self.config_file.truncate()
+
     def get_chat_id(self) -> int:
         fn = "get_chat_id:"
-        debug_logger.log(fn)
+        debug_logger.log(f"{fn} chat_id={self.chat_id}")
         return self.chat_id
-
-    def update_config(self, new_config: dict):
-        self.config.update_config(new_config)
-        json.dump(self.config, self.config_file)
 
     def start(self) -> bool:
         fn = "start:"
-        if started:
-            debug_logger.log(f"{fn} already started!")
-        self.update_config(dict(started=True))
-        debug_logger.log(f"{fn} Config.started={Config.started}")
+        self.update_config(dict(started=True, introduced=True))
         started = self.config.started
-        debug_logger.log(f"{fn} started={started}")
-        return started
+        introduced = self.config.introduced
+        debug_logger.log(f"{fn} started={started} introduced={introduced}")
 
     def stop(self) -> bool:
         fn = "stop:"
-        started = self.config.started
-        if not started:
-            debug_logger.log(f"{fn} not started!")
         self.update_config(dict(started=False))
-        debug_logger.log(f"{fn} Config.started={Config.started}")
-        stopped = self.config.started
+        stopped = not self.config.started
         debug_logger.log(f"{fn} stopped={stopped}")
-        return stopped
-
-    def introduce(self) -> bool:
-        fn = "introduce:"
-        self.update_config(dict(introduced=True))
-        debug_logger.log(f"{fn} Config.introduced={Config.introduced}")
-        introduced = self.config.introduced
-        debug_logger.log(f"{fn} introduced={introduced}")
-        return self.introduced
-
-    def forget(self) -> bool:
-        fn = "forget:"
-        started = self.config.started
-        if not started:
-            debug_logger.log(f"{fn} not started!")
-            return
-        self.update_config(dict(introduced=False))
-        debug_logger.log(f"{fn} Config.introduced={Config.introduced}")
-        introduced = self.introduced
-        debug_logger.log(f"{fn} introduced={introduced}")
-        return introduced
-
-    def unleash(self, count: int) -> bool:
-        fn = "unleash:"
-        self.update_config(dict(unleashed=True, count=count))
-        unleashed = self.config.unleashed
-        self.config.count = count
-        debug_logger.log(f"{fn} unleashed={unleashed} count={count}")
-        return unleashed
-
-    def leash(self) -> bool:
-        fn = "leash:"
-        self.update_config(dict(unleashed=False, count=None))
-        unleashed = self.config.unleashed
-        count = self.config.count
-        debug_logger.log(f"{fn} unleashed={unleashed} count={count}")
-        return unleashed
 
     def is_started(self) -> bool:
         fn = "is_started:"
@@ -232,10 +214,20 @@ class Abbot(Config, Bots):
         return started
 
     def is_stopped(self) -> bool:
-        fn = "is_stopped:"
+        fn = "is_not_started:"
         stopped = not self.is_started()
         debug_logger.log(f"{fn} {stopped}")
         return stopped
+
+    def introduce(self) -> bool:
+        fn = "introduce:"
+        self.update_config(dict(introduced=True))
+        debug_logger.log(f"{fn} introduced={self.config.introduced}")
+
+    def forget(self) -> bool:
+        fn = "forget:"
+        self.update_config(dict(introduced=False))
+        debug_logger.log(f"{fn} forgotten={not self.config.introduced}")
 
     def is_introduced(self) -> bool:
         fn = "is_introduced:"
@@ -244,10 +236,24 @@ class Abbot(Config, Bots):
         return introduced
 
     def is_forgotten(self) -> bool:
-        fn = "is_introduced:"
+        fn = "is_forgotten:"
         forgotten = not self.is_introduced()
         debug_logger.log(f"{fn} {forgotten}")
         return forgotten
+
+    def unleash(self, count: int) -> bool:
+        fn = "unleash:"
+        self.update_config(dict(unleashed=True, count=count))
+        unleashed = self.config.unleashed
+        self.config.count = count
+        debug_logger.log(f"{fn} unleashed={unleashed} count={count}")
+
+    def leash(self) -> bool:
+        fn = "leash:"
+        self.update_config(dict(unleashed=False, count=None))
+        leashed = not self.config.unleashed
+        count = self.config.count
+        debug_logger.log(f"{fn} leashed={leashed} count={count}")
 
     def is_unleashed(self) -> bool:
         fn = "is_unleashed:"
@@ -258,9 +264,9 @@ class Abbot(Config, Bots):
 
     def is_leashed(self) -> bool:
         fn = "is_leashed:"
-        leashed, count = not self.is_unleashed()
-        debug_logger.log(f"{fn} unleashed={leashed} count={count}")
-        return leashed, count
+        unleashed, count = self.is_unleashed()
+        debug_logger.log(f"{fn} unleashed={unleashed} count={count}")
+        return not unleashed, count
 
     def sleep(self, t: int) -> str:
         fn = "sleep:"
@@ -274,22 +280,18 @@ class Abbot(Config, Bots):
         return self.chat_history
 
     def tokenize(self, content: str) -> list:
-        fn = "tokenize:"
-        debug_logger.log(fn)
         return encoding.encode(content)
 
     def calculate_tokens(self, content: str | dict) -> int:
-        fn = "calculate_tokens:"
-        debug_logger.log(fn)
         return len(self.tokenize(content))
 
     def calculate_chat_history_tokens(self) -> int:
         fn = "calculate_chat_history_tokens:"
-        debug_logger.log(fn)
         total = 0
         for data in self.chat_history:
             content = try_get(data, "content")
             total += self.calculate_tokens(content)
+        debug_logger.log(f"{fn} {self.name} token_count={total}")
         return total
 
     def update_chat_history(self, chat_message: dict(role=str, content=str)) -> None:
