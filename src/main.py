@@ -1,6 +1,4 @@
-import asyncio
 from sys import argv
-from lib.nostr.nostr import Nostr
 
 ARGS = argv[1:]
 CLEAN = "-c" in ARGS or "--clean" in ARGS
@@ -120,9 +118,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         mpy.write("\n")
         mpy.close()
 
-        message: Message = try_get(update, "message") or try_get(
-            update, "effective_message"
-        )
+        message: Message = try_get(update, "message") or try_get(update, "effective_message")
         chat: Chat = try_get(message, "chat") or try_get(update, "effective_chat")
         if not message:
             debug(f"handle_message => Missing Message: {message}")
@@ -174,9 +170,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         which_abbot: GPT = try_get(ABBOTS, chat_id)
         if not which_abbot:
             which_bot_name = f"{bot_context}{BOT_NAME}{chat_id}"
-            which_abbot = GPT(
-                which_bot_name, BOT_HANDLE, ATL_BITCOINER, bot_context, chat_id
-            )
+            which_abbot = GPT(which_bot_name, BOT_HANDLE, ATL_BITCOINER, bot_context, chat_id)
 
         which_abbot_started = try_get(which_abbot, "started") == True
         which_name = try_get(which_abbot, "name")
@@ -291,9 +285,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
         debug(f"handle_message => Error={exception}, ErrorMessage={error_msg}")
         debug(f"handle_message => which_abbot={which_abbot} status={status}")
-        await context.bot.send_message(
-            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
-        )
+        await context.bot.send_message(chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}")
 
 
 def clean_data():
@@ -310,12 +302,8 @@ def clean_data():
                     obj = json.loads(obj)
                 except Exception as exception:
                     cause, traceback, args = deconstruct_error(exception)
-                    exception_msg = (
-                        f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
-                    )
-                    debug(
-                        f"clean_data => Exception={exception}, ExceptionMessage={exception_msg}"
-                    )
+                    exception_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
+                    debug(f"clean_data => Exception={exception}, ExceptionMessage={exception_msg}")
                     continue
                 if obj_hash not in seen:
                     seen.add(obj_hash)
@@ -350,13 +338,9 @@ def clean_data():
                             "date",
                         )
                     elif plus_in_date:
-                        obj = try_set(
-                            obj, obj_date.replace("+", " ").split(" ")[0], "date"
-                        )
+                        obj = try_set(obj, obj_date.replace("+", " ").split(" ")[0], "date")
                     elif t_in_date:
-                        obj = try_set(
-                            obj, obj_date.replace("T", " ").split(" ")[0], "date"
-                        )
+                        obj = try_set(obj, obj_date.replace("T", " ").split(" ")[0], "date")
 
                     outfile.write(json.dumps(obj))
                     outfile.write("\n")
@@ -374,11 +358,7 @@ def rand_num():
 
 async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE, both: bool = False):
     try:
-        message = (
-            try_get(update, "message")
-            or try_get(update, "effective_message")
-            or update.message
-        )
+        message = try_get(update, "message") or try_get(update, "effective_message") or update.message
         sender = try_get(message, "from_user", "username")
         debug(f"clean => /clean executed by {sender}")
         if not message or not sender:
@@ -393,19 +373,13 @@ async def clean(update: Update, context: ContextTypes.DEFAULT_TYPE, both: bool =
             cause, traceback, args = deconstruct_error(exception)
             error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}\n"
             debug(f"clean => Error={exception}, ErrorMessage={error_msg}")
-            await context.bot.send_message(
-                chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
-            )
+            await context.bot.send_message(chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}")
         raise exception
 
 
 async def both(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        message = (
-            try_get(update, "message")
-            or try_get(update, "effective_message")
-            or update.message
-        )
+        message = try_get(update, "message") or try_get(update, "effective_message") or update.message
         await message.reply_text("Cleaning ... please wait")
         await clean(update, context, both=True)
         await message.reply_text("Cleaning done!")
@@ -416,9 +390,7 @@ async def both(update: Update, context: ContextTypes.DEFAULT_TYPE):
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
         debug(f"both => Error={exception}, ErrorMessage={error_msg}")
-        await context.bot.send_message(
-            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
-        )
+        await context.bot.send_message(chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}")
         raise exception
 
 
@@ -468,9 +440,7 @@ def summarize_messages(chat, days=None):
         raise exception
 
 
-async def summary(
-    update: Update, context: ContextTypes.DEFAULT_TYPE, both: bool = False
-):
+async def summary(update: Update, context: ContextTypes.DEFAULT_TYPE, both: bool = False):
     try:
         message = update.effective_message
         sender = message.from_user.username
@@ -513,9 +483,7 @@ async def summary(
             cause, traceback, args = deconstruct_error(exception)
             error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
             debug(f"summary => Error={exception}, ErrorMessage={error_msg}")
-            await context.bot.send_message(
-                chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
-            )
+            await context.bot.send_message(chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}")
         raise exception
 
 
@@ -524,9 +492,7 @@ async def abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         sender = update.effective_message.from_user.username
         message = update.effective_message
         debug(f"abbot => /prompt executed => sender={sender} message={message}")
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id, text="Working on your request"
-        )
+        await context.bot.send_message(chat_id=update.effective_chat.id, text="Working on your request")
         args = context.args
         debug(f"abbot => args: {args}")
         if len(args) <= 0:
@@ -572,9 +538,7 @@ async def abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         PROMPT_ABBOT.update_message_content(prompt)
         answer = PROMPT_ABBOT.chat_completion()
-        await context.bot.send_message(
-            chat_id=update.effective_chat.id, text=f"{answer}"
-        )
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=f"{answer}")
         debug(f"abbot => Answer: {answer}")
     except Exception as error:
         debug(f"abbot => /prompt Error: {error}")
@@ -583,9 +547,7 @@ async def abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        message: Message = try_get(update, "message") or try_get(
-            update, "effective_message"
-        )
+        message: Message = try_get(update, "message") or try_get(update, "effective_message")
         sender = try_get(message, "from_user", "username")
         message_text = try_get(message, "text")
         chat: Chat = try_get(update, "effective_chat") or try_get(message, "chat")
@@ -606,9 +568,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
         error(f"help => Error={exception}, ErrorMessage={error_msg}")
-        await context.bot.send_message(
-            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
-        )
+        await context.bot.send_message(chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}")
         raise exception
 
 
@@ -618,9 +578,7 @@ def deconstruct_error(error):
 
 async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        message: Message = try_get(update, "message") or try_get(
-            update, "effective_message"
-        )
+        message: Message = try_get(update, "message") or try_get(update, "effective_message")
         chat: Chat = try_get(update, "effective_chat") or try_get(message, "chat")
         user: User = try_get(message, "from_user")
         if not user:
@@ -683,20 +641,14 @@ async def abbot_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
         error(f"abbot_status => Error={exception}, ErrorMessage={error_msg}")
-        await context.bot.send_message(
-            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
-        )
+        await context.bot.send_message(chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}")
         raise exception
 
 
 async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         args = try_get(context, "args")
-        message: Message = (
-            try_get(update, "message")
-            or try_get(update, "effective_message")
-            or update.message
-        )
+        message: Message = try_get(update, "message") or try_get(update, "effective_message") or update.message
         message_text = try_get(message, "text")
         chat = try_get(update, "effective_chat") or try_get(message, "chat")
         chat_type = try_get(chat, "type")
@@ -721,9 +673,7 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         bot_status = try_get(args, 0, default="False").capitalize()
         debug(f"unleash_the_abbot => bot_status={bot_status}")
         if bot_status not in UNLEASH_LEASH:
-            return await message.reply_text(
-                f"Bad arg: expecting one of {UNLEASH_LEASH}"
-            )
+            return await message.reply_text(f"Bad arg: expecting one of {UNLEASH_LEASH}")
         if private_chat:
             bot_context = "private"
         elif is_group_chat:
@@ -759,23 +709,17 @@ async def unleash_the_abbot(update: Update, context: ContextTypes.DEFAULT_TYPE):
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
         error(f"abbot_status => Error={exception}, ErrorMessage={error_msg}")
-        await context.bot.send_message(
-            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
-        )
+        await context.bot.send_message(chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}")
         raise exception
 
 
 async def abbot_rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
-        message: Message = try_get(update, "message") or try_get(
-            update, "effective_message"
-        )
+        message: Message = try_get(update, "message") or try_get(update, "effective_message")
         chat = try_get(update, "effective_chat") or try_get(message, "chat")
         chat_id = try_get(chat, "id")
         sender = try_get(message, "from_user", "username")
-        debug(
-            f"abbot_rules => /rules executed by {sender} - chat={chat} chat_id={chat_id}"
-        )
+        debug(f"abbot_rules => /rules executed by {sender} - chat={chat} chat_id={chat_id}")
         await message.reply_text(
             "Hey! The name's Abbot but you can think of me as your go-to guide for all things Bitcoin. AKA the virtual Bitcoin whisperer. 😉\n\n"
             "Here's the lowdown on how to get my attention: \n\n"
@@ -789,18 +733,14 @@ async def abbot_rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
         error(f"abbot_status => Error={exception}, ErrorMessage={error_msg}")
-        await context.bot.send_message(
-            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
-        )
+        await context.bot.send_message(chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}")
         raise exception
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         debug(f"start => Raw update={update}")
-        message: Message = try_get(update, "message") or try_get(
-            update, "effective_message"
-        )
+        message: Message = try_get(update, "message") or try_get(update, "effective_message")
         chat: Chat = try_get(message, "chat") or try_get(update, "effective_chat")
         user: User = try_get(message, "from_user")
         if not message:
@@ -864,9 +804,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         if not which_abbot:
             debug(f"start => No abbot! Which Abbot: {which_abbot}")
-            return await message.reply_text(
-                f"/start failed ... please try again later or contact @nonni_io"
-            )
+            return await message.reply_text(f"/start failed ... please try again later or contact @nonni_io")
         which_name = which_abbot.name
         which_handle = which_abbot.handle
         which_history_len = len(which_abbot.chat_history)
@@ -880,34 +818,26 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         which_abbot.update_abbots(chat_id, which_abbot)
         opt_in(OPTINOUT_FILEPATH, bot_context, chat_id, True)
         error_msg = f"Please try again later or contact @nonni_io"
-        await message.reply_text(
-            f"Please wait while we unplug {BOT_NAME} from the Matrix"
-        )
+        await message.reply_text(f"Please wait while we unplug {BOT_NAME} from the Matrix")
         response = which_abbot.chat_history_completion()
         if not response:
             status = which_abbot.leash()
             response = f"{which_abbot.name} leashed={status} ⛔️! {error_msg}."
-            return await context.bot.send_message(
-                chat_id=THE_CREATOR, text=f"status={status} response={response}"
-            )
+            return await context.bot.send_message(chat_id=THE_CREATOR, text=f"status={status} response={response}")
         await message.reply_text(response)
     except Exception as exception:
         error(f"start => Raw exception={exception}")
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
         error(f"start => Error={exception}, ErrorMessage={error_msg}")
-        await context.bot.send_message(
-            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
-        )
+        await context.bot.send_message(chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}")
         raise exception
 
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         debug(f"stop => Raw update={update}")
-        message: Message = try_get(update, "message") or try_get(
-            update, "effective_message"
-        )
+        message: Message = try_get(update, "message") or try_get(update, "effective_message")
         chat: Chat = try_get(message, "chat") or try_get(update, "effective_chat")
         user: User = try_get(message, "from_user")
         if not message:
@@ -968,25 +898,17 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         running = which_abbot.stop()
         if running:
-            err_msg = (
-                f"stop => not stopped! which_abbot={which_abbot}, running={running}"
-            )
+            err_msg = f"stop => not stopped! which_abbot={which_abbot}, running={running}"
             error(err_msg)
-            await message.reply_text(
-                "/stop failed! Something went wrong. Please try again later or contact @nonni_io"
-            )
+            await message.reply_text("/stop failed! Something went wrong. Please try again later or contact @nonni_io")
             return await context.bot.send_message(chat_id=THE_CREATOR, text=err_msg)
         opt_out(OPTINOUT_FILEPATH, bot_context, chat_id, False)
-        await message.reply_text(
-            f"Thanks for using {BOT_NAME}. Use /start to restart at any time."
-        )
+        await message.reply_text(f"Thanks for using {BOT_NAME}. Use /start to restart at any time.")
     except Exception as exception:
         cause, traceback, args = deconstruct_error(exception)
         error_msg = f"args={args}\n" f"cause={cause}\n" f"traceback={traceback}"
         error(f"stop => Error={exception}, ErrorMessage={error_msg}")
-        await context.bot.send_message(
-            chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}"
-        )
+        await context.bot.send_message(chat_id=THE_CREATOR, text=f"Error={exception} ErrorMessage={error_msg}")
         raise exception
 
 
