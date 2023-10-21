@@ -38,14 +38,12 @@ class AbbotFilters:
             authors: Optional[List[str]] = None
         """
 
-    e
-
 
 class AbbotNostr:
     relay_manager = RelayManager(timeout=6)
     notices = []
     events = []
-    # filters = FiltersList([Filters(kinds=[EventKind.TEXT_NOTE], limit=100)])
+    filters = FiltersList([Filters(kinds=[CHANNEL_MESSAGE], limit=100)])
     # filters = FiltersList([Filters(authors=[private_key.public_key.hex()], limit=100)])
     filters_list = []  # FiltersList()
     filters = kinds = [DM, CHANNEL_CREATE, CHANNEL_MESSAGE]  # Filters()
