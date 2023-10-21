@@ -54,7 +54,6 @@ class AbbotNostr:
         self.private_key = PrivateKey(unhexlify(sec_key))
         self.private_key_hex = self.private_key.hex()
         self.public_key = self.private_key.public_key
-        self.filters = filters
 
     def subscribe_to_relays(self):
         for relay in RELAYS:
