@@ -7,6 +7,7 @@ from pynostr.event import EventKind
 from pynostr.encrypted_dm import EncryptedDirectMessage
 from pynostr.event import Event
 from typing import List, Optional
+from dotenv import load_dotenv
 
 DM = EventKind.ENCRYPTED_DIRECT_MESSAGE  # 4
 CHANNEL_CREATE = EventKind.CHANNEL_CREATE  # 40
@@ -60,6 +61,8 @@ class AbbotNostr:
         self.private_key = PrivateKey.from_hex(sec_key)
         self.public_key = self.private_key.public_key
         self.author_whitelist = author_whitelist
+        self.filters = filters
+        # self.filters = filters
 
     def add_relays_subscribe_and_run(self):
         for relay in RELAYS:
@@ -110,6 +113,14 @@ class AbbotNostr:
         event.sign(self.private_key.hex())
         print(event)
         self.publish_event(event)
+
+    def decrypt_dm(self, public_key_hex: str, private_key_hex: str, encrypted_content: str, event_id: str):
+        dm = EncryptedDirectMessage(
+            recipient_pubkey=public_key_hex,
+            encrypted_message=encrypted_content,
+            reference_event_id=event_id)
+        plaintext_content = dm.decrypt(private_key_hex=private_key_hex, encrypted_message=encrypted_content, public_key_hex=public_key_hex)
+        return plaintext_content
 
     def publish_event(self, event):
         self.relay_manager.publish_event(event)
