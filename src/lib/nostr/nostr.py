@@ -11,6 +11,8 @@ from pynostr.event import EventKind
 from pynostr.encrypted_dm import EncryptedDirectMessage
 from pynostr.event import Event
 
+from dotenv import load_dotenv
+
 DM = EventKind.ENCRYPTED_DIRECT_MESSAGE  # 4
 CHANNEL_CREATE = EventKind.CHANNEL_CREATE  # 40
 CHANNEL_META = EventKind.CHANNEL_META  # 41
@@ -54,13 +56,14 @@ class AbbotNostr:
         self.private_key = PrivateKey(unhexlify(sec_key))
         self.private_key_hex = self.private_key.hex()
         self.public_key = self.private_key.public_key
-        self.filters = filters
+        # self.filters = filters
 
     def add_relays_subscribe_and_run(self):
         for relay in RELAYS:
             self.relay_manager.add_relay(relay)
         subscription_id = uuid.uuid1().hex
-        self.relay_manager.add_subscription_on_all_relays(subscription_id, self.filters)
+        self.relay_manager.add_subscription_on_all_relays(
+            subscription_id, self.filters)
         self.relay_manager.run_sync()
 
     def get_message_pool(self):
@@ -107,16 +110,20 @@ if __name__ == "__main__":
     # print("pool", pool)
     # print("notices", notices)
     # print("events", events)
-    abbot_nostr = AbbotNostr(os.environ["ABBOT_SEC"])
+
+    load_dotenv()
+    # print(os.environ["BOT_NOSTR_SK"])
+    abbot_nostr = AbbotNostr(os.environ["BOT_NOSTR_SK"])
     relay_manager = RelayManager(timeout=6)
     relay_manager.add_relay("wss://relay.damus.io")
     private_key = abbot_nostr.private_key
     private_key_hex = private_key.hex()
-    filters = FiltersList([Filters(authors=[private_key.public_key.hex()], limit=100)])
+    filters = FiltersList(
+        [Filters(authors=[private_key.public_key.hex()], limit=100)])
     subscription_id = uuid.uuid1().hex
     relay_manager.add_subscription_on_all_relays(subscription_id, filters)
     dm_event: Event = abbot_nostr.create_dm_event(
-        "Secret message2! Hello world!", "9ddf6fe3a194d330a6c6e278a432ae1309e52cc08587254b337d0f491f7ff642"
+        "Secret message2! Hello world!", "96ceb617eb41bfc4c45d383fe9c9d8e729cb24b71cd947faa234e22a23e59bfa"
     )
     dm_event.sign(private_key_hex)
     relay_manager.publish_event(dm_event)
