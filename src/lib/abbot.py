@@ -93,16 +93,10 @@ class Abbot(Config, Bots):
         self.personality: str = personality
         self.gpt_system: dict = dict(role="system", content=personality)
         self.chat_id: str = chat_id
-
         self.config_file_path: AnyStr @ abspath = abspath(f"src/data/chat/{context}/config/{chat_id}.json")
-        # handle case of new chat
         self.config_file: TextIOWrapper = self._open_config()
         self.config_json: dict = json.load(self.config_file)
         self.config = Config(**self.config_json)
-        # self.started: bool = self.config.started
-        # self.introduced: bool = self.config.introduced
-        # self.unleashed: bool = self.config.unleashed
-        # self.count: int | None = self.config.count if self.config.unleashed else None
 
         self.chat_history_file_path: AnyStr @ abspath = abspath(f"src/data/chat/{context}/content/{chat_id}.jsonl")
         self.chat_history_file: TextIOWrapper = self._open_history()
@@ -300,10 +294,9 @@ class Abbot(Config, Bots):
         if not chat_message:
             return
         self.chat_history.append(chat_message)
-        self.chat_history_file.write("\n" + json.dumps(chat_message))
+        # self.chat_history_file.write("\n" + json.dumps(chat_message))
         self.chat_history_len += 1
         self.chat_history_tokens += len(self.tokenize(try_get(chat_message, "content")))
-        return self.chat_history_tokens
 
     @try_except
     def chat_completion(self) -> str | None:
@@ -334,10 +327,8 @@ class Abbot(Config, Bots):
             index = self.chat_history_len // 2
             history = history[index:]
         messages.extend(history)
-        response = openai.ChatCompletion.create(
-            model=self.model,
-            messages=messages,
-        )
+        answer = abbot_api.
+        answer = requests.
         answer = try_get(response, "choices", 0, "message", "content")
         response_dict = dict(role="assistant", content=answer)
         self.update_chat_history(response_dict)

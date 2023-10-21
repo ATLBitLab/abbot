@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import asyncio
 from sys import argv
 from telegram.ext.filters import BaseFilter
@@ -22,11 +23,15 @@ from lib.bot.handlers import (
     admin_unplug,
     handle_message,
 )
+=======
+from . import abbot_telegram
+>>>>>>> Stashed changes
 
 ARGS = argv[1:]
 DEV_MODE = "-d" in ARGS or "--dev" in ARGS
 
 if __name__ == "__main__":
+<<<<<<< Updated upstream
     abbot_config = AbbotConfig(DEV_MODE)
     BOT_CONFIG = abbot_config.init_config()
     BOT_NAME = try_get(BOT_CONFIG, "BOT_NAME")
@@ -70,3 +75,9 @@ if __name__ == "__main__":
 
     debug_logger.log(f"{BOT_NAME} @{BOT_TELEGRAM_HANDLE} Polling")
     APPLICATION.run_polling()
+=======
+    # T0 - need to async thread this
+    abbot_api.run()  # T0 - thread0
+    abbot_nostr.run()  # T1 - thread1
+    abbot_telegram.run()  # T2 - thread2
+>>>>>>> Stashed changes
