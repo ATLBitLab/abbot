@@ -1,8 +1,8 @@
 import time
+from lib.abbot.config import BOT_NAME
 from subprocess import run, CalledProcessError
 
 from lib.utils import try_get
-from lib.abbot.config import BOT_NAME
 from lib.logger import debug_logger, error_logger
 
 

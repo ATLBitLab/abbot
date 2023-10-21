@@ -39,8 +39,8 @@
             }
         ],
         "apps": null,
-        "help": null,
-    }
+        "help": null
+    },
     "bot": {
         "name": "Abbot",
         "meaning": "ATL BitLab Bot",

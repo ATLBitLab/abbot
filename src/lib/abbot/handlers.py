@@ -4,16 +4,21 @@ from sys import argv
 from os import listdir
 from os.path import abspath
 
+ARGS = argv[1:]
+DEV_MODE = "-d" in ARGS or "--dev" in ARGS
+print("handlers", DEV_MODE)
+
 from telegram import Update, Message, Chat, User
 from telegram.ext import ContextTypes
 
 from constants import HELP_MENU, THE_CREATOR
-from lib.abbot import Abbot, Bots
+
 from lib.admin.admin_service import AdminService
+from lib.abbot.bot import Abbot, Bots
 from lib.logger import debug_logger, error_logger
 from lib.utils import sender_is_group_admin, try_get
-from src.lib.abbot.exceptions.exception import try_except, AbbotException
-from lib.abbot.config import AbbotConfig
+from lib.abbot.exceptions.exception import try_except, AbbotException
+from lib.abbot.config import BOT_CORE_SYSTEM, BOT_NAME, BOT_TELEGRAM_HANDLE, ORG_TELEGRAM_HANDLE
 from lib.abbot.utils import (
     parse_chat,
     parse_chat_data,
@@ -41,14 +46,6 @@ PRIVATE_CONFIG_FILE_PATH = abspath("src/data/chat/private/config")
 PRIVATE_CONTENT_FILES = sorted(listdir(PRIVATE_CONTENT_FILE_PATH))
 PRIVATE_CONFIG_FILES = sorted(listdir(PRIVATE_CONFIG_FILE_PATH))
 
-ARGS = argv[1:]
-DEV_MODE = "-d" in ARGS or "--dev" in ARGS
-
-bot_env_config: AbbotConfig = setup_bot_env_config(DEV_MODE)
-bot_env_info: dict = bot_env_config.get_bot_env()
-BOT_NAME = try_get(bot_env_info, "BOT_NAME")
-BOT_TG_HANDLE = try_get(bot_env_info, "BOT_TG_HANDLE")
-BOT_TG_TOKEN = try_get(bot_env_info, "BOT_TG_TOKEN")
 
 for content, config in zip(GROUP_CONTENT_FILES, GROUP_CONFIG_FILES):
     if ".jsonl" not in content or ".json" not in config:
@@ -59,7 +56,7 @@ for content, config in zip(GROUP_CONTENT_FILES, GROUP_CONFIG_FILES):
     debug_logger.log(f"main => context={context} chat_id={chat_id} name={name}")
     group_abbot = Abbot(
         name,
-        BOT_TELEGRAM_HANDLE,
+        ORG_TELEGRAM_HANDLE,
         BOT_CORE_SYSTEM,
         context,
         chat_id,
@@ -83,7 +80,6 @@ for content, config in zip(PRIVATE_CONTENT_FILES, PRIVATE_CONFIG_FILES):
     ALL_ABBOTS.append(private_abbot)
 
 abbots: Bots = Bots(ALL_ABBOTS)
-debug_logger.log(f"main abbots => {abbots}")
 admin = AdminService(THE_CREATOR, THE_CREATOR)
 admin.status = "running"
 
@@ -158,7 +154,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     not_introduced: bool = abbot.is_forgotten()
     if not_introduced:
         debug_logger.log(f"{fn} Abbot not introduced!")
-        debug_logger.log(f"abbot={abbot.__str__()}")
         abbot.introduce()
         introduced = abbot.is_introduced()
         debug_logger.log(f"introduced={introduced}")

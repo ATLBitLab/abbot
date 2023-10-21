@@ -114,5 +114,6 @@ async def sender_is_group_admin(context: ContextTypes.DEFAULT_TYPE, chat_id: int
     return user_id in admin_ids
 
 
-def json_loader(filepath: str, mode: str = "r"):
-    return json.load(open(abspath(filepath), mode))
+def json_loader(filepath: str, key: str | None = None, mode: str = "r"):
+    json_data = json.load(open(abspath(filepath), mode))
+    return try_get(json_data, key) if key else json_data

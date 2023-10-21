@@ -1,5 +1,8 @@
+from random import randrange
 from telegram.ext import ContextTypes
 from telegram import Message, Update, Chat, User
+
+from lib.abbot.config import BOT_RESPONSES
 
 from ..utils import try_get
 from constants import THE_CREATOR
@@ -103,3 +106,10 @@ async def squawk_error(error_message: str, context: ContextTypes.DEFAULT_TYPE):
     fn = f"{squawk_error.__name__}:"
     error_logger.log(f"{fn} {error_message}")
     return await context.bot.send_message(chat_id=THE_CREATOR, text=error_message)
+
+
+@try_except
+def get_bot_response(response_type: str, index: int = None) -> str:
+    response_list = try_get(BOT_RESPONSES, response_type)
+    index = randrange(len(response_list)) if not index else index
+    return try_get(response_list, index)

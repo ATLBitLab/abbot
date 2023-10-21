@@ -1,4 +1,12 @@
 from sys import argv
+
+from lib.abbot.config import BOT_NAME, BOT_TELEGRAM_HANDLE
+from lib.abbot.env import BOT_TELEGRAM_TOKEN
+
+ARGS = argv[1:]
+DEV_MODE = "-d" in ARGS or "--dev" in ARGS
+print("main", DEV_MODE)
+
 from telegram.ext.filters import BaseFilter
 from telegram.ext import (
     ApplicationBuilder,
@@ -6,8 +14,6 @@ from telegram.ext import (
     MessageHandler,
 )
 from lib.logger import debug_logger
-from lib.utils import try_get
-from lib.abbot.config import AbbotConfig, AbbotEnv, setup_abbot_config
 from lib.abbot.handlers import (
     leash,
     start,
@@ -24,23 +30,16 @@ from lib.abbot.handlers import (
 )
 
 if __name__ == "__main__":
-    ARGS = argv[1:]
-    DEV_MODE = "-d" in ARGS or "--dev" in ARGS
-
-    abbot_env_config: dict = bot_env_config.get_bot_env()
-    BOT_NAME: str = try_get(abbot_env_config, "BOT_NAME")
-    BOT_TG_HANDLE: str = try_get(abbot_env_config, "BOT_TG_HANDLE")
-    BOT_TG_TOKEN: str = try_get(abbot_env_config, "BOT_TG_TOKEN")
-
-    debug_logger.log(f"Initializing {abbot_env_config} @{BOT_TG_HANDLE}")
-    APPLICATION = ApplicationBuilder().token(BOT_TG_TOKEN).build()
-    debug_logger.log(f"{BOT_NAME} @{BOT_TG_HANDLE} Initialized")
+    debug_logger.log(f"Initializing {BOT_NAME} @{BOT_TELEGRAM_HANDLE}")
+    APPLICATION = ApplicationBuilder().token(BOT_TELEGRAM_TOKEN).build()
+    debug_logger.log(f"{BOT_NAME} @{BOT_TELEGRAM_HANDLE} Initialized")
 
     _unplug_handler = CommandHandler("unplug", admin_unplug)
     _plugin_handler = CommandHandler("plugin", admin_plugin)
     _kill_handler = CommandHandler("kill", admin_kill)
     _nap_handler = CommandHandler("nap", admin_nap)
     _status_handler = CommandHandler("status", admin_status)
+
     APPLICATION.add_handler(_unplug_handler)
     APPLICATION.add_handler(_plugin_handler)
     APPLICATION.add_handler(_kill_handler)
@@ -53,6 +52,7 @@ if __name__ == "__main__":
     stop_handler = CommandHandler("stop", stop)
     unleash_handler = CommandHandler("unleash", unleash)
     leash_handler = CommandHandler("leash", leash)
+
     APPLICATION.add_handler(help_handler)
     APPLICATION.add_handler(rules_handler)
     APPLICATION.add_handler(start_handler)
@@ -60,8 +60,8 @@ if __name__ == "__main__":
     APPLICATION.add_handler(unleash_handler)
     APPLICATION.add_handler(leash_handler)
 
-    message_handler = MessageHandler(BaseFilter(), handle_message)
-    APPLICATION.add_handler(message_handler)
+    # message_handler = MessageHandler(BaseFilter(), handle_message)
+    # APPLICATION.add_handler(message_handler)
 
-    debug_logger.log(f"{BOT_NAME} @{BOT_TG_HANDLE} Polling")
-    APPLICATION.run_polling()
+    debug_logger.log(f"{BOT_NAME} @{BOT_TELEGRAM_HANDLE} Polling")
+    # APPLICATION.run_polling()
