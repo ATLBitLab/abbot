@@ -1,14 +1,13 @@
-from functools import wraps
 import json
-from io import open
-from logging import debug
-import traceback
-from requests import request
-from datetime import datetime, timedelta
+
 from qrcode import make
-from io import BytesIO
-from constants import OPTIN_OUT_FILE, OPTINOUT_FILEPATH
-from lib.logger import error
+from os.path import abspath
+from io import BytesIO, open
+from requests import request
+
+from telegram.ext import ContextTypes
+from lib.logger import debug_logger, error_logger
+
 
 TELEGRAM_MESSAGE_FIELDS = [
     "audio",
@@ -23,36 +22,6 @@ TELEGRAM_MESSAGE_FIELDS = [
 ]
 
 
-def try_except(fn):
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        fn = "try_except => wrapper =>"
-        try:
-            # ---- Success ----
-            return fn(*args, **kwargs)
-        except Exception as exception:
-            exception.__traceback__ = traceback.extract_tb(exception.__traceback__)
-            error(f"{fn} exception={exception} traceback={exception.__traceback__}")
-            raise
-
-    return wrapper
-
-
-def now_date():
-    return datetime.now().date()
-
-
-@try_except
-def get_dates(lookback=7):
-    return [
-        (
-            (datetime.now() - timedelta(days=1)).date() - timedelta(days=i - 1)
-        ).isoformat()
-        for i in range(lookback, 0, -1)
-    ]
-
-
-@try_except
 def try_set(obj, value, *keys, **kwargs):
     default = kwargs.pop("default", None)
     if kwargs:
@@ -69,7 +38,6 @@ def try_set(obj, value, *keys, **kwargs):
     return obj
 
 
-@try_except
 def try_get(obj, *fields, **kwargs):
     default = kwargs.pop("default", None)
     if kwargs:
@@ -86,12 +54,10 @@ def try_get(obj, *fields, **kwargs):
     return obj
 
 
-@try_except
 def try_get_telegram_message_data(telegram_message):
     return {f"{key}": try_get(telegram_message, key) for key in TELEGRAM_MESSAGE_FIELDS}
 
 
-@try_except
 def try_gets(obj, keys=[], return_type="list", **kwargs):
     additional_keys = kwargs.pop("keys", None)
     keys = [*keys, *additional_keys] if additional_keys else keys
@@ -102,7 +68,6 @@ def try_gets(obj, keys=[], return_type="list", **kwargs):
     )
 
 
-@try_except
 def http_request(headers, method, url, json=None):
     try:
         return request(
@@ -115,7 +80,6 @@ def http_request(headers, method, url, json=None):
         return Exception(f"Request Failed: {e}")
 
 
-@try_except
 def qr_code(data):
     qr = make(data)
     bio = BytesIO()
@@ -124,23 +88,32 @@ def qr_code(data):
     return bio
 
 
-@try_except
 def opt_in(context: str, chat_id: int) -> bool:
-    fn = "opt_in => "
-    optinout_list = OPTIN_OUT_FILE[context]
-    if chat_id not in optinout_list:
-        debug(f"{fn} chat_id={chat_id} opting in")
-        optinout_list.append(chat_id)
-        json.dump(OPTIN_OUT_FILE, OPTINOUT_FILEPATH, indent=4)
+    fn = "opt_in:"
+    config_file_name = f"src/data/chat/{context}/config/{chat_id}.json"
+    debug_logger.log(f"{fn} config_file_name={config_file_name}")
+    config_file_path = abspath(config_file_name)
+    with open(config_file_path, "w") as config:
+        json.dump({"started": True, "sent_intro": False}, config)
     return True
 
 
-@try_except
 def opt_out(context: str, chat_id: int) -> bool:
-    fn = "opt_out =>"
-    optinout_list = OPTIN_OUT_FILE[context]
-    if chat_id in optinout_list:
-        debug(f"{fn} chat_id={chat_id} opting out")
-        optinout_list.remove(chat_id)
-        json.dump(OPTIN_OUT_FILE, OPTINOUT_FILEPATH, indent=4)
+    fn = "opt_out:"
+    config_file_name = f"src/data/chat/{context}/config/{chat_id}.json"
+    debug_logger.log(f"{fn} config_file_name={config_file_name}")
+    config_file_path = abspath(config_file_name)
+    with open(config_file_path, "w") as config:
+        json.dump({"started": False, "sent_intro": True}, config)
     return True
+
+
+async def sender_is_group_admin(context: ContextTypes.DEFAULT_TYPE, chat_id: int, user_id: int):
+    admins = await context.bot.get_chat_administrators(chat_id)
+    admin_ids = [admin.user.id for admin in admins]
+    return user_id in admin_ids
+
+
+def json_loader(filepath: str, key: str | None = None, mode: str = "r"):
+    json_data = json.load(open(abspath(filepath), mode))
+    return try_get(json_data, key) if key else json_data

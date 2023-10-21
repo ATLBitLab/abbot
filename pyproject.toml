@@ -1,0 +1,13 @@
+[tool.pyright]
+venvPath = "./"
+venv = ".venv"
+pythonVersion = "3.11"
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.black]
+line-length = 120
+target-version = ["py311"]
+

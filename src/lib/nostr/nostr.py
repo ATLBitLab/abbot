@@ -1,104 +1,130 @@
-import time
-import uuid
 from binascii import unhexlify
-
-from pynostr.key import PrivateKey
+import ssl
+import time
+import os
+import uuid
+import IPython
+from pynostr.key import PrivateKey, PublicKey
 from pynostr.relay_manager import RelayManager
 from pynostr.filters import FiltersList, Filters
 from pynostr.event import EventKind
-
-
 from pynostr.encrypted_dm import EncryptedDirectMessage
-from pynostr.key import PrivateKey
-import os
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from coincurve import PublicKey
-from coincurve.keys import PrivateKey
-import base64
-import time
-from env import NOSTR_NPUB, NOSTR_PUB, NOSTR_SEC
+from pynostr.event import Event
+
+DM = EventKind.ENCRYPTED_DIRECT_MESSAGE  # 4
+CHANNEL_CREATE = EventKind.CHANNEL_CREATE  # 40
+CHANNEL_META = EventKind.CHANNEL_META  # 41
+CHANNEL_MESSAGE = EventKind.CHANNEL_MESSAGE  # 42
+CHANNEL_HIDE = EventKind.CHANNEL_HIDE  # 43
+CHANNEL_MUTE = EventKind.CHANNEL_MUTE  # 44
+
+RELAYS = [
+    "wss://booger.pro",
+    "wss://nos.lol/",
+    "wss://relay.bitcoinpark.com/",
+    "wss://relay.damus.io",
+    "wss://nostr-pub.wellorder.net/",
+    "wss://relay.primal.net",
+    "wss://nostr.atlbitlab.com/",
+    "wss://relay.snort.social/",
+]
 
 
-class Nostr:
-    RELAYS = [
-        "wss://eden.nostr.land",
-        "wss://nostr.fmt.wiz.biz",
-        "wss://relay.damus.io",
-        "wss://nostr-pub.wellorder.net",
-        "wss://relay.nostr.info",
-        "wss://offchain.pub",
-        "wss://nos.lol",
-        "wss://brb.io",
-        "wss://relay.snort.social",
-        "wss://relay.current.fyi",
-        "wss://nostr.relayer.se",
-    ]
+class AbbotFilters:
+    def __init__(self, filter_data: list):
+        self.Filters = Filters(filter_data)
+        """
+            kinds: Optional[List[EventKind]] = None
+            authors: Optional[List[str]] = None
+        """
+
+
+class AbbotNostr:
+    relay_manager = RelayManager(timeout=6)
+    notices = []
+    events = []
+    filters = FiltersList([Filters(kinds=[CHANNEL_MESSAGE], limit=100)])
+    # filters = FiltersList([Filters(authors=[private_key.public_key.hex()], limit=100)])
+    filters_list = []  # FiltersList()
+    filters = kinds = [DM, CHANNEL_CREATE, CHANNEL_MESSAGE]  # Filters()
+    #
 
     def __init__(self, sec_key):
-        assert (sec_key is not None, "Nostr secret key must be supplied")
         self.sec_key = sec_key
-        private_key = PrivateKey(unhexlify(sec_key))
-        public_key = private_key.public_key
+        self.private_key = PrivateKey(unhexlify(sec_key))
+        self.private_key_hex = self.private_key.hex()
+        self.public_key = self.private_key.public_key
+        self.filters = filters
 
-    def subscribe(self):
-        relay_manager = RelayManager(timeout=2)
-        for relay in self.RELAYS:
-            relay_manager.add_relay(relay)
-        filters = FiltersList([Filters(kinds=[EventKind.TEXT_NOTE])])
+    def add_relays_subscribe_and_run(self):
+        for relay in RELAYS:
+            self.relay_manager.add_relay(relay)
         subscription_id = uuid.uuid1().hex
-        relay_manager.add_subscription_on_all_relays(subscription_id, filters)
-        while relay_manager.message_pool.has_notices():
-            notice_msg = relay_manager.message_pool.get_notice()
-            print(notice_msg.content)
-        while relay_manager.message_pool.has_events():
-            event_msg = relay_manager.message_pool.get_event()
-            print(event_msg.event.content)
-        relay_manager.close_all_relay_connections()
+        self.relay_manager.add_subscription_on_all_relays(subscription_id, self.filters)
+        self.relay_manager.run_sync()
 
-    def sendDM(self):
-        sender_private_key = bytes.fromhex(NOSTR_SEC)
-        recip_public_key = bytes.fromhex(
-            "029ddf6fe3a194d330a6c6e278a432ae1309e52cc08587254b337d0f491f7ff642"
-        )
-        text = "Hi, this is a test!"
+    def get_message_pool(self):
+        return self.relay_manager.message_pool
 
-        # Compute shared secret
-        sender_private_key_obj = PrivateKey(sender_private_key)
-        recip_public_key_obj = PublicKey(recip_public_key)
-        shared_point = sender_private_key_obj.ecdh(
-            recip_public_key_obj.format())
-        shared_x = shared_point[:32]
+    def get_notices(self):
+        while self.relay_manager.message_pool.has_notices():
+            notice_msg = self.relay_manager.message_pool.get_notice()
+            print(notice_msg)
+            self.notices.append(notice_msg)
+        return self.notices
 
-        # Create an AES-256-CBC cipher using the shared secret as the key
-        iv = os.urandom(16)
-        cipher = Cipher(algorithms.AES(shared_x), modes.CBC(iv),
-                        backend=default_backend())
-        encryptor = cipher.encryptor()
+    def get_events(self):
+        while self.relay_manager.message_pool.has_events():
+            event_msg = self.relay_manager.message_pool.get_event()
+            print(event_msg)
+        return self.events
 
-        # Ensure the text is a multiple of block size by padding if necessary
-        padding_length = 16 - len(text) % 16
-        text += chr(padding_length) * padding_length
-        text_bytes = text.encode("utf-8")
+    def get_events(self):
+        return self.relay_manager.message_pool.events
 
-        # Encrypt the message
-        encrypted_message = encryptor.update(text_bytes) + encryptor.finalize()
-        encrypted_message_base64 = base64.b64encode(
-            encrypted_message).decode("utf-8")
-        iv_base64 = base64.b64encode(iv).decode("utf-8")
+    def unsubscribe(self, url, id: str):
+        self.relay_manager.close_subscription_on_relay(url, id)
 
-        # Build the event object (assuming sender_pub_key is given as a hex string)
-        sender_pub_key = NOSTR_PUB
+    def disconnect_from_relays(self):
+        self.relay_manager.close_connections()
 
-        # UTC timezone but date/time should be adjusted according to where the current user is
-        timestamp = time.time()
-        # local_datetime = datetime.datetime.fromtimestamp(timestamp)
-        event = {
-            "pubkey": sender_pub_key,
-            "created_at": int(timestamp),
-            "kind": 4,
-            "tags": [["p", recip_public_key.hex()]],
-            "content": encrypted_message_base64 + "?iv=" + iv_base64,
-        }
-        print(event)
-        print(timestamp)
+    def create_dm_event(self, content: str, recipient_pubkey: str):
+        dm = EncryptedDirectMessage(self.public_key, recipient_pubkey, content)
+        dm.encrypt(self.private_key_hex)
+        dm_event = dm.to_event()
+        return dm_event
+
+    def publish_event(self, event):
+        self.relay_manager.publish_event(event)
+        self.add_relays_subscribe_and_run()
+
+
+if __name__ == "__main__":
+    # abbot_nostr.add_relays_subscribe_and_run()
+    # pool = abbot_nostr.get_message_pool()
+    # notices = abbot_nostr.get_notices()
+    # events = abbot_nostr.get_events()
+    # print("pool", pool)
+    # print("notices", notices)
+    # print("events", events)
+    abbot_nostr = AbbotNostr(os.environ["ABBOT_SEC"])
+    relay_manager = RelayManager(timeout=6)
+    relay_manager.add_relay("wss://relay.damus.io")
+    private_key = abbot_nostr.private_key
+    private_key_hex = private_key.hex()
+    filters = FiltersList([Filters(authors=[private_key.public_key.hex()], limit=100)])
+    subscription_id = uuid.uuid1().hex
+    relay_manager.add_subscription_on_all_relays(subscription_id, filters)
+    dm_event: Event = abbot_nostr.create_dm_event(
+        "Secret message2! Hello world!", "9ddf6fe3a194d330a6c6e278a432ae1309e52cc08587254b337d0f491f7ff642"
+    )
+    dm_event.sign(private_key_hex)
+    relay_manager.publish_event(dm_event)
+    relay_manager.run_sync()
+    time.sleep(5)  # allow the messages to send
+    while relay_manager.message_pool.has_ok_notices():
+        ok_msg = relay_manager.message_pool.get_ok_notice()
+        print(ok_msg)
+    while relay_manager.message_pool.has_events():
+        event_msg = relay_manager.message_pool.get_event()
+        print(event_msg.event)
