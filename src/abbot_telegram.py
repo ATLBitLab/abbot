@@ -1,5 +1,5 @@
-from lib.abbot.config import BOT_NAME, BOT_TELEGRAM_HANDLE
-from lib.abbot.env import BOT_TELEGRAM_TOKEN
+from lib.bot.config import BOT_NAME, BOT_TELEGRAM_HANDLE
+from lib.bot.env import BOT_TELEGRAM_TOKEN
 from telegram.ext.filters import BaseFilter
 from telegram.ext import (
     ApplicationBuilder,
@@ -7,7 +7,7 @@ from telegram.ext import (
     MessageHandler,
 )
 from lib.logger import debug_logger
-from src.lib.abbot.telegram.handlers import (
+from lib.bot.telegram_handlers import (
     leash,
     start,
     stop,

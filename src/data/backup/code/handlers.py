@@ -7,7 +7,7 @@ from telegram import Update, Message, Chat, User
 from telegram.ext import ContextTypes
 
 from constants import HELP_MENU, THE_CREATOR
-from lib.abbot import Abbot, Bots
+from lib.bot.abbot import Abbot, Bots
 from lib.admin.admin_service import AdminService
 from lib.logger import debug_logger, error_logger
 from lib.utils import sender_is_group_admin, try_get

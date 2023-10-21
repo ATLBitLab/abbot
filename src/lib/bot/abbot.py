@@ -4,7 +4,7 @@ import openai
 import tiktoken
 import traceback
 from typing import AnyStr
-from .utils import try_get
+from ..utils import try_get
 from io import TextIOWrapper, open
 from os.path import abspath, isfile
 
