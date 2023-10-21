@@ -30,25 +30,24 @@ RELAYS = [
 ]
 
 
-class AbbotFilters:
-    def __init__(self, filter_data: list):
-        self.Filters = Filters(filter_data)
-        """
-            kinds: Optional[List[EventKind]] = None
-            authors: Optional[List[str]] = None
-        """
-
-    e
+# class AbbotFilters:
+#     def __init__(self, filter_data: list):
+#         self.Filters = Filters(filter_data)
+#         """
+#             kinds: Optional[List[EventKind]] = None
+#             authors: Optional[List[str]] = None
+#         """
 
 
 class AbbotNostr:
+    # can we do this?
     relay_manager = RelayManager(timeout=6)
     notices = []
     events = []
     # filters = FiltersList([Filters(kinds=[EventKind.TEXT_NOTE], limit=100)])
     # filters = FiltersList([Filters(authors=[private_key.public_key.hex()], limit=100)])
-    filters_list = []  # FiltersList()
-    filters = kinds = [DM, CHANNEL_CREATE, CHANNEL_MESSAGE]  # Filters()
+    # filters_list = []  # FiltersList()
+    # filters = kinds = [DM, CHANNEL_CREATE, CHANNEL_MESSAGE]  # Filters()
     #
 
     def __init__(self, sec_key):
@@ -56,7 +55,7 @@ class AbbotNostr:
         self.private_key = PrivateKey(unhexlify(sec_key))
         self.private_key_hex = self.private_key.hex()
         self.public_key = self.private_key.public_key
-        self.filters = filters
+        # self.filters = filters
 
     def add_relays_subscribe_and_run(self):
         for relay in RELAYS:
@@ -118,9 +117,11 @@ if __name__ == "__main__":
     subscription_id = uuid.uuid1().hex
     relay_manager.add_subscription_on_all_relays(subscription_id, filters)
     dm_event: Event = abbot_nostr.create_dm_event(
-        "Secret message2! Hello world!", "9ddf6fe3a194d330a6c6e278a432ae1309e52cc08587254b337d0f491f7ff642"
+        "Secret message5! Hello jordan!", "9ddf6fe3a194d330a6c6e278a432ae1309e52cc08587254b337d0f491f7ff642"
     )
+
     dm_event.sign(private_key_hex)
+    IPython.embed()
     relay_manager.publish_event(dm_event)
     relay_manager.run_sync()
     time.sleep(5)  # allow the messages to send
