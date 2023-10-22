@@ -10,8 +10,8 @@ from os.path import abspath, isfile
 
 from constants import OPENAI_MODEL
 from lib.logger import debug_logger, error_logger
-from lib.bot.config import OPENAI_API_KEY
-from lib.bot.exceptions.abbot_exception import AbbotException, try_except
+from lib.abbot.config import OPENAI_API_KEY
+from lib.abbot.exceptions.abbot_exception import AbbotException, try_except
 
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
 
@@ -288,15 +288,18 @@ class Abbot(Config, Bots):
         debug_logger.log(f"{fn} {self.name} token_count={total}")
         return total
 
-    def update_chat_history(self, chat_message: dict(role=str, content=str)) -> None:
+    def update_chat_history(self, chat_message: dict) -> None:
         fn = "update_chat_history:"
-        debug_logger.log(fn)
+        debug_logger.log(f"{fn} chat_message={chat_message}")
         if not chat_message:
             return
         self.chat_history.append(chat_message)
         # self.chat_history_file.write("\n" + json.dumps(chat_message))
         self.chat_history_len += 1
+        debug_logger.log(f"{fn} history_len={self.chat_history_len}")
         self.chat_history_tokens += len(self.tokenize(try_get(chat_message, "content")))
+        debug_logger.log(f"{fn} tokens={self.chat_history_tokens}")
+        return self.chat_history_tokens
 
     @try_except
     def chat_completion(self) -> str | None:
@@ -320,15 +323,19 @@ class Abbot(Config, Bots):
     @try_except
     def chat_history_completion(self) -> str | Exception:
         fn = "chat_history_completion:"
-        debug_logger.log(fn)
         messages = [self.gpt_system]
         history = self.chat_history
-        if self.chat_history_tokens > 5000:
+        gt_5000 = self.chat_history_tokens > 5000
+        if gt_5000:
+            debug_logger.log(f"{fn} gt_5000={gt_5000}")
             index = self.chat_history_len // 2
+            debug_logger.log(f"{fn} index={index}")
             history = history[index:]
         messages.extend(history)
-        answer = abbot_api.
-        answer = requests.
+        response = openai.ChatCompletion.create(
+            model=self.model,
+            messages=self.chat_history,
+        )
         answer = try_get(response, "choices", 0, "message", "content")
         response_dict = dict(role="assistant", content=answer)
         self.update_chat_history(response_dict)
