@@ -2,8 +2,9 @@ import time
 from subprocess import run, CalledProcessError
 
 from lib.utils import try_get
-from lib.bot.config import BOT_NAME
+from lib.abbot.config import BOT_NAME
 from lib.logger import debug_logger, error_logger
+from lib.abbot.exceptions.abbot_exception import try_except
 
 
 SERVICE_STATUSES = {
@@ -32,6 +33,7 @@ class AdminService:
         self.status = status
         self.status_code = status_code
 
+    @try_except
     def start_service(self) -> int:
         try:
             fn = "start_service:"
@@ -45,6 +47,7 @@ class AdminService:
             error_logger.log(f"Error stopping {service}: {exception}")
             raise exception
 
+    @try_except
     def stop_service(self) -> int:
         try:
             fn = "stop_abbot_process:"
@@ -57,16 +60,13 @@ class AdminService:
             error_logger.log(f"Error stopping {service}: {exception}")
             raise exception
 
+    @try_except
     def kill_service(self) -> Exception:
         fn = "kill_service:"
         exception = Exception("Plugging Abbot back into the matrix!")
         error_logger.log(f"{fn} => raising exception={exception}")
         raise exception
 
+    @try_except
     def sleep_service(self, S: int = sleep_time) -> bool:
-        try:
-            fn = "sleep_service:"
-            time.sleep(S)
-        except Exception as exception:
-            error_logger.log(f"{fn} => exception={exception}")
-            raise exception
+        time.sleep(S)

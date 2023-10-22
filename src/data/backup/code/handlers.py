@@ -10,9 +10,8 @@ from constants import HELP_MENU, THE_CREATOR
 from lib.admin.admin_service import AdminService
 from lib.logger import debug_logger, error_logger
 from lib.utils import sender_is_group_admin, try_get
-from lib.bot.exceptions.abbot_exception import try_except, AbbotException
-from lib.bot.config import BOT_NAME, BOT_TELEGRAM_HANDLE, BOT_CORE_SYSTEM, ORG_CHAT_ID, ORG_CHAT_TITLE
-from lib.bot.utils import (
+from lib.abbot.abbot import Abbot
+from lib.abbot.utils import (
     parse_chat,
     parse_chat_data,
     parse_message,
@@ -22,6 +21,8 @@ from lib.bot.utils import (
     squawk_error,
     successful,
 )
+from lib.abbot.exceptions.abbot_exception import try_except, AbbotException
+from lib.abbot.config import BOT_NAME, BOT_TELEGRAM_HANDLE, BOT_CORE_SYSTEM, ORG_CHAT_ID, ORG_CHAT_TITLE
 
 # context.args
 RAW_MESSAGE_JL_FILE = abspath("src/data/raw_messages.jsonl")

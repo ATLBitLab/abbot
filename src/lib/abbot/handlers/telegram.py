@@ -14,12 +14,12 @@ from telegram.ext import ContextTypes
 from constants import HELP_MENU, THE_CREATOR
 
 from lib.admin.admin_service import AdminService
-from lib.bot.abbot import Abbot, Bots
+from lib.abbot.abbot import Abbot, Bots
 from lib.logger import debug_logger, error_logger
 from lib.utils import sender_is_group_admin, try_get
-from lib.bot.exceptions.abbot_exception import try_except, AbbotException
-from lib.bot.config import BOT_CORE_SYSTEM, BOT_NAME, BOT_TELEGRAM_HANDLE, ORG_TELEGRAM_HANDLE
-from lib.bot.utils import (
+from lib.abbot.exceptions.abbot_exception import try_except, AbbotException
+from lib.abbot.config import BOT_CORE_SYSTEM, BOT_NAME, BOT_TELEGRAM_HANDLE, ORG_TELEGRAM_HANDLE
+from lib.abbot.utils import (
     parse_chat,
     parse_chat_data,
     parse_message,
@@ -525,7 +525,6 @@ async def admin_unplug(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "admin_unplug:"
     chat_id: int = try_get(update, "message", "chat", "id")
     user_id: int = try_get(update, "message", "from_user", "id")
-
     admin: AdminService = AdminService(user_id, chat_id)
     admin.start_service()
 
@@ -569,6 +568,6 @@ async def admin_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     abbots_dict: dict = abbots.get_abbots()
     for bot in abbots_dict:
         abbot: Abbot = bot
-        status_data = json.dumps(abbot.get_state(), indent=4)
+        status_data = json.dumps(abbot.get_config(), indent=4)
         debug_logger.log(f"statuses => {abbot.name} status_data={status_data}")
         await message.reply_text(status_data)

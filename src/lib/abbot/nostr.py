@@ -11,7 +11,7 @@ from pynostr.event import EventKind
 from pynostr.encrypted_dm import EncryptedDirectMessage
 from pynostr.event import Event
 
-from lib.bot.exceptions.abbot_exception import try_except
+from lib.abbot.exceptions.abbot_exception import try_except
 from lib.utils import try_get
 
 DM = EventKind.ENCRYPTED_DIRECT_MESSAGE  # 4
