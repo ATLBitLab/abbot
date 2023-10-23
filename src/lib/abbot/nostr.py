@@ -12,7 +12,6 @@ from pynostr.encrypted_dm import EncryptedDirectMessage
 from pynostr.event import Event
 
 from lib.abbot.exceptions.abbot_exception import try_except
-from lib.utils import try_get
 
 DM = EventKind.ENCRYPTED_DIRECT_MESSAGE  # 4
 CHANNEL_CREATE = EventKind.CHANNEL_CREATE  # 40
@@ -133,6 +132,7 @@ class AbbotNostr(AbbotFilters):
         return dm_event
 
     @try_except
+<<<<<<< Updated upstream
     def decrypt_dm(self, content: str, recipient_pubkey: str):
         dm = EncryptedDirectMessage(self.public_key.hex(), recipient_pubkey, content)
         dm.encrypt(self.private_key_hex)
@@ -147,3 +147,66 @@ class AbbotNostr(AbbotFilters):
         self.relay_manager.publish_event(dm_event)
         self.run_relay_sync()
         time.sleep(5)
+=======
+    def send_greeting_to_channel(self, channel_id: str):
+        event = Event(
+            kind=CHANNEL_MESSAGE,
+            pubkey=self.public_key.hex(),
+            content=INTRODUCTION,
+            tags=[["e", channel_id, RELAYS[0], "root"]],
+        )
+        event.sign(self.private_key.hex())
+        print(event)
+        self.publish_event(event)
+
+    @try_except
+    def publish_event(self, event):
+        self.relay_manager.publish_event(event)
+        self.relay_manager.run_sync()
+
+
+if __name__ == "__main__":
+    # abbot_nostr.add_relays_subscribe_and_run()
+    # pool = abbot_nostr.get_message_pool()
+    # notices = abbot_nostr.get_notices()
+    # events = abbot_nostr.get_events()
+    # print("pool", pool)
+    # print("notices", notices)
+    # print("events", events)
+    abbot_nostr = AbbotNostr(os.environ["ABBOT_SEC"])
+    abbot_nostr.add_relays_and_subscribe()
+    for event in filter(lambda e: e.kind == BOT_CHANNEL_INVITE, abbot_nostr.poll_for_events()):
+        # this outputs all valid invite events. we still need to verify that they come from
+        # a specified whitelist of pubkeys, aka the atlbitlab pubkey
+        # print(event)
+        # search for 'e' tag that holds the channel id to join
+        channel_tag: List[str] = next(filter(lambda t: t[0] == "e", event.tags))
+        # print(channel_tag)s
+        abbot_nostr.send_greeting_to_channel(channel_tag[1])
+    # relay_manager = RelayManager(timeout=6)
+    # relay_manager.add_relay("wss://relay.damus.io")
+    # private_key = abbot_nostr.private_key
+    # private_key_hex = private_key.hex()
+    # filters = FiltersList([Filters(authors=[private_key.public_key.hex()], limit=100)])
+    # subscription_id = uuid.uuid1().hex
+    # relay_manager.add_subscription_on_all_relays(subscription_id, filters)
+    # dm_event: Event = abbot_nostr.create_dm_event(
+    #     "Secret message2! Hello world!", "9ddf6fe3a194d330a6c6e278a432ae1309e52cc08587254b337d0f491f7ff642"
+    # )
+    # dm_event.sign(private_key_hex)
+    # relay_manager.publish_event(dm_event)
+    # relay_manager.run_sync()
+    # time.sleep(5)  # allow the messages to send
+    # while relay_manager.message_pool.has_ok_notices():
+    #     ok_msg = relay_manager.message_pool.get_ok_notice()
+    #     print(ok_msg)
+    # while relay_manager.message_pool.has_events():
+    #     event_msg = relay_manager.message_pool.get_event()
+    #     print(event_msg.event)
+
+
+@try_except
+def run_nostr():
+    # TODO: create nostr run fn using backend handlers
+    pass
+>>>>>>> Stashed changes
