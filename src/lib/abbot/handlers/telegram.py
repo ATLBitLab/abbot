@@ -14,10 +14,10 @@ from telegram.ext import ContextTypes
 from constants import HELP_MENU, THE_CREATOR
 
 from lib.admin.admin_service import AdminService
-from lib.abbot.abbot import Abbot, Bots
+from lib.abbot.bot import Abbot, Bots
 from lib.logger import debug_logger, error_logger
 from lib.utils import sender_is_group_admin, try_get
-from lib.abbot.exceptions.abbot_exception import try_except, AbbotException
+from lib.abbot.exceptions.exception import try_except, AbbotException
 from lib.abbot.config import BOT_CORE_SYSTEM, BOT_NAME, BOT_TELEGRAM_HANDLE, ORG_TELEGRAM_HANDLE
 from lib.abbot.utils import (
     parse_chat,

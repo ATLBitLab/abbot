@@ -1,19 +1,14 @@
 from abc import ABC, abstractmethod
 from lib.utils import try_get
 import httpx
-from env import PAYMENT_PROCESSOR_KIND, PAYMENT_PROCESSOR_TOKEN, LNBITS_BASE_URL
+from lib.abbot.env import PAYMENT_PROCESSOR_KIND, PAYMENT_PROCESSOR_TOKEN, LNBITS_BASE_URL
 
 
 def init_payment_processor():
     available_processors = ["strike", "lnbits", "opennode"]
 
-    if (
-        PAYMENT_PROCESSOR_KIND is None
-        or PAYMENT_PROCESSOR_KIND not in available_processors
-    ):
-        raise Exception(
-            f"PAYMENT_PROCESSOR_KIND must be one of {', '.join(available_processors)}"
-        )
+    if PAYMENT_PROCESSOR_KIND is None or PAYMENT_PROCESSOR_KIND not in available_processors:
+        raise Exception(f"PAYMENT_PROCESSOR_KIND must be one of {', '.join(available_processors)}")
 
     if not PAYMENT_PROCESSOR_TOKEN.trim():
         raise Exception("PAYMENT_PROCESSOR_TOKEN must be a valid API token")

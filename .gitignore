@@ -1,11 +1,27 @@
+# desktop services store
 .DS_Store
-__pycache__
-.vscode
+
+# compiled python 
+__pycache__/
+
+# cached python bytecode folders
+.vscode/
 .venv/
-.env
 dev/
-env.py
+ignore/
+
+# env files
+.env.local
+.env
+
+# logs and tarballs
 *.log
 *.gz
-ignore/
-.env.abbit
+
+# chat data
+src/data/chat/group/content/*
+src/data/chat/group/config/*
+src/data/chat/private/content/*
+src/data/chat/private/config/*
+src/data/backup/chats/*
+src/data/raw_messages.jsonl

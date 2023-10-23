@@ -8,10 +8,11 @@ from ..utils import try_get
 from io import TextIOWrapper, open
 from os.path import abspath, isfile
 
-from constants import OPENAI_MODEL
 from lib.logger import debug_logger, error_logger
-from lib.abbot.config import OPENAI_API_KEY
-from lib.abbot.exceptions.abbot_exception import AbbotException, try_except
+from lib.abbot.exceptions.exception import try_except
+
+from constants import OPENAI_MODEL
+from lib.abbot.env import OPENAI_API_KEY
 
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
 
@@ -54,7 +55,6 @@ class Bots:
         for bot in bots:
             name = try_get(bot, "chat_id")
             self.abbots[name] = bot
-        print("gpt: Bots: self.abbots", self.abbots)
 
     def __str__(self) -> str:
         _str_ = f"\nAbbots(abbots="
@@ -106,24 +106,19 @@ class Abbot(Config, Bots):
         self.chat_history_file_cursor: int = self.chat_history_file.tell()
 
     def __str__(self) -> str:
-        fn = "__str__:"
-        abbot_str = (
-            f"Abbot(model={self.model}, name={self.name}, handle={self.handle}, chat_id={self.chat_id}, chat_history_tokens={self.chat_history_tokens}"
-            f"started={self.config.started}, unleashed={self.config.unleashed}, )"
+        return (
+            f"Abbot(model={self.model}, name={self.name}, handle={self.handle}, "
+            f"chat_id={self.chat_id}, chat_history_tokens={self.chat_history_tokens} "
+            f"started={self.config.started}, unleashed={self.config.unleashed})"
         )
-        debug_logger.log(f"{fn} abbot_str={abbot_str}")
-        return abbot_str
 
     def __repr__(self) -> str:
-        fn = "__repr__:"
-        abbot_repr = (
+        return (
             f"Abbot(chat_id={self.chat_id}, name={self.name}, "
             f"handle={self.handle}, personality={self.personality}, "
             f"chat_history_len={self.chat_history_len}, chat_history_tokens={self.chat_history_tokens}"
             f"self.config={self.config})"
         )
-        debug_logger.log(f"{fn} abbot_repr={abbot_repr}")
-        return abbot_repr
 
     def to_dict(self) -> dict:
         return self.__dict__
