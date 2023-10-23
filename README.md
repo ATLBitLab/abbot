@@ -1,23 +1,30 @@
-# ABBot
-Helpful Bot @ATLBitLab. Est. block 797812.
+# 🎃 Hacktoberfest 2023! 👨‍💻 
+ATL BitLab is participating in [Hacktoberfest 2023](https://hacktoberfest.com/), and this repo is included! Celebrate the 10th anniversary of Hacktoberfest this year! Hosted annually every October, Hacktoberfest is a month-long event sponsored by DigitalOcean, GitHub, and various other partners, championing open-source contributions.
+
+If you're new to Hacktoberfest, you can register to participate [here](https://hacktoberfest.com/auth/) anytime from September 26th- October 31st.
+
+Check out our [project board](https://github.com/orgs/ATLBitLab/projects/1) and [issues](https://github.com/ATLBitLab/open-abbot/issues) for good ways to contribute.
+
+# Abbot
+A helpful bitcoiner bot at [ATL BitLab](https://atlbitlab.com/abbot). Est. block 797812.
 
 ## Summary
-ABBot stands for **A**tl **B**itlab **Bot**. 
+Abbot stands for **A**tl **B**itlab **Bot**. 
 
-Basic tasks that ABBot can automate include:
-1. Content gathering, organization and summarization
-2. Content creation and marketing
-3. Payments
-4. Answering questions and basic AI chat interactions
-5. Nostr, X
+Basic tasks that Abbot can automate include:
+1. Content gathering and organization
+2. Content creation
+3. Answering questions about ... anything!
+4. Nostr, Twitter posting
+5. Automating tasks for meetup community organizers
 
 ## Requirements
-- Must have python3
-- Must have telegram bot API key
+- Python >= 3.11.6 
+- Telegram bot API key
   - DM the [Bot Father](https://www.telegram.me/BotFather)
   - Recommend creating 2 bots: @your_telegram_bot and @test_your_telegram_bot
   - See step 7. for how this comes in handy
-- Must have openai API key
+- OpenAI API key
   - Create an account at [https://platform.openai.com](https://platform.openai.com) 
   - Go create an API key [https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys)
 - Must have a lightning payment method
@@ -45,7 +52,7 @@ python -m venv .venv
 
 5. Activate virtual env
 ```
-source .env/bin/activate
+source .venv/bin/activate
 ```
 
 6. Install requirements.txt
