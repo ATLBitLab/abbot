@@ -6,6 +6,7 @@ from pynostr.filters import FiltersList, Filters
 from pynostr.event import EventKind
 from pynostr.encrypted_dm import EncryptedDirectMessage
 from pynostr.event import Event
+from typing import List, Optional
 
 DM = EventKind.ENCRYPTED_DIRECT_MESSAGE  # 4
 CHANNEL_CREATE = EventKind.CHANNEL_CREATE  # 40
@@ -28,6 +29,17 @@ RELAYS = [
 
 DEFAULT_FILTERS = [Filters(kinds=[DM, CHANNEL_CREATE, CHANNEL_MESSAGE], limit=100)]
 
+INTRODUCTION = """
+Hey! The name's Abbot but you can think of me as your go-to guide for all things Bitcoin.
+AKA the virtual Bitcoin whisperer. 😉
+Here's the lowdown on how to get my attention:
+1. Slap an @ before your message in the group chat - I'll come running to answer.
+2. Feel more comfortable replying directly to my messages? Go ahead! I'm all ears.. err.. code.
+3. Fancy a one-on-one chat? Slide into my DMs.
+Now, enough with the rules! Let's dive into the world of Bitcoin together!
+Ready. Set. Stack Sats! 🚀
+"""
+
 class AbbotFilters:
     def __init__(self, filter_data: list):
         self.Filters = Filters(filter_data)
@@ -42,16 +54,22 @@ class AbbotNostr:
     notices = []
     events = []
 
-    def __init__(self, sec_key):
+    def __init__(self, sec_key: str, author_whitelist: Optional[List[str]] = None):
         self.sec_key = sec_key
         self.private_key = PrivateKey.from_hex(sec_key)
         self.public_key = self.private_key.public_key
+        self.author_whitelist = author_whitelist
 
     def add_relays_subscribe_and_run(self):
         for relay in RELAYS:
             self.relay_manager.add_relay(relay)
 
-        filters = FiltersList(DEFAULT_FILTERS + [Filters(kinds=[BOT_CHANNEL_INVITE], pubkey_refs=[self.public_key.hex()])])
+        channel_invite_filter = Filters(
+            kinds=[BOT_CHANNEL_INVITE],
+            pubkey_refs=[self.public_key.hex()],
+            authors=self.author_whitelist
+        )
+        filters = FiltersList(DEFAULT_FILTERS + [channel_invite_filter])
         self.relay_manager.add_subscription_on_all_relays(uuid.uuid4().hex, filters)
         self.relay_manager.run_sync()
 
@@ -83,9 +101,20 @@ class AbbotNostr:
         dm_event = dm.to_event()
         return dm_event
 
+    def send_greeting_to_channel(self, channel_id: str):
+        event = Event(
+            kind=CHANNEL_MESSAGE,
+            pubkey=self.public_key.hex(),
+            content=INTRODUCTION,
+            tags=[['e', channel_id, RELAYS[0], 'root']]
+        )
+        event.sign(self.private_key.hex())
+        print(event)
+        self.publish_event(event)
+
     def publish_event(self, event):
         self.relay_manager.publish_event(event)
-        self.add_relays_subscribe_and_run()
+        self.relay_manager.run_sync()
 
 
 if __name__ == "__main__":
@@ -101,7 +130,11 @@ if __name__ == "__main__":
     for event in filter(lambda e: e.kind == BOT_CHANNEL_INVITE, abbot_nostr.get_events()):
         # this outputs all valid invite events. we still need to verify that they come from
         # a specified whitelist of pubkeys, aka the atlbitlab pubkey
-        print(event)
+        # print(event)
+        # search for 'e' tag that holds the channel id to join
+        channel_tag: List[str] = next(filter(lambda t: t[0] == 'e', event.tags))
+        # print(channel_tag)s
+        abbot_nostr.send_greeting_to_channel(channel_tag[1])
     # relay_manager = RelayManager(timeout=6)
     # relay_manager.add_relay("wss://relay.damus.io")
     # private_key = abbot_nostr.private_key
