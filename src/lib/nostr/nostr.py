@@ -1,10 +1,6 @@
-from binascii import unhexlify
-import ssl
-import time
 import os
 import uuid
-import IPython
-from pynostr.key import PrivateKey, PublicKey
+from pynostr.key import PrivateKey
 from pynostr.relay_manager import RelayManager
 from pynostr.filters import FiltersList, Filters
 from pynostr.event import EventKind
@@ -17,6 +13,7 @@ CHANNEL_META = EventKind.CHANNEL_META  # 41
 CHANNEL_MESSAGE = EventKind.CHANNEL_MESSAGE  # 42
 CHANNEL_HIDE = EventKind.CHANNEL_HIDE  # 43
 CHANNEL_MUTE = EventKind.CHANNEL_MUTE  # 44
+BOT_CHANNEL_INVITE = 21021
 
 RELAYS = [
     "wss://booger.pro",
@@ -29,6 +26,7 @@ RELAYS = [
     "wss://relay.snort.social/",
 ]
 
+DEFAULT_FILTERS = [Filters(kinds=[DM, CHANNEL_CREATE, CHANNEL_MESSAGE], limit=100)]
 
 class AbbotFilters:
     def __init__(self, filter_data: list):
@@ -43,24 +41,18 @@ class AbbotNostr:
     relay_manager = RelayManager(timeout=6)
     notices = []
     events = []
-    filters = FiltersList([Filters(kinds=[CHANNEL_MESSAGE], limit=100)])
-    # filters = FiltersList([Filters(authors=[private_key.public_key.hex()], limit=100)])
-    filters_list = []  # FiltersList()
-    filters = kinds = [DM, CHANNEL_CREATE, CHANNEL_MESSAGE]  # Filters()
-    #
 
     def __init__(self, sec_key):
         self.sec_key = sec_key
-        self.private_key = PrivateKey(unhexlify(sec_key))
-        self.private_key_hex = self.private_key.hex()
+        self.private_key = PrivateKey.from_hex(sec_key)
         self.public_key = self.private_key.public_key
-        self.filters = filters
 
     def add_relays_subscribe_and_run(self):
         for relay in RELAYS:
             self.relay_manager.add_relay(relay)
-        subscription_id = uuid.uuid1().hex
-        self.relay_manager.add_subscription_on_all_relays(subscription_id, self.filters)
+
+        filters = FiltersList(DEFAULT_FILTERS + [Filters(kinds=[BOT_CHANNEL_INVITE], pubkey_refs=[self.public_key.hex()])])
+        self.relay_manager.add_subscription_on_all_relays(uuid.uuid4().hex, filters)
         self.relay_manager.run_sync()
 
     def get_message_pool(self):
@@ -75,12 +67,9 @@ class AbbotNostr:
 
     def get_events(self):
         while self.relay_manager.message_pool.has_events():
-            event_msg = self.relay_manager.message_pool.get_event()
-            print(event_msg)
-        return self.events
-
-    def get_events(self):
-        return self.relay_manager.message_pool.events
+            event = self.relay_manager.message_pool.get_event().event
+            if event.verify():
+                yield event
 
     def unsubscribe(self, url, id: str):
         self.relay_manager.close_subscription_on_relay(url, id)
@@ -108,23 +97,28 @@ if __name__ == "__main__":
     # print("notices", notices)
     # print("events", events)
     abbot_nostr = AbbotNostr(os.environ["ABBOT_SEC"])
-    relay_manager = RelayManager(timeout=6)
-    relay_manager.add_relay("wss://relay.damus.io")
-    private_key = abbot_nostr.private_key
-    private_key_hex = private_key.hex()
-    filters = FiltersList([Filters(authors=[private_key.public_key.hex()], limit=100)])
-    subscription_id = uuid.uuid1().hex
-    relay_manager.add_subscription_on_all_relays(subscription_id, filters)
-    dm_event: Event = abbot_nostr.create_dm_event(
-        "Secret message2! Hello world!", "9ddf6fe3a194d330a6c6e278a432ae1309e52cc08587254b337d0f491f7ff642"
-    )
-    dm_event.sign(private_key_hex)
-    relay_manager.publish_event(dm_event)
-    relay_manager.run_sync()
-    time.sleep(5)  # allow the messages to send
-    while relay_manager.message_pool.has_ok_notices():
-        ok_msg = relay_manager.message_pool.get_ok_notice()
-        print(ok_msg)
-    while relay_manager.message_pool.has_events():
-        event_msg = relay_manager.message_pool.get_event()
-        print(event_msg.event)
+    abbot_nostr.add_relays_subscribe_and_run()
+    for event in filter(lambda e: e.kind == BOT_CHANNEL_INVITE, abbot_nostr.get_events()):
+        # this outputs all valid invite events. we still need to verify that they come from
+        # a specified whitelist of pubkeys, aka the atlbitlab pubkey
+        print(event)
+    # relay_manager = RelayManager(timeout=6)
+    # relay_manager.add_relay("wss://relay.damus.io")
+    # private_key = abbot_nostr.private_key
+    # private_key_hex = private_key.hex()
+    # filters = FiltersList([Filters(authors=[private_key.public_key.hex()], limit=100)])
+    # subscription_id = uuid.uuid1().hex
+    # relay_manager.add_subscription_on_all_relays(subscription_id, filters)
+    # dm_event: Event = abbot_nostr.create_dm_event(
+    #     "Secret message2! Hello world!", "9ddf6fe3a194d330a6c6e278a432ae1309e52cc08587254b337d0f491f7ff642"
+    # )
+    # dm_event.sign(private_key_hex)
+    # relay_manager.publish_event(dm_event)
+    # relay_manager.run_sync()
+    # time.sleep(5)  # allow the messages to send
+    # while relay_manager.message_pool.has_ok_notices():
+    #     ok_msg = relay_manager.message_pool.get_ok_notice()
+    #     print(ok_msg)
+    # while relay_manager.message_pool.has_events():
+    #     event_msg = relay_manager.message_pool.get_event()
+    #     print(event_msg.event)
