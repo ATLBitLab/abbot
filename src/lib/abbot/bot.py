@@ -289,15 +289,17 @@ class Abbot(Config, Bots):
         debug_logger.log(f"{fn} {self.name} token_count={total}")
         return total
 
-    def update_chat_history(self, chat_message: dict(role=str, content=str)) -> None:
+    def update_chat_history(self, chat_message: dict) -> None:
         fn = "update_chat_history:"
-        debug_logger.log(fn)
+        debug_logger.log(f"{fn} chat_message={chat_message}")
         if not chat_message:
             return
         self.chat_history.append(chat_message)
         self.chat_history_file.write("\n" + json.dumps(chat_message))
         self.chat_history_len += 1
+        debug_logger.log(f"{fn} history_len={self.chat_history_len}")
         self.chat_history_tokens += len(self.tokenize(try_get(chat_message, "content")))
+        debug_logger.log(f"{fn} tokens={self.chat_history_tokens}")
         return self.chat_history_tokens
 
     @try_except
@@ -322,11 +324,13 @@ class Abbot(Config, Bots):
     @try_except
     def chat_history_completion(self) -> str | Exception:
         fn = "chat_history_completion:"
-        debug_logger.log(fn)
         messages = [self.gpt_system]
         history = self.chat_history
-        if self.chat_history_tokens > 5000:
+        gt_5000 = self.chat_history_tokens > 5000
+        if gt_5000:
+            debug_logger.log(f"{fn} gt_5000={gt_5000}")
             index = self.chat_history_len // 2
+            debug_logger.log(f"{fn} index={index}")
             history = history[index:]
         messages.extend(history)
         response = openai.ChatCompletion.create(

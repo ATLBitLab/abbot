@@ -17,3 +17,11 @@ ignore/
 # logs and tarballs
 *.log
 *.gz
+
+# chat data
+src/data/chat/group/content/*
+src/data/chat/group/config/*
+src/data/chat/private/content/*
+src/data/chat/private/config/*
+src/data/backup/chats/*
+src/data/raw_messages.jsonl

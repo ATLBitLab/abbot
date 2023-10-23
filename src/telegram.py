@@ -22,10 +22,11 @@ from lib.abbot.handlers import (
     handle_message,
 )
 
-if __name__ == "__main__":
-    debug_logger.log(f"Initializing {BOT_NAME} @{BOT_TELEGRAM_HANDLE}")
+
+def run_telegram():
+    debug_logger.log(f"Initializing telegram {BOT_NAME} @{BOT_TELEGRAM_HANDLE}")
     APPLICATION = ApplicationBuilder().token(BOT_TELEGRAM_TOKEN).build()
-    debug_logger.log(f"{BOT_NAME} @{BOT_TELEGRAM_HANDLE} Initialized")
+    debug_logger.log(f"Telegram {BOT_NAME} @{BOT_TELEGRAM_HANDLE} Initialized")
 
     _unplug_handler = CommandHandler("unplug", admin_unplug)
     _plugin_handler = CommandHandler("plugin", admin_plugin)
@@ -53,8 +54,11 @@ if __name__ == "__main__":
     APPLICATION.add_handler(unleash_handler)
     APPLICATION.add_handler(leash_handler)
 
+    # TODO: define different message handlers such as Mention() or Reply() if exists
+    # BaseFilter should run first and do 1 thing: store the message and setup the telegram stuff
+    # Mention, ReplyToBot and Unleash fitlers should reply with a completion
     message_handler = MessageHandler(BaseFilter(), handle_message)
     APPLICATION.add_handler(message_handler)
 
-    debug_logger.log(f"{BOT_NAME} @{BOT_TELEGRAM_HANDLE} Polling")
+    debug_logger.log(f"Telegram {BOT_NAME} @{BOT_TELEGRAM_HANDLE} Polling")
     APPLICATION.run_polling()

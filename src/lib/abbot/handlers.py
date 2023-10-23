@@ -1,18 +1,12 @@
 import json
 from io import open
-from sys import argv
 from os import listdir
 from os.path import abspath
-
-ARGS = argv[1:]
-DEV_MODE = "-d" in ARGS or "--dev" in ARGS
-print("handlers", DEV_MODE)
 
 from telegram import Update, Message, Chat, User
 from telegram.ext import ContextTypes
 
 from constants import HELP_MENU, THE_CREATOR
-
 from lib.admin.admin_service import AdminService
 from lib.abbot.bot import Abbot, Bots
 from lib.logger import debug_logger, error_logger
@@ -151,28 +145,28 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         abbot = Abbot(name, BOT_TELEGRAM_HANDLE, BOT_CORE_SYSTEM, abbot_context, chat_id)
         abbots.update_abbots(chat_id, abbot)
 
-    not_introduced: bool = abbot.is_forgotten()
-    if not_introduced:
-        debug_logger.log(f"{fn} Abbot not introduced!")
-        abbot.introduce()
-        introduced = abbot.is_introduced()
-        debug_logger.log(f"introduced={introduced}")
-        abbots.update_abbots(chat_id, abbot)
-        return await message.reply_text(
-            "Thank you for talking to Abbot (@atl_bitlab_bot), a bitcoiner bot for bitcoin communities, by the Atlanta Bitcoin community!\n\n"
-            "Abbot is meant to provide education to local bitcoin communities and help community organizers with various tasks.\n\n"
-            "To start Abbot in a group chat, have a channel admin run /start\n"
-            "To start Abbot in a DM, simply run /start.\n\n"
-            "By running /start, you agree to our Terms & policies: https://atlbitlab.com/abbot/policies.\n\n"
-            "If you have multiple bots in one channel, you may need to run /start@atl_bitlab_bot to avoid bot confusion!\n\n"
-            "If you have questions, concerns, feature requests or find bugs, please contact @nonni_io or @ATLBitLab on Telegram."
-        )
+    # not_introduced: bool = abbot.is_forgotten()
+    # if not_introduced:
+    #     debug_logger.log(f"{fn} Abbot not introduced!")
+    #     abbot.introduce()
+    #     introduced = abbot.is_introduced()
+    #     debug_logger.log(f"introduced={introduced}")
+    #     abbots.update_abbots(chat_id, abbot)
+    #     return await message.reply_text(
+    #         "Thank you for talking to Abbot (@atl_bitlab_bot), a bitcoiner bot for bitcoin communities, by the Atlanta Bitcoin community!\n\n"
+    #         "Abbot is meant to provide education to local bitcoin communities and help community organizers with various tasks.\n\n"
+    #         "To start Abbot in a group chat, have a channel admin run /start\n"
+    #         "To start Abbot in a DM, simply run /start.\n\n"
+    #         "By running /start, you agree to our Terms & policies: https://atlbitlab.com/abbot/policies.\n\n"
+    #         "If you have multiple bots in one channel, you may need to run /start@atl_bitlab_bot to avoid bot confusion!\n\n"
+    #         "If you have questions, concerns, feature requests or find bugs, please contact @nonni_io or @ATLBitLab on Telegram."
+    #     )
 
-    not_started: bool = abbot.is_stopped()
-    if not_started:
-        debug_logger.log(f"{fn} Abbot introduced!")
-        debug_logger.log(f"{fn} Abbot not started!")
-        return
+    # not_started: bool = abbot.is_stopped()
+    # if not_started:
+    #     debug_logger.log(f"{fn} Abbot introduced!")
+    #     debug_logger.log(f"{fn} Abbot not started!")
+    #     return
 
     handle: str = abbot.handle
     message_reply = try_get(message, "reply_to_message")
@@ -180,7 +174,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_reply_from = try_get(message_reply, "from")
     replied_to_abbot = try_get(message_reply_from, "username") == handle
     if is_private_chat:
-        abbot.update_chat_history()
+        abbot.update_chat_history(abbot_message)
         debug_logger.log(f"{fn} is private, not group_in_name")
         answer = abbot.chat_history_completion()
     else:
@@ -201,23 +195,23 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return
         debug_logger.log(f"{fn} All checks passed!")
         answer = abbot.chat_history_completion()
-    if not answer:
-        await context.bot.send_message(
-            chat_id=THE_CREATOR,
-            text=f"{abbot.name} completion failed ⛔️: abbot={abbot} answer={answer}",
-        )
-    i = 0
-    while not answer and i < 5:
-        abbot.sleep(10)
-        answer = abbot.chat_history_completion()
-        debug_logger.log(f"{fn} answer={answer}")
-        if answer:
-            continue
-        i += 1
-    if not answer:
-        return await context.bot.send_message(
-            chat_id=user_id, text="Sorry, I seem to have bugged out bug 🐜 please contact @nonni_io for help."
-        )
+    # if not answer:
+    #     await context.bot.send_message(
+    #         chat_id=THE_CREATOR,
+    #         text=f"{abbot.name} completion failed ⛔️: abbot={abbot} answer={answer}",
+    #     )
+    # i = 0
+    # while not answer and i < 5:
+    #     abbot.sleep(10)
+    #     answer = abbot.chat_history_completion()
+    #     debug_logger.log(f"{fn} answer={answer}")
+    #     if answer:
+    #         continue
+    #     i += 1
+    # if not answer:
+    #     return await context.bot.send_message(
+    #         chat_id=user_id, text="Sorry, I seem to have bugged out bug 🐜 please contact @nonni_io for help."
+    #     )
     return await message.reply_text(answer)
 
 
