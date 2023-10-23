@@ -5,14 +5,21 @@ from os.path import abspath
 
 from telegram import Update, Message, Chat, User
 from telegram.ext import ContextTypes
+from telegram.ext.filters import BaseFilter
+from telegram.ext import (
+    ApplicationBuilder,
+    CommandHandler,
+    MessageHandler,
+)
 
 from constants import HELP_MENU, THE_CREATOR
-from lib.admin.admin_service import AdminService
-from lib.abbot.bot import Abbot, Bots
 from lib.logger import debug_logger, error_logger
 from lib.utils import sender_is_group_admin, try_get
+
+from lib.admin.admin_service import AdminService
+
+from lib.abbot.bot import Abbot, Bots
 from lib.abbot.exceptions.exception import try_except, AbbotException
-from lib.abbot.config import BOT_CORE_SYSTEM, BOT_NAME, BOT_TELEGRAM_HANDLE, ORG_TELEGRAM_HANDLE
 from lib.abbot.utils import (
     parse_chat,
     parse_chat_data,
@@ -24,7 +31,7 @@ from lib.abbot.utils import (
     successful,
 )
 from lib.abbot.exceptions.exception import try_except, AbbotException
-from lib.abbot.config import BOT_NAME, BOT_TELEGRAM_HANDLE, BOT_CORE_SYSTEM, ORG_CHAT_ID, ORG_CHAT_TITLE
+from lib.abbot.config import BOT_NAME, BOT_TELEGRAM_HANDLE, BOT_TELEGRAM_TOKEN, BOT_CORE_SYSTEM
 
 # context.args
 RAW_MESSAGE_JL_FILE = abspath("src/data/raw_messages.jsonl")
@@ -52,7 +59,7 @@ for content, config in zip(GROUP_CONTENT_FILES, GROUP_CONFIG_FILES):
     debug_logger.log(f"main => context={context} chat_id={chat_id} name={name}")
     group_abbot = Abbot(
         name,
-        ORG_TELEGRAM_HANDLE,
+        BOT_TELEGRAM_HANDLE,
         BOT_CORE_SYSTEM,
         context,
         chat_id,
@@ -568,3 +575,44 @@ async def admin_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         status_data = json.dumps(abbot.get_state(), indent=4)
         debug_logger.log(f"statuses => {abbot.name} status_data={status_data}")
         await message.reply_text(status_data)
+
+
+def run():
+    debug_logger.log(f"Initializing telegram {BOT_NAME} @{BOT_TELEGRAM_HANDLE}")
+    APPLICATION = ApplicationBuilder().token(BOT_TELEGRAM_TOKEN).build()
+    debug_logger.log(f"Telegram {BOT_NAME} @{BOT_TELEGRAM_HANDLE} Initialized")
+
+    _unplug_handler = CommandHandler("unplug", admin_unplug)
+    _plugin_handler = CommandHandler("plugin", admin_plugin)
+    _kill_handler = CommandHandler("kill", admin_kill)
+    _nap_handler = CommandHandler("nap", admin_nap)
+    _status_handler = CommandHandler("status", admin_status)
+
+    APPLICATION.add_handler(_unplug_handler)
+    APPLICATION.add_handler(_plugin_handler)
+    APPLICATION.add_handler(_kill_handler)
+    APPLICATION.add_handler(_nap_handler)
+    APPLICATION.add_handler(_status_handler)
+
+    help_handler = CommandHandler("help", help)
+    rules_handler = CommandHandler("rules", rules)
+    start_handler = CommandHandler("start", start)
+    stop_handler = CommandHandler("stop", stop)
+    unleash_handler = CommandHandler("unleash", unleash)
+    leash_handler = CommandHandler("leash", leash)
+
+    APPLICATION.add_handler(help_handler)
+    APPLICATION.add_handler(rules_handler)
+    APPLICATION.add_handler(start_handler)
+    APPLICATION.add_handler(stop_handler)
+    APPLICATION.add_handler(unleash_handler)
+    APPLICATION.add_handler(leash_handler)
+
+    # TODO: define different message handlers such as Mention() or Reply() if exists
+    # BaseFilter should run first and do 1 thing: store the message and setup the telegram stuff
+    # Mention, ReplyToBot and Unleash fitlers should reply with a completion
+    message_handler = MessageHandler(BaseFilter(), handle_message)
+    APPLICATION.add_handler(message_handler)
+
+    debug_logger.log(f"Telegram {BOT_NAME} @{BOT_TELEGRAM_HANDLE} Polling")
+    APPLICATION.run_polling()
