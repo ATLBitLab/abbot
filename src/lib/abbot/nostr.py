@@ -175,3 +175,8 @@ if __name__ == "__main__":
     # while relay_manager.message_pool.has_events():
     #     event_msg = relay_manager.message_pool.get_event()
     #     print(event_msg.event)
+
+
+def run():
+    # TODO: create nostr run fn using backend handlers
+    pass
