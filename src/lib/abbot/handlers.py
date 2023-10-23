@@ -23,7 +23,7 @@ from lib.abbot.utils import (
     squawk_error,
     successful,
 )
-from lib.abbot.exceptions.abbot_exception import try_except, AbbotException
+from lib.abbot.exceptions.exception import try_except, AbbotException
 from lib.abbot.config import BOT_NAME, BOT_TELEGRAM_HANDLE, BOT_CORE_SYSTEM, ORG_CHAT_ID, ORG_CHAT_TITLE
 
 # context.args
