@@ -93,7 +93,8 @@ export default function Abbot() {
         className={
           spacemono.className +
           " mx-auto max-w-4xl text-white flex flex-col items-center gap-2 my-16 pb-16 px-8"
-        }>
+        }
+      >
         <div className="flex flex-col items-center w-2/3 gap-8 text-center">
           <a href="tg://resolve?domain=atl_bitlab_bot">
             <Image src={abbot} alt={"Abbot ATL BitLab Bot"} />
@@ -107,21 +108,28 @@ export default function Abbot() {
             <Button
               className="w-full border-[#08252E] border-2 px-8"
               type="button"
-              onClick={() => router.push("/abbot/policies")}>
+              onClick={() => router.push("/abbot/policies")}
+            >
               Terms & policies 📑
             </Button>
           </Row>
           <Row className="w-full">
             <Button
-              className={`w-full border-[#08252E] border-2 mr-1 ${abbotState === 0 ? "bg-[#08252E] text-white" : ""}`}
+              className={`w-full border-[#08252E] border-2 mr-1 ${
+                abbotState === 0 ? "bg-[#08252E] text-white" : ""
+              }`}
               type="button"
-              onClick={() => setAbbotState(0)}>
+              onClick={() => setAbbotState(0)}
+            >
               Telegram 🤖
             </Button>
             <Button
-              className={`w-full border-[#08252E] border-2 ml-1 ${abbotState > 0 ? "bg-[#08252E] text-white" : ""}`}
+              className={`w-full border-[#08252E] border-2 ml-1 ${
+                abbotState > 0 ? "bg-[#08252E] text-white" : ""
+              }`}
               type="button"
-              onClick={() => setAbbotState(1)}>
+              onClick={() => setAbbotState(1)}
+            >
               Nostr 🟣
             </Button>
           </Row>
@@ -131,53 +139,57 @@ export default function Abbot() {
                 className="w-full border-[#08252E] border-2 mr-1"
                 type="button"
                 onClick={() =>
-                (window.location.href =
-                  "https://www.nostrchat.io/dm/npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk")
-                }>
+                  (window.location.href =
+                    "https://www.nostrchat.io/dm/npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk")
+                }
+              >
                 Nostr DM 🟣
               </Button>
               <Button
-                className={`w-full border-[#08252E] border-2 ml-1 ${abbotState === 2 ? "bg-[#08252E] text-white" : ""
-                  }`}
+                className={`w-full border-[#08252E] border-2 ml-1 ${
+                  abbotState === 2 ? "bg-[#08252E] text-white" : ""
+                }`}
                 type="button"
-                onClick={() => setAbbotState(2)}>
+                onClick={() => setAbbotState(2)}
+              >
                 Nostr Channel 🟣
               </Button>
             </Row>
           )}
-          {
-            abbotState === 2 && (
-              <Row className="w-full">
-                <form
-                  className="w-full flex justify-between items-center"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    console.log("Channel ID submitted:", channelId); // Placeholder for form submission handling
-                  }}>
-                  <input
-                    type="text"
-                    placeholder="Enter your channel ID"
-                    pattern="[a-f0-9]{64}"
-                    title="Channel ID should be 64 lowercase hex characters"
-                    className="border-2 border-[#08252E] px-2 text-black flex-grow"
-                    value={channelId}
-                    onChange={(e) => setChannelId(e.target.value)}
-                    required
-                  />
-                  <button
-                    type="submit"
-                    className="border-2 border-[#08252E] px-8 bg-[#08252E] text-white ml-2">
-                    Join
-                  </button>
-                </form>
-              </Row>
-            )
-          }
+          {abbotState === 2 && (
+            <Row className="w-full">
+              <form
+                className="w-full flex justify-between items-center"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  console.log("Channel ID submitted:", channelId); // Placeholder for form submission handling
+                }}
+              >
+                <input
+                  type="text"
+                  placeholder="Enter your channel ID"
+                  pattern="[a-f0-9]{64}"
+                  title="Channel ID should be 64 lowercase hex characters"
+                  className="border-2 border-[#08252E] px-2 text-black flex-grow"
+                  value={channelId}
+                  onChange={(e) => setChannelId(e.target.value)}
+                  required
+                />
+                <button
+                  type="submit"
+                  className="border-2 border-[#08252E] px-8 bg-[#08252E] text-white ml-2"
+                >
+                  Join
+                </button>
+              </form>
+            </Row>
+          )}
           <Row className="w-full">
             <Button
               className="w-full border-[#08252E] border-2 px-8"
               type="button"
-              onClick={() => router.push("/")}>
+              onClick={() => router.push("/")}
+            >
               Home 🏠
             </Button>
           </Row>
