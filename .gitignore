@@ -19,10 +19,12 @@ ignore/
 *.gz
 
 # chat data
-src/data/chat/group/content/*
-src/data/chat/group/config/*
-src/data/chat/private/content/*
-src/data/chat/private/config/*
+src/data/chat/group/content/*.json
+src/data/chat/group/config/*.json
+
+src/data/chat/private/content/*.json
+src/data/chat/private/config/*.json
+
 src/data/backup/chats/*
 src/data/raw_messages.jsonl
 
@@ -64,10 +66,3 @@ yarn-error.log*
 next-env.d.ts
 
 ignore/
-
-DATASTORE/
-EVENTLOG/
-INDEX/
-MESSAGESTORE/
-data/
-.vscode/
