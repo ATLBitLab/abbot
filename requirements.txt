@@ -65,6 +65,7 @@ Pygments==2.15.1
 pymongo==4.5.0
 pynostr==0.6.2
 pyparsing==3.1.1
+PyPDF2==3.0.1
 pypng==0.20220715.0
 python-dateutil==2.8.2
 python-dotenv==1.0.0
