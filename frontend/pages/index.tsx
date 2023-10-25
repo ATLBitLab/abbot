@@ -117,7 +117,7 @@ export default function Abbot() {
             <Button
               className={`w-full border-[#08252E] border-2 mr-1 ${abbotState === 0 ? "bg-[#08252E] text-white" : ""}`}
               type="button"
-              onClick={() => setAbbotState(0)}
+              onClick={() => window.location.href = "tg://resolve?domain=atl_bitlab_bot"}
             >
               Telegram 🤖
             </Button>
@@ -135,10 +135,7 @@ export default function Abbot() {
                 <Button
                   className="w-full border-[#08252E] border-2 mr-1"
                   type="button"
-                  onClick={() =>
-                  (window.location.href =
-                    "https://www.nostrchat.io/dm/npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk")
-                  }
+                  onClick={() => window.location.href = "https://www.nostrchat.io/dm/npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk"}
                 >
                   Nostr DM 🟣
                 </Button>
