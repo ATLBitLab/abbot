@@ -115,16 +115,14 @@ export default function Abbot() {
           </Row>
           <Row className="w-full">
             <Button
-              className={`w-full border-[#08252E] border-2 mr-1 ${abbotState === 0 ? "bg-[#08252E] text-white" : ""
-                }`}
+              className={`w-full border-[#08252E] border-2 mr-1 ${abbotState === 0 ? "bg-[#08252E] text-white" : ""}`}
               type="button"
               onClick={() => setAbbotState(0)}
             >
               Telegram 🤖
             </Button>
             <Button
-              className={`w-full border-[#08252E] border-2 ml-1 ${abbotState > 0 ? "bg-[#08252E] text-white" : ""
-                }`}
+              className={`w-full border-[#08252E] border-2 ml-1 ${abbotState > 0 ? "bg-[#08252E] text-white" : ""}`}
               type="button"
               onClick={() => setAbbotState(1)}
             >
@@ -145,8 +143,7 @@ export default function Abbot() {
                   Nostr DM 🟣
                 </Button>
                 <Button
-                  className={`w-full border-[#08252E] border-2 ml-1 ${abbotState === 2 ? "bg-[#08252E] text-white" : ""
-                    }`}
+                  className={`w-full border-[#08252E] border-2 ml-1 ${abbotState === 2 ? "bg-[#08252E] text-white" : ""}`}
                   type="button"
                   onClick={() => setAbbotState(2)}
                 >
