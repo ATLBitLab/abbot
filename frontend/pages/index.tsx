@@ -16,7 +16,7 @@ const spacemono = Space_Mono({
 
 export default function Abbot() {
   const router = useRouter();
-  const [abbotState, setAbbotState] = useState<number>(0);
+  const [abbotState, setAbbotState] = useState<number | null>(null);
   const [channelId, setChannelId] = useState<string>("");
 
   return (
@@ -115,70 +115,77 @@ export default function Abbot() {
           </Row>
           <Row className="w-full">
             <Button
-              className={`w-full border-[#08252E] border-2 mr-1 ${abbotState === 0 ? "bg-[#08252E] text-white" : ""}`}
+              className={`w-full border-[#08252E] border-2 mr-1 ${
+                abbotState === 0 ? "bg-[#08252E] text-white" : ""
+              }`}
               type="button"
-              onClick={() => window.location.href = "tg://resolve?domain=atl_bitlab_bot"}
+              onClick={() =>
+                (window.location.href = "tg://resolve?domain=atl_bitlab_bot")
+              }
             >
               Telegram 🤖
             </Button>
             <Button
-              className={`w-full border-[#08252E] border-2 ml-1 ${abbotState > 0 ? "bg-[#08252E] text-white" : ""}`}
+              className={`w-full border-[#08252E] border-2 ml-1 ${
+                abbotState > 0 ? "bg-[#08252E] text-white" : ""
+              }`}
               type="button"
               onClick={() => setAbbotState(1)}
             >
               Nostr 🟣
             </Button>
           </Row>
-          {
-            abbotState >= 1 && (
-              <Row className="w-full">
-                <Button
-                  className="w-full border-[#08252E] border-2 mr-1"
-                  type="button"
-                  onClick={() => window.location.href = "https://www.nostrchat.io/dm/npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk"}
+          {abbotState >= 1 && (
+            <Row className="w-full">
+              <Button
+                className="w-full border-[#08252E] border-2 mr-1"
+                type="button"
+                onClick={() =>
+                  (window.location.href =
+                    "https://www.nostrchat.io/dm/npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk")
+                }
+              >
+                Nostr DM 🟣
+              </Button>
+              <Button
+                className={`w-full border-[#08252E] border-2 ml-1 ${
+                  abbotState === 2 ? "bg-[#08252E] text-white" : ""
+                }`}
+                type="button"
+                onClick={() => setAbbotState(2)}
+              >
+                Nostr Channel 🟣
+              </Button>
+            </Row>
+          )}
+          {abbotState === 2 && (
+            <Row className="w-full">
+              <form
+                className="w-full flex justify-between items-center"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  console.log("Channel ID submitted:", channelId); // Placeholder for form submission handling
+                }}
+              >
+                <input
+                  type="text"
+                  placeholder="Enter your channel ID"
+                  pattern="[a-f0-9]{64}"
+                  title="Channel ID should be 64 lowercase hex characters"
+                  className="border-2 border-[#08252E] px-2 text-black flex-grow"
+                  value={channelId}
+                  onChange={(e) => setChannelId(e.target.value)}
+                  required
+                />
+                <button
+                  type="submit"
+                  className="border-2 border-[#08252E] px-8 bg-[#08252E] text-white ml-2"
                 >
-                  Nostr DM 🟣
-                </Button>
-                <Button
-                  className={`w-full border-[#08252E] border-2 ml-1 ${abbotState === 2 ? "bg-[#08252E] text-white" : ""}`}
-                  type="button"
-                  onClick={() => setAbbotState(2)}
-                >
-                  Nostr Channel 🟣
-                </Button>
-              </Row>
-            )
-          }
-          {
-            abbotState === 2 && (
-              <Row className="w-full">
-                <form
-                  className="w-full flex justify-between items-center"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    console.log("Channel ID submitted:", channelId); // Placeholder for form submission handling
-                  }}
-                >
-                  <input
-                    type="text"
-                    placeholder="Enter your channel ID"
-                    pattern="[a-f0-9]{64}"
-                    title="Channel ID should be 64 lowercase hex characters"
-                    className="border-2 border-[#08252E] px-2 text-black flex-grow"
-                    value={channelId}
-                    onChange={(e) => setChannelId(e.target.value)}
-                    required
-                  />
-                  <button
-                    type="submit"
-                    className="border-2 border-[#08252E] px-8 bg-[#08252E] text-white ml-2"
-                  >
-                    Join
-                  </button>
-                </form>
-              </Row>
-            )
-          }
+                  Join
+                </button>
+              </form>
+            </Row>
+          )}
           <Row className="w-full">
             <Button
               className="w-full border-[#08252E] border-2 px-8"
