@@ -3,8 +3,8 @@ from sys import argv
 ARGS = argv[1:]
 TEST_MODE = "-t" in ARGS or "--test" in ARGS
 
-from typing import Optional, Dict, List
-from dataclasses import dataclass, field, Field
+from typing import Dict, List
+from dataclasses import dataclass, field
 
 from pymongo import MongoClient
 from lib.abbot.env import DATABASE_CONNECTION_STRING
