@@ -1,6 +1,6 @@
-import os
+import IPython
 import uuid
-from pynostr.key import PrivateKey
+from pynostr.key import PrivateKey, PublicKey
 from pynostr.relay_manager import RelayManager
 from pynostr.filters import FiltersList, Filters
 from pynostr.event import EventKind
@@ -8,18 +8,18 @@ from pynostr.encrypted_dm import EncryptedDirectMessage
 from pynostr.event import Event
 from typing import List, Optional
 
+from lib.abbot.env import BOT_NOSTR_PK
 from lib.abbot.exceptions.exception import try_except
-from lib.utils import try_get
 
-DM = EventKind.ENCRYPTED_DIRECT_MESSAGE  # 4
-CHANNEL_CREATE = EventKind.CHANNEL_CREATE  # 40
-CHANNEL_META = EventKind.CHANNEL_META  # 41
-CHANNEL_MESSAGE = EventKind.CHANNEL_MESSAGE  # 42
-CHANNEL_HIDE = EventKind.CHANNEL_HIDE  # 43
-CHANNEL_MUTE = EventKind.CHANNEL_MUTE  # 44
-BOT_CHANNEL_INVITE = 21021
+DM: EventKind = EventKind.ENCRYPTED_DIRECT_MESSAGE  # 4
+CHANNEL_CREATE: EventKind = EventKind.CHANNEL_CREATE  # 40
+CHANNEL_META: EventKind = EventKind.CHANNEL_META  # 41
+CHANNEL_MESSAGE: EventKind = EventKind.CHANNEL_MESSAGE  # 42
+CHANNEL_HIDE: EventKind = EventKind.CHANNEL_HIDE  # 43
+CHANNEL_MUTE: EventKind = EventKind.CHANNEL_MUTE  # 44
+BOT_CHANNEL_INVITE: EventKind = EventKind.BOT_CHANNEL_INVITE  # 21021
 
-RELAYS = [
+RELAYS: List[str] = [
     "wss://relay1.nostrchat.io",
     "wss://relay2.nostrchat.io",
     "wss://relay.damus.io",
@@ -27,8 +27,6 @@ RELAYS = [
     "wss://relay.primal.net",
     "wss://relay.snort.social/",
 ]
-
-DEFAULT_FILTERS = dict(kinds=[DM, CHANNEL_CREATE, CHANNEL_MESSAGE], limit=100)
 
 INTRODUCTION = """
 Hey! The name's Abbot but you can think of me as your go-to guide for all things Bitcoin.
@@ -48,21 +46,34 @@ class AbbotNostr:
     notices = []
     events = []
 
-    def __init__(self, sk: str, filters_data: dict = None, author_whitelist: Optional[List[str]] = None):
-        self.private_key = PrivateKey.from_hex(sk)
-        self.public_key = self.private_key.public_key
-        self.filters_data = filters_data or DEFAULT_FILTERS
-        self.filters_list = FiltersList([Filters(**self.filters_data)])
+    def __init__(self, sk: str, custom_filters: Filters = None, author_whitelist: Optional[List[str]] = None):
+        self._private_key = PrivateKey.from_hex(sk)
+        self.public_key: PublicKey = self._private_key.public_key
+        self.author_whitelist: Optional[List[str]] = author_whitelist
         self.author_whitelist = author_whitelist
+        self.custom_filters = custom_filters
+        self.default_filters_list: List[Filters] = [
+            Filters(kinds=[DM, CHANNEL_CREATE, CHANNEL_MESSAGE], pubkey_refs=[BOT_NOSTR_PK], limit=1000),
+            Filters(kinds=[BOT_CHANNEL_INVITE], pubkey_refs=[BOT_NOSTR_PK], authors=self.author_whitelist, limit=1000),
+        ]
+
+    def _instantiate_direct_message(
+        self,
+        partner_pk: str,
+        cleartext: str | None,
+        encrypted: str | None,
+        reference_event_id: str | None = None,
+    ) -> EncryptedDirectMessage:
+        assert partner_pk != None, "Error: partner_pk required!"
+        assert None not in (cleartext, encrypted), "Error: cleartext or encrypted required"
+        return EncryptedDirectMessage(self.public_key.hex(), partner_pk, cleartext, encrypted, reference_event_id)
 
     @try_except
-    def add_relays_and_subscribe(self):
+    def add_relays_and_subscribe(self) -> None:
         for relay in RELAYS:
             self.relay_manager.add_relay(relay)
-        channel_invite_filter = Filters(
-            kinds=[BOT_CHANNEL_INVITE], pubkey_refs=[self.public_key.hex()], authors=self.author_whitelist
-        )
-        filters = FiltersList(DEFAULT_FILTERS + [channel_invite_filter])
+        self.default_filters_list.extend([])
+        filters = FiltersList()
         self.relay_manager.add_subscription_on_all_relays(uuid.uuid4().hex, filters)
         # subscription_id = uuid.uuid1().hex
         # self.relay_manager.add_subscription_on_all_relays(subscription_id, self.filters)
@@ -114,13 +125,29 @@ class AbbotNostr:
         self.relay_manager.close_connections()
 
     @try_except
-    def create_dm(self, content: str, recipient_pubkey: str):
-        dm = EncryptedDirectMessage(self.public_key.hex(), recipient_pubkey, content)
-        dm.encrypt(self.private_key.hex())
-        dm_event = dm.to_event()
-        dm_event.sign(self.public_key.hex())
-        return dm_event
+    def encrypt_direct_message(self, partner_pk: str, cleartext_content: str):
+        encrypted_direct_message: EncryptedDirectMessage = self._instantiate_direct_message(
+            partner_pk, cleartext_content=cleartext_content
+        )
+        encrypted_direct_message.encrypt(self._private_key.hex())
+        encrypted_direct_message_event = encrypted_direct_message.to_event()
+        encrypted_direct_message_event.sign(self.public_key.hex())
+        return encrypted_direct_message_event
 
+    @try_except
+    def decrypt_direct_message(
+        self,
+        partner_pk: str,
+        encrypted_message: str,
+        ref_event_id: str | None = None,
+    ):
+        encrypted_direct_message: EncryptedDirectMessage = self._instantiate_direct_message(
+            partner_pk, encrypted_message=encrypted_message, reference_event_id=ref_event_id
+        )
+        encrypted_direct_message.decrypt(self._private_key.hex())
+        return encrypted_direct_message
+
+    @try_except
     def send_greeting_to_channel(self, channel_id: str):
         event = Event(
             kind=CHANNEL_MESSAGE,
@@ -128,55 +155,11 @@ class AbbotNostr:
             content=INTRODUCTION,
             tags=[["e", channel_id, RELAYS[0], "root"]],
         )
-        event.sign(self.private_key.hex())
+        event.sign(self._private_key.hex())
         print(event)
         self.publish_event(event)
 
+    @try_except
     def publish_event(self, event):
         self.relay_manager.publish_event(event)
         self.relay_manager.run_sync()
-
-
-if __name__ == "__main__":
-    # abbot_nostr.add_relays_subscribe_and_run()
-    # pool = abbot_nostr.get_message_pool()
-    # notices = abbot_nostr.get_notices()
-    # events = abbot_nostr.get_events()
-    # print("pool", pool)
-    # print("notices", notices)
-    # print("events", events)
-    abbot_nostr = AbbotNostr(os.environ["ABBOT_SEC"])
-    abbot_nostr.add_relays_and_subscribe()
-    for event in filter(lambda e: e.kind == BOT_CHANNEL_INVITE, abbot_nostr.poll_for_events()):
-        # this outputs all valid invite events. we still need to verify that they come from
-        # a specified whitelist of pubkeys, aka the atlbitlab pubkey
-        # print(event)
-        # search for 'e' tag that holds the channel id to join
-        channel_tag: List[str] = next(filter(lambda t: t[0] == "e", event.tags))
-        # print(channel_tag)s
-        abbot_nostr.send_greeting_to_channel(channel_tag[1])
-    # relay_manager = RelayManager(timeout=6)
-    # relay_manager.add_relay("wss://relay.damus.io")
-    # private_key = abbot_nostr.private_key
-    # private_key_hex = private_key.hex()
-    # filters = FiltersList([Filters(authors=[private_key.public_key.hex()], limit=100)])
-    # subscription_id = uuid.uuid1().hex
-    # relay_manager.add_subscription_on_all_relays(subscription_id, filters)
-    # dm_event: Event = abbot_nostr.create_dm_event(
-    #     "Secret message2! Hello world!", "9ddf6fe3a194d330a6c6e278a432ae1309e52cc08587254b337d0f491f7ff642"
-    # )
-    # dm_event.sign(private_key_hex)
-    # relay_manager.publish_event(dm_event)
-    # relay_manager.run_sync()
-    # time.sleep(5)  # allow the messages to send
-    # while relay_manager.message_pool.has_ok_notices():
-    #     ok_msg = relay_manager.message_pool.get_ok_notice()
-    #     print(ok_msg)
-    # while relay_manager.message_pool.has_events():
-    #     event_msg = relay_manager.message_pool.get_event()
-    #     print(event_msg.event)
-
-
-def run():
-    # TODO: create nostr run fn using backend handlers
-    pass

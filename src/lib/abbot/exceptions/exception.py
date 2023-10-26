@@ -1,9 +1,6 @@
 from functools import wraps
-from traceback import extract_tb, format_exc, format_tb
-
-from lib.utils import try_get
 from lib.logger import error_logger
-from telegram.ext import ContextTypes
+from traceback import format_exc, format_tb
 
 
 class AbbotException(Exception):
