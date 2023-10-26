@@ -8,7 +8,6 @@ print(f"config: ARGS={ARGS}")
 print(f"config: DEV_MODE={DEV_MODE}")
 print(f"config: ERR_MODE={ERR_MODE}")
 print(f"config: TEST_MODE={TEST_MODE}")
-LOG_MODE = DEV_MODE if DEV_MODE else ERR_MODE
 
 from lib.utils import try_get
 from lib.utils import json_loader, try_get

@@ -1,7 +1,18 @@
-from lib.abbot.config import LOG_MODE
+from sys import argv
+
+ARGS = argv[1:]
+DEV_MODE = "-d" in ARGS or "--dev" in ARGS
+ERR_MODE = "-e" in ARGS or "--error" in ARGS
+TEST_MODE = "-t" in ARGS or "--test" in ARGS
+print(f"config: ARGS={ARGS}")
+print(f"config: DEV_MODE={DEV_MODE}")
+print(f"config: ERR_MODE={ERR_MODE}")
+print(f"config: TEST_MODE={TEST_MODE}")
+LOG_MODE = DEV_MODE if DEV_MODE else ERR_MODE
+
 from os.path import abspath
-from logging import FileHandler, Formatter, StreamHandler, getLogger, DEBUG, ERROR
 from datetime import datetime
+from logging import FileHandler, Formatter, StreamHandler, getLogger, DEBUG, ERROR
 
 now = datetime.now()
 
