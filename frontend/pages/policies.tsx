@@ -3,7 +3,7 @@ import Head from "next/head";
 import Image from "next/image";
 import React from "react";
 import { Space_Mono } from "next/font/google";
-import abbot from "@/public/abbot.jpeg";
+import abbot from "public/abbot.jpeg";
 import Button from "@/components/Button";
 import { useRouter } from 'next/router';
 import Row from "@/components/Row";
