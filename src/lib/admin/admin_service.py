@@ -4,7 +4,7 @@ from subprocess import run, CalledProcessError
 
 from lib.utils import try_get
 from lib.logger import debug_logger, error_logger
-from lib.abbot.exceptions.abbot_exception import try_except
+from lib.abbot.exceptions.exception import try_except
 
 
 SERVICE_STATUSES = {
