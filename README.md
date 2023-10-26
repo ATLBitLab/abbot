@@ -6,7 +6,9 @@ If you're new to Hacktoberfest, you can register to participate [here](https://h
 Check out our [project board](https://github.com/orgs/ATLBitLab/projects/1) and [issues](https://github.com/ATLBitLab/open-abbot/issues) for good ways to contribute.
 
 # Abbot
-A helpful bitcoiner bot at [ATL BitLab](https://atlbitlab.com/abbot). Est. block 797812.
+A helpful bitcoiner bot at [ATL BitLab](https://abbot.atlbitlab.com). Est. block 797812.
+
+[![Netlify Status](https://api.netlify.com/api/v1/badges/0f7c292b-482b-4ee1-b608-626851db4a23/deploy-status)](https://app.netlify.com/sites/abbot/deploys)
 
 ## Summary
 Abbot stands for **A**tl **B**itlab **Bot**. 
