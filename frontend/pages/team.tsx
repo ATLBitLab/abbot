@@ -3,7 +3,7 @@ import Head from "next/head";
 import Image from "next/image";
 import React, { useState } from "react";
 import { Space_Mono } from "next/font/google";
-import abbot from "@/public/abbot/abbot.jpeg";
+import abbot from "@/public/abbot.jpeg";
 import Member from "@/components/Member";
 import Button from "@/components/Button";
 import Row from "@/components/Row";
