@@ -10,6 +10,20 @@ class AbbotException(Exception):
         self.custom_stack = custom_stack
 
 
+def try_except_pass(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        try:
+            return fn(*args, **kwargs)
+        except Exception as exception:
+            error_message = f"An error occurred: {exception}"
+            abbot_exception = AbbotException(error_message, format_exc(), format_tb(exception.__traceback__)[:-1])
+            error_logger.log(f"Error: {abbot_exception}")
+            pass
+
+    return wrapper
+
+
 def try_except(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
@@ -19,5 +33,20 @@ def try_except(fn):
             error_message = f"An error occurred: {exception}"
             abbot_exception = AbbotException(error_message, format_exc(), format_tb(exception.__traceback__)[:-1])
             error_logger.log(f"Error: {abbot_exception}")
+            return abbot_exception
+
+    return wrapper
+
+
+def try_except_raise(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        try:
+            return fn(*args, **kwargs)
+        except Exception as exception:
+            error_message = f"An error occurred: {exception}"
+            abbot_exception = AbbotException(error_message, format_exc(), format_tb(exception.__traceback__)[:-1])
+            error_logger.log(f"Error: {abbot_exception}")
+            raise abbot_exception
 
     return wrapper
