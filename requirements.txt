@@ -63,7 +63,7 @@ pydantic==2.4.2
 pydantic_core==2.10.1
 Pygments==2.15.1
 pymongo==4.5.0
-pynostr==0.6.2
+git+https://github.com/ATLBitLab/pynostr.git@main#egg=pynostr
 pyparsing==3.1.1
 PyPDF2==3.0.1
 pypng==0.20220715.0

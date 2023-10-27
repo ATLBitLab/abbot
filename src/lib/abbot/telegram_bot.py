@@ -574,9 +574,9 @@ async def admin_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await message.reply_text(status_data)
 
 
-def build_telgram_bot():
+def build():
     debug_logger.log(f"Initializing telegram {BOT_NAME} @{BOT_TELEGRAM_HANDLE}")
-    APPLICATION = ApplicationBuilder().token(BOT_TELEGRAM_TOKEN).build()
+    abbot = ApplicationBuilder().token(BOT_TELEGRAM_TOKEN).build()
     debug_logger.log(f"Telegram {BOT_NAME} @{BOT_TELEGRAM_HANDLE} Initialized")
 
     _unplug_handler = CommandHandler("unplug", admin_unplug)
@@ -585,11 +585,11 @@ def build_telgram_bot():
     _nap_handler = CommandHandler("nap", admin_nap)
     _status_handler = CommandHandler("status", admin_status)
 
-    APPLICATION.add_handler(_unplug_handler)
-    APPLICATION.add_handler(_plugin_handler)
-    APPLICATION.add_handler(_kill_handler)
-    APPLICATION.add_handler(_nap_handler)
-    APPLICATION.add_handler(_status_handler)
+    abbot.add_handler(_unplug_handler)
+    abbot.add_handler(_plugin_handler)
+    abbot.add_handler(_kill_handler)
+    abbot.add_handler(_nap_handler)
+    abbot.add_handler(_status_handler)
 
     help_handler = CommandHandler("help", help)
     rules_handler = CommandHandler("rules", rules)
@@ -598,18 +598,18 @@ def build_telgram_bot():
     unleash_handler = CommandHandler("unleash", unleash)
     leash_handler = CommandHandler("leash", leash)
 
-    APPLICATION.add_handler(help_handler)
-    APPLICATION.add_handler(rules_handler)
-    APPLICATION.add_handler(start_handler)
-    APPLICATION.add_handler(stop_handler)
-    APPLICATION.add_handler(unleash_handler)
-    APPLICATION.add_handler(leash_handler)
+    abbot.add_handler(help_handler)
+    abbot.add_handler(rules_handler)
+    abbot.add_handler(start_handler)
+    abbot.add_handler(stop_handler)
+    abbot.add_handler(unleash_handler)
+    abbot.add_handler(leash_handler)
 
     # TODO: define different message handlers such as Mention() or Reply() if exists
     # BaseFilter should run first and do 1 thing: store the message and setup the telegram stuff
     # Mention, ReplyToBot and Unleash fitlers should reply with a completion
     message_handler = MessageHandler(BaseFilter(), handle_message)
-    APPLICATION.add_handler(message_handler)
+    abbot.add_handler(message_handler)
 
     debug_logger.log(f"Telegram {BOT_NAME} @{BOT_TELEGRAM_HANDLE} Polling")
-    return APPLICATION
+    return abbot
