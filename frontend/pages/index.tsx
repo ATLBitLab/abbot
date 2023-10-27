@@ -116,7 +116,9 @@ export default function Abbot() {
           <Row className="w-full">
             <Button
               className={`w-full border-[#08252E] border-2 mr-1 ${
-                abbotState === 0 ? "bg-[#08252E] text-white" : ""
+                abbotState !== null && abbotState !== null && abbotState === 0
+                  ? "bg-[#08252E] text-white"
+                  : ""
               }`}
               type="button"
               onClick={() =>
@@ -127,7 +129,9 @@ export default function Abbot() {
             </Button>
             <Button
               className={`w-full border-[#08252E] border-2 ml-1 ${
-                abbotState > 0 ? "bg-[#08252E] text-white" : ""
+                abbotState !== null && abbotState > 0
+                  ? "bg-[#08252E] text-white"
+                  : ""
               }`}
               type="button"
               onClick={() => setAbbotState(1)}
@@ -135,7 +139,7 @@ export default function Abbot() {
               Nostr 🟣
             </Button>
           </Row>
-          {abbotState >= 1 && (
+          {abbotState !== null && abbotState >= 1 && (
             <Row className="w-full">
               <Button
                 className="w-full border-[#08252E] border-2 mr-1"
@@ -158,7 +162,7 @@ export default function Abbot() {
               </Button>
             </Row>
           )}
-          {abbotState === 2 && (
+          {abbotState !== null && abbotState === 2 && (
             <Row className="w-full">
               <form
                 className="w-full flex justify-between items-center"
