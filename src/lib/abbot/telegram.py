@@ -87,7 +87,7 @@ admin = AdminService(THE_CREATOR, THE_CREATOR)
 admin.status = "running"
 
 
-@try_except
+@try_except_pass
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "handle_message:"
     if not update or not context:
@@ -224,7 +224,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return await message.reply_text(answer)
 
 
-@try_except
+@try_except_pass
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "help:"
     message: Message = parse_message(update)
@@ -240,7 +240,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await message.reply_text(HELP_MENU)
 
 
-@try_except
+@try_except_pass
 async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "unleash:"
     response: dict = parse_message(update, context)
@@ -305,7 +305,7 @@ async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-@try_except
+@try_except_pass
 async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "leash:"
     message: Message = parse_message(update)
@@ -355,7 +355,7 @@ async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-@try_except
+@try_except_pass
 async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "rules:"
     message: Message = try_get(update, "message")
@@ -393,7 +393,7 @@ async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-@try_except
+@try_except_pass
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "start:"
     response: dict = parse_message(update, context)
@@ -459,7 +459,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await message.reply_text(response)
 
 
-@try_except
+@try_except_pass
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "stop:"
     message: Message = try_get(update, "message")
@@ -512,7 +512,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await message.reply_text("Thanks for using Abbot! To restart, use the /start command at any time.")
 
 
-@try_except
+@try_except_pass
 async def admin_plugin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "_admin_plugin:"
     chat_id: int = try_get(update, "message", "chat", "id")
@@ -523,7 +523,7 @@ async def admin_plugin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admin.stop_service()
 
 
-@try_except
+@try_except_pass
 async def admin_unplug(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "admin_unplug:"
     chat_id: int = try_get(update, "message", "chat", "id")
@@ -533,7 +533,7 @@ async def admin_unplug(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admin.start_service()
 
 
-@try_except
+@try_except_pass
 async def admin_kill(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "admin_kill:"
     message: Message = try_get(update, "message")
@@ -547,7 +547,7 @@ async def admin_kill(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admin.kill_service()
 
 
-@try_except
+@try_except_pass
 async def admin_nap(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "admin_nap:"
     message: Message = try_get(update, "message")
@@ -561,7 +561,7 @@ async def admin_nap(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admin.sleep_service()
 
 
-@try_except
+@try_except_pass
 async def admin_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "admin_status:"
     message: Message = try_get(update, "message")
