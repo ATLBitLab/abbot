@@ -14,67 +14,67 @@ const spacemono = Space_Mono({
   display: "swap",
 });
 
-export default function Abbot() {
+export default function Team() {
   const members = [
     {
       name: "bryan",
       image: "/team/bryan.jpeg",
       bio: `
-            Website: <a href="https://bryan.nonni.io">https://bryan.nonni.io</a><br>
-            Nostr: <a href="https://primal.net/p/npub1nh0klcapjnfnpfkxufu2gv4wzvy72txqskrj2jen0585j8ml7epqp5scfr">nonni@atlbitlab.com</a><br>
-            ⚡️ co-founder <a href="https://atlbitlab.com">ATL BitLab</a><br>
-            📚 co-organizer <a href="https://atlbit.dev">ATL BitDevs</a><br>
-            🏗️ core organizer <a href="https://tabconf.com">TAB Conf</a><br>
-            🌎 founder <a href="https://bitcoin.hackerspace.network">BitHackNet</a><br>
-            👨🏼‍💻 software engineer <a href="https://libertypay.com">LibertyPay</a>
+           👨🏼‍💻 full stack software engineer<br>
+           💻 <a href="https://bolt.fun/profile/478/bryan">https://bolt.fun/profile/478/bryan</a><br>
+           🟣 <a href="https://primal.net/p/npub1nh0klcapjnfnpfkxufu2gv4wzvy72txqskrj2jen0585j8ml7epqp5scfr">nonni@atlbitlab.com</a><br>
+            ⚡️ runninig ATL BitLab <a href="https://atlbitlab.com">ATL BitLab</a><br>
+            
         `,
     },
     {
       name: "aida",
       image: "/team/aida.jpeg",
       bio: `
-            Website: <a href=""></a><br>
-            Nostr: <a href="https://snort.social/p/npub1gs2zeuadlkfkd0mfp6sh46arcvu8xzqtgv7chwtgc9hcvcfa4gxs07wvwg">zestyplastic01walletofsatoshi</a><br>
-            👨🏼‍💻 technical product manager <a href=""></a>
+            👨🏼‍💻 technical product manager<br>
+            💻 <a href="https://www.linkedin.com/in/aidacelys/">https://linkedin.com/in/aidacelys/</a><br>
+            🟣 <a href="https://snort.social/p/npub1gs2zeuadlkfkd0mfp6sh46arcvu8xzqtgv7chwtgc9hcvcfa4gxs07wvwg">zestyplastic01@walletofsatoshi</a>
+            
         `,
     },
     {
       name: "annie",
-      image: "/team/annie.png",
+      image: "/team/annie.jpeg",
       bio: `
-            Website: <a href=""></a><br>
-            Nostr: <a href="npub1jm8tv9ltgxluf3za8ql7njwcuu5ukf9hrnv5074zxn3z5gl9n0aqu8lqg5">wilddew771735@getalby.com
+            👨🏼‍💻 full stack software engineer<br>
+            💻 <a href="https://www.linkedin.com/in/annie-seth/">https://linkedin.com/in/annie-seth/</a><br>
+            🟣 <a href="https://snort.social/p/npub1jm8tv9ltgxluf3za8ql7njwcuu5ukf9hrnv5074zxn3z5gl9n0aqu8lqg5">annie@atlbitlab.com
 </a><br>
-            👨🏼‍💻 developer <a href=""></a>
+            
         `,
     },
     {
       name: "jordan",
       image: "/team/jordan.jpeg",
       bio: `
-            Website: <a href="jordan.bravo.cc">jordan.bravo.cc</a><br>
-            Nostr: <a href="https://snort.social/p/npub1f6ntw2f4dnpdwkccqgg7ef7yagf9kdkrfn7l07kr9uz0q8e9k94sje7kur">jordan@nostrplebs.com</a><br>
-            👨🏼‍💻 full stack ›software engineer <a href=""></a>
+            👨🏼‍💻 full stack software engineer<br>
+            💻 <a href="https://jordan.bravo.cc">https://jordan.bravo.cc</a><br>
+            🟣 <a href="https://snort.social/p/npub1f6ntw2f4dnpdwkccqgg7ef7yagf9kdkrfn7l07kr9uz0q8e9k94sje7kur">jordan@nostrplebs.com</a><br>
+            
         `,
     },
     {
       name: "w3irdrobot",
       image: "/team/w3irdrobot.png",
       bio: `
-            Website: <a href="https://w3ird.tech/">hhttps://w3ird.tech/</a><br>
-            Nostr: <a href="https://snort.social/p/npub17q5n2z8naw0xl6vu9lvt560lg33pdpe29k0k09umlfxm3vc4tqrq466f2y">rob@
-w3ird.tech</a><br>
-            👨🏼‍💻 software engineer <a href="https://voltage.cloud">Voltage</a>
+            👨🏼‍💻 software engineer<br>
+            💻 <a href="https://w3ird.tech/">https://w3ird.tech/</a><br>
+            🟣 <a href="https://snort.social/p/npub17q5n2z8naw0xl6vu9lvt560lg33pdpe29k0k09umlfxm3vc4tqrq466f2y">rob@w3ird.tech</a><br>
+            
         `,
     },
     {
       name: "brandon",
       image: "/team/brandon.jpeg",
       bio: `
-            Website: <a href="https://saucy.tech">https://saucy.tech</a><br>
-            Nostr: <a href="https://snort.social/p/npub14dd9x5uhdctewu6kv7yaunccsuk2fpda7ckttj28l90t2dj38f5spgt54z">saucy@getalby.com</a><br>
-            📚 bitpleb<br>
-            👨🏼‍💻 software engineer
+            👨🏼‍💻 software engineer<br>
+            💻 <a href="https://saucy.tech">https://saucy.tech</a><br>
+            🟣 <a href="https://snort.social/p/npub14dd9x5uhdctewu6kv7yaunccsuk2fpda7ckttj28l90t2dj38f5spgt54z">saucy@getalby.com</a><br>
         `,
     },
   ];
@@ -168,7 +168,7 @@ w3ird.tech</a><br>
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
-            gap: "50px",
+            gap: "60px",
             marginTop: "50px",
           }}
         >
