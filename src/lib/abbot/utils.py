@@ -20,7 +20,7 @@ def unsuccessful(data: dict) -> bool:
     return data["status"] != "success"
 
 
-@try_except
+@try_except_pass
 async def get_chat_admins(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -> dict:
     fn = f"{get_chat_admins.__name__}:"
     chat_admins = await context.bot.get_chat_administrators(chat_id)
@@ -31,7 +31,7 @@ async def get_chat_admins(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -> d
     return chat_admin_data
 
 
-@try_except
+@try_except_pass
 def parse_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None | Message:
     fn = f"{parse_message.__name__}:"
     message: Message = try_get(update, "message")
@@ -42,7 +42,7 @@ def parse_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None | 
     return dict(status="success", data=message)
 
 
-@try_except
+@try_except_pass
 def parse_message_data(message: Message, keys: list = None, **kwargs) -> bool | dict:
     fn = f"{parse_message_data.__name__}:"
     if not keys:
@@ -58,7 +58,7 @@ def parse_message_data(message: Message, keys: list = None, **kwargs) -> bool | 
     return message_data
 
 
-@try_except
+@try_except_pass
 def parse_chat(message: Message, context: ContextTypes.DEFAULT_TYPE) -> None | Chat:
     fn = f"{parse_message_data.__name__}:"
     chat: Chat = try_get(message, "chat")
@@ -69,7 +69,7 @@ def parse_chat(message: Message, context: ContextTypes.DEFAULT_TYPE) -> None | C
     return dict(status="success", data=chat)
 
 
-@try_except
+@try_except_pass
 def parse_chat_data(chat: Chat) -> bool | dict:
     fn = f"{parse_chat_data.__name__}:"
     chat_id: int = try_get(chat, "id")
@@ -80,7 +80,7 @@ def parse_chat_data(chat: Chat) -> bool | dict:
     return chat_data
 
 
-@try_except
+@try_except_pass
 def parse_user(message: Message, context: ContextTypes.DEFAULT_TYPE) -> None | User:
     fn = f"{parse_user.__name__}:"
     user: User = try_get(message, "from_user")
@@ -91,7 +91,7 @@ def parse_user(message: Message, context: ContextTypes.DEFAULT_TYPE) -> None | U
     return dict(status="success", data=user)
 
 
-@try_except
+@try_except_pass
 def parse_user_data(user: User) -> bool | dict:
     fn = f"{parse_user_data.__name__}:"
     user_id: int = try_get(user, "id")
@@ -101,14 +101,14 @@ def parse_user_data(user: User) -> bool | dict:
     return user_data
 
 
-@try_except
+@try_except_pass
 async def squawk_error(error_message: str, context: ContextTypes.DEFAULT_TYPE):
     fn = f"{squawk_error.__name__}:"
     error_logger.log(f"{fn} {error_message}")
     return await context.bot.send_message(chat_id=THE_CREATOR, text=error_message)
 
 
-@try_except
+@try_except_pass
 def get_bot_response(response_type: str, index: int = None) -> str:
     response_list = try_get(BOT_RESPONSES, response_type)
     index = randrange(len(response_list)) if not index else index

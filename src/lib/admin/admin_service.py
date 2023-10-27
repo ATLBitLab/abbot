@@ -33,7 +33,7 @@ class AdminService:
         self.status = status
         self.status_code = status_code
 
-    @try_except
+    @try_except_pass
     def start_service(self) -> int:
         try:
             fn = "start_service:"
@@ -47,7 +47,7 @@ class AdminService:
             error_logger.log(f"Error stopping {service}: {exception}")
             raise exception
 
-    @try_except
+    @try_except_pass
     def stop_service(self) -> int:
         try:
             fn = "stop_abbot_process:"
@@ -60,13 +60,13 @@ class AdminService:
             error_logger.log(f"Error stopping {service}: {exception}")
             raise exception
 
-    @try_except
+    @try_except_pass
     def kill_service(self) -> Exception:
         fn = "kill_service:"
         exception = Exception("Plugging Abbot back into the matrix!")
         error_logger.log(f"{fn} => raising exception={exception}")
         raise exception
 
-    @try_except
+    @try_except_pass
     def sleep_service(self, S: int = sleep_time) -> bool:
         time.sleep(S)

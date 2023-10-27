@@ -296,7 +296,7 @@ class Abbot(Config, Bots):
         debug_logger.log(f"{fn} tokens={self.chat_history_tokens}")
         return self.chat_history_tokens
 
-    @try_except
+    @try_except_pass
     def chat_completion(self) -> str | None:
         fn = "chat_completion:"
         debug_logger.log(fn)
@@ -315,7 +315,7 @@ class Abbot(Config, Bots):
         self.update_chat_history(response_dict)
         return answer
 
-    @try_except
+    @try_except_pass
     def chat_history_completion(self) -> str | Exception:
         fn = "chat_history_completion:"
         messages = [self.gpt_system]
