@@ -1,6 +1,18 @@
+from sys import argv
+
+ARGS = argv[1:]
+DEV_MODE = "-d" in ARGS or "--dev" in ARGS
+ERR_MODE = "-e" in ARGS or "--error" in ARGS
+TEST_MODE = "-t" in ARGS or "--test" in ARGS
+print(f"config: ARGS={ARGS}")
+print(f"config: DEV_MODE={DEV_MODE}")
+print(f"config: ERR_MODE={ERR_MODE}")
+print(f"config: TEST_MODE={TEST_MODE}")
+LOG_MODE = DEV_MODE if DEV_MODE else ERR_MODE
+
 from os.path import abspath
-from logging import FileHandler, Formatter, StreamHandler, getLogger, DEBUG, ERROR
 from datetime import datetime
+from logging import FileHandler, Formatter, StreamHandler, getLogger, DEBUG, ERROR
 
 now = datetime.now()
 
@@ -43,11 +55,18 @@ error_log.addHandler(error_console_handler)
 
 
 class BotLogger:
-    def __init__(self, level: str):
+    def __init__(self, level: str, toggle: bool):
         self.level = level
+        self.toggle = toggle or True
 
     def log(self, message: str = "BotLogger - No Message Passed"):
-        self._error(message) if self.level == "error" else self._debug(message)
+        if self.toggle:
+            if self.level == "error":
+                self._error(message)
+            else:
+                self._debug(message)
+        elif self.level == "error":
+            self._error(message)
 
     def _error(self, message: str):
         error_log.exception(message)
@@ -56,5 +75,5 @@ class BotLogger:
         debug_log.debug(message)
 
 
-error_logger = BotLogger("error")
-debug_logger = BotLogger("debug")
+error_logger = BotLogger("error", LOG_MODE)
+debug_logger = BotLogger("debug", LOG_MODE)

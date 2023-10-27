@@ -113,8 +113,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_data: dict = parse_chat_data(chat)
     chat_id: int = try_get(chat_data, "id")
     chat_type: str = try_get(chat_data, "type")
-    is_private_chat = chat_type == "private"
-    is_group_chat = chat_type == "group"
+    is_private_chat: bool = chat_type == "private"
+    is_group_chat: bool = not is_private_chat
     chat_title: str = try_get(chat_data, "title", default="private" if is_private_chat else None)
 
     response: dict = parse_user(message, context)
@@ -269,8 +269,8 @@ async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id: int = try_get(user_data, "user_id")
     username: str = try_get(user_data, "username")
 
-    is_group_chat: bool = chat_type == "group"
     is_private_chat: bool = chat_type == "private"
+    is_group_chat: bool = not is_private_chat
     # log all data for debugging
     all_data: dict = dict(**message_data, **chat_data, **user_data)
     for k, v in all_data.items():
@@ -322,8 +322,8 @@ async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id: int = try_get(user_data, "user_id")
     username: str = try_get(user_data, "username")
 
-    is_group_chat: bool = chat_type == "group"
     is_private_chat: bool = chat_type == "private"
+    is_group_chat: bool = not is_private_chat
     abbot_context = "group"
     # log all data for debugging
     all_data: dict = dict(**message_data, **chat_data, **user_data)
@@ -413,8 +413,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_data: dict = parse_chat_data(chat)
     chat_id: int = try_get(chat_data, "id")
     chat_type: str = try_get(chat_data, "type")
-    is_private_chat = chat_type == "private"
-    is_group_chat = chat_type == "group"
+    is_private_chat: bool = chat_type == "private"
+    is_group_chat: bool = not is_private_chat
     chat_title: str = try_get(chat_data, "title", default="private" if is_private_chat else None)
 
     response: dict = parse_user(message, context)
@@ -429,9 +429,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for k, v in all_data.items():
         debug_logger.log(f"{fn} {k}={v}")
 
-    abbot_context = "group"
-    is_private_chat = chat_type == "private"
-    is_group_chat = chat_type == "group"
     if is_group_chat:
         is_admin = await sender_is_group_admin(context)
         if not is_admin:
@@ -486,8 +483,8 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     debug_logger.log(f"{fn} chat_type={chat_type}")
     debug_logger.log(f"{fn} user_id={user_id}")
     abbot_context = "group"
-    is_private_chat = chat_type == "private"
-    is_group_chat = chat_type == "group"
+    is_private_chat: bool = chat_type == "private"
+    is_group_chat: bool = not is_private_chat
     if is_group_chat:
         admins = await context.bot.get_chat_administrators(chat_id)
         admin_ids = [admin.user.id for admin in admins]
@@ -577,9 +574,9 @@ async def admin_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await message.reply_text(status_data)
 
 
-def run():
+def build():
     debug_logger.log(f"Initializing telegram {BOT_NAME} @{BOT_TELEGRAM_HANDLE}")
-    APPLICATION = ApplicationBuilder().token(BOT_TELEGRAM_TOKEN).build()
+    abbot = ApplicationBuilder().token(BOT_TELEGRAM_TOKEN).build()
     debug_logger.log(f"Telegram {BOT_NAME} @{BOT_TELEGRAM_HANDLE} Initialized")
 
     _unplug_handler = CommandHandler("unplug", admin_unplug)
@@ -588,11 +585,11 @@ def run():
     _nap_handler = CommandHandler("nap", admin_nap)
     _status_handler = CommandHandler("status", admin_status)
 
-    APPLICATION.add_handler(_unplug_handler)
-    APPLICATION.add_handler(_plugin_handler)
-    APPLICATION.add_handler(_kill_handler)
-    APPLICATION.add_handler(_nap_handler)
-    APPLICATION.add_handler(_status_handler)
+    abbot.add_handler(_unplug_handler)
+    abbot.add_handler(_plugin_handler)
+    abbot.add_handler(_kill_handler)
+    abbot.add_handler(_nap_handler)
+    abbot.add_handler(_status_handler)
 
     help_handler = CommandHandler("help", help)
     rules_handler = CommandHandler("rules", rules)
@@ -601,18 +598,18 @@ def run():
     unleash_handler = CommandHandler("unleash", unleash)
     leash_handler = CommandHandler("leash", leash)
 
-    APPLICATION.add_handler(help_handler)
-    APPLICATION.add_handler(rules_handler)
-    APPLICATION.add_handler(start_handler)
-    APPLICATION.add_handler(stop_handler)
-    APPLICATION.add_handler(unleash_handler)
-    APPLICATION.add_handler(leash_handler)
+    abbot.add_handler(help_handler)
+    abbot.add_handler(rules_handler)
+    abbot.add_handler(start_handler)
+    abbot.add_handler(stop_handler)
+    abbot.add_handler(unleash_handler)
+    abbot.add_handler(leash_handler)
 
     # TODO: define different message handlers such as Mention() or Reply() if exists
     # BaseFilter should run first and do 1 thing: store the message and setup the telegram stuff
     # Mention, ReplyToBot and Unleash fitlers should reply with a completion
     message_handler = MessageHandler(BaseFilter(), handle_message)
-    APPLICATION.add_handler(message_handler)
+    abbot.add_handler(message_handler)
 
     debug_logger.log(f"Telegram {BOT_NAME} @{BOT_TELEGRAM_HANDLE} Polling")
-    APPLICATION.run_polling()
+    return abbot
