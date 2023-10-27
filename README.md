@@ -8,7 +8,7 @@ Check out our [project board](https://github.com/orgs/ATLBitLab/projects/1) and 
 # Abbot
 A helpful bitcoiner bot at [ATL BitLab](https://abbot.atlbitlab.com). Est. block 797812.
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/0f7c292b-482b-4ee1-b608-626851db4a23/deploy-status)](https://app.netlify.com/sites/abbot/deploys)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/02d37271-9ec5-4574-abe5-b36f134f6fa6/deploy-status)](https://app.netlify.com/sites/abbot/deploys)
 
 ## Summary
 Abbot stands for **A**tl **B**itlab **Bot**. 
