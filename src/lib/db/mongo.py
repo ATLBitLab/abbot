@@ -116,6 +116,9 @@ class MongoNostr:
     def find_dms_cursor(self, filter: {}) -> Cursor[_DocumentType]:
         return nostr_dms.find(filter)
 
+    def get_bot_channel_invite_author_whitelist():
+        pass
+
 
 class MongoTelegram:
     def __init__(self):

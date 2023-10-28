@@ -53,7 +53,8 @@ class AbbotNostr:
         self.author_whitelist = author_whitelist
         self.custom_filters = custom_filters
         self.default_filters_list: List[Filters] = [
-            Filters(kinds=[DM, CHANNEL_CREATE, CHANNEL_MESSAGE], pubkey_refs=[BOT_NOSTR_PK], limit=1000),
+            Filters(kinds=[DM], pubkey_refs=[BOT_NOSTR_PK], limit=1000),
+            Filters(kinds=[CHANNEL_CREATE, CHANNEL_MESSAGE], pubkey_refs=[BOT_NOSTR_PK], limit=1000),
             Filters(kinds=[BOT_CHANNEL_INVITE], pubkey_refs=[BOT_NOSTR_PK], authors=self.author_whitelist, limit=1000),
         ]
 
@@ -163,3 +164,11 @@ class AbbotNostr:
     def publish_event(self, event):
         self.relay_manager.publish_event(event)
         self.relay_manager.run_sync()
+
+
+def build():
+    from lib.abbot.env import BOT_NOSTR_SK
+
+    abbot_nostr = AbbotNostr(BOT_NOSTR_SK)
+    abbot_nostr.add_relays_and_subscribe()
+    return abbot_nostr
