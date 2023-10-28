@@ -89,7 +89,7 @@ export default function Policies() {
                     <Button
                         className="w-full border-[#08252E] border-2 ml-6 px-8"
                         type="button"
-                        onClick={() => router.push("/abbot")}
+                        onClick={() => router.push("/")}
                     >
                         Back
                     </Button>
