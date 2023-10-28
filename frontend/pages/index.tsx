@@ -108,7 +108,7 @@ export default function Abbot() {
             <Button
               className="w-full border-[#08252E] border-2 px-8"
               type="button"
-              onClick={() => router.push("/abbot/policies")}
+              onClick={() => router.push("/policies")}
             >
               Terms & policies 📑
             </Button>
@@ -149,7 +149,7 @@ export default function Abbot() {
                     "https://www.nostrchat.io/dm/npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk")
                 }
               >
-                Nostr DM 🟣
+                DM 🟣
               </Button>
               <Button
                 className={`w-full border-[#08252E] border-2 ml-1 ${
@@ -158,7 +158,7 @@ export default function Abbot() {
                 type="button"
                 onClick={() => setAbbotState(2)}
               >
-                Nostr Channel 🟣
+                Channel 🟣
               </Button>
             </Row>
           )}
@@ -194,9 +194,9 @@ export default function Abbot() {
             <Button
               className="w-full border-[#08252E] border-2 px-8"
               type="button"
-              onClick={() => router.push("/")}
+              onClick={() => router.push("/team")}
             >
-              Home 🏠
+              Abbot Team 🫂
             </Button>
           </Row>
         </div>

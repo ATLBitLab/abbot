@@ -7,6 +7,7 @@ import abbot from "@/public/abbot.jpeg";
 import Member from "@/components/Member";
 import Button from "@/components/Button";
 import Row from "@/components/Row";
+import router from "next/router";
 
 const spacemono = Space_Mono({
   subsets: ["latin"],
@@ -19,12 +20,10 @@ export default function Team() {
     {
       name: "bryan",
       image: "/team/bryan.jpeg",
-      bio: `
-           👨🏼‍💻 full stack software engineer<br>
-           💻 <a href="https://bolt.fun/profile/478/bryan">https://bolt.fun/profile/478/bryan</a><br>
+      bio: ` 
+           🤖 abbot's dad<br>
+           ⚡️ running <a href="https://atlbitlab.com">ATL BitLab</a><br>
            🟣 <a href="https://primal.net/p/npub1nh0klcapjnfnpfkxufu2gv4wzvy72txqskrj2jen0585j8ml7epqp5scfr">nonni@atlbitlab.com</a><br>
-            ⚡️ runninig ATL BitLab <a href="https://atlbitlab.com">ATL BitLab</a><br>
-            
         `,
     },
     {
@@ -39,12 +38,11 @@ export default function Team() {
     },
     {
       name: "annie",
-      image: "/team/annie.jpeg",
+      image: "/team/annie.png",
       bio: `
             👨🏼‍💻 full stack software engineer<br>
             💻 <a href="https://www.linkedin.com/in/annie-seth/">https://linkedin.com/in/annie-seth/</a><br>
-            🟣 <a href="https://snort.social/p/npub1jm8tv9ltgxluf3za8ql7njwcuu5ukf9hrnv5074zxn3z5gl9n0aqu8lqg5">annie@atlbitlab.com
-</a><br>
+            🟣 <a href="https://snort.social/p/npub1jm8tv9ltgxluf3za8ql7njwcuu5ukf9hrnv5074zxn3z5gl9n0aqu8lqg5">annie@atlbitlab.com</a><br>
             
         `,
     },
