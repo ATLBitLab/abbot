@@ -38,7 +38,7 @@ export default function Team() {
     },
     {
       name: "annie",
-      image: "/team/annie.png",
+      image: "/team/annie.jpeg",
       bio: `
             👨🏼‍💻 full stack software engineer<br>
             💻 <a href="https://www.linkedin.com/in/annie-seth/">https://linkedin.com/in/annie-seth/</a><br>
