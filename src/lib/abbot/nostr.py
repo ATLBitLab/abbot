@@ -42,7 +42,7 @@ Ready. Set. Stack Sats! 🚀
 """
 
 
-@try_except_pass
+@try_except
 class AbbotNostr:
     relay_manager = RelayManager(timeout=6)
     notices = []
@@ -55,13 +55,8 @@ class AbbotNostr:
         self.filters_list = FiltersList([Filters(**self.filters_data)])
         self.author_whitelist = author_whitelist
 
-<<<<<<< Updated upstream
     @try_except
     def add_relays_and_subscribe(self):
-=======
-    @try_except_pass
-    def add_relays_and_subscribe(self) -> None:
->>>>>>> Stashed changes
         for relay in RELAYS:
             self.relay_manager.add_relay(relay)
         channel_invite_filter = Filters(
@@ -72,21 +67,21 @@ class AbbotNostr:
         # subscription_id = uuid.uuid1().hex
         # self.relay_manager.add_subscription_on_all_relays(subscription_id, self.filters)
 
-    @try_except_pass
+    @try_except
     def run_relay_sync(self):
         self.relay_manager.run_sync()
 
-    @try_except_pass
+    @try_except
     def get_message_pool(self):
         return self.relay_manager.message_pool
 
-    @try_except_pass
+    @try_except
     def poll_for_notices(self):
         while self.relay_manager.message_pool.has_notices():
             notice = self.relay_manager.message_pool.get_notice()
             self.notices.append(notice)
 
-    @try_except_pass
+    @try_except
     def poll_for_events(self):
         while self.relay_manager.message_pool.has_events():
             event = self.relay_manager.message_pool.get_event().event
@@ -94,41 +89,31 @@ class AbbotNostr:
                 self.events.append(event)
                 yield event
 
-    @try_except_pass
+    @try_except
     def get_notices(self):
         return self.notices
 
-    @try_except_pass
+    @try_except
     def get_events(self):
         return self.events
 
-    @try_except_pass
+    @try_except
     def get_message_pool_notices(self):
         return self.relay_manager.message_pool.notices
 
-    @try_except_pass
+    @try_except
     def get_message_pool_events(self):
         return self.relay_manager.message_pool.events
 
-    @try_except_pass
+    @try_except
     def unsubscribe(self, url, id: str):
         self.relay_manager.close_subscription_on_relay(url, id)
 
-    @try_except_pass
+    @try_except
     def disconnect_from_relays(self):
         self.relay_manager.close_connections()
 
-<<<<<<< Updated upstream
     @try_except
-    def create_dm(self, content: str, recipient_pubkey: str):
-        dm = EncryptedDirectMessage(self.public_key.hex(), recipient_pubkey, content)
-        dm.encrypt(self.private_key.hex())
-        dm_event = dm.to_event()
-        dm_event.sign(self.public_key.hex())
-        return dm_event
-
-=======
-    @try_except_pass
     def encrypt_direct_message(self, partner_pk: str, cleartext_content: str):
         encrypted_direct_message: EncryptedDirectMessage = self._instantiate_direct_message(
             partner_pk, cleartext_content=cleartext_content
@@ -138,7 +123,7 @@ class AbbotNostr:
         encrypted_direct_message_event.sign(self.public_key.hex())
         return encrypted_direct_message_event
 
-    @try_except_pass
+    @try_except
     def decrypt_direct_message(
         self,
         partner_pk: str,
@@ -151,8 +136,7 @@ class AbbotNostr:
         encrypted_direct_message.decrypt(self._private_key.hex())
         return encrypted_direct_message
 
-    @try_except_pass
->>>>>>> Stashed changes
+    @try_except
     def send_greeting_to_channel(self, channel_id: str):
         event = Event(
             kind=CHANNEL_MESSAGE,
@@ -164,10 +148,7 @@ class AbbotNostr:
         print(event)
         self.publish_event(event)
 
-<<<<<<< Updated upstream
-=======
-    @try_except_pass
->>>>>>> Stashed changes
+    @try_except
     def publish_event(self, event):
         self.relay_manager.publish_event(event)
         self.relay_manager.run_sync()
