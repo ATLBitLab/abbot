@@ -14,6 +14,14 @@ const spacemono = Space_Mono({
   display: "swap",
 });
 
+const sendInvite = async (channelId: string) => {
+  await fetch('/api/sendInvite', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ channelId })
+  });
+};
+
 export default function Abbot() {
   const router = useRouter();
   const [abbotState, setAbbotState] = useState<number | null>(null);
@@ -168,7 +176,8 @@ export default function Abbot() {
                 className="w-full flex justify-between items-center"
                 onSubmit={(e) => {
                   e.preventDefault();
-                  console.log("Channel ID submitted:", channelId); // Placeholder for form submission handling
+                  console.log("Channel ID submitted:", channelId);
+                  sendInvite(channelId).then(() => console.log(`channel invite sent for ${channelId}`));
                 }}
               >
                 <input
