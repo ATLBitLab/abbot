@@ -26,6 +26,7 @@ RELAYS: List[str] = [
     "wss://nos.lol/",
     "wss://relay.primal.net",
     "wss://relay.snort.social/",
+    "wss://nostr.atlbitlab.com",
 ]
 
 INTRODUCTION = """
@@ -52,11 +53,15 @@ class AbbotNostr:
         self.author_whitelist: Optional[List[str]] = author_whitelist
         self.author_whitelist = author_whitelist
         self.custom_filters = custom_filters
-        self.default_filters_list: List[Filters] = [
-            Filters(kinds=[DM], pubkey_refs=[BOT_NOSTR_PK], limit=1000),
-            Filters(kinds=[CHANNEL_CREATE, CHANNEL_MESSAGE], pubkey_refs=[BOT_NOSTR_PK], limit=1000),
-            Filters(kinds=[BOT_CHANNEL_INVITE], pubkey_refs=[BOT_NOSTR_PK], authors=self.author_whitelist, limit=1000),
-        ]
+        self.default_filters_list: FiltersList = FiltersList(
+            [
+                Filters(kinds=[DM], pubkey_refs=[BOT_NOSTR_PK], limit=1000),
+                Filters(kinds=[CHANNEL_CREATE, CHANNEL_MESSAGE], pubkey_refs=[BOT_NOSTR_PK], limit=1000),
+                Filters(
+                    kinds=[BOT_CHANNEL_INVITE], pubkey_refs=[BOT_NOSTR_PK], authors=self.author_whitelist, limit=1000
+                ),
+            ]
+        )
 
     def _instantiate_direct_message(
         self,
@@ -70,14 +75,10 @@ class AbbotNostr:
         return EncryptedDirectMessage(self.public_key.hex(), partner_pk, cleartext, encrypted, reference_event_id)
 
     @try_except
-    def add_relays_and_subscribe(self) -> None:
+    def add_relays_and_subscribe(self):
         for relay in RELAYS:
             self.relay_manager.add_relay(relay)
-        self.default_filters_list.extend([])
-        filters = FiltersList()
-        self.relay_manager.add_subscription_on_all_relays(uuid.uuid4().hex, filters)
-        # subscription_id = uuid.uuid1().hex
-        # self.relay_manager.add_subscription_on_all_relays(subscription_id, self.filters)
+        self.relay_manager.add_subscription_on_all_relays(uuid.uuid4().hex, self.default_filters_list)
 
     @try_except
     def run_relay_sync(self):
