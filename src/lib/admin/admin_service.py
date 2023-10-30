@@ -23,13 +23,9 @@ class AdminService:
 
     def __init__(
         self,
-        user_id: int,
-        chat_id: int,
         status: str = status,
         status_code: int = status_code,
     ):
-        self.user_id = user_id
-        self.chat_id = chat_id
         self.status = status
         self.status_code = status_code
 

@@ -1,12 +1,11 @@
-import IPython
 import uuid
+from typing import List, Optional
+
+from pynostr.event import Event, EventKind
 from pynostr.key import PrivateKey, PublicKey
 from pynostr.relay_manager import RelayManager
 from pynostr.filters import FiltersList, Filters
-from pynostr.event import EventKind
 from pynostr.encrypted_dm import EncryptedDirectMessage
-from pynostr.event import Event
-from typing import List, Optional
 
 from lib.abbot.env import BOT_NOSTR_PK
 from lib.abbot.exceptions.exception import try_except
@@ -93,6 +92,7 @@ class AbbotNostr:
         while self.relay_manager.message_pool.has_notices():
             notice = self.relay_manager.message_pool.get_notice()
             self.notices.append(notice)
+            yield notice
 
     @try_except
     def poll_for_events(self):
