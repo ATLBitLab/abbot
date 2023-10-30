@@ -123,11 +123,10 @@ export default function Abbot() {
           </Row>
           <Row className="w-full">
             <Button
-              className={`w-full border-[#08252E] border-2 mr-1 ${
-                abbotState !== null && abbotState !== null && abbotState === 0
-                  ? "bg-[#08252E] text-white"
-                  : ""
-              }`}
+              className={`w-full border-[#08252E] border-2 mr-1 ${abbotState !== null && abbotState === 0
+                ? "bg-[#08252E] text-white"
+                : ""
+                }`}
               type="button"
               onClick={() =>
                 (window.location.href = "tg://resolve?domain=atl_bitlab_bot")
@@ -136,11 +135,10 @@ export default function Abbot() {
               Telegram 🤖
             </Button>
             <Button
-              className={`w-full border-[#08252E] border-2 ml-1 ${
-                abbotState !== null && abbotState > 0
-                  ? "bg-[#08252E] text-white"
-                  : ""
-              }`}
+              className={`w-full border-[#08252E] border-2 ml-1 ${abbotState !== null && abbotState > 0
+                ? "bg-[#08252E] text-white"
+                : ""
+                }`}
               type="button"
               onClick={() => setAbbotState(1)}
             >
@@ -153,16 +151,15 @@ export default function Abbot() {
                 className="w-full border-[#08252E] border-2 mr-1"
                 type="button"
                 onClick={() =>
-                  (window.location.href =
-                    "https://www.nostrchat.io/dm/npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk")
+                (window.location.href =
+                  "https://www.nostrchat.io/dm/npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk")
                 }
               >
                 DM 🟣
               </Button>
               <Button
-                className={`w-full border-[#08252E] border-2 ml-1 ${
-                  abbotState === 2 ? "bg-[#08252E] text-white" : ""
-                }`}
+                className={`w-full border-[#08252E] border-2 ml-1 ${abbotState === 2 ? "bg-[#08252E] text-white" : ""
+                  }`}
                 type="button"
                 onClick={() => setAbbotState(2)}
               >
@@ -178,6 +175,7 @@ export default function Abbot() {
                   e.preventDefault();
                   console.log("Channel ID submitted:", channelId);
                   sendInvite(channelId).then(() => console.log(`channel invite sent for ${channelId}`));
+                  window.location.href = `https://www.nostrchat.io/channel/${channelId}`
                 }}
               >
                 <input
