@@ -1,5 +1,8 @@
 import uuid
+import asyncio
+
 from typing import List, Optional
+from asyncio import StreamReader, StreamWriter
 
 from pynostr.event import Event, EventKind
 from pynostr.key import PrivateKey, PublicKey
@@ -7,7 +10,7 @@ from pynostr.relay_manager import RelayManager
 from pynostr.filters import FiltersList, Filters
 from pynostr.encrypted_dm import EncryptedDirectMessage
 
-from lib.abbot.env import BOT_NOSTR_PK
+from lib.abbot.env import BOT_NOSTR_PK, BOT_NOSTR_SK
 from lib.abbot.exceptions.exception import try_except
 
 DM: EventKind = EventKind.ENCRYPTED_DIRECT_MESSAGE  # 4
@@ -40,14 +43,24 @@ Ready. Set. Stack Sats! 🚀
 """
 
 
+async def event_handler(data: bytes, reader: StreamReader, writer: StreamWriter):
+    message = data.decode()
+    addr = writer.get_extra_info("peername")
+    print(f"Received {message!r} from {addr!r}")
+
+    print(f"Sending: {message!r}")
+    writer.write(data)
+    await writer.drain()
+
+
 @try_except
 class AbbotNostr:
     relay_manager = RelayManager(timeout=6)
     notices = []
     events = []
 
-    def __init__(self, sk: str, custom_filters: Filters = None, author_whitelist: Optional[List[str]] = None):
-        self._private_key = PrivateKey.from_hex(sk)
+    def __init__(self, custom_filters: Filters = None, author_whitelist: Optional[List[str]] = None):
+        self._private_key = PrivateKey.from_hex(BOT_NOSTR_SK)
         self.public_key: PublicKey = self._private_key.public_key
         self.author_whitelist: Optional[List[str]] = author_whitelist
         self.author_whitelist = author_whitelist
@@ -167,9 +180,42 @@ class AbbotNostr:
         self.relay_manager.run_sync()
 
 
-def build():
-    from lib.abbot.env import BOT_NOSTR_SK
+class AbbotBuilder(AbbotNostr):
+    def __init__(self, host: str = "127.0.0.1", port: int = 8888, handlers: List[function] = []):
+        self.host = host
+        self.port = port
+        self.handlers = handlers
 
-    abbot_nostr = AbbotNostr(BOT_NOSTR_SK)
-    abbot_nostr.add_relays_and_subscribe()
-    return abbot_nostr
+    def set_host(self, host):
+        self.host = host
+        return self
+
+    def set_port(self, port):
+        self.port = port
+        return self
+
+    def add_handler(self, handler):
+        self.handlers.append(handler)
+        return self
+
+    async def handle_client(self, reader: StreamReader, writer: StreamWriter):
+        while True:
+            data = await reader.read(100)
+            if not data:
+                break
+
+            for handler in self.handlers:
+                await handler(data, reader, writer)
+
+    async def run(self):
+        server = await asyncio.start_server(self.handle_client, self.host, self.port)
+        addr = server.sockets[0].getsockname()
+        print(f"Serving on {addr}")
+
+        async with server:
+            await server.serve_forever()
+
+
+abbot_nostr = AbbotBuilder()
+abbot_nostr.add_handler()
+abbot_nostr.add_handler()
