@@ -1,0 +1,7 @@
+const NOSTR_ATL_BITLAB_SK = process.env.NOSTR_ATL_BITLAB_SK;
+const NOSTR_ABBOT_PK = process.env.NOSTR_ABBOT_PK;
+
+export {
+    NOSTR_ATL_BITLAB_SK,
+    NOSTR_ABBOT_PK
+}
