@@ -170,9 +170,11 @@ export default function Team() {
             marginTop: "50px",
           }}
         >
-          {members.map((member, index) => (
-            <Member key={index} {...member} />
-          ))}
+          {
+            members.map((member, index) => (
+              <Member key={index} {...member} />
+            ))
+          }
         </div>
         <Row className="w-full mt-20">
           <Button

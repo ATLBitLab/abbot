@@ -2,6 +2,7 @@
 import Head from "next/head";
 import Image from "next/image";
 import React, { useState } from "react";
+import { Grid } from "react-loader-spinner";
 import { Space_Mono } from "next/font/google";
 import abbot from "@/public/abbot.jpeg";
 import Button from "@/components/Button";
@@ -15,17 +16,22 @@ const spacemono = Space_Mono({
 });
 
 const sendInvite = async (channelId: string) => {
-  await fetch('/api/sendInvite', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ channelId })
-  });
+  try {
+    const response = await fetch('/api/sendInvite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ channelId })
+    });
+  } catch (error) {
+    console.error(error)
+  }
 };
 
 export default function Abbot() {
   const router = useRouter();
   const [abbotState, setAbbotState] = useState<number | null>(null);
   const [channelId, setChannelId] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   return (
     <>
@@ -103,112 +109,128 @@ export default function Abbot() {
           " mx-auto max-w-4xl text-white flex flex-col items-center gap-2 my-16 pb-16 px-8"
         }
       >
-        <div className="flex flex-col items-center w-2/3 gap-8 text-center">
-          <a href="tg://resolve?domain=atl_bitlab_bot">
-            <Image src={abbot} alt={"Abbot ATL BitLab Bot"} />
-          </a>
-          <h4>Sup fam, I&apos;m Abbot</h4>
-          <h5>
-            I&apos;m a helpful bitcoiner bot from Atlanta created by ATL BitLab.
-            Est. block 797812.
-          </h5>
-          <Row className="w-full">
-            <Button
-              className="w-full border-[#08252E] border-2 px-8"
-              type="button"
-              onClick={() => router.push("/policies")}
-            >
-              Terms & policies 📑
-            </Button>
-          </Row>
-          <Row className="w-full">
-            <Button
-              className={`w-full border-[#08252E] border-2 mr-1 ${
-                abbotState !== null && abbotState !== null && abbotState === 0
-                  ? "bg-[#08252E] text-white"
-                  : ""
-              }`}
-              type="button"
-              onClick={() =>
-                (window.location.href = "tg://resolve?domain=atl_bitlab_bot")
-              }
-            >
-              Telegram 🤖
-            </Button>
-            <Button
-              className={`w-full border-[#08252E] border-2 ml-1 ${
-                abbotState !== null && abbotState > 0
-                  ? "bg-[#08252E] text-white"
-                  : ""
-              }`}
-              type="button"
-              onClick={() => setAbbotState(1)}
-            >
-              Nostr 🟣
-            </Button>
-          </Row>
-          {abbotState !== null && abbotState >= 1 && (
-            <Row className="w-full">
-              <Button
-                className="w-full border-[#08252E] border-2 mr-1"
-                type="button"
-                onClick={() =>
-                  (window.location.href =
-                    "https://www.nostrchat.io/dm/npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk")
-                }
-              >
-                DM 🟣
-              </Button>
-              <Button
-                className={`w-full border-[#08252E] border-2 ml-1 ${
-                  abbotState === 2 ? "bg-[#08252E] text-white" : ""
-                }`}
-                type="button"
-                onClick={() => setAbbotState(2)}
-              >
-                Channel 🟣
-              </Button>
-            </Row>
-          )}
-          {abbotState !== null && abbotState === 2 && (
-            <Row className="w-full">
-              <form
-                className="w-full flex justify-between items-center"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  console.log("Channel ID submitted:", channelId);
-                  sendInvite(channelId).then(() => console.log(`channel invite sent for ${channelId}`));
-                }}
-              >
-                <input
-                  type="text"
-                  placeholder="Enter your channel ID"
-                  pattern="[a-f0-9]{64}"
-                  title="Channel ID should be 64 lowercase hex characters"
-                  className="border-2 border-[#08252E] px-2 text-black flex-grow"
-                  value={channelId}
-                  onChange={(e) => setChannelId(e.target.value)}
-                  required
-                />
-                <button
-                  type="submit"
-                  className="border-2 border-[#08252E] px-8 bg-[#08252E] text-white ml-2"
+        {
+          loading ? (
+            <div className="flex justify-center mt-[40%]">
+              <Grid
+                height={200}
+                width={200}
+                color="white"
+                ariaLabel="grid-loading"
+                radius="12.5"
+                visible={true}
+              />
+            </div>
+          ) : (
+            <div className="flex flex-col items-center w-2/3 gap-8 text-center">
+              <a href="tg://resolve?domain=atl_bitlab_bot">
+                <Image src={abbot} alt={"Abbot ATL BitLab Bot"} />
+              </a>
+              <h4>Sup fam, I&apos;m Abbot</h4>
+              <h5>
+                I&apos;m a helpful bitcoiner bot from Atlanta created by ATL BitLab.
+                Est. block 797812.
+              </h5>
+              <Row className="w-full">
+                <Button
+                  className="w-full border-[#08252E] border-2 px-8"
+                  type="button"
+                  onClick={() => router.push("/policies")}
                 >
-                  Join
-                </button>
-              </form>
-            </Row>
-          )}
-          <Row className="w-full">
-            <Button
-              className="w-full border-[#08252E] border-2 px-8"
-              type="button"
-              onClick={() => router.push("/team")}
-            >
-              Abbot Team 🫂
-            </Button>
-          </Row>
-        </div>
+                  Terms & policies 📑
+                </Button>
+              </Row>
+              <Row className="w-full">
+                <Button
+                  className={`w-full border-[#08252E] border-2 mr-1 ${abbotState !== null && abbotState !== null && abbotState === 0
+                    ? "bg-[#08252E] text-white"
+                    : ""
+                    }`}
+                  type="button"
+                  onClick={() => (window.location.href = "tg://resolve?domain=atl_bitlab_bot")}
+                >
+                  Telegram 🤖
+                </Button>
+                <Button
+                  className={`w-full border-[#08252E] border-2 ml-1 ${abbotState !== null && abbotState > 0
+                    ? "bg-[#08252E] text-white"
+                    : ""
+                    }`}
+                  type="button"
+                  onClick={() => setAbbotState(1)}
+                >
+                  Nostr 🟣
+                </Button>
+              </Row>
+              {
+                abbotState !== null && abbotState >= 1 && (
+                  <Row className="w-full">
+                    <Button
+                      className="w-full border-[#08252E] border-2 mr-1"
+                      type="button"
+                      onClick={() =>
+                      (window.location.href =
+                        "https://www.nostrchat.io/dm/npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk")
+                      }
+                    >
+                      DM 🟣
+                    </Button>
+                    <Button
+                      className={`w-full border-[#08252E] border-2 ml-1 ${abbotState === 2 ? "bg-[#08252E] text-white" : ""
+                        }`}
+                      type="button"
+                      onClick={() => setAbbotState(2)}
+                    >
+                      Channel 🟣
+                    </Button>
+                  </Row>
+                )
+              }
+              {
+                abbotState !== null && abbotState === 2 && (
+                  <Row className="w-full">
+                    <form
+                      className="w-full flex justify-between items-center"
+                      onSubmit={(e) => {
+                        setLoading(true);
+                        e.preventDefault();
+                        console.log("Channel ID submitted:", channelId);
+                        sendInvite(channelId).then(() => console.log(`channel invite sent for ${channelId}`));
+                        setLoading(false);
+                      }}
+                    >
+                      <input
+                        type="text"
+                        placeholder="Enter your channel ID"
+                        pattern="[a-f0-9]{64}"
+                        title="Channel ID should be 64 lowercase hex characters"
+                        className="border-2 border-[#08252E] px-2 text-black flex-grow"
+                        value={channelId}
+                        onChange={(e) => setChannelId(e.target.value)}
+                        required
+                      />
+                      <button
+                        type="submit"
+                        className="border-2 border-[#08252E] px-8 bg-[#08252E] text-white ml-2"
+                      >
+                        Join
+                      </button>
+                    </form>
+                  </Row>
+                )
+              }
+              <Row className="w-full">
+                <Button
+                  className="w-full border-[#08252E] border-2 px-8"
+                  type="button"
+                  onClick={() => router.push("/team")}
+                >
+                  Abbot Team 🫂
+                </Button>
+              </Row>
+            </div>
+          )
+        }
       </main>
     </>
   );

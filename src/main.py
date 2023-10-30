@@ -4,13 +4,12 @@ ARGS = argv[1:]
 TELEGRAM_MODE = "-l" in ARGS or "--telegram" in ARGS
 NOSTR_MODE = "-n" in ARGS or "--nostr" in ARGS
 
-from lib.abbot import telegram_bot
 from lib.abbot import nostr_bot
 
 if __name__ == "__main__":
-    if NOSTR_MODE:
-        nabbot = nostr_bot.build()
-        while True:
-            nabbot.run_relay_sync()
-    elif TELEGRAM_MODE:
-        telegram_bot.build().run_polling()
+    n_abbot = nostr_bot.build()
+    while True:
+        for event in n_abbot.poll_for_events():
+            if event.kind == 21021:
+                print(event.tags[0])
+                n_abbot.send_greeting_to_channel(event.tags[0][1])

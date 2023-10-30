@@ -51,7 +51,6 @@ class AbbotNostr:
         self._private_key = PrivateKey.from_hex(sk)
         self.public_key: PublicKey = self._private_key.public_key
         self.author_whitelist: Optional[List[str]] = author_whitelist
-        self.author_whitelist = author_whitelist
         self.custom_filters = custom_filters
         self.default_filters_list: FiltersList = FiltersList(
             [
