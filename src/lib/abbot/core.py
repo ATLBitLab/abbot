@@ -5,7 +5,7 @@ import tiktoken
 import traceback
 from typing import AnyStr, List
 
-from lib.db.mongo import MongoNostr, NostrChannel
+from lib.db.mongo import Config, MongoNostr, NostrChannel
 from ..utils import try_get
 from io import TextIOWrapper, open
 from os.path import abspath, isfile
@@ -25,27 +25,6 @@ def handle_exception(fn: str, e: Exception):
     traceback.print_exc()
     tb = traceback.format_exc()
     error_logger.log(f"{fn} traceback:\n{tb}")
-
-
-class Config:
-    def __init__(
-        self,
-        started,
-        introduced,
-        unleashed,
-        count,
-    ):
-        self.started = started or False
-        self.introduced = introduced or False
-        self.unleashed = unleashed or False
-        self.count = count or None
-
-    def to_dict(self):
-        return self.__dict__
-
-    def update_config(self, data: dict):
-        config_dict = self.to_dict()
-        config_dict.update(data)
 
 
 class Bots:
@@ -73,7 +52,6 @@ class Bots:
         return self.__dict__
 
     def update_abbots(self, id: str | int, bot: object) -> None:
-        fn: str = "update_abbots:"
         self.abbots[id] = bot
 
 

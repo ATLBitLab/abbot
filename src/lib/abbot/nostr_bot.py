@@ -10,6 +10,7 @@ from pynostr.event import EventKind
 from pynostr.encrypted_dm import EncryptedDirectMessage
 from pynostr.event import Event
 from typing import Any, List, Optional, Dict, Tuple, Union
+import types as _types
 
 from lib.utils import try_get
 from lib.abbot.env import BOT_NOSTR_PK, BOT_NOSTR_NPUB, BOT_NOSTR_SK
@@ -187,7 +188,7 @@ class AbbotNostr(Abbot):
 class NostrEventHandler:
     group: int
     kind: int
-    handler: function
+    handler: _types.FunctionType
     if group == 0:
         assert kind == 4
     elif group == 1:
@@ -195,10 +196,55 @@ class NostrEventHandler:
 
 
 class NostrBotBuilder(AbbotNostr):
-    def __init__(self, host="127.0.0.1", port=8888):
+    def __init__(
+        self,
+        event: Event,
+        reader: StreamReader,
+        writer: StreamWriter,
+        host="127.0.0.1",
+        port=8888,
+    ):
+        self.event = event
+        self.reader = reader
+        self.writer = writer
         self.host = host
         self.port = port
         self.handlers: Dict[int, List[NostrEventHandler]] = {}
+
+    def get_handlers(self) -> object:
+        return self
+
+    @try_except
+    async def handle_dm(self):
+        pass
+
+    @try_except
+    async def handle_channel_create(self):
+        pass
+
+    @try_except
+    async def handle_channel_create(self):
+        pass
+
+    @try_except
+    async def handle_channel_meta(self):
+        pass
+
+    @try_except
+    async def handle_channel_message(self):
+        pass
+
+    @try_except
+    async def handle_channel_hide(self):
+        pass
+
+    @try_except
+    async def handle_channel_mute(self):
+        pass
+
+    @try_except
+    async def handle_channel_invite(self):
+        pass
 
     @try_except
     def add_handler(self, handler: NostrEventHandler, group: int):
@@ -228,7 +274,7 @@ class NostrBotBuilder(AbbotNostr):
             if not data:
                 break
             # TODO: Replace the following line with your actual message parsing logic
-            event: Event = ...
+            event: Event = data
             kind: int = try_get(event, "kind")
             id: str = try_get(event, "id")
             abbot_nostr = AbbotNostr(Abbot(f"AbbotNostr-{id}", BOT_NOSTR_NPUB, BOT_CORE_SYSTEM, id))
@@ -245,45 +291,16 @@ class NostrBotBuilder(AbbotNostr):
             await server.serve_forever()
 
 
-@dataclass
-class NostrBotHandlers:
-    def get_handlers(self) -> object:
-        return self
-
-    @try_except
-    async def handle_channel_create(self, event: Event, reader: StreamReader, writer: StreamWriter):
-        pass
-
-    @try_except
-    async def handle_channel_meta(self, event: Event, reader: StreamReader, writer: StreamWriter):
-        pass
-
-    @try_except
-    async def handle_channel_message(self, event: Event, reader: StreamReader, writer: StreamWriter):
-        pass
-
-    @try_except
-    async def handle_channel_hide(self, event: Event, reader: StreamReader, writer: StreamWriter):
-        pass
-
-    @try_except
-    async def handle_channel_mute(self, event: Event, reader: StreamReader, writer: StreamWriter):
-        pass
-
-    @try_except
-    async def handle_channel_invite(self, event: Event, reader: StreamReader, writer: StreamWriter):
-        pass
-
-
-nostr_bot_handlers: NostrBotHandlers = NostrBotHandlers().get_handlers()
-nostr_bot: NostrBotBuilder = NostrBotBuilder().add_handlers(
+nostr_bot: NostrBotBuilder = NostrBotBuilder()
+handlers: NostrBotBuilder = nostr_bot.get_handlers()
+nostr_bot.add_handlers(
     [
-        NostrEventHandler(4, handle_dm),
-        NostrEventHandler(40, handle_channel_create),
-        NostrEventHandler(41, handle_channel_meta),
-        NostrEventHandler(42, handle_channel_message),
-        NostrEventHandler(43, handle_channel_hide),
-        NostrEventHandler(44, handle_channel_mute),
-        NostrEventHandler(21021, handle_channel_invite),
+        NostrEventHandler(4, handlers.handle_dm),
+        NostrEventHandler(40, handlers.handle_channel_create),
+        NostrEventHandler(41, handlers.handle_channel_meta),
+        NostrEventHandler(42, handlers.handle_channel_message),
+        NostrEventHandler(43, handlers.handle_channel_hide),
+        NostrEventHandler(44, handlers.handle_channel_mute),
+        NostrEventHandler(21021, handlers.handle_channel_invite),
     ]
 )

@@ -11,7 +11,6 @@ from lib.abbot.env import DATABASE_CONNECTION_STRING
 from lib.abbot.exceptions.exception import try_except
 from lib.logger import error_logger
 from lib.utils import try_get
-from lib.abbot.core import Config
 
 client = MongoClient(host=DATABASE_CONNECTION_STRING)
 
@@ -26,16 +25,37 @@ telegram_chats = db_telegram.get_collection("chat")
 telegram_dms = db_telegram.get_collection("dm")
 
 
+class Config:
+    def __init__(
+        self,
+        started=False,
+        introduced=False,
+        unleashed=False,
+        count=None,
+    ):
+        self.started = started
+        self.introduced = introduced
+        self.unleashed = unleashed
+        self.count = count
+
+    def to_dict(self):
+        return self.__dict__
+
+    def update_config(self, data: dict):
+        config_dict = self.to_dict()
+        config_dict.update(data)
+
+
 @dataclass
 class NostrChannel:
     id: str
     pubkey: str
-    config: Config = Config().to_dict()
-    created_at: int = 0000000000
-    kind: int = 40
-    tags: List[List[str]]
     content: str
     sig: str
+    config: Config = field(default_factory=Config().to_dict())
+    created_at: int = 0000000000
+    kind: int = 40
+    tags: List[List[str]] = field(default_factory=list)
     messages: List[Dict] = field(default_factory=list)
     history: List[Dict] = field(default_factory=list)
 
@@ -47,8 +67,8 @@ class NostrChannel:
 class NostrDirectMessage:
     id: str
     sender_pk: str
-    started_at: int = 0000000000
     receiver_pk: str
+    started_at: int = 0000000000
     messages: List[Dict] = field(default_factory=list)
     history: List[Dict] = field(default_factory=list)
 
@@ -97,11 +117,11 @@ class MongoNostr:
         nostr_dms.insert_many(list(map(lambda dm: dm, self.validate_doc_for_insert(direct_messages))))
 
     @try_except
-    def find_channel(self, filter: {}) -> NostrChannel.to_dict():
+    def find_channel(self, filter: {}) -> NostrChannel:
         return nostr_channels.find_one(filter)
 
     @try_except
-    def find_channels(self, filter: {}) -> List[NostrChannel.to_dict()]:
+    def find_channels(self, filter: {}) -> List[NostrChannel]:
         channels = []
         for channel in nostr_channels.find(filter):
             channels.append(channel)
