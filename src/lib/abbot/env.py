@@ -6,6 +6,7 @@ env: dict = dotenv_values()
 
 BOT_NOSTR_SK = try_get(env, "BOT_NOSTR_SK")
 BOT_NOSTR_PK = try_get(env, "BOT_NOSTR_PK")
+BOT_NOSTR_NPUB = try_get(env, "BOT_NOSTR_NPUB")
 OPENAI_API_KEY = try_get(env, "OPENAI_API_KEY")
 LNBITS_BASE_URL = try_get(env, "LNBITS_BASE_URL")
 PINECONE_API_KEY = try_get(env, "PINECONE_API_KEY")

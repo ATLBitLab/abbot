@@ -1,15 +1,22 @@
-import IPython
 import uuid
+import asyncio
+from asyncio import StreamReader, StreamWriter
+from attr import dataclass
+
 from pynostr.key import PrivateKey, PublicKey
 from pynostr.relay_manager import RelayManager
 from pynostr.filters import FiltersList, Filters
 from pynostr.event import EventKind
 from pynostr.encrypted_dm import EncryptedDirectMessage
 from pynostr.event import Event
-from typing import List, Optional
+from typing import Any, List, Optional, Dict, Tuple, Union
 
-from lib.abbot.env import BOT_NOSTR_PK
+from lib.utils import try_get
+from lib.abbot.env import BOT_NOSTR_PK, BOT_NOSTR_NPUB, BOT_NOSTR_SK
+from lib.abbot.config import BOT_CORE_SYSTEM
+from lib.logger import debug_logger
 from lib.abbot.exceptions.exception import try_except
+from lib.abbot.core import Abbot
 
 DM: EventKind = EventKind.ENCRYPTED_DIRECT_MESSAGE  # 4
 CHANNEL_CREATE: EventKind = EventKind.CHANNEL_CREATE  # 40
@@ -42,13 +49,15 @@ Ready. Set. Stack Sats! 🚀
 
 
 @try_except
-class AbbotNostr:
+class AbbotNostr(Abbot):
     relay_manager = RelayManager(timeout=6)
     notices = []
     events = []
 
-    def __init__(self, sk: str, custom_filters: Filters = None, author_whitelist: Optional[List[str]] = None):
-        self._private_key = PrivateKey.from_hex(sk)
+    def __init__(self, custom_filters: Filters = None, author_whitelist: Optional[List[str]] = None):
+        from env import BOT_NOSTR_SK
+
+        self._private_key = PrivateKey.from_hex(BOT_NOSTR_SK)
         self.public_key: PublicKey = self._private_key.public_key
         self.author_whitelist: Optional[List[str]] = author_whitelist
         self.custom_filters = custom_filters
@@ -126,6 +135,13 @@ class AbbotNostr:
         self.relay_manager.close_connections()
 
     @try_except
+    async def handle_dm(self, event: Event, reader: StreamReader, writer: StreamWriter):
+        tag_dict = event.get_tag_dict()
+        if event.has_pubkey_ref():
+            p = try_get(tag_dict, "p")
+        direct_message = self.decrypt_direct_message(p, event.content, event.id)
+
+    @try_except
     def encrypt_direct_message(self, partner_pk: str, cleartext_content: str):
         encrypted_direct_message: EncryptedDirectMessage = self._instantiate_direct_message(
             partner_pk, cleartext_content=cleartext_content
@@ -166,9 +182,108 @@ class AbbotNostr:
         self.relay_manager.run_sync()
 
 
-def build():
-    from lib.abbot.env import BOT_NOSTR_SK
+@dataclass
+@try_except
+class NostrEventHandler:
+    group: int
+    kind: int
+    handler: function
+    if group == 0:
+        assert kind == 4
+    elif group == 1:
+        assert kind in [40, 41, 42, 43, 44, 21021]
 
-    abbot_nostr = AbbotNostr(BOT_NOSTR_SK)
-    abbot_nostr.add_relays_and_subscribe()
-    return abbot_nostr
+
+class NostrBotBuilder(AbbotNostr):
+    def __init__(self, host="127.0.0.1", port=8888):
+        self.host = host
+        self.port = port
+        self.handlers: Dict[int, List[NostrEventHandler]] = {}
+
+    @try_except
+    def add_handler(self, handler: NostrEventHandler, group: int):
+        if group not in self.handlers:
+            self.handlers[group] = []
+            self.handlers = dict(sorted(self.handlers.items()))
+        self.handlers[group] = handler
+        return self
+
+    """
+    {
+       -1: [NostrEventHandler(...)],
+        1: [CallbackQueryHandler(...), CommandHandler(...)]
+    }
+    """
+
+    @try_except
+    def add_handlers(self, handlers: List[Dict[int, NostrEventHandler]], group: int):
+        for handler in handlers:
+            self.add_handler(handler, group)
+        return self
+
+    @try_except
+    async def handle_event(self, reader: StreamReader, writer: StreamWriter):
+        while True:
+            data = await reader.read(100)
+            if not data:
+                break
+            # TODO: Replace the following line with your actual message parsing logic
+            event: Event = ...
+            kind: int = try_get(event, "kind")
+            id: str = try_get(event, "id")
+            abbot_nostr = AbbotNostr(Abbot(f"AbbotNostr-{id}", BOT_NOSTR_NPUB, BOT_CORE_SYSTEM, id))
+            for handler in self.handlers:
+                if try_get(handler, kind) == kind:
+                    await abbot_nostr[handler(data, reader, writer)]
+
+    @try_except
+    async def run(self):
+        server = await asyncio.start_server(self.handle_event, self.host, self.port)
+        addr = server.sockets[0].getsockname()
+        print(f"Serving on {addr}")
+        async with server:
+            await server.serve_forever()
+
+
+@dataclass
+class NostrBotHandlers:
+    def get_handlers(self) -> object:
+        return self
+
+    @try_except
+    async def handle_channel_create(self, event: Event, reader: StreamReader, writer: StreamWriter):
+        pass
+
+    @try_except
+    async def handle_channel_meta(self, event: Event, reader: StreamReader, writer: StreamWriter):
+        pass
+
+    @try_except
+    async def handle_channel_message(self, event: Event, reader: StreamReader, writer: StreamWriter):
+        pass
+
+    @try_except
+    async def handle_channel_hide(self, event: Event, reader: StreamReader, writer: StreamWriter):
+        pass
+
+    @try_except
+    async def handle_channel_mute(self, event: Event, reader: StreamReader, writer: StreamWriter):
+        pass
+
+    @try_except
+    async def handle_channel_invite(self, event: Event, reader: StreamReader, writer: StreamWriter):
+        pass
+
+
+nostr_bot_handlers: NostrBotHandlers = NostrBotHandlers().get_handlers()
+nostr_bot: NostrBotBuilder = NostrBotBuilder().add_handlers(
+    [
+        NostrEventHandler(4, handle_dm),
+        NostrEventHandler(40, handle_channel_create),
+        NostrEventHandler(41, handle_channel_meta),
+        NostrEventHandler(42, handle_channel_message),
+        NostrEventHandler(43, handle_channel_hide),
+        NostrEventHandler(44, handle_channel_mute),
+        NostrEventHandler(21021, handle_channel_invite),
+    ]
+)

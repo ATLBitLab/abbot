@@ -1,10 +1,6 @@
-from sys import argv
+from cli_args import CLI_ARGS, DEV_MODE, ERR_MODE, TEST_MODE
 
-ARGS = argv[1:]
-DEV_MODE = "-d" in ARGS or "--dev" in ARGS
-ERR_MODE = "-e" in ARGS or "--error" in ARGS
-TEST_MODE = "-t" in ARGS or "--test" in ARGS
-print(f"config: ARGS={ARGS}")
+print(f"config: CLI_ARGS={CLI_ARGS}")
 print(f"config: DEV_MODE={DEV_MODE}")
 print(f"config: ERR_MODE={ERR_MODE}")
 print(f"config: TEST_MODE={TEST_MODE}")

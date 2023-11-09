@@ -1,14 +1,9 @@
-from sys import argv
+from cli_args import CLI_ARGS, DEV_MODE, ERR_MODE, TEST_MODE, LOG_MODE
 
-ARGS = argv[1:]
-DEV_MODE = "-d" in ARGS or "--dev" in ARGS
-ERR_MODE = "-e" in ARGS or "--error" in ARGS
-TEST_MODE = "-t" in ARGS or "--test" in ARGS
-print(f"config: ARGS={ARGS}")
-print(f"config: DEV_MODE={DEV_MODE}")
-print(f"config: ERR_MODE={ERR_MODE}")
-print(f"config: TEST_MODE={TEST_MODE}")
-LOG_MODE = DEV_MODE if DEV_MODE else ERR_MODE
+print(f"logger: CLI_ARGS={CLI_ARGS}")
+print(f"logger: DEV_MODE={DEV_MODE}")
+print(f"logger: ERR_MODE={ERR_MODE}")
+print(f"logger: TEST_MODE={TEST_MODE}")
 
 from os.path import abspath
 from datetime import datetime

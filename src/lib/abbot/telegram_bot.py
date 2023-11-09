@@ -18,7 +18,7 @@ from lib.utils import sender_is_group_admin, try_get
 
 from lib.admin.admin_service import AdminService
 
-from lib.abbot.bot import Abbot, Bots
+from src.lib.abbot.core import Abbot, Bots
 from lib.abbot.exceptions.exception import try_except, AbbotException
 from lib.abbot.utils import (
     parse_chat,
@@ -574,9 +574,9 @@ async def admin_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await message.reply_text(status_data)
 
 
-def build():
+def build_telegram_bot():
     debug_logger.log(f"Initializing telegram {BOT_NAME} @{BOT_TELEGRAM_HANDLE}")
-    abbot = ApplicationBuilder().token(BOT_TELEGRAM_TOKEN).build()
+    telegram_bot = ApplicationBuilder().token(BOT_TELEGRAM_TOKEN).build()
     debug_logger.log(f"Telegram {BOT_NAME} @{BOT_TELEGRAM_HANDLE} Initialized")
 
     _unplug_handler = CommandHandler("unplug", admin_unplug)
@@ -585,11 +585,11 @@ def build():
     _nap_handler = CommandHandler("nap", admin_nap)
     _status_handler = CommandHandler("status", admin_status)
 
-    abbot.add_handler(_unplug_handler)
-    abbot.add_handler(_plugin_handler)
-    abbot.add_handler(_kill_handler)
-    abbot.add_handler(_nap_handler)
-    abbot.add_handler(_status_handler)
+    telegram_bot.add_handler(_unplug_handler)
+    telegram_bot.add_handler(_plugin_handler)
+    telegram_bot.add_handler(_kill_handler)
+    telegram_bot.add_handler(_nap_handler)
+    telegram_bot.add_handler(_status_handler)
 
     help_handler = CommandHandler("help", help)
     rules_handler = CommandHandler("rules", rules)
@@ -598,18 +598,18 @@ def build():
     unleash_handler = CommandHandler("unleash", unleash)
     leash_handler = CommandHandler("leash", leash)
 
-    abbot.add_handler(help_handler)
-    abbot.add_handler(rules_handler)
-    abbot.add_handler(start_handler)
-    abbot.add_handler(stop_handler)
-    abbot.add_handler(unleash_handler)
-    abbot.add_handler(leash_handler)
+    telegram_bot.add_handler(help_handler)
+    telegram_bot.add_handler(rules_handler)
+    telegram_bot.add_handler(start_handler)
+    telegram_bot.add_handler(stop_handler)
+    telegram_bot.add_handler(unleash_handler)
+    telegram_bot.add_handler(leash_handler)
 
     # TODO: define different message handlers such as Mention() or Reply() if exists
     # BaseFilter should run first and do 1 thing: store the message and setup the telegram stuff
     # Mention, ReplyToBot and Unleash fitlers should reply with a completion
     message_handler = MessageHandler(BaseFilter(), handle_message)
-    abbot.add_handler(message_handler)
+    telegram_bot.add_handler(message_handler)
 
     debug_logger.log(f"Telegram {BOT_NAME} @{BOT_TELEGRAM_HANDLE} Polling")
-    return abbot
+    return telegram_bot

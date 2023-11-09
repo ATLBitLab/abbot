@@ -1,7 +1,4 @@
-from sys import argv
-
-ARGS = argv[1:]
-TEST_MODE = "-t" in ARGS or "--test" in ARGS
+from cli_args import TEST_MODE
 
 from typing import Dict, List
 from dataclasses import dataclass, field
@@ -11,8 +8,10 @@ from pymongo.cursor import Cursor
 from bson.typings import _DocumentType
 
 from lib.abbot.env import DATABASE_CONNECTION_STRING
-from lib.abbot.exceptions.exception import try_except_pass
+from lib.abbot.exceptions.exception import try_except
 from lib.logger import error_logger
+from lib.utils import try_get
+from lib.abbot.core import Config
 
 client = MongoClient(host=DATABASE_CONNECTION_STRING)
 
@@ -29,13 +28,14 @@ telegram_dms = db_telegram.get_collection("dm")
 
 @dataclass
 class NostrChannel:
-    id: str = ""
-    pubkey: str = ""
+    id: str
+    pubkey: str
+    config: Config = Config().to_dict()
     created_at: int = 0000000000
     kind: int = 40
-    tags: List[List[str]] = ""
-    content: str = ""
-    sig: str = ""
+    tags: List[List[str]]
+    content: str
+    sig: str
     messages: List[Dict] = field(default_factory=list)
     history: List[Dict] = field(default_factory=list)
 
@@ -45,17 +45,17 @@ class NostrChannel:
 
 @dataclass
 class NostrDirectMessage:
-    id: str = ""
-    sender_pk: str = ""
+    id: str
+    sender_pk: str
     started_at: int = 0000000000
-    receiver_pk: str = ""
+    receiver_pk: str
     messages: List[Dict] = field(default_factory=list)
     history: List[Dict] = field(default_factory=list)
 
     def to_dict(self) -> Dict:
         return self.__dict__
 
-    @try_except_pass
+    @try_except
     def validate_direct_messages(self, direct_messages: List[Dict]) -> List[Dict]:
         valid_direct_messages = []
         for direct_message in direct_messages:
@@ -68,7 +68,7 @@ class MongoNostr:
     def __init__(self):
         pass
 
-    @try_except_pass
+    @try_except
     def validate_doc_for_insert(self, docs: List[Dict], is_channel: bool = True) -> List[Dict]:
         try:
             valid_docs = []
@@ -80,42 +80,53 @@ class MongoNostr:
             error_logger.log(f"invalid nostr channel, skipping {'channel' if is_channel else 'dm'} {valid_doc}")
             pass
 
+    @try_except
     def insert_channel(self, channel_data: NostrChannel):
         nostr_channels.insert_one(channel_data.__dict__)
 
+    @try_except
     def insert_channels(self, channels: List[NostrChannel]):
         nostr_channels.insert_many(list(map(lambda channel: channel, self.validate_doc_for_insert(channels))))
 
+    @try_except
     def insert_dm(self, direct_message_data: NostrDirectMessage):
         nostr_dms.insert_one(direct_message_data)
 
+    @try_except
     def insert_dms(self, direct_messages: List[NostrDirectMessage]):
         nostr_dms.insert_many(list(map(lambda dm: dm, self.validate_doc_for_insert(direct_messages))))
 
-    def find_channel(self, filter: {}):
+    @try_except
+    def find_channel(self, filter: {}) -> NostrChannel.to_dict():
         return nostr_channels.find_one(filter)
 
-    def find_channels(self, filter: {}):
+    @try_except
+    def find_channels(self, filter: {}) -> List[NostrChannel.to_dict()]:
         channels = []
         for channel in nostr_channels.find(filter):
             channels.append(channel)
         return channels
 
+    @try_except
     def find_channels_cursor(self, filter: {}) -> Cursor[_DocumentType]:
         return nostr_channels.find(filter)
 
+    @try_except
     def find_dm(self, filter: {}):
         return nostr_dms.find_one(filter)
 
+    @try_except
     def find_dms(self, filter: {}):
         dms = []
         for nostr_dm in nostr_dms.find(filter):
             dms.append(nostr_dm)
         return dms
 
+    @try_except
     def find_dms_cursor(self, filter: {}) -> Cursor[_DocumentType]:
         return nostr_dms.find(filter)
 
+    @try_except
     def get_bot_channel_invite_author_whitelist():
         pass
 
