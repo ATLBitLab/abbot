@@ -1,9 +1,4 @@
-from cli_args import CLI_ARGS, DEV_MODE, ERR_MODE, TEST_MODE
-
-print(f"config: CLI_ARGS={CLI_ARGS}")
-print(f"config: DEV_MODE={DEV_MODE}")
-print(f"config: ERR_MODE={ERR_MODE}")
-print(f"config: TEST_MODE={TEST_MODE}")
+from cli_args import DEV_MODE, TEST_MODE
 
 from lib.utils import try_get
 from lib.utils import json_loader, try_get
@@ -16,10 +11,18 @@ ORG_SLUG = try_get(ORG_CONFIG, "slug")
 ORG_ADMINS = try_get(ORG_CONFIG, "admins")
 ORG_TYPE = try_get(ORG_CONFIG, "type")
 ORG_DESCRIPTION = try_get(ORG_CONFIG, "description")
+
+ORG_BUSINESS_MODEL = try_get(ORG_CONFIG, "business_model")
+ORG_INPUT_TOKEN_COST = try_get(ORG_BUSINESS_MODEL, "input_token_cost")
+ORG_OUTPUT_TOKEN_COST = try_get(ORG_BUSINESS_MODEL, "output_token_cost")
+ORG_PER_TOKEN_COST_DIV = try_get(ORG_BUSINESS_MODEL, "per_token_cost_divisor")
+ORG_TOKEN_COST_MULT = try_get(ORG_BUSINESS_MODEL, "token_cost_multiplier")
+
 ORG_CHAT_ID = try_get(ORG_CONFIG, "chat_id")
 ORG_CHAT_TITLE = try_get(ORG_CONFIG, "chat_title")
 ORG_BLOCK_HEIGHT = try_get(ORG_CONFIG, "block_height")
 ORG_LOCATION = try_get(ORG_CONFIG, "location")
+ORG_HEX_PUBKEY = try_get(ORG_CONFIG, "hex_pubkey")
 ORG_WEBSITE = try_get(ORG_CONFIG, "website")
 ORG_GITHUB = try_get(ORG_CONFIG, "github")
 ORG_TELEGRAM = try_get(ORG_CONFIG, "telegram")
@@ -41,12 +44,16 @@ BOT_USER_ID = try_get(BOT_CONFIG, "user_id")
 
 BOT_NAME = try_get(BOT_CONFIG, "name")
 BOT_TELEGRAM_HANDLE = try_get(BOT_CONFIG, "handle")
-BOT_CHAT_HISTORY_FILEPATH = f"src/data/chat/content/{BOT_NAME}.jsonl"
-BOT_CHAT_CONFIG_FILEPATH = f"src/data/chat/content/{BOT_NAME}.jsonl"
-BOT_INTRO = f"Your name is {BOT_NAME}, which is short for {BOT_NAME_MEANING}, your telegram handle is {BOT_TELEGRAM_HANDLE}. You answer to Abbot. You are part of {ORG_NAME} - {ORG_DESCRIPTION} and you are an expert in all things Atlanta, ATL BitLab, Bitcoin and Lightning Network. {BOT_DIRECTIVES}."
-BOT_SYSTEM = try_get(BOT_CONFIG, "system")
-BOT_CORE_SYSTEM = f"{BOT_INTRO}. {BOT_SYSTEM}"
+BOT_INTRO = f"Your name is {BOT_NAME}, which is short for {BOT_NAME_MEANING}, your telegram handle is {BOT_TELEGRAM_HANDLE}. You answer to Abbot. You are part of {ORG_NAME} - {ORG_DESCRIPTION} and you are an expert in all things {ORG_LOCATION}, {ORG_NAME} and Bitcoin and Lightning Network. {BOT_DIRECTIVES}"
 
-BOT_NAME = f"t{BOT_NAME}" if TEST_MODE else BOT_NAME
-BOT_TELEGRAM_HANDLE = f"test_{BOT_TELEGRAM_HANDLE}" if TEST_MODE else BOT_TELEGRAM_HANDLE
-BOT_TELEGRAM_TOKEN = TEST_BOT_TELEGRAM_HANDLE if TEST_MODE else BOT_TELEGRAM_TOKEN
+BOT_SYSTEM = try_get(BOT_CONFIG, "system")
+BOT_SYSTEM_DMS = try_get(BOT_SYSTEM, "dms")
+BOT_SYSTEM_GROUPS = try_get(BOT_SYSTEM, "groups")
+BOT_SYSTEM_CORE = try_get(BOT_SYSTEM, "core")
+
+BOT_SYSTEM_CORE_DMS = f"{BOT_SYSTEM_DMS}. {BOT_INTRO}. {BOT_SYSTEM_CORE}"
+BOT_SYSTEM_CORE_GROUPS = f"{BOT_SYSTEM_GROUPS}. {BOT_INTRO}. {BOT_SYSTEM_CORE}"
+
+BOT_NAME = f"t{BOT_NAME}" if TEST_MODE or DEV_MODE else BOT_NAME
+BOT_TELEGRAM_HANDLE = f"test_{BOT_TELEGRAM_HANDLE}" if TEST_MODE or DEV_MODE else BOT_TELEGRAM_HANDLE
+BOT_TELEGRAM_TOKEN = TEST_BOT_TELEGRAM_HANDLE if TEST_MODE or DEV_MODE else BOT_TELEGRAM_TOKEN

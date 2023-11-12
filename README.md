@@ -1,14 +1,7 @@
-# 🎃 Hacktoberfest 2023! 👨‍💻 
-ATL BitLab is participating in [Hacktoberfest 2023](https://hacktoberfest.com/), and this repo is included! Celebrate the 10th anniversary of Hacktoberfest this year! Hosted annually every October, Hacktoberfest is a month-long event sponsored by DigitalOcean, GitHub, and various other partners, championing open-source contributions.
-
-If you're new to Hacktoberfest, you can register to participate [here](https://hacktoberfest.com/auth/) anytime from September 26th- October 31st.
-
-Check out our [project board](https://github.com/orgs/ATLBitLab/projects/1) and [issues](https://github.com/ATLBitLab/open-abbot/issues) for good ways to contribute.
+[![Netlify Status](https://api.netlify.com/api/v1/badges/1db6e002-0e3c-4dfb-9a57-8d7c39109fd1/deploy-status)](https://app.netlify.com/sites/atlbitlab/deploys)
 
 # Abbot
 A helpful bitcoiner bot at [ATL BitLab](https://abbot.atlbitlab.com). Est. block 797812.
-
-[![Netlify Status](https://api.netlify.com/api/v1/badges/02d37271-9ec5-4574-abe5-b36f134f6fa6/deploy-status)](https://app.netlify.com/sites/abbot/deploys)
 
 ## Summary
 Abbot stands for **A**tl **B**itlab **Bot**. 
@@ -19,6 +12,9 @@ Basic tasks that Abbot can automate include:
 3. Answering questions about ... anything!
 4. Nostr, Twitter posting
 5. Automating tasks for meetup community organizers
+
+## Contributing
+Check out our [project board](https://github.com/orgs/ATLBitLab/projects/1) and [issues](https://github.com/ATLBitLab/abbot/issues) for good ways to contribute.
 
 ## Requirements
 - Python >= 3.11.6 
@@ -64,8 +60,7 @@ pip3 install -r requirements.txt
 
 7. If you created a test bot per the #requirements section, you can run the test bot
 ```
-cd src
-python main.py --dev
+python src/main.py --dev --telegram
 ```
 
 8. Go to your telegram and DM your bot! That's it!
