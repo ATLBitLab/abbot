@@ -10,7 +10,7 @@ from ..utils import try_get
 from io import TextIOWrapper, open
 from os.path import abspath, isfile
 
-from lib.logger import debug_logger, error_logger
+from lib.logger import bot_debug, bot_error
 from lib.abbot.exceptions.exception import try_except
 
 from constants import OPENAI_MODEL
@@ -21,10 +21,10 @@ mongo_nostr = MongoNostr()
 
 
 def handle_exception(fn: str, e: Exception):
-    error_logger.log(f"{fn} exception:\n{e}")
+    bot_error.log(f"{fn} exception:\n{e}")
     traceback.print_exc()
     tb = traceback.format_exc()
-    error_logger.log(f"{fn} traceback:\n{tb}")
+    bot_error.log(f"{fn} traceback:\n{tb}")
 
 
 class Bots:

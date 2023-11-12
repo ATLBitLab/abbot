@@ -1,23 +1,28 @@
 import uuid
+import json
 import asyncio
-from asyncio import StreamReader, StreamWriter
+import websockets
 from attr import dataclass
+from typing import Dict, List, Optional, Tuple, Callable, Coroutine, Tuple
 
-from pynostr.key import PrivateKey, PublicKey
-from pynostr.relay_manager import RelayManager
-from pynostr.filters import FiltersList, Filters
-from pynostr.event import EventKind
-from pynostr.encrypted_dm import EncryptedDirectMessage
+from tornado import gen
+from tornado.ioloop import IOLoop
+from tornado.tcpserver import TCPServer
+from tornado.iostream import IOStream, StreamClosedError
+
+from nostr_sdk import Keys, Client, EventBuilder, Filter
+
 from pynostr.event import Event
-from typing import Any, List, Optional, Dict, Tuple, Union
-import types as _types
+from pynostr.event import EventKind
+from pynostr.key import PrivateKey, PublicKey
+from pynostr.relay_manager import RelayManager, RelayPolicy
+from pynostr.filters import FiltersList, Filters
+from pynostr.encrypted_dm import EncryptedDirectMessage
 
 from lib.utils import try_get
-from lib.abbot.env import BOT_NOSTR_PK, BOT_NOSTR_NPUB, BOT_NOSTR_SK
-from lib.abbot.config import BOT_CORE_SYSTEM
-from lib.logger import debug_logger
+from lib.abbot.env import BOT_NOSTR_PK
+from lib.logger import bot_debug, bot_error
 from lib.abbot.exceptions.exception import try_except
-from lib.abbot.core import Abbot
 
 DM: EventKind = EventKind.ENCRYPTED_DIRECT_MESSAGE  # 4
 CHANNEL_CREATE: EventKind = EventKind.CHANNEL_CREATE  # 40
@@ -31,9 +36,9 @@ RELAYS: List[str] = [
     "wss://relay1.nostrchat.io",
     "wss://relay2.nostrchat.io",
     "wss://relay.damus.io",
-    "wss://nos.lol/",
+    "wss://nos.lol",
     "wss://relay.primal.net",
-    "wss://relay.snort.social/",
+    "wss://relay.snort.social",
     "wss://nostr.atlbitlab.com",
 ]
 
@@ -49,28 +54,25 @@ Ready. Set. Stack Sats! 🚀
 """
 
 
-@try_except
-class AbbotNostr(Abbot):
-    relay_manager = RelayManager(timeout=6)
-    notices = []
-    events = []
+class AbbotNostr:
+    relay_manager: RelayManager = RelayManager()
+    io_loop: IOLoop = relay_manager.io_loop
+    notices: List = []
+    events: List = []
 
-    def __init__(self, custom_filters: Filters = None, author_whitelist: Optional[List[str]] = None):
-        from env import BOT_NOSTR_SK
+    def __init__(self, custom_filters: Filters = None, author_whitelist: Optional[List[str]] = []):
+        import lib.abbot.env as e
 
-        self._private_key = PrivateKey.from_hex(BOT_NOSTR_SK)
-        self.public_key: PublicKey = self._private_key.public_key
+        self._private_key = Keys.from_sk_str(e.BOT_NOSTR_SK)
+        self.public_key = self._private_key.public_key()
+        self.client = Client(Keys(self._private_key))
         self.author_whitelist: Optional[List[str]] = author_whitelist
         self.custom_filters = custom_filters
-        self.default_filters_list: FiltersList = FiltersList(
-            [
-                Filters(kinds=[DM], pubkey_refs=[BOT_NOSTR_PK], limit=1000),
-                Filters(kinds=[CHANNEL_CREATE, CHANNEL_MESSAGE], pubkey_refs=[BOT_NOSTR_PK], limit=1000),
-                Filters(
-                    kinds=[BOT_CHANNEL_INVITE], pubkey_refs=[BOT_NOSTR_PK], authors=self.author_whitelist, limit=1000
-                ),
-            ]
-        )
+        self.default_filters_list: List[Filter] = [
+            Filter().kind(4).pubkey(self.public_key),
+            Filter().kinds([40, 42]).pubkey(self.public_key),
+            Filter().kind(21021).pubkey(self.public_key).authors(self.author_whitelist),
+        ]
 
     def _instantiate_direct_message(
         self,
@@ -81,17 +83,27 @@ class AbbotNostr(Abbot):
     ) -> EncryptedDirectMessage:
         assert partner_pk != None, "Error: partner_pk required!"
         assert None not in (cleartext, encrypted), "Error: cleartext or encrypted required"
-        return EncryptedDirectMessage(self.public_key.hex(), partner_pk, cleartext, encrypted, reference_event_id)
+        return EncryptedDirectMessage(self.public_key.to_hex(), partner_pk, cleartext, encrypted, reference_event_id)
 
+    @gen.coroutine
     @try_except
-    def add_relays_and_subscribe(self):
+    def add_relays_and_connect(self):
+        bot_debug.log("add_relays_and_connect")
         for relay in RELAYS:
-            self.relay_manager.add_relay(relay)
-        self.relay_manager.add_subscription_on_all_relays(uuid.uuid4().hex, self.default_filters_list)
+            bot_debug.log(f"Adding relay {relay}")
+            self.client.add_relay(relay)
+            self.client.connect()
+        sub_id = uuid.uuid4().hex
+        bot_debug.log(f"Subscriptions added with id {sub_id}")
+        self.client.start()
 
+    @gen.coroutine
     @try_except
-    def run_relay_sync(self):
-        self.relay_manager.run_sync()
+    def start_client(self):
+        bot_debug.log("Running relay sync ...")
+        while True:
+            for event in self.client.get_events_of(self.default_filters_list, None):
+                print("event", event.as_json())
 
     @try_except
     def get_message_pool(self):
@@ -136,13 +148,6 @@ class AbbotNostr(Abbot):
         self.relay_manager.close_connections()
 
     @try_except
-    async def handle_dm(self, event: Event, reader: StreamReader, writer: StreamWriter):
-        tag_dict = event.get_tag_dict()
-        if event.has_pubkey_ref():
-            p = try_get(tag_dict, "p")
-        direct_message = self.decrypt_direct_message(p, event.content, event.id)
-
-    @try_except
     def encrypt_direct_message(self, partner_pk: str, cleartext_content: str):
         encrypted_direct_message: EncryptedDirectMessage = self._instantiate_direct_message(
             partner_pk, cleartext_content=cleartext_content
@@ -184,123 +189,112 @@ class AbbotNostr(Abbot):
 
 
 @dataclass
-@try_except
-class NostrEventHandler:
+class NostrHandler:
     group: int
-    kind: int
-    handler: _types.FunctionType
-    if group == 0:
-        assert kind == 4
-    elif group == 1:
-        assert kind in [40, 41, 42, 43, 44, 21021]
+    handler_fn: Callable[[IOStream, Tuple], Coroutine[None, None, None]]
+
+    def items(self):
+        return self.__dict__.items()
 
 
-class NostrBotBuilder(AbbotNostr):
+class NostrBuilder:
     def __init__(
         self,
-        event: Event,
-        reader: StreamReader,
-        writer: StreamWriter,
         host="127.0.0.1",
-        port=8888,
+        port=8080,
     ):
-        self.event = event
-        self.reader = reader
-        self.writer = writer
         self.host = host
         self.port = port
-        self.handlers: Dict[int, List[NostrEventHandler]] = {}
-
-    def get_handlers(self) -> object:
-        return self
+        self.handlers: Dict[List[NostrHandler[int, Callable[[IOStream, Tuple], Coroutine[None, None, None]]]]] = {}
 
     @try_except
-    async def handle_dm(self):
-        pass
-
-    @try_except
-    async def handle_channel_create(self):
-        pass
-
-    @try_except
-    async def handle_channel_create(self):
-        pass
-
-    @try_except
-    async def handle_channel_meta(self):
-        pass
-
-    @try_except
-    async def handle_channel_message(self):
-        pass
-
-    @try_except
-    async def handle_channel_hide(self):
-        pass
-
-    @try_except
-    async def handle_channel_mute(self):
-        pass
-
-    @try_except
-    async def handle_channel_invite(self):
-        pass
-
-    @try_except
-    def add_handler(self, handler: NostrEventHandler, group: int):
+    def add_handler(self, group: int, handler: NostrHandler):
         if group not in self.handlers:
             self.handlers[group] = []
-            self.handlers = dict(sorted(self.handlers.items()))
-        self.handlers[group] = handler
+        self.handlers[group].append(handler)
+        self.handlers = dict(sorted(self.handlers.items()))
         return self
 
-    """
-    {
-       -1: [NostrEventHandler(...)],
-        1: [CallbackQueryHandler(...), CommandHandler(...)]
-    }
-    """
-
     @try_except
-    def add_handlers(self, handlers: List[Dict[int, NostrEventHandler]], group: int):
+    def add_handlers(self, handlers: List[NostrHandler]):
         for handler in handlers:
-            self.add_handler(handler, group)
+            self.add_handler(handler.group, handler.handler_fn)
         return self
 
-    @try_except
-    async def handle_event(self, reader: StreamReader, writer: StreamWriter):
+    def handle_event(self, stream: IOStream, address: Tuple):
+        print("handle_event")
+        print("stream", stream)
+        print("address", address)
         while True:
-            data = await reader.read(100)
-            if not data:
+            try:
+                print("while True try")
+                data = yield stream.read_until()
+                print("data", data)
+                if not data:
+                    bot_error.log(f"No client data")
+                    yield stream.write(b"No client data\n")
+                    break
+
+                try:
+                    data = json.loads(data)
+                    print("jsonloads data", data)
+                except:
+                    pass
+                event: Event = Event(data)  # Make sure Event is properly parsed from data
+                print("event", event)
+                kind: int = try_get(event, "kind")  # Assuming this function extracts the 'kind' from the event
+                print("kind", kind)
+
+                for group, handler in self.handlers.items():
+                    print("group, handler", group, handler)
+                    if group == kind:
+                        yield handler(event, stream, address)
+                        break
+                bot_error.log(f"No matching handler for kind: {kind}")
+                yield stream.write(b"No matching handler found\n")
                 break
-            # TODO: Replace the following line with your actual message parsing logic
-            event: Event = data
-            kind: int = try_get(event, "kind")
-            id: str = try_get(event, "id")
-            abbot_nostr = AbbotNostr(Abbot(f"AbbotNostr-{id}", BOT_NOSTR_NPUB, BOT_CORE_SYSTEM, id))
-            for handler in self.handlers:
-                if try_get(handler, kind) == kind:
-                    await abbot_nostr[handler(data, reader, writer)]
 
-    @try_except
+            except StreamClosedError:
+                bot_error.log(f"StreamClosedError: Client {address} disconnected")
+                break
+
+    async def listen_to_websocket(self, url):
+        async with websockets.connect(url) as websocket:
+            while True:
+                data = await websocket.recv()
+                await self.handle_event(data)
+
     async def run(self):
-        server = await asyncio.start_server(self.handle_event, self.host, self.port)
-        addr = server.sockets[0].getsockname()
-        print(f"Serving on {addr}")
-        async with server:
-            await server.serve_forever()
+        await asyncio.gather(*(self.listen_to_websocket(relay) for relay in RELAYS))
 
 
-nostr_bot: NostrBotBuilder = NostrBotBuilder()
-handlers: NostrBotBuilder = nostr_bot.get_handlers()
-nostr_bot.add_handlers(
-    [
-        NostrEventHandler(4, handlers.handle_dm),
-        NostrEventHandler(40, handlers.handle_channel_create),
-        NostrEventHandler(41, handlers.handle_channel_meta),
-        NostrEventHandler(42, handlers.handle_channel_message),
-        NostrEventHandler(43, handlers.handle_channel_hide),
-        NostrEventHandler(44, handlers.handle_channel_mute),
-        NostrEventHandler(21021, handlers.handle_channel_invite),
-    ]
-)
+async def handle_dm(stream: IOStream, address: Tuple):
+    print("handler")
+
+
+async def handle_channel_create(stream: IOStream, address: Tuple):
+    print("handler")
+
+
+async def handle_channel_create(stream: IOStream, address: Tuple):
+    print("handler")
+
+
+async def handle_channel_meta(stream: IOStream, address: Tuple):
+    print("handler")
+
+
+async def handle_channel_message(stream: IOStream, address: Tuple):
+    print("handler")
+
+
+async def handle_channel_hide(stream: IOStream, address: Tuple):
+    print("handler")
+
+
+async def handle_channel_mute(stream: IOStream, address: Tuple):
+    print("handler")
+
+
+async def handle_channel_invite(stream: IOStream, address: Tuple):
+    print("handler")

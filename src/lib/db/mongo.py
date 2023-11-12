@@ -9,8 +9,7 @@ from bson.typings import _DocumentType
 
 from lib.abbot.env import DATABASE_CONNECTION_STRING
 from lib.abbot.exceptions.exception import try_except
-from lib.logger import error_logger
-from lib.utils import try_get
+from lib.logger import bot_error
 
 client = MongoClient(host=DATABASE_CONNECTION_STRING)
 
@@ -52,7 +51,7 @@ class NostrChannel:
     pubkey: str
     content: str
     sig: str
-    config: Config = field(default_factory=Config().to_dict())
+    config: Config = Config(started=False, introduced=False, unleashed=False, count=None)
     created_at: int = 0000000000
     kind: int = 40
     tags: List[List[str]] = field(default_factory=list)
@@ -97,7 +96,7 @@ class MongoNostr:
                 valid_docs.append(valid_doc)
             return valid_docs
         except:
-            error_logger.log(f"invalid nostr channel, skipping {'channel' if is_channel else 'dm'} {valid_doc}")
+            bot_error.log(f"invalid nostr channel, skipping {'channel' if is_channel else 'dm'} {valid_doc}")
             pass
 
     @try_except

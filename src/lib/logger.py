@@ -17,7 +17,7 @@ debug_log.setLevel(DEBUG)
 debug_formatter = Formatter("[%(asctime)s] debug - %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S.%f")
 
 # File handler for debug logger
-debug_file_handler = FileHandler(abspath("src/data/logs/debug.log"))
+debug_file_handler = FileHandler(abspath("src/data/logs/bot_debug.log"))
 debug_file_handler.setLevel(DEBUG)
 debug_file_handler.setFormatter(debug_formatter)
 
@@ -70,5 +70,5 @@ class BotLogger:
         debug_log.debug(message)
 
 
-error_logger = BotLogger("error", LOG_MODE)
-debug_logger = BotLogger("debug", LOG_MODE)
+bot_error = BotLogger("error", LOG_MODE)
+bot_debug = BotLogger("debug", LOG_MODE)

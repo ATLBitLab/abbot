@@ -1,5 +1,5 @@
 from functools import wraps
-from lib.logger import error_logger
+from lib.logger import bot_error
 from traceback import format_exc, format_tb
 
 
@@ -16,10 +16,9 @@ def try_except(fn):
         try:
             return fn(*args, **kwargs)
         except Exception as exception:
-            error_message = f"An error occurred: {exception}"
-            abbot_exception = AbbotException(error_message, format_exc(), format_tb(exception.__traceback__)[:-1])
-            error_logger.log(f"Error: {abbot_exception}")
-            return abbot_exception
+            abbot_exception = AbbotException(exception, format_exc(), format_tb(exception.__traceback__)[:-1])
+            bot_error.log(f"Error: {abbot_exception}")
+            pass
 
     return wrapper
 
@@ -32,7 +31,7 @@ def try_except_raise(fn):
         except Exception as exception:
             error_message = f"An error occurred: {exception}"
             abbot_exception = AbbotException(error_message, format_exc(), format_tb(exception.__traceback__)[:-1])
-            error_logger.log(f"Error: {abbot_exception}")
+            bot_error.log(f"Error: {abbot_exception}")
             raise abbot_exception
 
     return wrapper

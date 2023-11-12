@@ -6,7 +6,7 @@ from io import BytesIO, open
 from requests import request
 
 from telegram.ext import ContextTypes
-from lib.logger import debug_logger, error_logger
+from lib.logger import bot_debug, bot_error
 
 
 TELEGRAM_MESSAGE_FIELDS = [
@@ -91,7 +91,7 @@ def qr_code(data):
 def opt_in(context: str, chat_id: int) -> bool:
     fn = "opt_in:"
     config_file_name = f"src/data/chat/{context}/config/{chat_id}.json"
-    debug_logger.log(f"{fn} config_file_name={config_file_name}")
+    bot_debug.log(f"{fn} config_file_name={config_file_name}")
     config_file_path = abspath(config_file_name)
     with open(config_file_path, "w") as config:
         json.dump({"started": True, "sent_intro": False}, config)
@@ -101,7 +101,7 @@ def opt_in(context: str, chat_id: int) -> bool:
 def opt_out(context: str, chat_id: int) -> bool:
     fn = "opt_out:"
     config_file_name = f"src/data/chat/{context}/config/{chat_id}.json"
-    debug_logger.log(f"{fn} config_file_name={config_file_name}")
+    bot_debug.log(f"{fn} config_file_name={config_file_name}")
     config_file_path = abspath(config_file_name)
     with open(config_file_path, "w") as config:
         json.dump({"started": False, "sent_intro": True}, config)
