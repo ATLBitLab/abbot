@@ -1,5 +1,5 @@
 CONFIG_JSON_FILEPATH = "src/data/config.json"
-OPENAI_MODEL = "gpt-4"
+OPENAI_MODEL = "gpt-4-1106-preview"
 THE_CREATOR = 1711738045
 HELP_MENU = """Welcome to Abbot!
 Available Commands

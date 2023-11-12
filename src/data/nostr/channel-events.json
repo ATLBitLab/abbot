@@ -1,0 +1,386 @@
+[
+    {
+        "content": "{\"about\":\"A group for bitcoiners from Austria\",\"name\":\"BitcoinAustria\",\"picture\":\"https://bitcoin-austria.at/wp-content/uploads/2020/06/Bitcoin-Austria-Verein-250.png\"}",
+        "created_at": 1684258355,
+        "id": "dbcbdd7219084c42d1ac45d50660fc28c047afdcd63ccb3247fd3221960b1ceb",
+        "kind": 41,
+        "pubkey": "b56fd5e5f081d6da95b2a761ec4c5fc8e82345d05bf5cfd0ae6a741601c422e2",
+        "sig": "01093d2daf0cc6aa9469e16c74a0dc389f481dea6caa7bf74de360f872f5c2ef241c3e4d1f4a1af44e035e35f0de9efd017d76bb63d45c763126b54baafb61f2",
+        "tags": [
+            [
+                "e",
+                "3b11442362e94c7347e34a5437acd9dae6be27d10b26bd7fee7bf35f78354956",
+                "",
+                "root"
+            ]
+        ]
+    },
+    {
+        "content": "{\"name\":\"TCR\",\"about\":\"Testing channel\",\"picture\":\"https://nostr.build/i/af888cb5ba8c58f1ebeee4c831c12525adf583bf621c67e68e6c8725e00d3131.jpg\"}",
+        "created_at": 1684243641,
+        "id": "5de229354c68cb73eaff0d6eef3dd423e1cda4a1664a3aab577e64d6b2555b2b",
+        "kind": 41,
+        "pubkey": "9e19243f3e431aa42f1f947b56788b36120761eb6c0f9e37aa4c7e78542dd63c",
+        "sig": "170258718dd45c3bb7ac3638a260f49773878f03fa23d4f786bc1dc38351b11b13174bfff27c55be4ae477b9e551c288c440ffe9a91bf7ee3aa6ecf74f7a0ceb",
+        "tags": [
+            [
+                "e",
+                "42cb949f671ce38dd18ce7a0f51518fb94061d83a6a8371bdc13e1f78e1e58c0",
+                "wss://relay.damus.io/"
+            ]
+        ]
+    },
+    {
+        "content": "{\"about\":\"TB\",\"name\":\"TB\",\"picture\":\"TB\"}",
+        "created_at": 1684215730,
+        "id": "47e9bcd6d1a040bb3f9d76c320cfccdd8de0c7ee347c3de5f74b899fac8b9a72",
+        "kind": 41,
+        "pubkey": "44107ce070595bd94330d045f6772baef93a527c4c9b3531a41c70d344ffaad3",
+        "sig": "971cfb3df92e9293610ce05619bdd4b67832b334cbb96fd621482e0d7cc5968dd8341b703f124db17d3c012c77462efef7696300006d1bf95984f9c82a20156d",
+        "tags": [
+            [
+                "e",
+                "ce37140d6f2d31fd66a08fb0eaf20df512d64aa1e33a14ded5a48d31d754fb7f",
+                "",
+                "root"
+            ]
+        ]
+    },
+    {
+        "content": "{\"about\":\"#social\",\"name\":\"Social ⭐️\",\"picture\":\"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTt27OTT0I6kKFDtU04Kj0LkV90eSF1lVkV3Q&usqp=CAU\"}",
+        "created_at": 1684184134,
+        "id": "70daf6b0c683c2c9798e89cf4e4a9ddab170cb65056d9c7556a3a71266ba40d5",
+        "kind": 41,
+        "pubkey": "82ed92cb311c148376d1ea0e59e53ed6ae3ea55d61e84daac4a7cd62d58c3bbd",
+        "sig": "89ccf7d6e1863ca09b3e0f797964f2b673940be9365b976f83e5ab3d25e281cb18a730c07b8feacf47feb1984bd4a36aa6d4e58e90f4c52cf24e1d0960e7f5ee",
+        "tags": [
+            [
+                "e",
+                "e4f2642bca0e452a0ec2bcaf480e66c9d9d4be8fa9ce81c8181b8afa02368af7",
+                "",
+                "root"
+            ]
+        ]
+    },
+    {
+        "content": "{\"name\":\"$PIMPLE token - The most disturbing #memecoin! \",\"about\":\"Tongue in cheek on #memecoinseason\",\"picture\":\"\"}",
+        "created_at": 1684173773,
+        "id": "a4042d914420f5037193d337095957ce10774a433ff55fb4a020abaa6dac04c0",
+        "kind": 41,
+        "pubkey": "48565ff3cfa36f549012bf2144526475951c590c387a7af44e0521ce44647209",
+        "sig": "3d9399513094bd41263dc56bc3e3affc35ac9fe028ac18c3920ce6d317c944e84aebb06f713a96132f6598bd32446186e304c5bf5b919a8605131047d8ddb79b",
+        "tags": [
+            [
+                "e",
+                "da792db3e00ad964e1b9f46408b1e6646de9bf9962ce7703a466c4d416cd230a",
+                "wss://relay1.nostrchat.io/"
+            ]
+        ]
+    },
+    {
+        "content": "{\"name\":\"Ma room \",\"about\":\"This is ma roomm\",\"picture\":\"\"}",
+        "created_at": 1684066848,
+        "id": "1e07021a7300148fc03df8dc041238698b40821604f4531ce7de0186be8837c3",
+        "kind": 41,
+        "pubkey": "e60aa7ac8699c3f261d7d1c373465294cf4b11a68197cbb7d5566092067036b9",
+        "sig": "87820e409030121d16903cf6fc886a4eb107b56c76722cdbcee4cca115350adc79530517faf54e5fd48f9669f327ba794ff199b222de02fc09458b3e1fecb82f",
+        "tags": [
+            [
+                "e",
+                "489443915be80426e779b77f7d6056af3d880ee43f88af77862a37ee95d730c3",
+                "wss://nos.lol/"
+            ]
+        ]
+    },
+    {
+        "content": "Sending a message from Brazil",
+        "created_at": 1679573433,
+        "id": "b6cf57bd91932cc9677d315e20165796c52aa7fdb5460e45ae17bba15815923a",
+        "kind": 42,
+        "pubkey": "ac39e0ce2b17f42d95f4ba7c1472f1023017c700ee3c8600c1e193cdccf19539",
+        "sig": "e96c43351385bc108a8770f3ab87c24f61a492bc638e6ee17aa005a26d979b7fb8bce07396cabd5935025b226a670533808fb412bd774b8981a2265254bf4322",
+        "tags": [
+            [
+                "e",
+                "f412192fdc846952c75058e911d37a7392aa7fd2e727330f4344badc92fb8a22",
+                "wss://relay1.nostrchat.io",
+                "root"
+            ]
+        ]
+    },
+    {
+        "content": "😱",
+        "created_at": 1679573672,
+        "id": "501b9afd3854d6d2c04a73e21015db988abc6eb9be93908608ff11955ca368d3",
+        "kind": 42,
+        "pubkey": "cc8d072efdcc676fcbac14f6cd6825edc3576e55eb786a2a975ee034a6a026cb",
+        "sig": "95d7b918c99a5a8924e0148b51ae62a6064319e452bb972e63431e5f45a2e8a5e452f881c211c4ef80e77ed2c01a1d861df8dd0944f6d025bdeaf2376ca412c9",
+        "tags": [
+            [
+                "e",
+                "f412192fdc846952c75058e911d37a7392aa7fd2e727330f4344badc92fb8a22",
+                "wss://relay1.nostrchat.io",
+                "root"
+            ]
+        ]
+    },
+    {
+        "content": "Ping",
+        "created_at": 1679573773,
+        "id": "2690b016f9d05378f46ac4c01107a60baf45e5b93c6ab052aabeba5982dd6295",
+        "kind": 42,
+        "pubkey": "2de04f7895d84bed1a34fef73c79263c53fc85bdc65df2f443a756cee5e004e5",
+        "sig": "2d44fe61f19aa5f8aecee7ea07784e8b432bc9f441110aa2f7705c3a04a86d5c5b81f9154fabd2432bc770f6cc7854bbe0ca07a3c0f37a42c6c889c7d882354b",
+        "tags": [
+            [
+                "e",
+                "f412192fdc846952c75058e911d37a7392aa7fd2e727330f4344badc92fb8a22",
+                "wss://relay1.nostrchat.io",
+                "root"
+            ]
+        ]
+    },
+    {
+        "content": "Toque toque tem alguém aí?",
+        "created_at": 1679574045,
+        "id": "8350e19b33f01ffbb15f0ba7af2fd1a7e4fb4c5d3a227b5362e85a63f4777828",
+        "kind": 42,
+        "pubkey": "88194d6b23c5b5cc5df773a081eacfba275a326e45f37981dc1a0c2ce909de1b",
+        "sig": "ef7bb97bd9bc4f69d6b7152037a9cc9682c5eefbb5fa366e1ac1dd775a73f4e2254c746d1b6d943846514a0b03660f10e9693ffb201b2210c281ef0e12b631a1",
+        "tags": [
+            [
+                "e",
+                "f412192fdc846952c75058e911d37a7392aa7fd2e727330f4344badc92fb8a22",
+                "wss://relay1.nostrchat.io",
+                "root"
+            ]
+        ]
+    },
+    {
+        "content": "greeting folks :)",
+        "created_at": 1679575432,
+        "id": "52cff59d6cd34d66ab5cb6ae72a92b15ab4438073f92fd4021ab1cad06b37569",
+        "kind": 42,
+        "pubkey": "ca44f01c9b12e792dea094de46d5bc0683fd2d0460b744ce1fc6423e15224dce",
+        "sig": "63facff57e7b23e0b811eb6fd9ed9fc4e1ecf44507fc78091be3b24cfcc528c3fb4a29afae89b3cc38bab97ad96adf295e4025fe0aabc9b1969e3bd92cec495c",
+        "tags": [
+            [
+                "e",
+                "f412192fdc846952c75058e911d37a7392aa7fd2e727330f4344badc92fb8a22",
+                "wss://relay1.nostrchat.io",
+                "root"
+            ]
+        ]
+    },
+    {
+        "content": "greetings even",
+        "created_at": 1679575468,
+        "id": "a7020adba2baa3ce9b3c449de3a19d98005b41ea5d039b22901d80141894f856",
+        "kind": 42,
+        "pubkey": "ca44f01c9b12e792dea094de46d5bc0683fd2d0460b744ce1fc6423e15224dce",
+        "sig": "30569e87b96e4bf06de52d5efcc6033e0baf1d764b542e7f7b6447c63b5f36373f9ca93a0f451a1fb6c08efb545107ef7bae5bde69d5f462b9be1c7375cc072c",
+        "tags": [
+            [
+                "e",
+                "f412192fdc846952c75058e911d37a7392aa7fd2e727330f4344badc92fb8a22",
+                "wss://relay1.nostrchat.io",
+                "root"
+            ]
+        ]
+    },
+    {
+        "content": "{\"reason\":\"\"}",
+        "created_at": 1681872457,
+        "id": "3a699fc9d634dc8a400573be197562d21f0ee90e2f5b1fa3d1446652824c6611",
+        "kind": 43,
+        "pubkey": "2fa1cec68f7f0f33357d63de234d16157dd3fcad3d294c0e1fd81ae4fb38290c",
+        "sig": "997e3fb7e39938a9462e3017073645898b7ff9a6c043f65158de8f14a4f3c0fa5f721951a89ad797b66de58647d5d6b8a95f9d499112946e409dcc1825d29fc6",
+        "tags": [
+            [
+                "e",
+                "5cbacfce201473069e6bde6e259ccd95e8c6eb6f34a08100e3d74b0b9af9f1f7"
+            ]
+        ]
+    },
+    {
+        "content": "{\"reason\":\"\"}",
+        "created_at": 1682601380,
+        "id": "092c24a539ef751cd2279fc298c1deb32a87c473b91b197c6ac3cdc4cb9fddd6",
+        "kind": 43,
+        "pubkey": "2b87bf3efc6d632817028335dd2e6888296378c23d77d51f7c93ea04964c1de5",
+        "sig": "dd585a0efe804e0b1accfa639dd4c78b2c5717ab6f357baf748bfa2bca79257a8b852c667b505e6a9fdb60778df57003d2d40aaffc0486e76b94a16ee9a3ebba",
+        "tags": [
+            [
+                "e",
+                "4ca65a81fbb8c0da61196d69a4162e6ac09a67cbed2dc5a7a20416ead6817d81"
+            ]
+        ]
+    },
+    {
+        "content": "{\"reason\":\"\"}",
+        "created_at": 1683115017,
+        "id": "69e13a9cda8c3dc9bf23b6a52bc07198f9ef25e417a419995c8a0f0ebfb4bce4",
+        "kind": 43,
+        "pubkey": "e2ffe50683f6ed2a75198169755bda16991d49facf98736e3d69b89a09febdbe",
+        "sig": "aa5e976f5da6b6fe3866ad85b09d0aabe4debf603c724c5df9856c0d581235d97fa3b075d05bc4440d1e05e8ab8798c64812766b3a29275b3e5fefb1ac36011c",
+        "tags": [
+            [
+                "e",
+                "1ec2aacd0be6d769179ecdd3cbeff57bf3a08ea5f4bb9b669deefde203147212"
+            ]
+        ]
+    },
+    {
+        "content": "{\"reason\":\"Spam\"}",
+        "created_at": 1690298094,
+        "id": "a2fc18a46acbdbee4cc25683587d6249b15abc0ed2a1e3e13e0abe34df2eb5ee",
+        "kind": 43,
+        "pubkey": "619af6a60b3fe4c733aaca061c522cc9c7cf1d87ef4c908facc5ed936d3bdf23",
+        "sig": "b605e048ac1ea5a486b50dfa60d08fc790180180a103763de03e049e3a4b18f07f2ae5cbe57f9bf626a5f777ac30dc636794dbc91148e6cc84e6374a16c2d208",
+        "tags": [
+            [
+                "e",
+                "44c228ab6e73e82fd7f06d41e69c0b5748694d0e08c61d895f00d19fac6a4ad8"
+            ]
+        ]
+    },
+    {
+        "content": "{\"reason\":\"Spam\"}",
+        "created_at": 1690298085,
+        "id": "c4a06eee809a6b87bf87b20d0f969bafff8dae66d8b1ea378dd034fa89ad4cdf",
+        "kind": 43,
+        "pubkey": "619af6a60b3fe4c733aaca061c522cc9c7cf1d87ef4c908facc5ed936d3bdf23",
+        "sig": "1157d99a6af842c1f62e2dd118c8eafc80b77b2c3a581f8dda54b646b235d2745ff0408975889dcce098e01f518db457aeefa4931f2c7477c85e44fafca11543",
+        "tags": [
+            [
+                "e",
+                "f8cf6640c084ac676bdc06d533900c8875ee1db2843e5dddf4db36ab8dcfacf1"
+            ]
+        ]
+    },
+    {
+        "content": "{\"reason\":\"Spam\"}",
+        "created_at": 1690298070,
+        "id": "8151aa16ecb40673b1c820577091685920aec579d2500967fa2ca62716c5cbef",
+        "kind": 43,
+        "pubkey": "619af6a60b3fe4c733aaca061c522cc9c7cf1d87ef4c908facc5ed936d3bdf23",
+        "sig": "e014530e373642cd71c4f72966df78b0e4e740cf7c1c65f61633042810fc40ad7147c4cf076b36873a6c465c5a33a73b7eee51b796c4ae2fcad219587b10e017",
+        "tags": [
+            [
+                "e",
+                "ba4fda22d853618e46f046e3eb215fc02e8ef8dd8041902e932387a95b789cea"
+            ]
+        ]
+    },
+    ,
+    {
+        "content": "",
+        "created_at": 1681288240,
+        "id": "fc52982988e63ebb367080d8936ba6597e3c1f2fb39dcda9a08093756069fdfe",
+        "kind": 44,
+        "pubkey": "126103bfddc8df256b6e0abfd7f3797c80dcc4ea88f7c2f87dd4104220b4d65f",
+        "sig": "a99a184adfc5053f7e4acb740687cac208bf3b77e88b2b3797feaf01df1ef25ea8322634cf9d1a52277c1a51d92a9de174938159041b4d3ae9b85f5a7937fc45",
+        "tags": [
+            [
+                "p",
+                "1e0699dcf5b1a4e5cf38588c3c1972484bc61db3ea959bd230c2ec1e28216f2b"
+            ]
+        ]
+    },
+    {
+        "content": "",
+        "created_at": 1681288282,
+        "id": "e3beee93982671caaa09d290cafe806555d4cdec7c403a2f833a8e1a7311711a",
+        "kind": 44,
+        "pubkey": "126103bfddc8df256b6e0abfd7f3797c80dcc4ea88f7c2f87dd4104220b4d65f",
+        "sig": "a3cd4e4cf8dbebd240749fd0a4b8d2ee841efdb88845508a499c83a95bc14eb548c052e1621e18a60bdb1c2fdd56f2b467ca319221c40d59d066b3fb8871067a",
+        "tags": [
+            [
+                "p",
+                "1e0699dcf5b1a4e5cf38588c3c1972484bc61db3ea959bd230c2ec1e28216f2b"
+            ]
+        ]
+    },
+    {
+        "content": "",
+        "created_at": 1681288485,
+        "id": "09217b8d0e9692e0239909097164e2d68883149b18cf64dd1581ef3d612d3330",
+        "kind": 44,
+        "pubkey": "126103bfddc8df256b6e0abfd7f3797c80dcc4ea88f7c2f87dd4104220b4d65f",
+        "sig": "38169203af9e09623f454779e908d78e22266f966b92892a67e1561b3a59e86f5297947fd30b012c12f8cfe19d8cd1623963681bd317fa9ad1971291bc79a325",
+        "tags": [
+            [
+                "p",
+                "1e0699dcf5b1a4e5cf38588c3c1972484bc61db3ea959bd230c2ec1e28216f2b"
+            ]
+        ]
+    },
+    {
+        "content": "",
+        "created_at": 1681305722,
+        "id": "c441bd8650cd2118066c6379fccd7f368360ce71a2f5e6055fdaa014c8334628",
+        "kind": 44,
+        "pubkey": "f839fb6714598a7233d09dbd42af82cc9781d0faa57474f1841af90b5c930939",
+        "sig": "4db442b413f0b1ea58663ba3d940becf312cfaf9cc13325e1e2c1127f4e710b39b47080cc3d6aac7d2d093edac649f4b523d816f0c44c4269e9ff523d8251bf3",
+        "tags": [
+            [
+                "p",
+                "3c7f5948b5d80900046a67d8e3bf4971d6cba013abece1dd542eca223cf3dd3f"
+            ]
+        ]
+    },
+    {
+        "content": "",
+        "created_at": 1681325538,
+        "id": "a995fb0e82a0ca525b65fe4a5c5ec3a7e9a53aba05498bf6bdadb08a06e42f9f",
+        "kind": 44,
+        "pubkey": "b6c29682e195420f56ffba98f83030c9ec0e579416a35867660fad2c9614c184",
+        "sig": "73e4b26dc4690d2b0a9d1dddcacc8ac84662cf24f951da9c229eb35f1db4da51a786fc26fbd4cbc3b812f7b1cc3480ece48afcdddcb27ba67c757a6d8c40216e",
+        "tags": [
+            [
+                "p",
+                "8ed237334555289b3f412a88f391b1a33e90f01a335fc31c410b4a2bcaa04c30"
+            ],
+            [
+                "bitcoin",
+                "00000000000000000005426e3b29a3e181e730219e95bc38af18633c71da4063",
+                "785120",
+                "1681324911"
+            ]
+        ]
+    },
+    {
+        "content": "",
+        "created_at": 1681358760,
+        "id": "44dc583d56dcbc945166302e836aebcb58ee890764c91aa361b5680bbeac0a97",
+        "kind": 44,
+        "pubkey": "834c0b53c8b33e0ad50fc4524e11f0506ac64fed2be7629e69512c9d2da74369",
+        "sig": "aa0f366c72b12af95dd2340a32a6db354fda35224318998673c3d5f024069ed5516c0cf848d2bf63a2acba0768dd0960e8f32cdc1f27adb9c4aab701618672da",
+        "tags": [
+            [
+                "p",
+                "a9c5d46c84cad54f647556067eb5ae0103c6cfbe5b53d968be50725bbdbbce2f"
+            ]
+        ]
+    },
+    {
+        "content": "😍",
+        "created_at": 1681480909,
+        "id": "a301b19fe81d5fc49eee3ea7c7eb7404dc3813b5f5e02f55e798a8b5c396e9b4",
+        "kind": 44,
+        "pubkey": "ec9c73936b316f263978ea7bc7c0ca7e58dd92484496fd9a79ffbb9a7bdf819a",
+        "sig": "29e60c1ef9b6385caaa05f757268b0497553f3119f0893520aba858ed0eb41175a32d50590db9046734277586f181a7cfb43516d9e18c9b67a234d829f42fe7b",
+        "tags": [
+            [
+                "e",
+                "bd86f81bdb0cddda5bc0ba495469000e99e1fcf106177a6b4f50f3a44b7bb21d",
+                "wss://nos.lol/",
+                "root"
+            ],
+            [
+                "p",
+                "ec9c73936b316f263978ea7bc7c0ca7e58dd92484496fd9a79ffbb9a7bdf819a"
+            ]
+        ]
+    }
+]

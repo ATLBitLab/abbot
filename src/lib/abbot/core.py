@@ -1,16 +1,26 @@
-import json
+from ast import Dict
 import time
 import openai
 import tiktoken
-import traceback
-from typing import AnyStr, List
 
-from lib.db.mongo import Config, MongoNostr, NostrChannel
-from ..utils import try_get
-from io import TextIOWrapper, open
-from os.path import abspath, isfile
+from typing import List
+from abc import abstractmethod
 
-from lib.logger import debug_logger, error_logger
+from lib.db.utils import successful_update_one
+
+from ..utils import error, to_dict, try_get
+from lib.abbot.config import BOT_CORE_SYSTEM
+from lib.db.mongo import (
+    GroupConfig,
+    MongoNostr,
+    MongoNostrChannel,
+    MongoNostrDirectMessage,
+    UpdateResult,
+    nostr_dms,
+    nostr_channels,
+)
+
+from lib.logger import bot_debug, bot_error
 from lib.abbot.exceptions.exception import try_except
 
 from constants import OPENAI_MODEL
@@ -20,146 +30,28 @@ encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
 mongo_nostr = MongoNostr()
 
 
-def handle_exception(fn: str, e: Exception):
-    error_logger.log(f"{fn} exception:\n{e}")
-    traceback.print_exc()
-    tb = traceback.format_exc()
-    error_logger.log(f"{fn} traceback:\n{tb}")
-
-
-class Bots:
-    cl: str = "Bots:"
-    abbots: dict = dict()
-
-    def __init__(self, bots: list):
-        for bot in bots:
-            name = try_get(bot, "id")
-            self.abbots[name] = bot
-
-    def __str__(self) -> str:
-        _str_ = f"\nAbbots(abbots="
-        for bot in self.abbots:
-            _str_ += f"{bot.__str__()})\n"
-        return f"{_str_.rstrip()})\n"
-
-    def __repr__(self) -> str:
-        return f"Bots(abbots={self.abbots})"
-
-    def get_abbots(self) -> dict:
-        return self.abbots
-
-    def to_dict(self) -> dict:
-        return self.__dict__
-
-    def update_abbots(self, id: str | int, bot: object) -> None:
-        self.abbots[id] = bot
-
-
-class Abbot(Config, Bots):
-    def __init__(
-        self,
-        name: str,
-        handle: str,
-        personality: str,
-        id: int,
-    ) -> object:
+@to_dict
+class Abbot(GroupConfig):
+    def __init__(self, id: str, bot_type: str):
         openai.api_key: str = OPENAI_API_KEY
         self.model: str = OPENAI_MODEL
-        self.name: str = name
-        self.handle: str = handle
-        self.personality: str = personality
-        self.gpt_system: dict = dict(role="system", content=personality)
         self.id: str = id
-        self.channel: NostrChannel = mongo_nostr.find_channel({"id": id})
-        self.config = Config(self.channel)
-        self.history: List = self.channel.history
+        self.bot_type: str = bot_type
+        self.channel_or_dm: Dict = self.determine_and_set_channel_or_dm()
+        self.history: List = [{"role": "system", "content": BOT_CORE_SYSTEM}, *self.channel_or_dm.get("history", None)]
+        if self.history == None:
+            raise Exception(f"self.history is none {self.channel_or_dm}")
         self.history_len = len(self.history)
         self.history_tokens = self.calculate_history_tokens()
+        self.config: GroupConfig = GroupConfig()
 
-    def __str__(self) -> str:
-        return (
-            f"Abbot(model={self.model}, name={self.name}, handle={self.handle}, "
-            f"id={self.id}, history_tokens={self.history_tokens} "
-            f"started={self.config.started}, unleashed={self.config.unleashed})"
-        )
-
-    def __repr__(self) -> str:
-        return (
-            f"Abbot(id={self.id}, name={self.name}, "
-            f"handle={self.handle}, personality={self.personality}, "
-            f"history_len={self.history_len}, history_tokens={self.history_tokens}"
-            f"self.config={self.config})"
-        )
-
-    def to_dict(self) -> dict:
-        return self.__dict__
-
-    def get_config(self) -> dict:
-        return self.config.to_dict()
-
-    def update_config(self, new_config: dict):
-        self.config.update_config(new_config)
-
-    def get_id(self) -> int:
-        return self.id
-
-    def start(self) -> bool:
-        self.update_config(dict(started=True, introduced=True))
-        self.config.started
-        self.config.introduced
-
-    def stop(self) -> bool:
-        self.update_config(dict(started=False))
-        not self.config.started
-
-    def is_started(self) -> bool:
-        started = self.config.started
-        return started
-
-    def is_stopped(self) -> bool:
-        return not self.is_started()
-
-    def introduce(self) -> bool:
-        self.update_config(dict(introduced=True))
-
-    def forget(self) -> bool:
-        self.update_config(dict(introduced=False))
-
-    def is_introduced(self) -> bool:
-        return self.config.introduced
-
-    def is_forgotten(self) -> bool:
-        return not self.is_introduced()
-
-    def unleash(self, count: int) -> bool:
-        self.update_config(dict(unleashed=True, count=count))
-        self.config.unleashed
-        self.config.count = count
-
-    def leash(self) -> bool:
-        self.update_config(dict(unleashed=False, count=None))
-        not self.config.unleashed
-        self.config.count
-
-    def is_unleashed(self) -> bool:
-        return self.config.unleashed, self.config.count
-
-    def is_leashed(self) -> bool:
-        unleashed, count = self.is_unleashed()
-        return not unleashed, count
-
-    def sleep(self, t: int) -> str:
-        time.sleep(t)
-        return True
-
-    def get_history(self) -> list:
-        return self.history
-
-    def tokenize(self, content: str) -> list:
-        return encoding.encode(content)
-
-    def calculate_tokens(self, content: str | dict) -> int:
-        return len(self.tokenize(content))
+    def determine_and_set_channel_or_dm(self):
+        if self.bot_type == "dm":
+            channel_or_dm = mongo_nostr.find_one_dm({"id": self.id})
+        else:
+            channel_or_dm = mongo_nostr.find_one_channel({"id": self.id})
+        if not channel_or_dm:
+            raise Exception("not channel_or_dm")
 
     def calculate_history_tokens(self) -> int:
         total = 0
@@ -168,37 +60,138 @@ class Abbot(Config, Bots):
             total += self.calculate_tokens(content)
         return total
 
-    def update_history(self, chat_message: dict) -> None:
-        if not chat_message:
+    def __str__(self) -> str:
+        return self.__str__()
+
+    def __repr__(self) -> str:
+        return self.__repr__()
+
+    @abstractmethod
+    def to_dict(self) -> dict:
+        pass
+
+    @try_except
+    def determine_and_set_channel_or_dm(self):
+        if self.bot_type == "dm":
+            channel_or_dm = mongo_nostr.find_one_dm({"id": self.id})
+        else:
+            channel_or_dm = mongo_nostr.find_one_channel({"id": self.id})
+        if not channel_or_dm:
+            raise Exception("not channel_or_dm")
+
+    @try_except
+    def get_config(self) -> dict:
+        return self.config.to_dict()
+
+    @try_except
+    def update_config(self, new_config: dict):
+        self.config.update_config(new_config)
+
+    @try_except
+    def start(self) -> bool:
+        self.update_config(dict(started=True, introduced=True))
+        return self.config.started
+
+    @try_except
+    def stop(self) -> bool:
+        self.update_config(dict(started=False))
+        return not self.config.started
+
+    @try_except
+    def introduce(self) -> bool:
+        self.update_config(dict(introduced=True))
+        return self.config.introduced
+
+    @try_except
+    def forget(self) -> bool:
+        self.update_config(dict(introduced=False))
+        return not self.config.introduced
+
+    @try_except
+    def is_started(self) -> bool:
+        return self.config.started
+
+    @try_except
+    def is_stopped(self) -> bool:
+        return not self.is_started()
+
+    @try_except
+    def is_introduced(self) -> bool:
+        return self.config.introduced
+
+    @try_except
+    def is_forgotten(self) -> bool:
+        return not self.is_introduced()
+
+    @try_except
+    def unleash(self, count: int) -> bool:
+        self.update_config(dict(unleashed=True, count=count))
+        self.config.unleashed
+        self.config.count = count
+
+    @try_except
+    def leash(self) -> bool:
+        self.update_config(dict(unleashed=False, count=None))
+        not self.config.unleashed
+        self.config.count
+
+    @try_except
+    def is_unleashed(self) -> bool:
+        return self.config.unleashed, self.config.count
+
+    @try_except
+    def is_leashed(self) -> bool:
+        unleashed, count = self.is_unleashed()
+        return not unleashed, count
+
+    @try_except
+    def sleep(self, t: int) -> str:
+        time.sleep(t)
+        return True
+
+    @try_except
+    def get_history(self) -> list:
+        return self.history
+
+    @try_except
+    def get_messages(self) -> list:
+        return self.channel_or_dm["messages"]
+
+    @try_except
+    def tokenize(self, content: str) -> list:
+        return encoding.encode(content)
+
+    @try_except
+    def calculate_tokens(self, content: str | dict) -> int:
+        return len(self.tokenize(content))
+
+    @try_except
+    def calculate_history_tokens(self) -> int:
+        total = 0
+        for data in self.history:
+            content = try_get(data, "content")
+            total += self.calculate_tokens(content)
+        return total
+
+    @try_except
+    def update_history(self, history_message: dict) -> None:
+        if not history_message:
             return
-        self.history.append(chat_message)
-        # TODO: update mongo
+        self.history.append(history_message)
+        result: UpdateResult = mongo_nostr.update_one_channel({"id": self.id}, {"$push": {"history": history_message}})
+        if not successful_update_one(result):
+            bot_error.log(f"update_history failed: {history_message}")
+            return error("update_history => update_one_channel failed")
         self.history_len += 1
-        self.history_tokens += len(self.tokenize(try_get(chat_message, "content")))
+        self.history_tokens += len(self.tokenize(try_get(history_message, "content")))
         return self.history_tokens
 
     @try_except
     def chat_completion(self) -> str | None:
-        messages = [self.gpt_system]
-        history = self.history
-        if self.history_tokens > 5000:
-            index = self.history_len // 2
-            history = history[index:]
-        messages.extend(history)
         response = openai.ChatCompletion.create(
             model=self.model,
             messages=self.history,
         )
         answer = try_get(response, "choices", 0, "message", "content")
-        response_dict = dict(role="assistant", content=answer)
-        self.update_history(response_dict)
+        self.update_history({"role": "assistant", "content": answer})
         return answer
-
-    def update_abbots(self, id: str | int, bot: object) -> None:
-        Bots.abbots[id] = bot
-
-    def get_abbots(self) -> Bots.abbots:
-        return Bots.abbots
-
-    def abbots_to_dict(self):
-        return Bots.__dict__

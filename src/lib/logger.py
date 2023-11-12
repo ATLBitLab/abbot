@@ -1,3 +1,4 @@
+from typing import Optional
 from cli_args import CLI_ARGS, DEV_MODE, ERR_MODE, TEST_MODE, LOG_MODE
 
 print(f"logger: CLI_ARGS={CLI_ARGS}")
@@ -17,7 +18,7 @@ debug_log.setLevel(DEBUG)
 debug_formatter = Formatter("[%(asctime)s] debug - %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S.%f")
 
 # File handler for debug logger
-debug_file_handler = FileHandler(abspath("src/data/logs/debug.log"))
+debug_file_handler = FileHandler(abspath("src/data/logs/bot_debug.log"))
 debug_file_handler.setLevel(DEBUG)
 debug_file_handler.setFormatter(debug_formatter)
 
@@ -54,7 +55,8 @@ class BotLogger:
         self.level = level
         self.toggle = toggle or True
 
-    def log(self, message: str = "BotLogger - No Message Passed"):
+    def log(self, fn_name: Optional[str] = None, message: str = "BotLogger - No Message Passed"):
+        message = f"{fn_name} {message}" if fn_name else message
         if self.toggle:
             if self.level == "error":
                 self._error(message)
@@ -70,5 +72,5 @@ class BotLogger:
         debug_log.debug(message)
 
 
-error_logger = BotLogger("error", LOG_MODE)
-debug_logger = BotLogger("debug", LOG_MODE)
+bot_error = BotLogger("error", LOG_MODE)
+bot_debug = BotLogger("debug", LOG_MODE)

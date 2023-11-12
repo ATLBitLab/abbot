@@ -45,7 +45,6 @@ src/data/raw_messages.jsonl
 /build
 
 # misc
-.DS_Store
 *.pem
 
 # debug
@@ -66,3 +65,10 @@ yarn-error.log*
 next-env.d.ts
 
 ignore/
+
+# nostr-sdk-ffi python-bindings
+target/
+*.db
+*.db-shm
+*.db-wal
+ffi/
