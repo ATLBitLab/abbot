@@ -35,7 +35,7 @@ ipython==8.14.0
 jedi==0.19.0
 jsonpatch==1.33
 jsonpointer==2.4
-langchain==0.0.312
+langchain==0.0.329
 langsmith==0.0.43
 loguru==0.7.2
 markdown-it-py==3.0.0
