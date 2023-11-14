@@ -45,6 +45,7 @@ mdurl==0.1.2
 multidict==6.0.4
 mypy-extensions==1.0.0
 nostr==0.0.2
+nostr-sdk @ git+https://github.com/ATLBitLab/nostr-sdk-ffi-bindings-python.git@e68d1f4f875810157a9f516b9a5ea570abe9f425
 numpy==1.26.0
 openai==0.27.7
 packaging==23.2
@@ -63,7 +64,7 @@ pydantic==2.4.2
 pydantic_core==2.10.1
 Pygments==2.15.1
 pymongo==4.5.0
-git+https://github.com/ATLBitLab/pynostr.git@main#egg=pynostr
+pynostr @ git+https://github.com/ATLBitLab/pynostr.git@22b378336df80f17b8d690139797a8501b100e4b
 pyparsing==3.1.1
 pypng==0.20220715.0
 python-dateutil==2.8.2
