@@ -1,4 +1,6 @@
+from functools import wraps
 import json
+from typing import Any, Callable, Dict
 
 from qrcode import make
 from os.path import abspath
@@ -7,6 +9,7 @@ from requests import request
 
 from telegram.ext import ContextTypes
 from lib.logger import bot_debug, bot_error
+from lib.abbot.exceptions.exception import try_except
 
 
 TELEGRAM_MESSAGE_FIELDS = [
@@ -117,3 +120,15 @@ async def sender_is_group_admin(context: ContextTypes.DEFAULT_TYPE, chat_id: int
 def json_loader(filepath: str, key: str | None = None, mode: str = "r"):
     json_data = json.load(open(abspath(filepath), mode))
     return try_get(json_data, key) if key else json_data
+
+
+def to_dict(cls):
+    def to_dict(self):
+        return vars(self)
+
+    setattr(cls, "to_dict", to_dict)
+    return cls
+
+
+def error(message: str = "", **kwargs) -> Dict:
+    return {"status": "error", "message": message, **kwargs}

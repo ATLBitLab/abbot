@@ -48,8 +48,8 @@ def shutdown():
 
 if __name__ == "__main__":
     try:
-        abbot_nostr.add_relays_and_connect()
-        asyncio.create_task(abbot_nostr.start_client())
+        abbot_nostr.add_relays_connect_and_start_client()
+        asyncio.create_subprocess_exec(nostr_bot.run(abbot_nostr))
     except KeyboardInterrupt:
         bot_debug.log("Interrupt received, shutting down.")
         shutdown()

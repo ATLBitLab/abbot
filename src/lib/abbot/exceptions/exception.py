@@ -3,6 +3,15 @@ from lib.logger import bot_error
 from traceback import format_exc, format_tb
 
 
+class NostrEventNotFoundError(Exception):
+    def __init__(self, kind=None, message="Nostr event not found", formatted_traceback=None, custom_stack=None):
+        self.formatted_traceback = formatted_traceback
+        self.custom_stack = custom_stack
+        if kind is not None:
+            message = f"Nostr event not found for kind: {kind}"
+        super().__init__(message)
+
+
 class AbbotException(Exception):
     def __init__(self, message, formatted_traceback=None, custom_stack=None):
         super().__init__(message)

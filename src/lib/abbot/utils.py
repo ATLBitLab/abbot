@@ -7,17 +7,13 @@ from lib.abbot.config import BOT_RESPONSES
 from ..utils import try_get
 from constants import THE_CREATOR
 from .exceptions.exception import try_except
-from ..logger import debug_logger, err
+from ..logger import bot_debug, bot_error
 
 BASE_KEYS = ["text", "date"]
 
 
-def successful(data: dict) -> bool:
-    return data["status"] == "success"
-
-
-def unsuccessful(data: dict) -> bool:
-    return data["status"] != "success"
+def successful_request(response: dict) -> bool:
+    return response["status"] == "success"
 
 
 @try_except
