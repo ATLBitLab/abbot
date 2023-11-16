@@ -12,10 +12,6 @@ from ..logger import bot_debug, bot_error
 BASE_KEYS = ["text", "date"]
 
 
-def successful_request(response: dict) -> bool:
-    return response["status"] == "success"
-
-
 @try_except
 async def get_chat_admins(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -> dict:
     fn = f"{get_chat_admins.__name__}:"

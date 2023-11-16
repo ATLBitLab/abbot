@@ -1,3 +1,4 @@
+from typing import Optional
 from cli_args import CLI_ARGS, DEV_MODE, ERR_MODE, TEST_MODE, LOG_MODE
 
 print(f"logger: CLI_ARGS={CLI_ARGS}")
@@ -54,7 +55,8 @@ class BotLogger:
         self.level = level
         self.toggle = toggle or True
 
-    def log(self, message: str = "BotLogger - No Message Passed"):
+    def log(self, fn_name: Optional[str] = None, message: str = "BotLogger - No Message Passed"):
+        message = f"{fn_name} {message}" if fn_name else message
         if self.toggle:
             if self.level == "error":
                 self._error(message)

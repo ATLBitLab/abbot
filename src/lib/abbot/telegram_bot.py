@@ -13,12 +13,12 @@ from telegram.ext import (
 )
 
 from constants import HELP_MENU, THE_CREATOR
-from lib.logger import bot_debug, err
-from lib.utils import sender_is_group_admin, try_get
+from lib.logger import bot_debug, bot_error
+from lib.utils import sender_is_group_admin, try_get, successful
 
 from lib.admin.admin_service import AdminService
 
-from src.lib.abbot.core import Abbot, Bots
+from lib.abbot.core import Abbot
 from lib.abbot.exceptions.exception import try_except, AbbotException
 from lib.abbot.utils import (
     parse_chat,
@@ -28,7 +28,6 @@ from lib.abbot.utils import (
     parse_user,
     parse_user_data,
     squawk_error,
-    successful,
 )
 from lib.abbot.exceptions.exception import try_except, AbbotException
 from lib.abbot.config import BOT_NAME, BOT_TELEGRAM_HANDLE, BOT_CORE_SYSTEM
@@ -51,40 +50,6 @@ PRIVATE_CONFIG_FILE_PATH = abspath("src/data/chat/private/config")
 PRIVATE_CONTENT_FILES = sorted(listdir(PRIVATE_CONTENT_FILE_PATH))
 PRIVATE_CONFIG_FILES = sorted(listdir(PRIVATE_CONFIG_FILE_PATH))
 
-
-for content, config in zip(GROUP_CONTENT_FILES, GROUP_CONFIG_FILES):
-    if ".jsonl" not in content or ".json" not in config:
-        continue
-    context = "group"
-    chat_id = int(content.split(".")[0])
-    name = f"{context}{BOT_NAME}{chat_id}"
-    bot_debug.log(f"main => context={context} chat_id={chat_id} name={name}")
-    group_abbot = Abbot(
-        name,
-        BOT_TELEGRAM_HANDLE,
-        BOT_CORE_SYSTEM,
-        context,
-        chat_id,
-    )
-    ALL_ABBOTS.append(group_abbot)
-
-for content, config in zip(PRIVATE_CONTENT_FILES, PRIVATE_CONFIG_FILES):
-    if ".jsonl" not in content or ".json" not in config:
-        continue
-    context = "private"
-    chat_id = int(content.split(".")[0])
-    name = f"{context}{BOT_NAME}{chat_id}"
-    bot_debug.log(f"main => context={context} chat_id={chat_id} name={name}")
-    private_abbot = Abbot(
-        name,
-        BOT_TELEGRAM_HANDLE,
-        BOT_CORE_SYSTEM,
-        context,
-        chat_id,
-    )
-    ALL_ABBOTS.append(private_abbot)
-
-abbots: Bots = Bots(ALL_ABBOTS)
 admin = AdminService(THE_CREATOR, THE_CREATOR)
 admin.status = "running"
 
@@ -150,11 +115,7 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
         bot_debug.log(f"{fn} is_private_chat={is_private_chat}")
     bot_debug.log(f"{fn} abbot_context={abbot_context}")
 
-    abbot: Abbot = try_get(abbots, chat_id)
-    if not abbot:
-        name = f"{abbot_context}{BOT_NAME}{chat_id}"
-        abbot = Abbot(name, BOT_TELEGRAM_HANDLE, BOT_CORE_SYSTEM, abbot_context, chat_id)
-        abbots.update_abbots(chat_id, abbot)
+    abbot = Abbot(chat_id)
 
     # not_introduced: bool = abbot.is_forgotten()
     # if not_introduced:
@@ -224,6 +185,11 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
     #         chat_id=user_id, text="Sorry, I seem to have bugged out bug 🐜 please contact @nonni_io for help."
     #     )
     return await message.reply_text(answer)
+
+
+@try_except
+def handle_mention(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    pass
 
 
 @try_except
@@ -613,7 +579,7 @@ def build_telegram_bot():
     # BaseFilter should run first and do 1 thing: store the message and setup the telegram stuff
     # Mention, ReplyToBot and Unleash fitlers should reply with a completion
     message_handler = MessageHandler(filters.BaseFilter("BaseFilterText", filters.TEXT), handle_text_message)
-    mention_handler = MessageHandler(filters.Regex(FULL_TELEGRAM_HANDLE))
+    mention_handler = MessageHandler(filters.Regex(FULL_TELEGRAM_HANDLE), handle_mention)
     telegram_bot.add_handler(message_handler)
     telegram_bot.add_handler(mention_handler)
 

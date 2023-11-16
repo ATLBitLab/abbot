@@ -1,15 +1,24 @@
+from ast import Dict
 import time
 import openai
 import tiktoken
 
-from typing import List, Dict
+from typing import List
 from abc import abstractmethod
 
-from src.lib.db.utils import successful_update, successful_update_one
+from lib.db.utils import successful_update_one
 
 from ..utils import error, to_dict, try_get
-from src.lib.abbot.config import BOT_CORE_SYSTEM
-from lib.db.mongo import AbbotConfig, MongoNostr, MongoNostrChannel, UpdateResult
+from lib.abbot.config import BOT_CORE_SYSTEM
+from lib.db.mongo import (
+    GroupConfig,
+    MongoNostr,
+    MongoNostrChannel,
+    MongoNostrDirectMessage,
+    UpdateResult,
+    nostr_dms,
+    nostr_channels,
+)
 
 from lib.logger import bot_debug, bot_error
 from lib.abbot.exceptions.exception import try_except
@@ -22,16 +31,34 @@ mongo_nostr = MongoNostr()
 
 
 @to_dict
-class Abbot(AbbotConfig):
-    def __init__(self, id: str) -> object:
+class Abbot(GroupConfig):
+    def __init__(self, id: str, bot_type: str):
         openai.api_key: str = OPENAI_API_KEY
         self.model: str = OPENAI_MODEL
         self.id: str = id
-        self.history: List = [{"role": "system", "content": BOT_CORE_SYSTEM}, *self.channel.history]
+        self.bot_type: str = bot_type
+        self.channel_or_dm: Dict = self.determine_and_set_channel_or_dm()
+        self.history: List = [{"role": "system", "content": BOT_CORE_SYSTEM}, *self.channel_or_dm.get("history", None)]
+        if self.history == None:
+            raise Exception(f"self.history is none {self.channel_or_dm}")
         self.history_len = len(self.history)
         self.history_tokens = self.calculate_history_tokens()
-        self.channel: MongoNostrChannel = mongo_nostr.find_one_channel({"id": id})
-        self.config: AbbotConfig = AbbotConfig()
+        self.config: GroupConfig = GroupConfig()
+
+    def determine_and_set_channel_or_dm(self):
+        if self.bot_type == "dm":
+            channel_or_dm = mongo_nostr.find_one_dm({"id": self.id})
+        else:
+            channel_or_dm = mongo_nostr.find_one_channel({"id": self.id})
+        if not channel_or_dm:
+            raise Exception("not channel_or_dm")
+
+    def calculate_history_tokens(self) -> int:
+        total = 0
+        for data in self.history:
+            content = try_get(data, "content")
+            total += self.calculate_tokens(content)
+        return total
 
     def __str__(self) -> str:
         return self.__str__()
@@ -42,6 +69,15 @@ class Abbot(AbbotConfig):
     @abstractmethod
     def to_dict(self) -> dict:
         pass
+
+    @try_except
+    def determine_and_set_channel_or_dm(self):
+        if self.bot_type == "dm":
+            channel_or_dm = mongo_nostr.find_one_dm({"id": self.id})
+        else:
+            channel_or_dm = mongo_nostr.find_one_channel({"id": self.id})
+        if not channel_or_dm:
+            raise Exception("not channel_or_dm")
 
     @try_except
     def get_config(self) -> dict:
@@ -119,7 +155,7 @@ class Abbot(AbbotConfig):
 
     @try_except
     def get_messages(self) -> list:
-        return self.channel.messages
+        return self.channel_or_dm["messages"]
 
     @try_except
     def tokenize(self, content: str) -> list:

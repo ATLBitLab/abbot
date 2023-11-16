@@ -8,9 +8,9 @@ from telegram.ext import ContextTypes
 
 from constants import HELP_MENU, THE_CREATOR
 from lib.admin.admin_service import AdminService
-from src.lib.abbot.core import Abbot, Bots
+from lib.abbot.core import Abbot
 from lib.logger import bot_debug, bot_error
-from lib.utils import sender_is_group_admin, try_get
+from lib.utils import sender_is_group_admin, try_get, successful
 from lib.abbot.exceptions.exception import try_except, AbbotException
 from lib.abbot.config import BOT_CORE_SYSTEM, BOT_NAME, BOT_TELEGRAM_HANDLE, ORG_TELEGRAM_HANDLE
 from lib.abbot.utils import (
@@ -21,7 +21,6 @@ from lib.abbot.utils import (
     parse_user,
     parse_user_data,
     squawk_error,
-    successful_request,
 )
 from lib.abbot.exceptions.exception import try_except, AbbotException
 from lib.abbot.config import BOT_NAME, BOT_TELEGRAM_HANDLE, BOT_CORE_SYSTEM, ORG_CHAT_ID, ORG_CHAT_TITLE
@@ -91,7 +90,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     response: dict = parse_message(update, context)
     message: Message = try_get(response, "data")
-    if not successful_request(response):
+    if not successful(response):
         return await squawk_error(message, context)
 
     message_data: dict = parse_message_data(message)
@@ -100,7 +99,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     response: dict = parse_chat(message, context)
     chat: Chat = try_get(response, "data")
-    if not successful_request(response):
+    if not successful(response):
         error_message = try_get(message, "data")
         return await squawk_error(error_message, context)
     chat_data: dict = parse_chat_data(chat)
@@ -112,7 +111,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     response: dict = parse_user(message, context)
     user: User = try_get(response, "data")
-    if not successful_request(response):
+    if not successful(response):
         return await squawk_error(user, context)
     user_data: dict = parse_user_data(user)
     user_id: int = try_get(user_data, "user_id")
@@ -238,14 +237,14 @@ async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "unleash:"
     response: dict = parse_message(update, context)
     message: Message = try_get(response, "data")
-    if not successful_request(response):
+    if not successful(response):
         data = message
         return await squawk_error(data, context)
     message_data: dict = parse_message_data(message)
 
     response: dict = parse_chat(update, message)
     chat: Chat = try_get(response, "data")
-    if not successful_request(response):
+    if not successful(response):
         data = chat
         return await squawk_error(data, context)
     chat_data: dict = parse_chat_data(chat)
@@ -255,7 +254,7 @@ async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     response: dict = parse_user(message)
     user: User = try_get(response, "data")
-    if not successful_request(response):
+    if not successful(response):
         data = user
         return await squawk_error(data, context)
     user_data: dict = parse_user_data(user)
@@ -391,7 +390,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "start:"
     response: dict = parse_message(update, context)
     message: Message = try_get(response, "data")
-    if not successful_request(response):
+    if not successful(response):
         return squawk_error(message, context)
 
     message_data: dict = parse_message_data(message)
@@ -400,7 +399,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     response: dict = parse_chat(message, context)
     chat: Chat = try_get(response, "data")
-    if not successful_request(response):
+    if not successful(response):
         error_message = try_get(message, "data")
         return squawk_error(error_message, context)
     chat_data: dict = parse_chat_data(chat)
@@ -412,7 +411,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     response: dict = parse_user(message, context)
     user: User = try_get(response, "data")
-    if not successful_request(response):
+    if not successful(response):
         return await squawk_error(user, context)
     user_data: dict = parse_user_data(user)
 
