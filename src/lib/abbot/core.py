@@ -13,8 +13,6 @@ from lib.abbot.config import BOT_CORE_SYSTEM
 from lib.db.mongo import (
     GroupConfig,
     MongoNostr,
-    MongoNostrChannel,
-    MongoNostrDirectMessage,
     UpdateResult,
     nostr_dms,
     nostr_channels,

@@ -1,9 +1,4 @@
-from cli_args import CLI_ARGS, DEV_MODE, ERR_MODE, TEST_MODE
-
-print(f"config: CLI_ARGS={CLI_ARGS}")
-print(f"config: DEV_MODE={DEV_MODE}")
-print(f"config: ERR_MODE={ERR_MODE}")
-print(f"config: TEST_MODE={TEST_MODE}")
+from cli_args import DEV_MODE, TEST_MODE
 
 from lib.utils import try_get
 from lib.utils import json_loader, try_get
@@ -48,6 +43,6 @@ BOT_INTRO = f"Your name is {BOT_NAME}, which is short for {BOT_NAME_MEANING}, yo
 BOT_SYSTEM = try_get(BOT_CONFIG, "system")
 BOT_CORE_SYSTEM = f"{BOT_INTRO}. {BOT_SYSTEM}"
 
-BOT_NAME = f"t{BOT_NAME}" if TEST_MODE else BOT_NAME
-BOT_TELEGRAM_HANDLE = f"test_{BOT_TELEGRAM_HANDLE}" if TEST_MODE else BOT_TELEGRAM_HANDLE
-BOT_TELEGRAM_TOKEN = TEST_BOT_TELEGRAM_HANDLE if TEST_MODE else BOT_TELEGRAM_TOKEN
+BOT_NAME = f"t{BOT_NAME}" if TEST_MODE or DEV_MODE else BOT_NAME
+BOT_TELEGRAM_HANDLE = f"test_{BOT_TELEGRAM_HANDLE}" if TEST_MODE or DEV_MODE else BOT_TELEGRAM_HANDLE
+BOT_TELEGRAM_TOKEN = TEST_BOT_TELEGRAM_HANDLE if TEST_MODE or DEV_MODE else BOT_TELEGRAM_TOKEN

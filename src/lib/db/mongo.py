@@ -1,7 +1,6 @@
 from abc import abstractmethod
-from cli_args import TEST_MODE
+from cli_args import TEST_MODE, DEV_MODE
 from typing import Dict, List, Optional
-from dataclasses import dataclass, field
 
 from nostr_sdk import PublicKey, EventId, Event
 
@@ -12,15 +11,9 @@ from pymongo.results import InsertOneResult, InsertManyResult, UpdateResult
 from bson.typings import _DocumentType
 
 from lib.logger import bot_error, bot_debug
-from lib.utils import to_dict, error, try_get
+from lib.utils import to_dict, error
 from lib.abbot.env import DATABASE_CONNECTION_STRING
-from lib.db.utils import (
-    decorator_successful_insert_one,
-    decorator_successful_insert_many,
-    decorator_successful_update_one,
-)
 from lib.abbot.exceptions.exception import try_except
-from src.lib.abbot.core import Abbot
 
 nostr_db_name = "test_nostr" if TEST_MODE else "nostr"
 client = MongoClient(host=DATABASE_CONNECTION_STRING)

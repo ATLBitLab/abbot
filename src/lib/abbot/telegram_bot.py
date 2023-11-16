@@ -38,18 +38,6 @@ FULL_TELEGRAM_HANDLE = f"@{BOT_TELEGRAM_HANDLE}"
 RAW_MESSAGE_JL_FILE = abspath("src/data/raw_messages.jsonl")
 MATRIX_IMG_FILEPATH = abspath("src/assets/unplugging_matrix.jpg")
 
-ALL_ABBOTS = []
-
-GROUP_CONTENT_FILE_PATH = abspath("src/data/chat/group/content")
-GROUP_CONFIG_FILE_PATH = abspath("src/data/chat/group/config")
-GROUP_CONTENT_FILES = sorted(listdir(GROUP_CONTENT_FILE_PATH))
-GROUP_CONFIG_FILES = sorted(listdir(GROUP_CONFIG_FILE_PATH))
-
-PRIVATE_CONTENT_FILE_PATH = abspath("src/data/chat/private/content")
-PRIVATE_CONFIG_FILE_PATH = abspath("src/data/chat/private/config")
-PRIVATE_CONTENT_FILES = sorted(listdir(PRIVATE_CONTENT_FILE_PATH))
-PRIVATE_CONFIG_FILES = sorted(listdir(PRIVATE_CONFIG_FILE_PATH))
-
 admin = AdminService(THE_CREATOR, THE_CREATOR)
 admin.status = "running"
 
@@ -253,20 +241,16 @@ async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return await message.reply_text(f"Forbidden: Admin only. {username} is not an admin of {chat_title}.")
 
     bot_debug.log(f"{fn} abbot_context={abbot_context}")
-    abbot: Abbot = try_get(abbots, chat_id)
-    if not abbot:
-        # TODO: dont do this
-        raise AbbotException(f"{fn} Abbot missing!")
-    elif abbot.is_stopped():
+    abbot: Abbot = Abbot(chat_id)
+    if abbot.is_stopped():
         return await message.reply_text(f"I'm already stopped for {chat_title}! Please run /start to begin!")
     unleashed, count = abbot.is_unleashed()
     if unleashed:
         return await message.reply_text(f"I'm already unleashed for {chat_title}! To leash me, please run /leash!")
 
     abbot.unleash()
-    abbot.update_abbots(chat_id, abbot)
     unleashed, count = abbot.is_unleashed()
-    bot_debug.log(f"{fn} {abbot.name} unleashed={unleashed}")
+    bot_debug.log(f"{fn} {abbot} unleashed={unleashed}")
     return await message.reply_text(
         f"I have been unleashed! I will now respond every {count} messages until"
         "you run /leash or /unleash <insert_new_number> (e.g. /unleash 10)"
@@ -304,11 +288,8 @@ async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not is_admin:
             return await message.reply_text(f"Forbidden: Admin only. {username} is not an admin of {chat_title}.")
     bot_debug.log(f"{fn} abbot_context={abbot_context}")
-    abbot: Abbot = try_get(abbots, chat_id)
-    if not abbot:
-        # TODO: dont do this
-        raise AbbotException(f"{fn} Abbot missing!")
-    elif abbot.is_stopped():
+    abbot: Abbot = Abbot(chat_id)
+    if abbot.is_stopped():
         return await message.reply_text(f"I'm already stopped for {chat_title}! Please run /start to begin!")
     leashed, count = abbot.is_leashed()
     if leashed:
@@ -316,8 +297,7 @@ async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     abbot.leash()
     leashed, count = abbot.is_leashed()
-    abbot.update_abbots(chat_id, abbot)
-    bot_debug.log(f"{fn} {abbot.name} leashed={leashed}")
+    bot_debug.log(f"{fn} leashed={leashed}")
     return await message.reply_text(
         f"I have been leashed! To unleash me again, run /unleash or /unleash <insert_new_number> (e.g. /unleash 10)"
     )
@@ -405,17 +385,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         abbot_context = "private"
         bot_debug.log(f"{fn} is_private_chat={is_private_chat}")
     bot_debug.log(f"{fn} abbot_context={abbot_context}")
-    abbot: Abbot = try_get(abbots, chat_id)
-    if not abbot:
-        name = f"{abbot_context}{BOT_NAME}{chat_id}"
-        abbot: Abbot = Abbot(name, BOT_TELEGRAM_HANDLE, BOT_CORE_SYSTEM, abbot_context, chat_id)
-    elif abbot.is_started():
+    abbot: Abbot = Abbot(chat_id)
+    if abbot.is_started():
         return await message.reply_text("Abbot already started!")
     abbot.start()
     started = abbot.is_started()
     bot_debug.log(f"{fn} abbot={abbot.to_dict()} started={started}")
     await message.reply_photo(MATRIX_IMG_FILEPATH, f"Please wait while we unplug {BOT_NAME} from the Matrix")
-    response = abbot.chat_history_completion()
+    response = abbot.chat_completion()
     if not response:
         return await context.bot.send_message(
             chat_id=THE_CREATOR,
@@ -462,12 +439,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
         abbot_context = "private"
         bot_debug.log(f"{fn} is_private_chat={is_private_chat}")
     bot_debug.log(f"{fn} abbot_context={abbot_context}")
-    abbot: Abbot = try_get(abbots, chat_id)
-    if not abbot:
-        abbot: Abbot = Abbot(
-            f"{abbot_context}{BOT_NAME}{chat_id}", BOT_TELEGRAM_HANDLE, BOT_CORE_SYSTEM, abbot_context, chat_id
-        )
-    bot_debug.log(f"{fn} abbot: {json.dumps(abbot.to_dict())}")
+    abbot: Abbot = Abbot(chat_id)
     if not abbot.started:
         await message.reply_text("Abbot isn't started yet! Have an admin run /start")
         return await context.bot.send_message(chat_id=THE_CREATOR, text=f"chat_title={chat_title} chat_id={chat_id}")
@@ -493,7 +465,6 @@ async def admin_unplug(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "admin_unplug:"
     chat_id: int = try_get(update, "message", "chat", "id")
     user_id: int = try_get(update, "message", "from_user", "id")
-
     admin: AdminService = AdminService(user_id, chat_id)
     admin.start_service()
 
@@ -530,58 +501,61 @@ async def admin_nap(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def admin_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "admin_status:"
     message: Message = try_get(update, "message")
+    chat: Chat = try_get(message, "chat")
+    chat_id: int = try_get(chat, "id")
     user: User = try_get(message, "from_user")
     user_id: int = try_get(user, "id")
     if user_id != THE_CREATOR:
         return
-    abbots_dict: dict = abbots.get_abbots()
-    for bot in abbots_dict:
-        abbot: Abbot = bot
-        status_data = json.dumps(abbot.get_state(), indent=4)
-        bot_debug.log(f"statuses => {abbot.name} status_data={status_data}")
-        await message.reply_text(status_data)
+    abbot: Abbot = Abbot(chat_id)
+    status_data = json.dumps(abbot.get_config(), indent=4)
+    bot_debug.log(f"statuses => {abbot} status_data={status_data}")
+    await message.reply_text(status_data)
 
 
-def build_telegram_bot():
+class TelegramBotBuilder:
     from lib.abbot.env import BOT_TELEGRAM_TOKEN
 
-    bot_debug.log(f"Telegram abbot initializing: name={BOT_NAME} handle={FULL_TELEGRAM_HANDLE}")
-    telegram_bot = ApplicationBuilder().token(BOT_TELEGRAM_TOKEN).build()
-    bot_debug.log(f"Telegram abbot initialized")
+    def __init__(self):
+        bot_debug.log(f"Telegram abbot initializing: name={BOT_NAME} handle={FULL_TELEGRAM_HANDLE}")
+        telegram_bot = ApplicationBuilder().token(self.BOT_TELEGRAM_TOKEN).build()
+        bot_debug.log(f"Telegram abbot initialized")
 
-    _unplug_handler = CommandHandler("unplug", admin_unplug)
-    _plugin_handler = CommandHandler("plugin", admin_plugin)
-    _kill_handler = CommandHandler("kill", admin_kill)
-    _nap_handler = CommandHandler("nap", admin_nap)
-    _status_handler = CommandHandler("status", admin_status)
+        _unplug_handler = CommandHandler("unplug", admin_unplug)
+        _plugin_handler = CommandHandler("plugin", admin_plugin)
+        _kill_handler = CommandHandler("kill", admin_kill)
+        _nap_handler = CommandHandler("nap", admin_nap)
+        _status_handler = CommandHandler("status", admin_status)
 
-    telegram_bot.add_handler(_unplug_handler)
-    telegram_bot.add_handler(_plugin_handler)
-    telegram_bot.add_handler(_kill_handler)
-    telegram_bot.add_handler(_nap_handler)
-    telegram_bot.add_handler(_status_handler)
+        telegram_bot.add_handler(_unplug_handler)
+        telegram_bot.add_handler(_plugin_handler)
+        telegram_bot.add_handler(_kill_handler)
+        telegram_bot.add_handler(_nap_handler)
+        telegram_bot.add_handler(_status_handler)
 
-    help_handler = CommandHandler("help", help)
-    rules_handler = CommandHandler("rules", rules)
-    start_handler = CommandHandler("start", start)
-    stop_handler = CommandHandler("stop", stop)
-    unleash_handler = CommandHandler("unleash", unleash)
-    leash_handler = CommandHandler("leash", leash)
+        help_handler = CommandHandler("help", help)
+        rules_handler = CommandHandler("rules", rules)
+        start_handler = CommandHandler("start", start)
+        stop_handler = CommandHandler("stop", stop)
+        unleash_handler = CommandHandler("unleash", unleash)
+        leash_handler = CommandHandler("leash", leash)
 
-    telegram_bot.add_handler(help_handler)
-    telegram_bot.add_handler(rules_handler)
-    telegram_bot.add_handler(start_handler)
-    telegram_bot.add_handler(stop_handler)
-    telegram_bot.add_handler(unleash_handler)
-    telegram_bot.add_handler(leash_handler)
+        telegram_bot.add_handler(help_handler)
+        telegram_bot.add_handler(rules_handler)
+        telegram_bot.add_handler(start_handler)
+        telegram_bot.add_handler(stop_handler)
+        telegram_bot.add_handler(unleash_handler)
+        telegram_bot.add_handler(leash_handler)
 
-    # TODO: define different message handlers such as Mention() or Reply() if exists
-    # BaseFilter should run first and do 1 thing: store the message and setup the telegram stuff
-    # Mention, ReplyToBot and Unleash fitlers should reply with a completion
-    message_handler = MessageHandler(filters.BaseFilter("BaseFilterText", filters.TEXT), handle_text_message)
-    mention_handler = MessageHandler(filters.Regex(FULL_TELEGRAM_HANDLE), handle_mention)
-    telegram_bot.add_handler(message_handler)
-    telegram_bot.add_handler(mention_handler)
+        # TODO: define different message handlers such as Mention() or Reply() if exists
+        # BaseFilter should run first and do 1 thing: store the message and setup the telegram stuff
+        # Mention, ReplyToBot and Unleash fitlers should reply with a completion
+        # message_handler = MessageHandler(filters.BaseFilter("BaseFilterText", filters.TEXT), handle_text_message)
+        mention_handler = MessageHandler(filters.Regex(FULL_TELEGRAM_HANDLE), handle_mention)
+        # telegram_bot.add_handler(message_handler)
+        telegram_bot.add_handler(mention_handler)
+        self.telegram_bot = telegram_bot
 
-    bot_debug.log(f"Telegram abbot polling")
-    return telegram_bot
+    def run(self):
+        bot_debug.log(f"Telegram abbot polling")
+        self.telegram_bot.run_polling()

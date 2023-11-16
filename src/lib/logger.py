@@ -1,11 +1,5 @@
+from cli_args import LOG_MODE
 from typing import Optional
-from cli_args import CLI_ARGS, DEV_MODE, ERR_MODE, TEST_MODE, LOG_MODE
-
-print(f"logger: CLI_ARGS={CLI_ARGS}")
-print(f"logger: DEV_MODE={DEV_MODE}")
-print(f"logger: ERR_MODE={ERR_MODE}")
-print(f"logger: TEST_MODE={TEST_MODE}")
-
 from os.path import abspath
 from datetime import datetime
 from logging import FileHandler, Formatter, StreamHandler, getLogger, DEBUG, ERROR
