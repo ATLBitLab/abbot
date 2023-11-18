@@ -3,6 +3,7 @@ from cli_args import TEST_MODE, DEV_MODE
 from typing import Dict, List, Optional
 
 from nostr_sdk import PublicKey, EventId, Event
+from telegram import Chat, Message
 
 from pymongo import MongoClient
 from pymongo.cursor import Cursor
@@ -11,7 +12,7 @@ from pymongo.results import InsertOneResult, InsertManyResult, UpdateResult
 from bson.typings import _DocumentType
 
 from lib.logger import bot_error, bot_debug
-from lib.utils import to_dict, error
+from lib.utils import to_dict, error, try_get
 from lib.abbot.env import DATABASE_CONNECTION_STRING
 from lib.abbot.exceptions.exception import try_except
 
@@ -24,8 +25,8 @@ nostr_dms = db_nostr.get_collection("dms")
 
 telegram_db_name = "test_telegram" if TEST_MODE else "telegram"
 db_telegram = client.get_database(telegram_db_name)
-telegram_chats = db_telegram.get_collection("chat")
-telegram_dms = db_telegram.get_collection("dm")
+telegram_channels = db_telegram.get_collection("channels")
+telegram_dms = db_telegram.get_collection("dms")
 
 
 @to_dict
@@ -44,6 +45,7 @@ class GroupConfig:
         return {**self.to_dict(), **data}
 
 
+# ====== Nostr ======
 @to_dict
 class NostrEvent(Event):
     def __init__(self, event: Event):
@@ -58,6 +60,8 @@ class NostrEvent(Event):
 class MongoNostrEvent(NostrEvent, GroupConfig):
     def __init__(self, nostr_event: NostrEvent):
         self.nostr_event: NostrEvent = NostrEvent.__init__(nostr_event)
+        self.messages = []
+        self.history = []
         if self.nostr_event.kind() != 4:
             self.group_config = GroupConfig.__init__(started=True, introduced=True, unleashed=False, count=None)
 
@@ -151,6 +155,28 @@ class MongoNostr:
         return [MongoNostrEvent(dm).pubkey() for dm in nostr_dms.find()]
 
 
+# ====== Telegram ======
+class TelegramMessage(Message):
+    def __init__(self, message: Message):
+        super().__init__(message)
+
+    @abstractmethod
+    def to_dict(self):
+        pass
+
+
+class MongoTelegramMessage(TelegramMessage, GroupConfig):
+    def __init__(self, telegram_message: TelegramMessage):
+        self.telegram_message: TelegramMessage = TelegramMessage.__init__(telegram_message)
+        self.messages = []
+        self.history = []
+        telegram_chat: Chat = try_get(self.telegram_message, "chat")
+        telegram_chat_type: str = try_get(telegram_chat, "type")
+        if telegram_chat_type != "private":
+            self.group_config = GroupConfig.__init__(started=True, introduced=True, unleashed=False, count=None)
+
+
+#  Should minic MongoNostr
 @to_dict
 class MongoTelegram:
     def __init__(self):

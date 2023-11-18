@@ -550,7 +550,7 @@ class TelegramBotBuilder:
         # TODO: define different message handlers such as Mention() or Reply() if exists
         # BaseFilter should run first and do 1 thing: store the message and setup the telegram stuff
         # Mention, ReplyToBot and Unleash fitlers should reply with a completion
-        # message_handler = MessageHandler(filters.BaseFilter("BaseFilterText", filters.TEXT), handle_text_message)
+        message_handler = MessageHandler(filters.BaseFilter("BaseFilterText", filters.TEXT), handle_text_message)
         mention_handler = MessageHandler(filters.Regex(FULL_TELEGRAM_HANDLE), handle_mention)
         # telegram_bot.add_handler(message_handler)
         telegram_bot.add_handler(mention_handler)
