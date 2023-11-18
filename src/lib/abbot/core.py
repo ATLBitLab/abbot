@@ -1,6 +1,9 @@
 import time
 import tiktoken
+
 from openai import OpenAI
+
+from typing import List, Dict
 from abc import abstractmethod
 from bson.typings import _DocumentType
 from typing import List, Optional, Dict
@@ -8,14 +11,6 @@ from typing import List, Optional, Dict
 from traitlets import default
 
 from constants import OPENAI_MODEL
-
-from ..db.utils import successful_update_one
-from ..utils import error, success, successful, to_dict, try_get
-from ..abbot.config import BOT_CORE_SYSTEM
-from ..db.mongo import GroupConfig, UpdateResult, mongo_abbot
-
-from ..logger import bot_debug, bot_error
-from ..abbot.exceptions.exception import try_except
 
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
 
@@ -26,7 +21,8 @@ class Abbot(GroupConfig):
 
     client: OpenAI = OpenAI(api_key=OPENAI_API_KEY)
 
-    def __init__(self, id: str, bot_type: str, history: List):
+    def __init__(self, id: str, bot_type: str):
+        self.model: str = OPENAI_MODEL
         self.id: str = id
         self.bot_type: str = bot_type
         self.model: str = OPENAI_MODEL
@@ -120,12 +116,12 @@ class Abbot(GroupConfig):
             return error("update_db => update_one_channel failed")
         return success(try_get(result, "upserted_id"))
 
-    def update_history_meta(self, content: str) -> int:
-        self.history_len += 1
-        self.history_tokens += len(self.tokenize(content))
-
-    def chat_completion(self) -> str:
-        response = self.client.chat.completions.create(messages=self.history, model=self.model)
+    @try_except
+    def chat_completion(self) -> str | None:
+        response = self.client.completions.create(
+            model=self.model,
+            messages=self.history,
+        )
         answer = try_get(response, "choices", 0, "message", "content")
         self.history.append({"role": "assistant", "content": answer})
         self.update_history_meta(answer)

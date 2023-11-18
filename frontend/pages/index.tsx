@@ -3,7 +3,6 @@ import Head from "next/head";
 import Image from "next/image";
 import abbot from "@/public/abbot.jpeg";
 import Button from "@/components/Button";
-import Row from "@/components/Row";
 import { useRouter } from "next/router";
 import Toast from "awesome-toast-component";
 

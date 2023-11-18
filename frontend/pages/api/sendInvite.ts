@@ -52,7 +52,7 @@ export default async function handler(
     } else {
       data = await handleTelegram(channelId);
     }
-    res.status(204).json({ success: true, data });
+    res.status(204).json({ success: true, data: "Invite sent" });
   } catch (error) {
     res.status(500).json({ success: false, data: error })
   }
