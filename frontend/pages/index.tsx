@@ -1,37 +1,55 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
-import React, { useState } from "react";
-import { Grid } from "react-loader-spinner";
-import { Space_Mono } from "next/font/google";
 import abbot from "@/public/abbot.jpeg";
 import Button from "@/components/Button";
-import { useRouter } from "next/router";
 import Row from "@/components/Row";
-
-const spacemono = Space_Mono({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  display: "swap",
-});
-
-const sendInvite = async (channelId: string) => {
-  try {
-    const response = await fetch('/api/sendInvite', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ channelId })
-    });
-  } catch (error) {
-    console.error(error)
-  }
-};
+import { useRouter } from "next/router";
 
 export default function Abbot() {
   const router = useRouter();
-  const [abbotState, setAbbotState] = useState<number | null>(null);
-  const [channelId, setChannelId] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
+  const [channelId, setChannelId] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [platform, setPlatform] = useState(null); // 'nostr' or 'telegram'
+  const [channelMode, setChannelMode] = useState(false); // true when a channel button is clicked
+
+  const sendInvite = async (channelId: string) => {
+    try {
+      const response = await fetch("/api/sendInvite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ channelId }),
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // Function to handle platform and channel button selection
+  const handleNostrClick = () => {
+    setPlatform("nostr");
+    setChannelMode(false); // Reset channel mode when switching platforms
+  };
+  const handleTelegramClick = () => {
+    setPlatform("telegram");
+    setChannelMode(false); // Reset channel mode when switching platforms
+  };
+
+  // Function to reset to initial state
+  const handleBackClick = () => {
+    setPlatform(null);
+    setChannelMode(false);
+    setChannelId("");
+  };
+
+  // Function to handle form submission
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    await sendInvite(channelId);
+    console.log(`Channel invite sent for ${channelId}`);
+    setLoading(false);
+  };
 
   return (
     <>
@@ -102,136 +120,170 @@ export default function Abbot() {
           content="https://t.me/atl_bitlab_bot"
         />
       </Head>
-
-      <main
-        className={
-          spacemono.className +
-          " mx-auto max-w-4xl text-white flex flex-col items-center gap-2 my-16 pb-16 px-8"
-        }
-      >
-        {
-          loading ? (
-            <div className="flex justify-center mt-[40%]">
-              <Grid
-                height={200}
-                width={200}
-                color="white"
-                ariaLabel="grid-loading"
-                radius="12.5"
-                visible={true}
+      <main className="mx-auto max-w-4xl text-white flex flex-col items-center gap-2 my-16 pb-16 px-8">
+        {loading ? (
+          <div className="flex justify-center mt-[40%]"></div>
+        ) : (
+          <div className="flex flex-col items-center w-2/3 gap-8 text-center">
+            <a href="tg://resolve?domain=atl_bitlab_bot">
+              <Image src={abbot} alt={"Abbot ATL BitLab Bot"} />
+            </a>
+            <h4>Sup fam, I&apos;m Abbot</h4>
+            <h5>
+              I&apos;m a helpful bitcoiner bot from Atlanta created by ATL
+              BitLab. Est. block 797812.
+            </h5>
+            <Button
+              className="w-full border-[#08252E] border-2 px-8 mt-4"
+              type="button"
+              onClick={() => router.push("/policies")}
+            >
+              Terms & Policies 📜
+            </Button>
+            <PlatformButtons
+              onNostrClick={handleNostrClick}
+              onTelegramClick={handleTelegramClick}
+            />
+            {platform && (
+              <ChannelInteraction
+                platform={platform}
+                setChannelMode={setChannelMode}
+                channelMode={channelMode}
+                channelId={channelId}
+                setChannelId={setChannelId}
+                loading={loading}
+                handleFormSubmit={handleFormSubmit}
               />
-            </div>
-          ) : (
-            <div className="flex flex-col items-center w-2/3 gap-8 text-center">
-              <a href="tg://resolve?domain=atl_bitlab_bot">
-                <Image src={abbot} alt={"Abbot ATL BitLab Bot"} />
-              </a>
-              <h4>Sup fam, I&apos;m Abbot</h4>
-              <h5>
-                I&apos;m a helpful bitcoiner bot from Atlanta created by ATL BitLab.
-                Est. block 797812.
-              </h5>
-              <Row className="w-full">
-                <Button
-                  className="w-full border-[#08252E] border-2 px-8"
-                  type="button"
-                  onClick={() => router.push("/policies")}
-                >
-                  Terms & policies 📑
-                </Button>
-              </Row>
-              <Row className="w-full">
-                <Button
-                  className={`w-full border-[#08252E] border-2 mr-1 ${abbotState !== null && abbotState !== null && abbotState === 0
-                    ? "bg-[#08252E] text-white"
-                    : ""
-                    }`}
-                  type="button"
-                  onClick={() => (window.location.href = "tg://resolve?domain=atl_bitlab_bot")}
-                >
-                  Telegram 🤖
-                </Button>
-                <Button
-                  className={`w-full border-[#08252E] border-2 ml-1 ${abbotState !== null && abbotState > 0
-                    ? "bg-[#08252E] text-white"
-                    : ""
-                    }`}
-                  type="button"
-                  onClick={() => setAbbotState(1)}
-                >
-                  Nostr 🟣
-                </Button>
-              </Row>
-              {
-                abbotState !== null && abbotState >= 1 && (
-                  <Row className="w-full">
-                    <Button
-                      className="w-full border-[#08252E] border-2 mr-1"
-                      type="button"
-                      onClick={() =>
-                      (window.location.href =
-                        "https://www.nostrchat.io/dm/npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk")
-                      }
-                    >
-                      DM 🟣
-                    </Button>
-                    <Button
-                      className={`w-full border-[#08252E] border-2 ml-1 ${abbotState === 2 ? "bg-[#08252E] text-white" : ""
-                        }`}
-                      type="button"
-                      onClick={() => setAbbotState(2)}
-                    >
-                      Channel 🟣
-                    </Button>
-                  </Row>
-                )
-              }
-              {
-                abbotState !== null && abbotState === 2 && (
-                  <Row className="w-full">
-                    <form
-                      className="w-full flex justify-between items-center"
-                      onSubmit={(e) => {
-                        setLoading(true);
-                        e.preventDefault();
-                        console.log("Channel ID submitted:", channelId);
-                        sendInvite(channelId).then(() => console.log(`channel invite sent for ${channelId}`));
-                        setLoading(false);
-                      }}
-                    >
-                      <input
-                        type="text"
-                        placeholder="Enter your channel ID"
-                        pattern="[a-f0-9]{64}"
-                        title="Channel ID should be 64 lowercase hex characters"
-                        className="border-2 border-[#08252E] px-2 text-black flex-grow"
-                        value={channelId}
-                        onChange={(e) => setChannelId(e.target.value)}
-                        required
-                      />
-                      <button
-                        type="submit"
-                        className="border-2 border-[#08252E] px-8 bg-[#08252E] text-white ml-2"
-                      >
-                        Join
-                      </button>
-                    </form>
-                  </Row>
-                )
-              }
-              <Row className="w-full">
-                <Button
-                  className="w-full border-[#08252E] border-2 px-8"
-                  type="button"
-                  onClick={() => router.push("/team")}
-                >
-                  Abbot Team 🫂
-                </Button>
-              </Row>
-            </div>
-          )
-        }
+            )}
+            {platform && (
+              <Button
+                className="w-full border-[#08252E] border-2 px-8 mt-4"
+                type="button"
+                onClick={handleBackClick}
+              >
+                Back
+              </Button>
+            )}
+            <Row className="w-full">
+              <Button
+                className="w-full border-[#08252E] border-2 mr-1"
+                type="button"
+                onClick={() => router.push("/team")}
+              >
+                Meet the Team 🫂
+              </Button>
+              <Button
+                className="w-full border-[#08252E] border-2 mr-1"
+                type="button"
+                onClick={() => router.push("/help")} // Placeholder routing for Abbot Onboarding
+              >
+                Abbot Help 🚀
+              </Button>
+            </Row>
+          </div>
+        )}
       </main>
     </>
+  );
+}
+
+function PlatformButtons({ onNostrClick, onTelegramClick }) {
+  return (
+    <Row className="w-full">
+      <Button
+        className="w-full border-[#08252E] border-2 mr-1"
+        type="button"
+        onClick={onNostrClick}
+      >
+        Nostr 🟣
+      </Button>
+      <Button
+        className="w-full border-[#08252E] border-2 ml-1"
+        type="button"
+        onClick={onTelegramClick}
+      >
+        Telegram 🤖
+      </Button>
+    </Row>
+  );
+}
+
+function ChannelInteraction({
+  platform,
+  setChannelMode,
+  channelMode,
+  channelId,
+  setChannelId,
+  loading,
+  handleFormSubmit,
+}) {
+  const isTelegram = platform === "telegram";
+
+  const handleChannelClick = () => {
+    setChannelMode(true);
+  };
+
+  return (
+    <>
+      <Row className="w-full">
+        <Button
+          className="w-full border-[#08252E] border-2 mr-1"
+          type="button"
+          onClick={() => {
+            if (isTelegram) {
+              window.location.href = "tg://resolve?domain=atl_bitlab_bot";
+            } else {
+              window.location.href =
+                "https://www.nostrchat.io/dm/npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk";
+            }
+          }}
+        >
+          {isTelegram ? "DM 🤖" : "DM 🟣"}
+        </Button>
+        <Button
+          className="w-full border-[#08252E] border-2 ml-1"
+          type="button"
+          onClick={handleChannelClick}
+        >
+          {isTelegram ? "Channel 🤖" : "Channel 🟣"}
+        </Button>
+      </Row>
+      {channelMode && (
+        <ChannelForm
+          channelId={channelId}
+          setChannelId={setChannelId}
+          loading={loading}
+          handleFormSubmit={handleFormSubmit}
+        />
+      )}
+    </>
+  );
+}
+
+function ChannelForm({ channelId, setChannelId, loading, handleFormSubmit }) {
+  return (
+    <Row className="w-full">
+      <form
+        className="w-full flex justify-between items-center"
+        onSubmit={handleFormSubmit}
+      >
+        <input
+          type="text"
+          placeholder="Enter your channel ID"
+          pattern="[a-f0-9]{64}"
+          title="Channel ID should be 64 lowercase hex characters"
+          className="border-2 border-[#08252E] px-2 text-black flex-grow"
+          value={channelId}
+          onChange={(e) => setChannelId(e.target.value)}
+          required
+        />
+        <button
+          type="submit"
+          className="border-2 border-[#08252E] px-8 bg-[#08252E] text-white ml-2"
+        >
+          Join
+        </button>
+      </form>
+    </Row>
   );
 }
