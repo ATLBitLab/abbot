@@ -61,7 +61,7 @@ pip3 install -r requirements.txt
 7. If you created a test bot per the #requirements section, you can run the test bot
 ```
 cd src
-python main.py --dev
+python main.py --dev --telegram
 ```
 
 8. Go to your telegram and DM your bot! That's it!
