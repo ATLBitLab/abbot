@@ -513,6 +513,26 @@ async def admin_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await message.reply_text(status_data)
 
 
+@try_except
+async def handle_channel_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    pass
+
+
+@try_except
+async def handle_supergroup_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    pass
+
+
+@try_except
+async def handle_group_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    pass
+
+
+@try_except
+async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    pass
+
+
 class TelegramBotBuilder:
     from lib.abbot.env import BOT_TELEGRAM_TOKEN
 
@@ -550,10 +570,19 @@ class TelegramBotBuilder:
         # TODO: define different message handlers such as Mention() or Reply() if exists
         # BaseFilter should run first and do 1 thing: store the message and setup the telegram stuff
         # Mention, ReplyToBot and Unleash fitlers should reply with a completion
-        message_handler = MessageHandler(filters.BaseFilter("BaseFilterText", filters.TEXT), handle_text_message)
+        channel_handler = MessageHandler(filters.ChatType.CHANNEL, handle_channel_message)
+        supergroup_handler = MessageHandler(filters.ChatType.SUPERGROUP, handle_supergroup_message)
+        group_handler = MessageHandler(filters.ChatType.GROUP, handle_group_message)
+        dm_handler = MessageHandler(filters.ChatType.PRIVATE, handle_dm)
         mention_handler = MessageHandler(filters.Regex(FULL_TELEGRAM_HANDLE), handle_mention)
-        # telegram_bot.add_handler(message_handler)
+        telegram_bot.add_handler(channel_handler)
+        telegram_bot.add_handler(supergroup_handler)
+        telegram_bot.add_handler(group_handler)
+        telegram_bot.add_handler(dm_handler)
         telegram_bot.add_handler(mention_handler)
+
+        text_handler = MessageHandler(filters.BaseFilter("BaseFilterText", filters.TEXT), handle_text_message)
+        telegram_bot.add_handler(text_handler)
         self.telegram_bot = telegram_bot
 
     def run(self):

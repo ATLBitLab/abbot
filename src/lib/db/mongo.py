@@ -45,7 +45,7 @@ class GroupConfig:
         return {**self.to_dict(), **data}
 
 
-# ====== Nostr ======
+# ====== Nostr Types ======
 @to_dict
 class NostrEvent(Event):
     def __init__(self, event: Event):
@@ -66,6 +66,42 @@ class MongoNostrEvent(NostrEvent, GroupConfig):
             self.group_config = GroupConfig.__init__(started=True, introduced=True, unleashed=False, count=None)
 
 
+# ====== Telegram Types ======
+class TelegramMessage(Message):
+    def __init__(self, message: Message):
+        super().__init__(message)
+
+    @abstractmethod
+    def to_dict(self):
+        pass
+
+
+class MongoTelegramMessage(TelegramMessage, GroupConfig):
+    def __init__(self, telegram_message: TelegramMessage):
+        self.telegram_message: TelegramMessage = TelegramMessage.__init__(telegram_message)
+        self.messages = []
+        self.history = []
+        telegram_chat: Chat = try_get(self.telegram_message, "chat")
+        telegram_chat_type: str = try_get(telegram_chat, "type")
+        if telegram_chat_type != "private":
+            self.group_config = GroupConfig.__init__(started=True, introduced=True, unleashed=False, count=None)
+
+
+"""
+@to_dict
+class Mongo:
+    def __init__(self, db_name):
+        self.db_name = db_name
+        if db_name == "telegram":
+            self.channels = telegram_channels
+            self.dms = telegram_dms
+        elif db_name == "nostr":
+            self.channels = telegram_channels
+            self.dms = telegram_dms
+"""
+
+
+# ====== Mongo Wrappers ======
 @to_dict
 class MongoNostr:
     def __init__(self):
@@ -94,7 +130,7 @@ class MongoNostr:
 
     # read documents
     @try_except
-    def find_channels(self, filter: {}) -> List[MongoNostrEvent]:
+    def find_channels(self, filter: {}) -> List[MongoNostrEvent | MongoTelegramMessage]:
         return [MongoNostrEvent(channel) for channel in nostr_channels.find(filter)]
 
     @try_except
@@ -153,27 +189,6 @@ class MongoNostr:
     @try_except
     def known_dm_pubkeys(self) -> List[PublicKey]:
         return [MongoNostrEvent(dm).pubkey() for dm in nostr_dms.find()]
-
-
-# ====== Telegram ======
-class TelegramMessage(Message):
-    def __init__(self, message: Message):
-        super().__init__(message)
-
-    @abstractmethod
-    def to_dict(self):
-        pass
-
-
-class MongoTelegramMessage(TelegramMessage, GroupConfig):
-    def __init__(self, telegram_message: TelegramMessage):
-        self.telegram_message: TelegramMessage = TelegramMessage.__init__(telegram_message)
-        self.messages = []
-        self.history = []
-        telegram_chat: Chat = try_get(self.telegram_message, "chat")
-        telegram_chat_type: str = try_get(telegram_chat, "type")
-        if telegram_chat_type != "private":
-            self.group_config = GroupConfig.__init__(started=True, introduced=True, unleashed=False, count=None)
 
 
 #  Should minic MongoNostr

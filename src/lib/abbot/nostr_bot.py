@@ -159,11 +159,11 @@ class NostrBotBuilder:
                             bot_error.log(fn, f"inset_one_dm Failed")
                             result: InsertOneResult = mongo_nostr.insert_one_dm(db_nostr_event)
                             bot_debug.log(fn, f"result {result}")
-                            dm: Dict = mongo_nostr.find_one_dm({"id": sender_pubkey})
+                            dm: Dict = mongo_nostr.find_one_dm({"id": event.pubkey()})
                             if not successful_insert_one(result):
-                                bot_error.log(f"insert_dm failed: {nostr_event_dict}")
+                                bot_error.log(f"insert_dm failed: {event_json}")
                                 time.sleep(1)
-                        IPython.embed()
+                        # IPython.embed()
                         self.handle_dm(event)
                     # elif kind == 40:
                     #     result: InsertOneResult = mongo_nostr.insert_one_channel(nostr_event_dict)
