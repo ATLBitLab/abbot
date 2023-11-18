@@ -6,10 +6,11 @@ from nostr_sdk import PublicKey, EventId, Event
 from telegram import Chat, Message
 
 from pymongo import MongoClient
+from pymongo.collection import Collection
 from pymongo.cursor import Cursor
 from pymongo.results import InsertOneResult, InsertManyResult, UpdateResult
 
-from bson.typings import _DocumentType
+from bson.typings import _DocumentType, Coll
 
 from lib.logger import bot_error, bot_debug
 from lib.utils import to_dict, error, try_get
@@ -66,10 +67,46 @@ class MongoNostrEvent(NostrEvent, GroupConfig):
             self.group_config = GroupConfig.__init__(started=True, introduced=True, unleashed=False, count=None)
 
 
+<<<<<<< Updated upstream
 @to_dict
 class MongoNostr:
     def __init__(self):
         pass
+=======
+# ====== Telegram Types ======
+class TelegramMessage(Message):
+    def __init__(self, message: Message):
+        super().__init__(message)
+
+    @abstractmethod
+    def to_dict(self):
+        pass
+
+
+class MongoTelegramMessage(TelegramMessage, GroupConfig):
+    def __init__(self, telegram_message: TelegramMessage):
+        self.telegram_message: TelegramMessage = TelegramMessage.__init__(telegram_message)
+        self.messages = []
+        self.history = []
+        telegram_chat: Chat = try_get(self.telegram_message, "chat")
+        telegram_chat_type: str = try_get(telegram_chat, "type")
+        if telegram_chat_type != "private":
+            self.group_config = GroupConfig.__init__(started=True, introduced=True, unleashed=False, count=None)
+
+
+@to_dict
+class MongoAbbot:
+    def __init__(self, db_name):
+        self.db_name = db_name
+        self.channels: Collection[_DocumentType] | None = None
+        self.dms: Collection[_DocumentType] | None = None
+        if db_name == "telegram":
+            self.channels = telegram_channels
+            self.dms = telegram_dms
+        elif db_name == "nostr":
+            self.channels = nostr_channels
+            self.dms = nostr_dms
+>>>>>>> Stashed changes
 
     @abstractmethod
     def to_dict(self):
@@ -78,53 +115,58 @@ class MongoNostr:
     # create docs
     @try_except
     def insert_one_channel(self, channel: Dict) -> InsertOneResult:
-        return nostr_channels.insert_one(channel)
+        return self.channels.insert_one(channel)
 
     @try_except
     def insert_many_channels(self, channels: List[Dict]) -> InsertManyResult:
-        return nostr_channels.insert_many(channels)
+        return self.channels.insert_many(channels)
 
     @try_except
     def insert_one_dm(self, direct_message: Dict) -> InsertOneResult:
-        return nostr_dms.insert_one(direct_message)
+        return self.dms.insert_one(direct_message)
 
     @try_except
     def insert_many_dms(self, direct_messages: List[Dict]) -> InsertManyResult:
-        return nostr_dms.insert_many(direct_messages)
+        return self.dms.insert_many(direct_messages)
 
     # read documents
     @try_except
+<<<<<<< Updated upstream
     def find_channels(self, filter: {}) -> List[MongoNostrEvent]:
         return [MongoNostrEvent(channel) for channel in nostr_channels.find(filter)]
+=======
+    def find_channels(self, filter: {}) -> List[MongoNostrEvent | MongoTelegramMessage]:
+        return [MongoNostrEvent(channel) for channel in self.channels.find(filter)]
+>>>>>>> Stashed changes
 
     @try_except
     def find_channels_cursor(self, filter: {}) -> Cursor:
-        return nostr_channels.find(filter)
+        return self.channels.find(filter)
 
     @try_except
     def find_one_channel(self, filter: {}) -> MongoNostrEvent:
-        return MongoNostrEvent(nostr_channels.find_one(filter))
+        return MongoNostrEvent(self.channels.find_one(filter))
 
     @try_except
     def find_one_dm(self, filter: {}) -> Optional[_DocumentType]:
-        return nostr_dms.find_one(filter)
+        return self.dms.find_one(filter)
 
     @try_except
     def find_dms(self, filter: {}) -> List[MongoNostrEvent]:
-        return [MongoNostrEvent(dm) for dm in nostr_dms.find(filter)]
+        return [MongoNostrEvent(dm) for dm in self.dms.find(filter)]
 
     @try_except
     def find_dms_cursor(self, filter: {}) -> Cursor:
-        return nostr_dms.find(filter)
+        return self.dms.find(filter)
 
     # update docs
     @try_except
     def update_one_channel(self, filter: {}, update: Dict, upsert: bool = True) -> UpdateResult:
-        return nostr_channels.update_one(filter, {"$set": {**update}}, upsert)
+        return self.channels.update_one(filter, {"$set": {**update}}, upsert)
 
     @try_except
     def update_one_dm(self, filter: {}, update: Dict, upsert: bool = True) -> UpdateResult:
-        return nostr_dms.update_one(filter, {"$set": {**update}}, upsert)
+        return self.dms.update_one(filter, {"$set": {**update}}, upsert)
 
     # custom reads
     @try_except
@@ -136,7 +178,7 @@ class MongoNostr:
 
     @try_except
     def known_channels(self) -> List[MongoNostrEvent]:
-        return [MongoNostrEvent(channel) for channel in nostr_channels.find()]
+        return [MongoNostrEvent(channel) for channel in self.channels.find()]
 
     @try_except
     def known_channel_ids(self) -> List[EventId]:
@@ -148,11 +190,11 @@ class MongoNostr:
 
     @try_except
     def known_dms(self) -> List[MongoNostrEvent]:
-        return [MongoNostrEvent(dm) for dm in nostr_dms.find()]
+        return [MongoNostrEvent(dm) for dm in self.dms.find()]
 
     @try_except
     def known_dm_pubkeys(self) -> List[PublicKey]:
-        return [MongoNostrEvent(dm).pubkey() for dm in nostr_dms.find()]
+        return [MongoNostrEvent(dm).pubkey() for dm in self.dms.find()]
 
 
 # ====== Telegram ======
