@@ -31,7 +31,7 @@ export default function Team() {
       image: "/team/aida.jpeg",
       bio: `
             👨🏼‍💻 technical product manager<br>
-            💻 <a href="https://www.linkedin.com/in/aidacelys/">https://linkedin.com/in/aidacelys/</a><br>
+            💻 <a href="https://www.linkedin.com/in/aidacelys/">linkedin/aida</a><br>
             🟣 <a href="https://snort.social/p/npub1gs2zeuadlkfkd0mfp6sh46arcvu8xzqtgv7chwtgc9hcvcfa4gxs07wvwg">zestyplastic01@walletofsatoshi</a>
             
         `,
@@ -41,7 +41,7 @@ export default function Team() {
       image: "/team/annie.jpeg",
       bio: `
             👨🏼‍💻 full stack software engineer<br>
-            💻 <a href="https://www.linkedin.com/in/annie-seth/">https://linkedin.com/in/annie-seth/</a><br>
+            💻 <a href="https://www.linkedin.com/in/annie-seth/">linkedin/annie</a><br>
             🟣 <a href="https://snort.social/p/npub1jm8tv9ltgxluf3za8ql7njwcuu5ukf9hrnv5074zxn3z5gl9n0aqu8lqg5">annie@atlbitlab.com</a><br>
             
         `,
@@ -60,7 +60,7 @@ export default function Team() {
       name: "w3irdrobot",
       image: "/team/w3irdrobot.png",
       bio: `
-            👨🏼‍💻 software engineer<br>
+            👨🏼‍💻 full stack software engineer<br>
             💻 <a href="https://w3ird.tech/">https://w3ird.tech/</a><br>
             🟣 <a href="https://snort.social/p/npub17q5n2z8naw0xl6vu9lvt560lg33pdpe29k0k09umlfxm3vc4tqrq466f2y">rob@w3ird.tech</a><br>
             
@@ -70,7 +70,7 @@ export default function Team() {
       name: "brandon",
       image: "/team/brandon.jpeg",
       bio: `
-            👨🏼‍💻 software engineer<br>
+            👨🏼‍💻 full stack software engineer<br>
             💻 <a href="https://saucy.tech">https://saucy.tech</a><br>
             🟣 <a href="https://snort.social/p/npub14dd9x5uhdctewu6kv7yaunccsuk2fpda7ckttj28l90t2dj38f5spgt54z">saucy@getalby.com</a><br>
         `,
@@ -166,15 +166,13 @@ export default function Team() {
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr",
-            gap: "60px",
+            gap: "40px",
             marginTop: "50px",
           }}
         >
-          {
-            members.map((member, index) => (
-              <Member key={index} {...member} />
-            ))
-          }
+          {members.map((member, index) => (
+            <Member key={index} {...member} />
+          ))}
         </div>
         <Row className="w-full mt-20">
           <Button
