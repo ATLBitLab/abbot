@@ -10,7 +10,7 @@ from pymongo.collection import Collection
 from pymongo.cursor import Cursor
 from pymongo.results import InsertOneResult, InsertManyResult, UpdateResult
 
-from bson.typings import _DocumentType, Coll
+from bson.typings import _DocumentType
 
 from lib.logger import bot_error, bot_debug
 from lib.utils import to_dict, error, try_get
@@ -67,12 +67,6 @@ class MongoNostrEvent(NostrEvent, GroupConfig):
             self.group_config = GroupConfig.__init__(started=True, introduced=True, unleashed=False, count=None)
 
 
-<<<<<<< Updated upstream
-@to_dict
-class MongoNostr:
-    def __init__(self):
-        pass
-=======
 # ====== Telegram Types ======
 class TelegramMessage(Message):
     def __init__(self, message: Message):
@@ -106,7 +100,6 @@ class MongoAbbot:
         elif db_name == "nostr":
             self.channels = nostr_channels
             self.dms = nostr_dms
->>>>>>> Stashed changes
 
     @abstractmethod
     def to_dict(self):
@@ -131,13 +124,8 @@ class MongoAbbot:
 
     # read documents
     @try_except
-<<<<<<< Updated upstream
-    def find_channels(self, filter: {}) -> List[MongoNostrEvent]:
-        return [MongoNostrEvent(channel) for channel in nostr_channels.find(filter)]
-=======
     def find_channels(self, filter: {}) -> List[MongoNostrEvent | MongoTelegramMessage]:
         return [MongoNostrEvent(channel) for channel in self.channels.find(filter)]
->>>>>>> Stashed changes
 
     @try_except
     def find_channels_cursor(self, filter: {}) -> Cursor:
