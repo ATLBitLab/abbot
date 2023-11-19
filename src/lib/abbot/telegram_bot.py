@@ -2,14 +2,27 @@ import json
 from io import open
 from os import listdir
 from os.path import abspath
+from typing import Any, Dict, Optional, Tuple
 
-from telegram.ext import filters
-from telegram import Update, Message, Chat, User
+from telegram import Update, Message, Chat, User, MessageEntity
+from telegram.constants import MessageEntityType
 from telegram.ext import (
     ContextTypes,
     ApplicationBuilder,
     CommandHandler,
     MessageHandler,
+)
+from telegram.ext.filters import (
+    ChatType,
+    Regex,
+    MessageFilter,
+    BaseFilter,
+    Command,
+    ViaBot,
+    TEXT,
+    Entity,
+    _Reply,
+    REPLY,
 )
 
 from constants import HELP_MENU, THE_CREATOR
@@ -19,7 +32,8 @@ from lib.utils import sender_is_group_admin, try_get, successful
 from lib.admin.admin_service import AdminService
 
 from lib.abbot.core import Abbot
-from lib.abbot.exceptions.exception import try_except, AbbotException
+from lib.abbot.exceptions.exception import try_except
+from lib.abbot.config import BOT_NAME, BOT_TELEGRAM_HANDLE
 from lib.abbot.utils import (
     parse_chat,
     parse_chat_data,
@@ -29,17 +43,37 @@ from lib.abbot.utils import (
     parse_user_data,
     squawk_error,
 )
-from lib.abbot.exceptions.exception import try_except, AbbotException
-from lib.abbot.config import BOT_NAME, BOT_TELEGRAM_HANDLE, BOT_CORE_SYSTEM
+from src.data.backup.code.handlers import handle_message
 
 FULL_TELEGRAM_HANDLE = f"@{BOT_TELEGRAM_HANDLE}"
+MENTION = MessageEntityType.MENTION
 
-# context.args
 RAW_MESSAGE_JL_FILE = abspath("src/data/raw_messages.jsonl")
 MATRIX_IMG_FILEPATH = abspath("src/assets/unplugging_matrix.jpg")
 
 admin = AdminService(THE_CREATOR, THE_CREATOR)
 admin.status = "running"
+
+
+@try_except
+async def parse_message_chat_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Tuple[Message, Chat, User]:
+    response: Dict = parse_message(update, context)
+    message: Message = try_get(response, "data")
+    if not successful(response):
+        return await squawk_error(message, context)
+
+    response: Dict = parse_chat(message, context)
+    chat: Chat = try_get(response, "data")
+    if not successful(response):
+        error_message = try_get(message, "data")
+        return await squawk_error(error_message, context)
+
+    response: Dict = parse_user(message, context)
+    user: User = try_get(response, "data")
+    if not successful(response):
+        return await squawk_error(user, context)
+
+    return (message, chat, user)
 
 
 @try_except
@@ -51,38 +85,35 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
     bot_debug.log(f"{fn} Update={update}")
     bot_debug.log(f"{fn} Context={context}")
 
-    response: dict = parse_message(update, context)
+    response: Dict = parse_message(update, context)
     message: Message = try_get(response, "data")
     if not successful(response):
         return await squawk_error(message, context)
-
-    message_data: dict = parse_message_data(message)
+    message_data: Dict = parse_message_data(message)
     message_text: str = try_get(message_data, "text")
     message_date: str = try_get(message_data, "date")
-
-    response: dict = parse_chat(message, context)
+    response: Dict = parse_chat(message, context)
     chat: Chat = try_get(response, "data")
     if not successful(response):
         error_message = try_get(message, "data")
         return await squawk_error(error_message, context)
-    chat_data: dict = parse_chat_data(chat)
+    chat_data: Dict = parse_chat_data(chat)
     chat_id: int = try_get(chat_data, "id")
     chat_type: str = try_get(chat_data, "type")
     is_private_chat: bool = chat_type == "private"
     is_group_chat: bool = not is_private_chat
     chat_title: str = try_get(chat_data, "title", default="private" if is_private_chat else None)
-
-    response: dict = parse_user(message, context)
+    response: Dict = parse_user(message, context)
     user: User = try_get(response, "data")
     if not successful(response):
         return await squawk_error(user, context)
-    user_data: dict = parse_user_data(user)
+    user_data: Dict = parse_user_data(user)
     user_id: int = try_get(user_data, "user_id")
 
     # log all data for debugging
     abbot_context = "group"
 
-    all_data: dict = dict(**message_data, **chat_data, **user_data)
+    all_data: Dict = dict(**message_data, **chat_data, **user_data)
     for k, v in all_data.items():
         bot_debug.log(f"{fn} {k}={v}")
 
@@ -176,21 +207,16 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 
 @try_except
-def handle_mention(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    pass
-
-
-@try_except
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "help:"
     message: Message = parse_message(update)
     chat: Chat = parse_chat(update, message)
     user: User = parse_user(message)
-    user_data: dict = parse_user_data(user)
-    message_data: dict = parse_message_data(message)
-    chat_data: dict = parse_chat_data(chat)
+    user_data: Dict = parse_user_data(user)
+    message_data: Dict = parse_message_data(message)
+    chat_data: Dict = parse_chat_data(chat)
     # log all data for debugging
-    all_data: dict = dict(**message_data, **chat_data, **user_data)
+    all_data: Dict = dict(**message_data, **chat_data, **user_data)
     for k, v in all_data.items():
         bot_debug.log(f"{fn} {k}={v}")
     await message.reply_text(HELP_MENU)
@@ -199,36 +225,36 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
 @try_except
 async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "unleash:"
-    response: dict = parse_message(update, context)
+    response: Dict = parse_message(update, context)
     message: Message = try_get(response, "data")
     if not successful(response):
         data = message
         return await squawk_error(data, context)
-    message_data: dict = parse_message_data(message)
+    message_data: Dict = parse_message_data(message)
 
-    response: dict = parse_chat(update, message)
+    response: Dict = parse_chat(update, message)
     chat: Chat = try_get(response, "data")
     if not successful(response):
         data = chat
         return await squawk_error(data, context)
-    chat_data: dict = parse_chat_data(chat)
+    chat_data: Dict = parse_chat_data(chat)
     chat_id: int = try_get(chat_data, "id")
     chat_title: str = try_get(chat_data, "title")
     chat_type: str = try_get(chat_data, "type")
 
-    response: dict = parse_user(message)
+    response: Dict = parse_user(message)
     user: User = try_get(response, "data")
     if not successful(response):
         data = user
         return await squawk_error(data, context)
-    user_data: dict = parse_user_data(user)
+    user_data: Dict = parse_user_data(user)
     user_id: int = try_get(user_data, "user_id")
     username: str = try_get(user_data, "username")
 
     is_private_chat: bool = chat_type == "private"
     is_group_chat: bool = not is_private_chat
     # log all data for debugging
-    all_data: dict = dict(**message_data, **chat_data, **user_data)
+    all_data: Dict = dict(**message_data, **chat_data, **user_data)
     for k, v in all_data.items():
         bot_debug.log(f"{fn} {k}={v}")
 
@@ -261,16 +287,16 @@ async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "leash:"
     message: Message = parse_message(update)
-    message_data: dict = parse_message_data(message)
+    message_data: Dict = parse_message_data(message)
 
     chat: Chat = parse_chat(update, message)
-    chat_data: dict = parse_chat_data(chat)
+    chat_data: Dict = parse_chat_data(chat)
     chat_id: int = try_get(chat_data, "id")
     chat_title: str = try_get(chat_data, "title")
     chat_type: str = try_get(chat_data, "type")
 
     user: User = parse_user(message)
-    user_data: dict = parse_user_data(user)
+    user_data: Dict = parse_user_data(user)
     user_id: int = try_get(user_data, "user_id")
     username: str = try_get(user_data, "username")
 
@@ -278,7 +304,7 @@ async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     is_group_chat: bool = not is_private_chat
     abbot_context = "group"
     # log all data for debugging
-    all_data: dict = dict(**message_data, **chat_data, **user_data)
+    all_data: Dict = dict(**message_data, **chat_data, **user_data)
     for k, v in all_data.items():
         bot_debug.log(f"{fn} {k}={v}")
     if is_private_chat:
@@ -344,36 +370,36 @@ async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
 @try_except
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "start:"
-    response: dict = parse_message(update, context)
+    response: Dict = parse_message(update, context)
     message: Message = try_get(response, "data")
     if not successful(response):
         return squawk_error(message, context)
 
-    message_data: dict = parse_message_data(message)
+    message_data: Dict = parse_message_data(message)
     message_text: str = try_get(message_data, "text")
     message_date: str = try_get(message_data, "date")
 
-    response: dict = parse_chat(message, context)
+    response: Dict = parse_chat(message, context)
     chat: Chat = try_get(response, "data")
     if not successful(response):
         error_message = try_get(message, "data")
         return squawk_error(error_message, context)
-    chat_data: dict = parse_chat_data(chat)
+    chat_data: Dict = parse_chat_data(chat)
     chat_id: int = try_get(chat_data, "id")
     chat_type: str = try_get(chat_data, "type")
     is_private_chat: bool = chat_type == "private"
     is_group_chat: bool = not is_private_chat
     chat_title: str = try_get(chat_data, "title", default="private" if is_private_chat else None)
 
-    response: dict = parse_user(message, context)
+    response: Dict = parse_user(message, context)
     user: User = try_get(response, "data")
     if not successful(response):
         return await squawk_error(user, context)
-    user_data: dict = parse_user_data(user)
+    user_data: Dict = parse_user_data(user)
 
     # log all data for debugging
     abbot_context = "group"
-    all_data: dict = dict(**message_data, **chat_data, **user_data)
+    all_data: Dict = dict(**message_data, **chat_data, **user_data)
     for k, v in all_data.items():
         bot_debug.log(f"{fn} {k}={v}")
 
@@ -533,6 +559,43 @@ async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
     pass
 
 
+@try_except
+async def handle_mention(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    message_chat_user: Tuple[Message, Chat, User] = await parse_message_chat_user(update, context)
+    message, chat, user = message_chat_user
+
+    chat_type: ChatType = try_get(chat, "type")
+    if chat_type == "channel":
+        await handle_channel_message()
+    elif chat_type == "supergroup":
+        await handle_supergroup_message()
+    elif chat_type == "group":
+        await handle_group_message()
+    else:
+        await handle_message()
+
+    # message_data: Dict = parse_message_data(message)
+    # message_text: str = try_get(message_data, "text")
+    # message_date: str = try_get(message_data, "date")
+
+    # chat_data: Dict = parse_chat_data(chat)
+    # chat_id: int = try_get(chat_data, "id")
+    # chat_type: str = try_get(chat_data, "type")
+    # chat_title: str = try_get(chat_data, "title", default="private" if is_private_chat else None)
+
+    # is_private_chat: bool = chat_type == "private"
+    # is_group_chat: bool = not is_private_chat
+
+    # user_data: Dict = parse_user_data(user)
+    # user_id: int = try_get(user_data, "user_id")
+
+
+@try_except
+async def handle_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if update.message.reply_to_message and update.message.reply_to_message.from_user.username == BOT_TELEGRAM_HANDLE:
+        pass
+
+
 class TelegramBotBuilder:
     from lib.abbot.env import BOT_TELEGRAM_TOKEN
 
@@ -570,19 +633,16 @@ class TelegramBotBuilder:
         # TODO: define different message handlers such as Mention() or Reply() if exists
         # BaseFilter should run first and do 1 thing: store the message and setup the telegram stuff
         # Mention, ReplyToBot and Unleash fitlers should reply with a completion
-        channel_handler = MessageHandler(filters.ChatType.CHANNEL, handle_channel_message)
-        supergroup_handler = MessageHandler(filters.ChatType.SUPERGROUP, handle_supergroup_message)
-        group_handler = MessageHandler(filters.ChatType.GROUP, handle_group_message)
-        dm_handler = MessageHandler(filters.ChatType.PRIVATE, handle_dm)
-        mention_handler = MessageHandler(filters.Regex(FULL_TELEGRAM_HANDLE), handle_mention)
-        telegram_bot.add_handler(channel_handler)
-        telegram_bot.add_handler(supergroup_handler)
-        telegram_bot.add_handler(group_handler)
-        telegram_bot.add_handler(dm_handler)
-        telegram_bot.add_handler(mention_handler)
+        dm_handler = MessageHandler(ChatType.PRIVATE, handle_dm)
+        mention_abbot_handler = MessageHandler(Entity(MENTION) & Regex(FULL_TELEGRAM_HANDLE), handle_mention)
+        reply_to_abbot_handler = MessageHandler(Entity(REPLY) & Regex(FULL_TELEGRAM_HANDLE), handle_reply)
 
-        text_handler = MessageHandler(filters.BaseFilter("BaseFilterText", filters.TEXT), handle_text_message)
-        telegram_bot.add_handler(text_handler)
+        telegram_bot.add_handler(dm_handler)
+        telegram_bot.add_handler(mention_abbot_handler)
+        telegram_bot.add_handler(reply_to_abbot_handler)
+
+        # text_handler = MessageHandler(BaseFilter("BaseFilterText", TEXT), handle_text_message)
+        # telegram_bot.add_handler(text_handler)
         self.telegram_bot = telegram_bot
 
     def run(self):
