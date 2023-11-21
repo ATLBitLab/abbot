@@ -2,7 +2,7 @@ import json
 from io import open
 from os import listdir
 from os.path import abspath
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from telegram import Update, Message, Chat, User, MessageEntity
 from telegram.constants import MessageEntityType
@@ -43,7 +43,7 @@ from lib.abbot.utils import (
     parse_user_data,
     squawk_error,
 )
-from src.data.backup.code.handlers import handle_message
+from lib.db.mongo import MongoTelegramMessage, TelegramMessage
 
 FULL_TELEGRAM_HANDLE = f"@{BOT_TELEGRAM_HANDLE}"
 MENTION = MessageEntityType.MENTION
@@ -59,18 +59,18 @@ admin.status = "running"
 async def parse_message_chat_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Tuple[Message, Chat, User]:
     response: Dict = parse_message(update, context)
     message: Message = try_get(response, "data")
-    if not successful(response):
+    if not successful(response) or not message:
         return await squawk_error(message, context)
 
     response: Dict = parse_chat(message, context)
     chat: Chat = try_get(response, "data")
-    if not successful(response):
+    if not successful(response) or not chat:
         error_message = try_get(message, "data")
         return await squawk_error(error_message, context)
 
     response: Dict = parse_user(message, context)
     user: User = try_get(response, "data")
-    if not successful(response):
+    if not successful(response) or not user:
         return await squawk_error(user, context)
 
     return (message, chat, user)
@@ -89,9 +89,7 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
     message: Message = try_get(response, "data")
     if not successful(response):
         return await squawk_error(message, context)
-    message_data: Dict = parse_message_data(message)
-    message_text: str = try_get(message_data, "text")
-    message_date: str = try_get(message_data, "date")
+
     response: Dict = parse_chat(message, context)
     chat: Chat = try_get(response, "data")
     if not successful(response):
@@ -159,11 +157,9 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
     #     debug. log(f"{fn} Abbot not started!")
     #     return
 
-    handle: str = abbot.handle
     message_reply = try_get(message, "reply_to_message")
     message_reply_text = try_get(message_reply, "text")
     message_reply_from = try_get(message_reply, "from")
-    replied_to_abbot = try_get(message_reply_from, "username") == handle
     if is_private_chat:
         abbot.update_chat_history(abbot_message)
         bot_debug.log(f"{fn} is private, not group_in_name")
@@ -540,54 +536,47 @@ async def admin_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 @try_except
-async def handle_channel_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    pass
-
-
-@try_except
-async def handle_supergroup_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    pass
-
-
-@try_except
-async def handle_group_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    pass
-
-
-@try_except
 async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    pass
+    message_chat_user: Tuple[Message, Chat, User] = await parse_message_chat_user(update, context)
+    message, chat, user = message_chat_user
+    chat_type: ChatType = chat.type
+    if chat_type != "private":
+        bot_error.log(__name__, f"chat_type not private")
+        return await context.bot.send_message(
+            chat_id=THE_CREATOR, text=f"chat_id={chat.id} chat_type={chat_type} chat_title={chat.title}"
+        )
+    abbot = Abbot(chat.id, "dm")
+    mongo_telegram_message: MongoTelegramMessage = MongoTelegramMessage(TelegramMessage(message)).to_dict()
+    abbot.update_db(mongo_telegram_message)
+    abbot.update_history({"role": "user", "content": message.text})
+    bot_debug.log(f"{__name__} chat_id={chat.id}, {user.username} dms with Abbot")
+    answer = abbot.chat_completion()
+    return await message.reply_text(answer)
+
+
+@try_except
+async def handle_multiperson_chat_message(message: Message, chat: Chat, user: User):
+    abbot = Abbot(chat.id, "channel")
+    mongo_telegram_message: MongoTelegramMessage = MongoTelegramMessage(TelegramMessage(message)).to_dict()
+    abbot.update_db(mongo_telegram_message)
+    abbot.update_history({"role": "user", "content": message.text})
+    bot_debug.log(f"{__name__} chat_id={chat.id}, {user.username} mentioned Abbot")
+    answer = abbot.chat_completion()
+    return await message.reply_text(answer)
 
 
 @try_except
 async def handle_mention(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_chat_user: Tuple[Message, Chat, User] = await parse_message_chat_user(update, context)
     message, chat, user = message_chat_user
-
-    chat_type: ChatType = try_get(chat, "type")
-    if chat_type == "channel":
-        await handle_channel_message()
-    elif chat_type == "supergroup":
-        await handle_supergroup_message()
-    elif chat_type == "group":
-        await handle_group_message()
-    else:
-        await handle_message()
-
-    # message_data: Dict = parse_message_data(message)
-    # message_text: str = try_get(message_data, "text")
-    # message_date: str = try_get(message_data, "date")
-
-    # chat_data: Dict = parse_chat_data(chat)
-    # chat_id: int = try_get(chat_data, "id")
-    # chat_type: str = try_get(chat_data, "type")
-    # chat_title: str = try_get(chat_data, "title", default="private" if is_private_chat else None)
-
-    # is_private_chat: bool = chat_type == "private"
-    # is_group_chat: bool = not is_private_chat
-
-    # user_data: Dict = parse_user_data(user)
-    # user_id: int = try_get(user_data, "user_id")
+    chat_type: ChatType = chat.type
+    valid_chat_types: Tuple[str] = ("channel", "supergroup", "group")
+    if chat_type not in valid_chat_types:
+        bot_error.log(__name__, f"chat_type not in valid_chat_types: {valid_chat_types}")
+        return await context.bot.send_message(
+            chat_id=THE_CREATOR, text=f"chat_id={chat.id} chat_type={chat_type} chat_title={chat.title}"
+        )
+    return await handle_multiperson_chat_message(message, chat, user)
 
 
 @try_except
@@ -604,45 +593,31 @@ class TelegramBotBuilder:
         telegram_bot = ApplicationBuilder().token(self.BOT_TELEGRAM_TOKEN).build()
         bot_debug.log(f"Telegram abbot initialized")
 
-        _unplug_handler = CommandHandler("unplug", admin_unplug)
-        _plugin_handler = CommandHandler("plugin", admin_plugin)
-        _kill_handler = CommandHandler("kill", admin_kill)
-        _nap_handler = CommandHandler("nap", admin_nap)
-        _status_handler = CommandHandler("status", admin_status)
+        # Add command handlers
+        telegram_bot.add_handlers(
+            handlers=[
+                CommandHandler("unplug", admin_unplug),
+                CommandHandler("plugin", admin_plugin),
+                CommandHandler("kill", admin_kill),
+                CommandHandler("nap", admin_nap),
+                CommandHandler("status", admin_status),
+                CommandHandler("help", help),
+                CommandHandler("rules", rules),
+                CommandHandler("start", start),
+                CommandHandler("stop", stop),
+                CommandHandler("unleash", unleash),
+                CommandHandler("leash", leash),
+            ]
+        )
+        # Add message handlers
+        telegram_bot.add_handlers(
+            handlers=[
+                MessageHandler(ChatType.PRIVATE, handle_dm),
+                MessageHandler(Entity(MENTION) & Regex(FULL_TELEGRAM_HANDLE), handle_mention),
+                MessageHandler(ChatType.GROUPS & Entity(REPLY), handle_reply),
+            ]
+        )
 
-        telegram_bot.add_handler(_unplug_handler)
-        telegram_bot.add_handler(_plugin_handler)
-        telegram_bot.add_handler(_kill_handler)
-        telegram_bot.add_handler(_nap_handler)
-        telegram_bot.add_handler(_status_handler)
-
-        help_handler = CommandHandler("help", help)
-        rules_handler = CommandHandler("rules", rules)
-        start_handler = CommandHandler("start", start)
-        stop_handler = CommandHandler("stop", stop)
-        unleash_handler = CommandHandler("unleash", unleash)
-        leash_handler = CommandHandler("leash", leash)
-
-        telegram_bot.add_handler(help_handler)
-        telegram_bot.add_handler(rules_handler)
-        telegram_bot.add_handler(start_handler)
-        telegram_bot.add_handler(stop_handler)
-        telegram_bot.add_handler(unleash_handler)
-        telegram_bot.add_handler(leash_handler)
-
-        # TODO: define different message handlers such as Mention() or Reply() if exists
-        # BaseFilter should run first and do 1 thing: store the message and setup the telegram stuff
-        # Mention, ReplyToBot and Unleash fitlers should reply with a completion
-        dm_handler = MessageHandler(ChatType.PRIVATE, handle_dm)
-        mention_abbot_handler = MessageHandler(Entity(MENTION) & Regex(FULL_TELEGRAM_HANDLE), handle_mention)
-        reply_to_abbot_handler = MessageHandler(Entity(REPLY) & Regex(FULL_TELEGRAM_HANDLE), handle_reply)
-
-        telegram_bot.add_handler(dm_handler)
-        telegram_bot.add_handler(mention_abbot_handler)
-        telegram_bot.add_handler(reply_to_abbot_handler)
-
-        # text_handler = MessageHandler(BaseFilter("BaseFilterText", TEXT), handle_text_message)
-        # telegram_bot.add_handler(text_handler)
         self.telegram_bot = telegram_bot
 
     def run(self):

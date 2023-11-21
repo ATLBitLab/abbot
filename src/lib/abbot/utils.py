@@ -1,3 +1,4 @@
+from typing import Dict
 from random import randrange
 from telegram.ext import ContextTypes
 from telegram import Message, Update, Chat, User
@@ -9,11 +10,9 @@ from constants import THE_CREATOR
 from .exceptions.exception import try_except
 from ..logger import bot_debug, bot_error
 
-BASE_KEYS = ["text", "date"]
-
 
 @try_except
-async def get_chat_admins(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -> dict:
+async def get_chat_admins(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -> Dict:
     fn = f"{get_chat_admins.__name__}:"
     chat_admins = await context.bot.get_chat_administrators(chat_id)
     admin_ids = [try_get(admin, "user", "id") for admin in chat_admins]
@@ -24,7 +23,7 @@ async def get_chat_admins(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -> d
 
 
 @try_except
-def parse_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None | Message:
+def parse_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Dict:
     fn = f"{parse_message.__name__}:"
     message: Message = try_get(update, "message")
     if not message:
@@ -35,23 +34,17 @@ def parse_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None | 
 
 
 @try_except
-def parse_message_data(message: Message, keys: list = None, **kwargs) -> bool | dict:
+def parse_message_data(message: Message) -> Dict:
     fn = f"{parse_message_data.__name__}:"
-    if not keys:
-        keys = BASE_KEYS
-    additional_keys = kwargs.pop("keys", None)
-    if additional_keys:
-        keys = [*keys, *additional_keys]
-    bot_debug.log(f"{fn} keys={keys}")
-    message_data: dict = dict()
-    for key in keys:
-        message_data[key] = try_get(message, key, default="")
+    message_text = try_get(message, "text")
+    message_date = try_get(message, "date")
+    message_data: dict = dict(status="success", text=message_text, date=message_date)
     bot_debug.log(f"{fn} message_data={message_data}")
     return message_data
 
 
 @try_except
-def parse_chat(message: Message, context: ContextTypes.DEFAULT_TYPE) -> None | Chat:
+def parse_chat(message: Message, context: ContextTypes.DEFAULT_TYPE) -> Dict:
     fn = f"{parse_message_data.__name__}:"
     chat: Chat = try_get(message, "chat")
     if not chat:
@@ -62,7 +55,7 @@ def parse_chat(message: Message, context: ContextTypes.DEFAULT_TYPE) -> None | C
 
 
 @try_except
-def parse_chat_data(chat: Chat) -> bool | dict:
+def parse_chat_data(chat: Chat) -> Dict:
     fn = f"{parse_chat_data.__name__}:"
     chat_id: int = try_get(chat, "id")
     chat_title: str = try_get(chat, "title")
@@ -73,7 +66,7 @@ def parse_chat_data(chat: Chat) -> bool | dict:
 
 
 @try_except
-def parse_user(message: Message, context: ContextTypes.DEFAULT_TYPE) -> None | User:
+def parse_user(message: Message, context: ContextTypes.DEFAULT_TYPE) -> Dict:
     fn = f"{parse_user.__name__}:"
     user: User = try_get(message, "from_user")
     if not user:
@@ -84,7 +77,7 @@ def parse_user(message: Message, context: ContextTypes.DEFAULT_TYPE) -> None | U
 
 
 @try_except
-def parse_user_data(user: User) -> bool | dict:
+def parse_user_data(user: User) -> Dict:
     fn = f"{parse_user_data.__name__}:"
     user_id: int = try_get(user, "id")
     username: int = try_get(user, "username")
@@ -94,7 +87,7 @@ def parse_user_data(user: User) -> bool | dict:
 
 
 @try_except
-async def squawk_error(error_message: str, context: ContextTypes.DEFAULT_TYPE):
+async def squawk_error(error_message: str, context: ContextTypes.DEFAULT_TYPE) -> Message:
     fn = f"{squawk_error.__name__}:"
     bot_error.log(f"{fn} {error_message}")
     return await context.bot.send_message(chat_id=THE_CREATOR, text=error_message)

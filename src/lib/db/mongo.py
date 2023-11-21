@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from cli_args import TEST_MODE, DEV_MODE
+from cli_args import TELEGRAM_MODE, TEST_MODE, DEV_MODE
 from typing import Dict, List, Optional
 
 from nostr_sdk import PublicKey, EventId, Event
@@ -21,14 +21,14 @@ client = MongoClient(host=DATABASE_CONNECTION_STRING)
 
 nostr_db_name = "test_nostr" if TEST_MODE else "nostr"
 db_nostr = client.get_database(nostr_db_name)
-nostr_channels = db_nostr.get_collection("channels")
-bot_channel_invites = db_nostr.get_collection("channel_invites")
-nostr_dms = db_nostr.get_collection("dms")
+nostr_channels = db_nostr.get_collection("channel")
+bot_channel_invites = db_nostr.get_collection("channel_invite")
+nostr_dms = db_nostr.get_collection("dm")
 
 telegram_db_name = "test_telegram" if TEST_MODE else "telegram"
 db_telegram = client.get_database(telegram_db_name)
-telegram_channels = db_telegram.get_collection("channels")
-telegram_dms = db_telegram.get_collection("dms")
+telegram_channels = db_telegram.get_collection("channel")
+telegram_dms = db_telegram.get_collection("dm")
 
 
 @to_dict
@@ -126,14 +126,12 @@ class MongoTelegram:
 class MongoAbbot(MongoNostr, MongoTelegram):
     def __init__(self, db_name):
         self.db_name = db_name
-        self.channels: Collection[_DocumentType] | None = None
-        self.dms: Collection[_DocumentType] | None = None
         if db_name == "telegram":
-            self.channels = telegram_channels
-            self.dms = telegram_dms
+            self.channels: Collection[_DocumentType] = telegram_channels
+            self.dms: Collection[_DocumentType] = telegram_dms
         elif db_name == "nostr":
-            self.channels = nostr_channels
-            self.dms = nostr_dms
+            self.channels: Collection[_DocumentType] = nostr_channels
+            self.dms: Collection[_DocumentType] = nostr_dms
 
     @abstractmethod
     def to_dict(self):
@@ -158,30 +156,44 @@ class MongoAbbot(MongoNostr, MongoTelegram):
 
     # read documents
     @try_except
-    def find_channels(self, filter: {}) -> List[MongoNostrEvent | MongoTelegramMessage]:
-        return [MongoNostrEvent(channel) for channel in self.channels.find(filter)]
+    def find_channels(self, filter: {}) -> List[Optional[_DocumentType]]:
+        return [channel for channel in self.channels.find(filter)]
 
     @try_except
     def find_channels_cursor(self, filter: {}) -> Cursor:
         return self.channels.find(filter)
 
     @try_except
-    def find_one_channel(self, filter: {}) -> MongoNostrEvent:
-        return MongoNostrEvent(self.channels.find_one(filter))
+    def find_one_channel(self, filter: {}) -> Optional[_DocumentType]:
+        return self.channels.find_one(filter)
 
     @try_except
     def find_one_dm(self, filter: {}) -> Optional[_DocumentType]:
         return self.dms.find_one(filter)
 
     @try_except
-    def find_dms(self, filter: {}) -> List[MongoNostrEvent]:
-        return [MongoNostrEvent(dm) for dm in self.dms.find(filter)]
+    def find_dms(self, filter: {}) -> List[Optional[_DocumentType]]:
+        return [dm for dm in self.dms.find(filter)]
 
     @try_except
     def find_dms_cursor(self, filter: {}) -> Cursor:
         return self.dms.find(filter)
 
     # update docs
+    @try_except
+    def update_one(self, collection: str, filter: {}, update: Dict, upsert: bool = True) -> UpdateResult:
+        if collection == "dm":
+            return self.update_one_dm(filter, update, upsert)
+        else:
+            return self.update_one_channel(filter, update, upsert)
+
+    @try_except
+    def update_one_history(self, collection: str, filter: {}, update: Dict, upsert: bool = True) -> UpdateResult:
+        if collection == "dm":
+            return self.dms.update_one(filter, {"$push": {"history": update}}, upsert)
+        else:
+            return self.channels.update_one(filter, {"$push": {"history": update}}, upsert)
+
     @try_except
     def update_one_channel(self, filter: {}, update: Dict, upsert: bool = True) -> UpdateResult:
         return self.channels.update_one(filter, {"$set": {**update}}, upsert)
@@ -197,3 +209,7 @@ class MongoAbbot(MongoNostr, MongoTelegram):
         if channel_doc == None:
             return error("Channel does not exist")
         return channel_doc
+
+
+db_name = "telegram" if TELEGRAM_MODE else "nostr"
+mongo_abbot = MongoAbbot(db_name)

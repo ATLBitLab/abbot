@@ -1,31 +1,24 @@
-from ast import Dict
 import time
 import openai
 import tiktoken
 
-from typing import List
 from abc import abstractmethod
-
-from lib.db.utils import successful_update_one
-
-from ..utils import error, to_dict, try_get
-from lib.abbot.config import BOT_CORE_SYSTEM
-from lib.db.mongo import (
-    GroupConfig,
-    MongoNostr,
-    UpdateResult,
-    nostr_dms,
-    nostr_channels,
-)
-
-from lib.logger import bot_debug, bot_error
-from lib.abbot.exceptions.exception import try_except
+from bson.typings import _DocumentType
+from typing import List, Optional, Dict
 
 from constants import OPENAI_MODEL
-from lib.abbot.env import OPENAI_API_KEY
+
+from ..db.utils import successful_update_one
+from ..utils import error, success, to_dict, try_get
+from ..abbot.config import BOT_CORE_SYSTEM
+from ..db.mongo import GroupConfig, UpdateResult, mongo_abbot
+
+from ..logger import bot_debug, bot_error
+from ..abbot.exceptions.exception import try_except
+
+from ..abbot.env import OPENAI_API_KEY
 
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
-mongo_nostr = MongoNostr()
 
 
 @to_dict
@@ -35,28 +28,13 @@ class Abbot(GroupConfig):
         self.model: str = OPENAI_MODEL
         self.id: str = id
         self.bot_type: str = bot_type
-        self.channel_or_dm: Dict = self.determine_and_set_channel_or_dm()
-        self.history: List = [{"role": "system", "content": BOT_CORE_SYSTEM}, *self.channel_or_dm.get("history", None)]
+        self.context: Dict = self.set_context()
+        self.history: List = [{"role": "system", "content": BOT_CORE_SYSTEM}, *self.context.get("history", None)]
         if self.history == None:
-            raise Exception(f"self.history is none {self.channel_or_dm}")
-        self.history_len = len(self.history)
-        self.history_tokens = self.calculate_history_tokens()
+            raise Exception(f"self.history is none = {self.context}")
+        self.history_len: int = len(self.history)
+        self.history_tokens: int = self.calculate_history_tokens()
         self.config: GroupConfig = GroupConfig()
-
-    def determine_and_set_channel_or_dm(self):
-        if self.bot_type == "dm":
-            channel_or_dm = mongo_nostr.find_one_dm({"id": self.id})
-        else:
-            channel_or_dm = mongo_nostr.find_one_channel({"id": self.id})
-        if not channel_or_dm:
-            raise Exception("not channel_or_dm")
-
-    def calculate_history_tokens(self) -> int:
-        total = 0
-        for data in self.history:
-            content = try_get(data, "content")
-            total += self.calculate_tokens(content)
-        return total
 
     def __str__(self) -> str:
         return self.__str__()
@@ -69,20 +47,18 @@ class Abbot(GroupConfig):
         pass
 
     @try_except
-    def determine_and_set_channel_or_dm(self):
+    def set_context(self) -> Optional[_DocumentType]:
         if self.bot_type == "dm":
-            channel_or_dm = mongo_nostr.find_one_dm({"id": self.id})
+            return mongo_abbot.find_one_dm({"id": self.id})
         else:
-            channel_or_dm = mongo_nostr.find_one_channel({"id": self.id})
-        if not channel_or_dm:
-            raise Exception("not channel_or_dm")
+            return mongo_abbot.find_one_channel({"id": self.id})
 
     @try_except
-    def get_config(self) -> dict:
+    def get_config(self) -> Dict:
         return self.config.to_dict()
 
     @try_except
-    def update_config(self, new_config: dict):
+    def update_config(self, new_config: Dict):
         self.config.update_config(new_config)
 
     @try_except
@@ -152,15 +128,15 @@ class Abbot(GroupConfig):
         return self.history
 
     @try_except
-    def get_messages(self) -> list:
-        return self.channel_or_dm["messages"]
+    def get_messages(self) -> List:
+        return self.context.get("messages", None)
 
     @try_except
     def tokenize(self, content: str) -> list:
         return encoding.encode(content)
 
     @try_except
-    def calculate_tokens(self, content: str | dict) -> int:
+    def calculate_tokens(self, content: str) -> int:
         return len(self.tokenize(content))
 
     @try_except
@@ -172,20 +148,30 @@ class Abbot(GroupConfig):
         return total
 
     @try_except
-    def update_history(self, history_message: dict) -> None:
-        if not history_message:
-            return
-        self.history.append(history_message)
-        result: UpdateResult = mongo_nostr.update_one_channel({"id": self.id}, {"$push": {"history": history_message}})
+    def update_db(self, update: Dict) -> Dict | UpdateResult:
+        result: UpdateResult = mongo_abbot.update_one(self.bot_type, {"id": self.id}, update)
         if not successful_update_one(result):
-            bot_error.log(f"update_history failed: {history_message}")
-            return error("update_history => update_one_channel failed")
-        self.history_len += 1
-        self.history_tokens += len(self.tokenize(try_get(history_message, "content")))
-        return self.history_tokens
+            bot_error.log(f"update_db failed: {update}")
+            return error("update_db => update_one_channel failed")
+        return success(try_get(result, "upserted_id"))
 
     @try_except
-    def chat_completion(self) -> str | None:
+    def update_history(self, update: Dict[str, str]) -> int:
+        if not update:
+            return
+        self.history.append(update)
+        result: UpdateResult = mongo_abbot.update_one_history(
+            self.bot_type, {"id": self.id}, {"$push": {"history": update}}
+        )
+        if not successful_update_one(result):
+            bot_error.log(f"update_history failed: {update}")
+            return error("update_history => update_one_channel failed")
+        self.history_len += 1
+        self.history_tokens += len(self.tokenize(try_get(update, "content")))
+        return success(try_get(result, "upserted_id"))
+
+    @try_except
+    def chat_completion(self) -> str:
         response = openai.ChatCompletion.create(
             model=self.model,
             messages=self.history,
