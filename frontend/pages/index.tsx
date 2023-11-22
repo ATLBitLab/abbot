@@ -143,6 +143,7 @@ export default function Abbot() {
             <PlatformButtons
               onNostrClick={handleNostrClick}
               onTelegramClick={handleTelegramClick}
+              platform={platform}
             />
             {platform && (
               <ChannelInteraction
@@ -187,22 +188,26 @@ export default function Abbot() {
   );
 }
 
-function PlatformButtons({ onNostrClick, onTelegramClick }) {
+function PlatformButtons({ onNostrClick, onTelegramClick, platform }) {
   return (
     <Row className="w-full">
       <Button
-        className="w-full border-[#08252E] border-2 mr-1"
+        className={`w-full border-[#08252E] border-2 ${
+          platform === "nostr" ? "bg-[#08252E] text-white" : ""
+        }`}
         type="button"
         onClick={onNostrClick}
       >
-        Nostr 🟣
+        Use Nostr 🟣
       </Button>
       <Button
-        className="w-full border-[#08252E] border-2 ml-1"
+        className={`w-full border-[#08252E] border-2 ml-1 ${
+          platform === "telegram" ? "bg-[#08252E] text-white" : ""
+        }`}
         type="button"
         onClick={onTelegramClick}
       >
-        Telegram 🤖
+        Use Telegram 🤖
       </Button>
     </Row>
   );
@@ -241,7 +246,9 @@ function ChannelInteraction({
           {isTelegram ? "DM 🤖" : "DM 🟣"}
         </Button>
         <Button
-          className="w-full border-[#08252E] border-2 ml-1"
+          className={`w-full border-[#08252E] border-2 mr-1 ${
+            channelMode ? "bg-[#08252E] text-white" : ""
+          }`}
           type="button"
           onClick={handleChannelClick}
         >
@@ -254,34 +261,57 @@ function ChannelInteraction({
           setChannelId={setChannelId}
           loading={loading}
           handleFormSubmit={handleFormSubmit}
+          isTelegram={isTelegram}
         />
       )}
     </>
   );
 }
 
-function ChannelForm({ channelId, setChannelId, loading, handleFormSubmit }) {
+function ChannelForm({
+  chatId,
+  setChatId,
+  channelId,
+  setChannelId,
+  loading,
+  handleFormSubmit,
+  isTelegram,
+}) {
   return (
     <Row className="w-full">
       <form
         className="w-full flex justify-between items-center"
         onSubmit={handleFormSubmit}
       >
-        <input
-          type="text"
-          placeholder="Enter your channel ID"
-          pattern="[a-f0-9]{64}"
-          title="Channel ID should be 64 lowercase hex characters"
-          className="border-2 border-[#08252E] px-2 text-black flex-grow"
-          value={channelId}
-          onChange={(e) => setChannelId(e.target.value)}
-          required
-        />
+        {isTelegram ? (
+          <input
+            type="text"
+            placeholder="Enter your chat ID"
+            pattern="\\d+"
+            title="Chat ID should be a number"
+            className="border-2 border-[#08252E] px-2 text-black flex-grow"
+            value={chatId}
+            onChange={(e) => setChatId(e.target.value)}
+            required
+          />
+        ) : (
+          <input
+            type="text"
+            placeholder="Enter your channel ID"
+            pattern="[a-f0-9]{64}"
+            title="Channel ID should be 64 lowercase hex characters"
+            className="border-2 border-[#08252E] px-2 text-black flex-grow"
+            value={channelId}
+            onChange={(e) => setChannelId(e.target.value)}
+            required
+          />
+        )}
         <button
           type="submit"
           className="border-2 border-[#08252E] px-8 bg-[#08252E] text-white ml-2"
+          disabled={loading}
         >
-          Join
+          {loading ? "Loading..." : "Join"}
         </button>
       </form>
     </Row>
