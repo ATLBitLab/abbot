@@ -176,7 +176,7 @@ export default function Abbot() {
               <Button
                 className="w-full border-[#08252E] border-2 mr-1"
                 type="button"
-                onClick={() => router.push("/help")} // Placeholder routing for Abbot Onboarding
+                onClick={() => router.push("/help")}
               >
                 Abbot Help 🚀
               </Button>
@@ -286,7 +286,7 @@ function ChannelForm({
         {isTelegram ? (
           <input
             type="text"
-            placeholder="Enter your chat ID"
+            placeholder="Enter your Telegram chat ID"
             pattern="\\d+"
             title="Chat ID should be a number"
             className="border-2 border-[#08252E] px-2 text-black flex-grow"
@@ -297,7 +297,7 @@ function ChannelForm({
         ) : (
           <input
             type="text"
-            placeholder="Enter your channel ID"
+            placeholder="Enter your NOSTR channel ID"
             pattern="[a-f0-9]{64}"
             title="Channel ID should be 64 lowercase hex characters"
             className="border-2 border-[#08252E] px-2 text-black flex-grow"
