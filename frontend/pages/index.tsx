@@ -13,6 +13,7 @@ export default function Abbot() {
   const [platform, setPlatform] = useState(null); // 'nostr' or 'telegram'
   const [channelMode, setChannelMode] = useState(false); // true when a channel button is clicked
 
+  // Function to send NOSTR channel invite
   const sendInvite = async (channelId: string) => {
     try {
       const response = await fetch("/api/sendInvite", {
