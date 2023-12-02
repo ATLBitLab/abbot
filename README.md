@@ -36,7 +36,7 @@ Check out our [project board](https://github.com/orgs/ATLBitLab/projects/1) and 
 git clone https://github.com/ATLBitLab/abbot.git && cd abbot
 ```
 
-2. Copy sample env file into `lib/`
+2. Copy sample env file into `src/`
 ```
 cp .env.sample src/.env
 ```
