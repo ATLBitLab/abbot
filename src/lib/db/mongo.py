@@ -211,3 +211,92 @@ class MongoTelegramMessage(TelegramMessage, GroupConfig):
 class MongoTelegram:
     def __init__(self):
         pass
+
+# MongoAbbot is a combo of MongoNostr and MongoTelegram
+@to_dict
+class MongoAbbot:
+    def __init__(self):
+        pass
+
+    @abstractmethod
+    def to_dict(self):
+        pass
+
+    # create docs
+    @try_except
+    def insert_one_channel(self, channel: Dict) -> InsertOneResult:
+        return nostr_channels.insert_one(channel)
+
+    @try_except
+    def insert_many_channels(self, channels: List[Dict]) -> InsertManyResult:
+        return nostr_channels.insert_many(channels)
+
+    @try_except
+    def insert_one_dm(self, direct_message: Dict) -> InsertOneResult:
+        return nostr_dms.insert_one(direct_message)
+
+    @try_except
+    def insert_many_dms(self, direct_messages: List[Dict]) -> InsertManyResult:
+        return nostr_dms.insert_many(direct_messages)
+
+    # read documents
+    @try_except
+    def find_channels(self, filter: {}) -> List[MongoNostrEvent]:
+        return [MongoNostrEvent(channel) for channel in nostr_channels.find(filter)]
+
+    @try_except
+    def find_channels_cursor(self, filter: {}) -> Cursor:
+        return nostr_channels.find(filter)
+
+    @try_except
+    def find_one_channel(self, filter: {}) -> MongoNostrEvent:
+        return MongoNostrEvent(nostr_channels.find_one(filter))
+
+    @try_except
+    def find_one_dm(self, filter: {}) -> Optional[_DocumentType]:
+        return nostr_dms.find_one(filter)
+
+    @try_except
+    def find_dms(self, filter: {}) -> List[MongoNostrEvent]:
+        return [MongoNostrEvent(dm) for dm in nostr_dms.find(filter)]
+
+    @try_except
+    def find_dms_cursor(self, filter: {}) -> Cursor:
+        return nostr_dms.find(filter)
+
+    # update docs
+    @try_except
+    def update_one_channel(self, filter: {}, update: Dict, upsert: bool = True) -> UpdateResult:
+        return nostr_channels.update_one(filter, {"$set": {**update}}, upsert)
+
+    @try_except
+    def update_one_dm(self, filter: {}, update: Dict, upsert: bool = True) -> UpdateResult:
+        return nostr_dms.update_one(filter, {"$set": {**update}}, upsert)
+
+    # custom reads
+    @try_except
+    def get_group_config(self, id: str) -> Optional[_DocumentType]:
+        channel_doc = self.find_one_channel({"id": id})
+        if channel_doc == None:
+            return error("Channel does not exist")
+        return channel_doc
+
+    @try_except
+    def known_channels(self) -> List[MongoNostrEvent]:
+        return [MongoNostrEvent(channel) for channel in nostr_channels.find()]
+
+    @try_except
+    def known_channel_ids(self) -> List[EventId]:
+        return [channel.id() for channel in self.known_channels()]
+
+    @try_except
+    def known_channel_invite_authors(self) -> List[PublicKey]:
+        return [channel.pubkey() for channel in self.known_channels()]
+
+    @try_except
+    def known_dms(self) -> List[MongoNostrEvent]:
+        return [MongoNostrEvent(dm) for dm in nostr_dms.find()]
+
+    @try_except
+    def known_dm_pubkeys(self) -> List[PublicKey]:
+        return [MongoNostrEvent(dm).pubkey() for dm in nostr_dms.find()]
