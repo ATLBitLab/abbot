@@ -13,7 +13,14 @@ from telegram.ext import (
     CommandHandler,
     MessageHandler,
 )
-from telegram.ext.filters import ChatType, Regex, Entity, REPLY
+from telegram.ext.filters import ChatType, StatusUpdate, Regex, Entity, REPLY
+
+MENTION = MessageEntityType.MENTION
+NEW_CHAT_MEMBERS = StatusUpdate(StatusUpdate.NEW_CHAT_MEMBERS)
+CHAT_CREATED = StatusUpdate(StatusUpdate.CHAT_CREATED)
+GROUPS = ChatType.GROUPS
+PRIVATE = ChatType.PRIVATE
+ENTITY_REPLY = Entity(REPLY)
 
 # local
 from constants import HELP_MENU, THE_CREATOR
@@ -36,18 +43,26 @@ from ..abbot.utils import (
 from ..admin.admin_service import AdminService
 
 FULL_TELEGRAM_HANDLE = f"@{BOT_TELEGRAM_HANDLE}"
-MENTION = MessageEntityType.MENTION
-ENTITY_REPLY = Entity(REPLY)
 
 RAW_MESSAGE_JL_FILE = abspath("src/data/raw_messages.jsonl")
 MATRIX_IMG_FILEPATH = abspath("src/assets/unplugging_matrix.jpg")
 
 admin = AdminService(THE_CREATOR, THE_CREATOR)
 admin.status = "running"
+INTRODUCTION = """
+Hey! The name's Abbot but you can think of me as your go-to guide for all things Bitcoin.
+AKA the virtual Bitcoin whisperer. 😉
+Here's the lowdown on how to get my attention:
+1. Slap an @ before your message in the group chat - I'll come running to answer.
+2. Feel more comfortable replying directly to my messages? Go ahead! I'm all ears.. err.. code.
+3. Fancy a one-on-one chat? Slide into my DMs.
+Now, enough with the rules! Let's dive into the world of Bitcoin together!
+Ready. Set. Stack Sats! 🚀
+"""
 
 
 @try_except
-async def parse_message_chat_user(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Tuple[Message, Chat, User]:
+async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Tuple[Message, Chat, User]:
     response: Dict = parse_message(update, context)
     message: Message = try_get(response, "data")
     if not successful(response) or not message:
@@ -528,8 +543,8 @@ async def admin_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 @try_except
 async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    message_chat_user: Tuple[Message, Chat, User] = await parse_message_chat_user(update, context)
-    message, chat, user = message_chat_user
+    update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
+    message, chat, user = update_data
     chat_type: ChatType = chat.type
     if chat_type != "private":
         bot_error.log(__name__, f"chat_type not private")
@@ -572,9 +587,9 @@ async def handle_multiperson_chat_message(message: Message, chat: Chat, user: Us
 
 
 @try_except
-async def handle_mention(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    message_chat_user: Tuple[Message, Chat, User] = await parse_message_chat_user(update, context)
-    message, chat, user = message_chat_user
+async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
+    message, chat, user = update_data
     chat_type: ChatType = chat.type
     valid_chat_types: Tuple[str] = ("channel", "supergroup", "group")
     if chat_type not in valid_chat_types:
@@ -586,9 +601,19 @@ async def handle_mention(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 @try_except
-async def handle_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.reply_to_message and update.message.reply_to_message.from_user.username == BOT_TELEGRAM_HANDLE:
         pass
+
+
+@try_except
+async def handle_new_member_or_chat(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
+    message, _, _ = update_data
+    for member in message.new_chat_members:
+        if member.username != BOT_TELEGRAM_HANDLE:
+            continue
+        return await message.reply_text("")
 
 
 class TelegramBotBuilder:
@@ -618,9 +643,13 @@ class TelegramBotBuilder:
         # Add message handlers
         telegram_bot.add_handlers(
             handlers=[
-                MessageHandler(ChatType.PRIVATE, handle_dm),
-                MessageHandler(Entity(MENTION) & Regex(FULL_TELEGRAM_HANDLE), handle_mention),
-                MessageHandler(ChatType.GROUPS & ENTITY_REPLY, handle_reply),
+                MessageHandler(PRIVATE, handle_dm),
+                MessageHandler(
+                    GROUPS & (NEW_CHAT_MEMBERS | CHAT_CREATED),
+                    handle_new_member_or_chat,
+                ),
+                MessageHandler(GROUPS & Entity(MENTION) & Regex(FULL_TELEGRAM_HANDLE), handle_group_mention),
+                MessageHandler(GROUPS & Entity(REPLY), handle_group_reply),
             ]
         )
 
