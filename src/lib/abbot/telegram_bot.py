@@ -16,8 +16,8 @@ from telegram.ext import (
 from telegram.ext.filters import ChatType, StatusUpdate, Regex, Entity, REPLY
 
 MENTION = MessageEntityType.MENTION
-NEW_CHAT_MEMBERS = StatusUpdate(StatusUpdate.NEW_CHAT_MEMBERS)
-CHAT_CREATED = StatusUpdate(StatusUpdate.CHAT_CREATED)
+NEW_CHAT_MEMBERS = StatusUpdate.NEW_CHAT_MEMBERS
+CHAT_CREATED = StatusUpdate.CHAT_CREATED
 GROUPS = ChatType.GROUPS
 PRIVATE = ChatType.PRIVATE
 ENTITY_REPLY = Entity(REPLY)
@@ -26,7 +26,7 @@ ENTITY_REPLY = Entity(REPLY)
 from constants import HELP_MENU, THE_CREATOR
 from ..logger import bot_debug, bot_error
 from ..utils import sender_is_group_admin, try_get, successful
-from ..db.utils import successful_insert_one
+from ..db.utils import successful_insert_one, successful_update_one
 from ..db.mongo import MongoTelegramDocument, mongo_abbot
 from ..abbot.core import Abbot
 from ..abbot.exceptions.exception import try_except
@@ -545,6 +545,7 @@ async def admin_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
     update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
     message, chat, user = update_data
+    mongo_dm_filter = {"id": chat.id}
     chat_type: ChatType = chat.type
     if chat_type != "private":
         bot_error.log(__name__, f"chat_type not private")
@@ -552,21 +553,27 @@ async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=THE_CREATOR, text=f"chat_id={chat.id} chat_type={chat_type} chat_title={chat.title}"
         )
     tg_doc: MongoTelegramDocument = MongoTelegramDocument(message=message)
-    bot_debug.log("tg_doc", tg_doc)
     tg_doc_dict = tg_doc.to_dict()
-    bot_debug.log("tg_doc_dict", tg_doc_dict)
-    dm = mongo_abbot.find_one_dm({"id": chat.id})
-    bot_debug.log("dm", dm)
-    if not dm:
+    bot_debug.log(__name__, f"telegram_bot => handle_dm => tg_doc={tg_doc}")
+    bot_debug.log(__name__, f"telegram_bot => handle_dm => tg_doc_dict={tg_doc_dict}")
+
+    tg_dm = mongo_abbot.find_one_dm_and_update(
+        mongo_dm_filter,
+        {"$push": {"messages": message.to_dict(), "history": {"role": "user", "content": message.text}}},
+    )
+    if not tg_dm:
         insert = mongo_abbot.insert_one_dm(tg_doc_dict)
         if not successful_insert_one(insert):
-            bot_error.log("insert failed", insert)
-        bot_debug.log("insert", insert)
-    # abbot = Abbot(chat.id, "dm")
-    # abbot.update_history({"role": "user", "content": message.text})
-    # bot_debug.log(f"{__name__} chat_id={chat.id}, {user.username} dms with Abbot")
-    # answer = abbot.chat_completion()
-    return await message.reply_text("answer")
+            bot_error.log(__name__, f"telegram_bot => handle_dm => insert failed={insert}")
+        bot_debug.log(__name__, f"telegram_bot => handle_dm => insert={insert}")
+        tg_dm = mongo_abbot.find_one_dm(mongo_dm_filter)
+    bot_debug.log(__name__, f"telegram_bot => handle_dm => tg_dm={tg_dm}")
+    abbot = Abbot(chat.id, "dm", tg_dm)
+    # bot_debug.log(__name__, f"telegram_bot => handle_dm => abbot={abbot.to_dict()}")
+    abbot.update_history({"role": "user", "content": message.text})
+    bot_debug.log(__name__, f"chat_id={chat.id}, {user.username} dms with Abbot")
+    answer = abbot.chat_completion()
+    return await message.reply_text(answer)
 
 
 @try_except
