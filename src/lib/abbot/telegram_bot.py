@@ -1,10 +1,10 @@
 # core
-from datetime import datetime
 import json
+import uuid
 from io import open
 from os.path import abspath
+from datetime import datetime
 from typing import Dict, List, Optional, Tuple
-import IPython
 
 # packages
 from telegram import ChatMember, Update, Message, Chat, User
@@ -17,6 +17,8 @@ from telegram.ext import (
 )
 from telegram.ext.filters import ChatType, StatusUpdate, Regex, Entity, REPLY
 
+from lib.payments import Strike, init_payment_processor
+
 MENTION = MessageEntityType.MENTION
 CHAT_CREATED = StatusUpdate.CHAT_CREATED
 GROUPS = ChatType.GROUPS
@@ -26,7 +28,7 @@ ENTITY_REPLY = Entity(REPLY)
 # local
 from constants import HELP_MENU, INTRODUCTION, THE_CREATOR
 from ..logger import bot_debug, bot_error
-from ..utils import error, sender_is_group_admin, success, try_get, successful
+from ..utils import error, qr_code, sender_is_group_admin, success, try_get, successful
 from ..db.utils import successful_insert_one, successful_update_one
 from ..db.mongo import GroupConfig, TelegramDocument, TelegramGroupDocument, mongo_abbot
 from ..abbot.core import Abbot
@@ -270,6 +272,24 @@ async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"I have been unleashed! I will now respond every {count} messages until"
         "you run /leash or /unleash <insert_new_number> (e.g. /unleash 10)"
     )
+
+
+async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
+    message, chat, _ = update_data
+    message_text: str = message.text
+    args = message_text.split()
+    if args[0] != "/fund":
+        return error()
+    amount: int = int(args[1])
+    strike: Strike = init_payment_processor()
+    description = f"Account topup for {chat.title}"
+    response = strike.get_invoice(str(uuid.uuid1()), description, amount)
+    invoice = try_get(response, "lnInvoice")
+    if not invoice:
+        return error()
+    await message.reply_photo(qr_code(invoice), caption=description)
+    await message.reply_markdown_v2(invoice)
 
 
 async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -555,9 +575,9 @@ async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def handle_group_chat_update(message: Message, chat: Chat, user: User):
-    bot_debug.log("group_doc_exists", group_doc_exists)
-    tg_doc_dict = tg_doc.to_dict()
-    bot_debug.log("tg_doc_dict", tg_doc_dict)
+    # bot_debug.log("group_doc_exists", group_doc_exists)
+    # tg_doc_dict = tg_doc.to_dict()
+    bot_debug.log("tg_doc_dict", "tg_doc_dict")
     channel = mongo_abbot.find_one_channel({"id": chat.id})
     bot_debug.log("channel", channel)
     if not channel:
@@ -661,6 +681,7 @@ class TelegramBotBuilder:
                 CommandHandler("stop", stop),
                 CommandHandler("unleash", unleash),
                 CommandHandler("leash", leash),
+                CommandHandler("fund", fund),
             ]
         )
         # Add message handlers

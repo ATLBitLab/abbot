@@ -1,7 +1,8 @@
 from cli_args import DEV_MODE, TEST_MODE, TELEGRAM_MODE, NOSTR_MODE
 from lib.abbot.exceptions.exception import AbbotException
 from lib.logger import bot_debug
-from lib.abbot.nostr_bot import NostrBotBuilder
+
+# from lib.abbot.nostr_bot import NostrBotBuilder
 from lib.abbot.telegram_bot import TelegramBotBuilder
 
 if __name__ == "__main__":
@@ -13,10 +14,10 @@ if __name__ == "__main__":
         elif TELEGRAM_MODE:
             telegram_abbot: TelegramBotBuilder = TelegramBotBuilder()
             telegram_abbot.run()
-        elif NOSTR_MODE:
-            nostr_abbot: NostrBotBuilder = NostrBotBuilder()
-            nostr_abbot.add_relays_connect_and_start_client()
-            nostr_abbot.run()
+        # elif NOSTR_MODE:
+        #     nostr_abbot: NostrBotBuilder = NostrBotBuilder()
+        #     nostr_abbot.add_relays_connect_and_start_client()
+        #     nostr_abbot.run()
         else:
             raise AbbotException("Must specify platform: python src/main.py [--telegram | --nostr] [--dev | --test]")
     except KeyboardInterrupt:

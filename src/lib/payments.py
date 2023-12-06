@@ -46,7 +46,7 @@ class Strike(Processor):
 
     def __init__(self, api_key):
         super().__init__()
-        assert (api_key is not None, "a Strike API key must be supplied")
+        assert api_key is not None, "a Strike API key must be supplied"
         self._client = httpx.AsyncClient(
             base_url="https://api.strike.me/v1",
             headers={
@@ -56,13 +56,13 @@ class Strike(Processor):
             },
         )
 
-    async def get_invoice(self, correlation_id, description):
+    async def get_invoice(self, correlation_id, description, amount):
         invoice_resp = await self._client.post(
             "/invoices",
             json={
                 "correlationId": correlation_id,
                 "description": description,
-                "amount": {"amount": "1.00", "currency": "USD"},
+                "amount": {"amount": amount, "currency": "USD"},
             },
         )
         invoice_id = try_get(invoice_resp, "invoiceId")
@@ -91,8 +91,8 @@ class LNbits(Processor):
 
     def __init__(self, base_url, api_key):
         super().__init__()
-        assert (base_url is not None, "an LNbits base URL must be supplied")
-        assert (api_key is not None, "an LNbits API key must be supplied")
+        assert base_url is not None, "an LNbits base URL must be supplied"
+        assert api_key is not None, "an LNbits API key must be supplied"
         self._client = httpx.AsyncClient(
             base_url=f"{base_url}/api/v1",
             headers={
@@ -140,10 +140,7 @@ class OpenNode(Processor):
 
     def __init__(self, api_key):
         super().__init__()
-        assert (
-            api_key is not None,
-            "an OpenNode API key with invoice permissions must be supplied",
-        )
+        assert api_key is not None, "an OpenNode API key with invoice permissions must be supplied"
         self._client = httpx.AsyncClient(
             base_url="https://api.opennode.com",
             headers={

@@ -12,7 +12,7 @@ from constants import OPENAI_MODEL
 from ..db.utils import successful_update_one
 from ..utils import error, success, successful, to_dict, try_get
 from ..abbot.config import BOT_CORE_SYSTEM
-from ..db.mongo import GroupConfig, MongoTelegramDocument, UpdateResult, mongo_abbot
+from ..db.mongo import GroupConfig, UpdateResult, mongo_abbot
 
 from ..logger import bot_debug, bot_error
 from ..abbot.exceptions.exception import try_except
