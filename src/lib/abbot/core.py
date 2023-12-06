@@ -17,8 +17,6 @@ from ..db.mongo import GroupConfig, UpdateResult, mongo_abbot
 from ..logger import bot_debug, bot_error
 from ..abbot.exceptions.exception import try_except
 
-from ..abbot.env import OPENAI_API_KEY
-
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
 
 
