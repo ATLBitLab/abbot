@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from datetime import datetime
 from cli_args import TELEGRAM_MODE, TEST_MODE, DEV_MODE
 from typing import Dict, List, Optional
 
@@ -19,13 +20,21 @@ from lib.abbot.exceptions.exception import try_except
 
 client = MongoClient(host=DATABASE_CONNECTION_STRING)
 
-nostr_db_name = "test_nostr" if TEST_MODE else "nostr"
+if TEST_MODE:
+    telegram_db_name = "test_telegram"
+    nostr_db_name = "test_nostr"
+elif DEV_MODE:
+    telegram_db_name = "dev_telegram"
+    nostr_db_name = "dev_nostr"
+else:
+    telegram_db_name = "telegram"
+    nostr_db_name = "nostr"
+
 db_nostr = client.get_database(nostr_db_name)
 nostr_channels = db_nostr.get_collection("channel")
 bot_channel_invites = db_nostr.get_collection("channel_invite")
 nostr_dms = db_nostr.get_collection("dm")
 
-telegram_db_name = "test_telegram" if TEST_MODE else "telegram"
 db_telegram = client.get_database(telegram_db_name)
 telegram_channels = db_telegram.get_collection("channel")
 telegram_dms = db_telegram.get_collection("dm")
@@ -69,21 +78,26 @@ class MongoNostrEvent(NostrEvent, GroupConfig):
 
 
 # ====== Telegram Types ======
-class TelegramMessage(Message):
+@to_dict
+class MongoTelegramDocument:
     def __init__(self, message: Message):
-        super().__init__(message)
+        self.id: int = message.chat.id
+        self.username: str = message.from_user.username
+        self.created_at: datetime = datetime.now()
+        self.messages = []
+        self.history = []
 
     @abstractmethod
     def to_dict(self):
         pass
 
 
-class MongoTelegramMessage(TelegramMessage, GroupConfig):
-    def __init__(self, telegram_message: TelegramMessage):
-        self.telegram_message: TelegramMessage = TelegramMessage.__init__(telegram_message)
+class MongoTelegramGroupMessage(MongoTelegramDocument, GroupConfig):
+    def __init__(self, message: Message):
+        super().__init__(message)
         self.messages = []
         self.history = []
-        telegram_chat: Chat = try_get(self.telegram_message, "chat")
+        telegram_chat: Chat | None = try_get(self.telegram_message, "chat")
         telegram_chat_type: str = try_get(telegram_chat, "type")
         if telegram_chat_type != "private":
             self.group_config = GroupConfig.__init__(started=True, introduced=True, unleashed=False, count=None)

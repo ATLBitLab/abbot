@@ -1,10 +1,11 @@
+# core
 import json
 from io import open
-from os import listdir
 from os.path import abspath
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Dict, Tuple
 
-from telegram import Update, Message, Chat, User, MessageEntity
+# packages
+from telegram import Update, Message, Chat, User
 from telegram.constants import MessageEntityType
 from telegram.ext import (
     ContextTypes,
@@ -12,29 +13,18 @@ from telegram.ext import (
     CommandHandler,
     MessageHandler,
 )
-from telegram.ext.filters import (
-    ChatType,
-    Regex,
-    MessageFilter,
-    BaseFilter,
-    Command,
-    ViaBot,
-    TEXT,
-    Entity,
-    _Reply,
-    REPLY,
-)
+from telegram.ext.filters import ChatType, Regex, Entity, REPLY
 
+# local
 from constants import HELP_MENU, THE_CREATOR
-from lib.logger import bot_debug, bot_error
-from lib.utils import sender_is_group_admin, try_get, successful
-
-from lib.admin.admin_service import AdminService
-
-from lib.abbot.core import Abbot
-from lib.abbot.exceptions.exception import try_except
-from lib.abbot.config import BOT_NAME, BOT_TELEGRAM_HANDLE
-from lib.abbot.utils import (
+from ..logger import bot_debug, bot_error
+from ..utils import sender_is_group_admin, try_get, successful
+from ..db.utils import successful_insert_one
+from ..db.mongo import MongoTelegramDocument, mongo_abbot
+from ..abbot.core import Abbot
+from ..abbot.exceptions.exception import try_except
+from ..abbot.config import BOT_NAME, BOT_TELEGRAM_HANDLE
+from ..abbot.utils import (
     parse_chat,
     parse_chat_data,
     parse_message,
@@ -43,10 +33,11 @@ from lib.abbot.utils import (
     parse_user_data,
     squawk_error,
 )
-from lib.db.mongo import MongoTelegramMessage, TelegramMessage
+from ..admin.admin_service import AdminService
 
 FULL_TELEGRAM_HANDLE = f"@{BOT_TELEGRAM_HANDLE}"
 MENTION = MessageEntityType.MENTION
+ENTITY_REPLY = Entity(REPLY)
 
 RAW_MESSAGE_JL_FILE = abspath("src/data/raw_messages.jsonl")
 MATRIX_IMG_FILEPATH = abspath("src/assets/unplugging_matrix.jpg")
@@ -545,20 +536,35 @@ async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"chat_id={chat.id} chat_type={chat_type} chat_title={chat.title}"
         )
-    abbot = Abbot(chat.id, "dm")
-    mongo_telegram_message: MongoTelegramMessage = MongoTelegramMessage(TelegramMessage(message)).to_dict()
-    abbot.update_db(mongo_telegram_message)
-    abbot.update_history({"role": "user", "content": message.text})
-    bot_debug.log(f"{__name__} chat_id={chat.id}, {user.username} dms with Abbot")
-    answer = abbot.chat_completion()
-    return await message.reply_text(answer)
+    tg_doc: MongoTelegramDocument = MongoTelegramDocument(message=message)
+    bot_debug.log("tg_doc", tg_doc)
+    tg_doc_dict = tg_doc.to_dict()
+    bot_debug.log("tg_doc_dict", tg_doc_dict)
+    dm = mongo_abbot.find_one_dm({"id": chat.id})
+    bot_debug.log("dm", dm)
+    if not dm:
+        insert = mongo_abbot.insert_one_dm(tg_doc_dict)
+        if not successful_insert_one(insert):
+            bot_error.log("insert failed", insert)
+        bot_debug.log("insert", insert)
+    # abbot = Abbot(chat.id, "dm")
+    # abbot.update_history({"role": "user", "content": message.text})
+    # bot_debug.log(f"{__name__} chat_id={chat.id}, {user.username} dms with Abbot")
+    # answer = abbot.chat_completion()
+    return await message.reply_text("answer")
 
 
 @try_except
 async def handle_multiperson_chat_message(message: Message, chat: Chat, user: User):
+    tg_doc: MongoTelegramDocument = MongoTelegramDocument(message=message)
+    bot_debug.log("tg_doc", tg_doc)
+    tg_doc_dict = tg_doc.to_dict()
+    bot_debug.log("tg_doc_dict", tg_doc_dict)
+    channel = mongo_abbot.find_one_channel({"id": chat.id})
+    bot_debug.log("channel", channel)
+    if not channel:
+        mongo_abbot.insert_one_dm(MongoTelegramDocument(message).to_dict())
     abbot = Abbot(chat.id, "channel")
-    mongo_telegram_message: MongoTelegramMessage = MongoTelegramMessage(TelegramMessage(message)).to_dict()
-    abbot.update_db(mongo_telegram_message)
     abbot.update_history({"role": "user", "content": message.text})
     bot_debug.log(f"{__name__} chat_id={chat.id}, {user.username} mentioned Abbot")
     answer = abbot.chat_completion()
@@ -614,7 +620,7 @@ class TelegramBotBuilder:
             handlers=[
                 MessageHandler(ChatType.PRIVATE, handle_dm),
                 MessageHandler(Entity(MENTION) & Regex(FULL_TELEGRAM_HANDLE), handle_mention),
-                MessageHandler(ChatType.GROUPS & Entity(REPLY), handle_reply),
+                MessageHandler(ChatType.GROUPS & ENTITY_REPLY, handle_reply),
             ]
         )
 
