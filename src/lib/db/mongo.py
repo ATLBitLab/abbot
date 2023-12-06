@@ -81,34 +81,28 @@ class MongoNostrEvent(NostrEvent, GroupConfig):
 
 # ====== Telegram Types ======
 @to_dict
-class TelegramDM:
+class MongoTelegramDocument:
     def __init__(self, message: Message):
         self.id: int = message.chat.id
         self.username: str = message.from_user.username
         self.created_at: datetime = datetime.now()
-        self.messages = [{"message": message.to_dict()}]
-        self.history = [{"role": "user", "content": message.text}]
+        self.messages = []
+        self.history = []
 
     @abstractmethod
     def to_dict(self):
         pass
 
 
-class TelegramGroup(GroupConfig):
-    async def __init__(self, message: Message, admins: Tuple[ChatMember]):
-        self.title: str = message.chat.title
-        self.id: int = message.chat.id
-        self.created_at: datetime = datetime.now()
-        self.type: str = message.chat.type
-        self.admins: List = admins
-        self.balance: int = 50000
-        self.messages = [{"message": message.to_dict()}]
-        self.history = [
-            {"role": "system", "content": BOT_CORE_SYSTEM},
-            {"role": "assistant", "content": INTRODUCTION},
-            {"role": "user", "content": message.text},
-        ]
-        self.config = GroupConfig(started=True, introduced=True, unleashed=False, count=None)
+class MongoTelegramGroupMessage(MongoTelegramDocument, GroupConfig):
+    def __init__(self, message: Message):
+        super().__init__(message)
+        self.messages = []
+        self.history = []
+        telegram_chat: Chat | None = try_get(self.telegram_message, "chat")
+        telegram_chat_type: str = try_get(telegram_chat, "type")
+        if telegram_chat_type != "private":
+            self.group_config = GroupConfig.__init__(started=True, introduced=True, unleashed=False, count=None)
 
 
 @to_dict

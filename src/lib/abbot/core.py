@@ -12,7 +12,7 @@ from constants import OPENAI_MODEL
 from ..db.utils import successful_update_one
 from ..utils import error, success, to_dict, try_get
 from ..abbot.config import BOT_CORE_SYSTEM
-from ..db.mongo import GroupConfig, UpdateResult, mongo_abbot
+from ..db.mongo import GroupConfig, MongoTelegramDocument, UpdateResult, mongo_abbot
 
 from ..logger import bot_debug, bot_error
 from ..abbot.exceptions.exception import try_except
@@ -30,8 +30,11 @@ class Abbot(GroupConfig):
         self.model: str = OPENAI_MODEL
         self.id: str = id
         self.bot_type: str = bot_type
-        self.model: str = OPENAI_MODEL
-        self.history: List = [{"role": "system", "content": BOT_CORE_SYSTEM}, *history]
+        self.context: Dict = self.set_context()
+        bot_debug.log("self.context", self.context)
+        self.history: List = [{"role": "system", "content": BOT_CORE_SYSTEM}]
+        if self.history == None:
+            raise Exception(f"self.history is none = {self.context}")
         self.history_len: int = len(self.history)
         self.history_tokens: int = self.calculate_history_tokens()
         self.config: GroupConfig = GroupConfig() if self.bot_type != "dm" else None
@@ -43,6 +46,17 @@ class Abbot(GroupConfig):
     def to_dict(self) -> dict:
         pass
 
+    @try_except
+    def set_context(self) -> Optional[_DocumentType]:
+        if self.bot_type == "dm":
+            ctx: MongoTelegramDocument = mongo_abbot.find_one_dm({"id": self.id})
+            bot_debug.log("ctx", ctx)
+            history_messages = ctx.history
+            self.history = [*self.history, history_messages]
+        else:
+            return mongo_abbot.find_one_channel({"id": self.id})
+
+    @try_except
     def get_config(self) -> Dict:
         return self.config.to_dict()
 
