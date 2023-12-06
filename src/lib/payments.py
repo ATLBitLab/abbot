@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from lib.utils import try_get
+from lib.utils import success, try_get
 import httpx
 from lib.abbot.env import PAYMENT_PROCESSOR_KIND, PAYMENT_PROCESSOR_TOKEN, LNBITS_BASE_URL
 
@@ -68,10 +68,11 @@ class Strike(Processor):
         invoice_id = try_get(invoice_resp, "invoiceId")
         quote_resp = await self._client.post(f"/invoices/{invoice_id}/quote")
 
-        return (
-            invoice_id,
-            try_get(quote_resp, "lnInvoice"),
-            try_get(quote_resp, "expirationInSec"),
+        return success(
+            "Invoice created",
+            invoice_id=invoice_id,
+            lnInvoice=try_get(quote_resp, "lnInvoice"),
+            expirationInSec=try_get(quote_resp, "expirationInSec"),
         )
 
     async def invoice_is_paid(self, invoice_id):

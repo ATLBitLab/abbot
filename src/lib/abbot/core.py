@@ -32,7 +32,7 @@ class Abbot(GroupConfig):
         self.doc: Dict = doc
 
         self.model: str = OPENAI_MODEL
-        self.history: List = [{"role": "system", "content": BOT_CORE_SYSTEM}, *try_get(self.doc, "history")]
+        self.history: List = [*try_get(self.doc, "history")]
         self.history_len: int = len(self.history)
         self.history_tokens: int = self.calculate_history_tokens()
         self.config: GroupConfig = GroupConfig() if self.bot_type != "dm" else None

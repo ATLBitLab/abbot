@@ -1,10 +1,10 @@
 from abc import abstractmethod
 from datetime import datetime
 from cli_args import TELEGRAM_MODE, TEST_MODE, DEV_MODE
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 from nostr_sdk import PublicKey, EventId, Event
-from telegram import Chat, Message
+from telegram import Chat, ChatMember, Message
 
 from pymongo import MongoClient
 from pymongo.collection import Collection
@@ -13,6 +13,7 @@ from pymongo.results import InsertOneResult, InsertManyResult, UpdateResult
 
 from bson.typings import _DocumentType
 
+from constants import INTRODUCTION
 from ..logger import bot_error, bot_debug
 from ..utils import to_dict, error, try_get
 from ..abbot.env import DATABASE_CONNECTION_STRING
@@ -80,7 +81,7 @@ class MongoNostrEvent(NostrEvent, GroupConfig):
 
 # ====== Telegram Types ======
 @to_dict
-class MongoTelegramDocument:
+class TelegramDocument:
     def __init__(self, message: Message):
         self.id: int = message.chat.id
         self.username: str = message.from_user.username
@@ -93,17 +94,22 @@ class MongoTelegramDocument:
         pass
 
 
-class MongoTelegramGroupDocument(MongoTelegramDocument, GroupConfig):
-    async def __init__(self, message: Message):
+class TelegramGroupDocument(TelegramDocument, GroupConfig):
+    async def __init__(self, message: Message, admins: Tuple[ChatMember]):
         self.title: str = message.chat.title
         self.id: int = message.chat.id
         self.created_at: datetime = datetime.now()
         self.type: str = message.chat.type
-        self.admins: List = await message.chat.get_administrators()
+        self.admins: List = admins
         self.balance: int = 50000
         self.messages = [{"message": message.to_dict()}]
-        self.history = [{"role": "user", "content": message.text}]
-        self.config = GroupConfig.__init__(started=True, introduced=True, unleashed=False, count=None)
+        self.history = [
+            {"role": "system", "content": BOT_CORE_SYSTEM},
+            {"role": "assistant", "content": INTRODUCTION},
+            {"role": "user", "content": message.text},
+        ]
+        self.config = GroupConfig(started=True, introduced=True, unleashed=False, count=None)
+        self.dict = dict(**self)
 
 
 @to_dict

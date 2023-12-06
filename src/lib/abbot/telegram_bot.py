@@ -1,11 +1,13 @@
 # core
+from datetime import datetime
 import json
 from io import open
 from os.path import abspath
-from typing import Dict, Tuple
+from typing import Dict, List, Optional, Tuple
+import IPython
 
 # packages
-from telegram import Update, Message, Chat, User
+from telegram import ChatMember, Update, Message, Chat, User
 from telegram.constants import MessageEntityType
 from telegram.ext import (
     ContextTypes,
@@ -16,21 +18,20 @@ from telegram.ext import (
 from telegram.ext.filters import ChatType, StatusUpdate, Regex, Entity, REPLY
 
 MENTION = MessageEntityType.MENTION
-NEW_CHAT_MEMBERS = StatusUpdate.NEW_CHAT_MEMBERS
 CHAT_CREATED = StatusUpdate.CHAT_CREATED
 GROUPS = ChatType.GROUPS
 PRIVATE = ChatType.PRIVATE
 ENTITY_REPLY = Entity(REPLY)
 
 # local
-from constants import HELP_MENU, THE_CREATOR
+from constants import HELP_MENU, INTRODUCTION, THE_CREATOR
 from ..logger import bot_debug, bot_error
-from ..utils import sender_is_group_admin, try_get, successful
+from ..utils import error, sender_is_group_admin, success, try_get, successful
 from ..db.utils import successful_insert_one, successful_update_one
-from ..db.mongo import MongoTelegramDocument, mongo_abbot
+from ..db.mongo import GroupConfig, TelegramDocument, TelegramGroupDocument, mongo_abbot
 from ..abbot.core import Abbot
 from ..abbot.exceptions.exception import try_except
-from ..abbot.config import BOT_NAME, BOT_TELEGRAM_HANDLE
+from ..abbot.config import BOT_CORE_SYSTEM, BOT_NAME, BOT_TELEGRAM_HANDLE
 from ..abbot.utils import (
     parse_chat,
     parse_chat_data,
@@ -49,19 +50,8 @@ MATRIX_IMG_FILEPATH = abspath("src/assets/unplugging_matrix.jpg")
 
 admin = AdminService(THE_CREATOR, THE_CREATOR)
 admin.status = "running"
-INTRODUCTION = """
-Hey! The name's Abbot but you can think of me as your go-to guide for all things Bitcoin.
-AKA the virtual Bitcoin whisperer. 😉
-Here's the lowdown on how to get my attention:
-1. Slap an @ before your message in the group chat - I'll come running to answer.
-2. Feel more comfortable replying directly to my messages? Go ahead! I'm all ears.. err.. code.
-3. Fancy a one-on-one chat? Slide into my DMs.
-Now, enough with the rules! Let's dive into the world of Bitcoin together!
-Ready. Set. Stack Sats! 🚀
-"""
 
 
-@try_except
 async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Tuple[Message, Chat, User]:
     response: Dict = parse_message(update, context)
     message: Message = try_get(response, "data")
@@ -82,7 +72,6 @@ async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     return (message, chat, user)
 
 
-@try_except
 async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "handle_text_message:"
     if not update or not context:
@@ -208,7 +197,6 @@ async def handle_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE
     return await message.reply_text(answer)
 
 
-@try_except
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "help:"
     message: Message = parse_message(update)
@@ -224,7 +212,6 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await message.reply_text(HELP_MENU)
 
 
-@try_except
 async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "unleash:"
     response: Dict = parse_message(update, context)
@@ -285,7 +272,6 @@ async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-@try_except
 async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "leash:"
     message: Message = parse_message(update)
@@ -331,7 +317,6 @@ async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-@try_except
 async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "rules:"
     message: Message = try_get(update, "message")
@@ -369,7 +354,6 @@ async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-@try_except
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "start:"
     response: Dict = parse_message(update, context)
@@ -429,7 +413,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await message.reply_text(response)
 
 
-@try_except
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "stop:"
     message: Message = try_get(update, "message")
@@ -477,7 +460,6 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await message.reply_text("Thanks for using Abbot! To restart, use the /start command at any time.")
 
 
-@try_except
 async def admin_plugin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "_admin_plugin:"
     chat_id: int = try_get(update, "message", "chat", "id")
@@ -488,7 +470,6 @@ async def admin_plugin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admin.stop_service()
 
 
-@try_except
 async def admin_unplug(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "admin_unplug:"
     chat_id: int = try_get(update, "message", "chat", "id")
@@ -497,7 +478,6 @@ async def admin_unplug(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admin.start_service()
 
 
-@try_except
 async def admin_kill(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "admin_kill:"
     message: Message = try_get(update, "message")
@@ -511,7 +491,6 @@ async def admin_kill(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admin.kill_service()
 
 
-@try_except
 async def admin_nap(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "admin_nap:"
     message: Message = try_get(update, "message")
@@ -525,7 +504,6 @@ async def admin_nap(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admin.sleep_service()
 
 
-@try_except
 async def admin_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "admin_status:"
     message: Message = try_get(update, "message")
@@ -541,8 +519,8 @@ async def admin_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await message.reply_text(status_data)
 
 
-@try_except
 async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    bot_debug.log(__name__, f"handle_dm")
     update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
     message, chat, user = update_data
     mongo_dm_filter = {"id": chat.id}
@@ -552,7 +530,7 @@ async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"chat_id={chat.id} chat_type={chat_type} chat_title={chat.title}"
         )
-    tg_doc: MongoTelegramDocument = MongoTelegramDocument(message=message)
+    tg_doc: TelegramDocument = TelegramDocument(message=message)
     tg_doc_dict = tg_doc.to_dict()
     bot_debug.log(__name__, f"telegram_bot => handle_dm => tg_doc={tg_doc}")
     bot_debug.log(__name__, f"telegram_bot => handle_dm => tg_doc_dict={tg_doc_dict}")
@@ -576,16 +554,14 @@ async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return await message.reply_text(answer)
 
 
-@try_except
-async def handle_multiperson_chat_message(message: Message, chat: Chat, user: User):
-    tg_doc: MongoTelegramDocument = MongoTelegramDocument(message=message)
-    bot_debug.log("tg_doc", tg_doc)
+async def handle_group_chat_update(message: Message, chat: Chat, user: User):
+    bot_debug.log("group_doc_exists", group_doc_exists)
     tg_doc_dict = tg_doc.to_dict()
     bot_debug.log("tg_doc_dict", tg_doc_dict)
     channel = mongo_abbot.find_one_channel({"id": chat.id})
     bot_debug.log("channel", channel)
     if not channel:
-        mongo_abbot.insert_one_dm(MongoTelegramDocument(message).to_dict())
+        mongo_abbot.insert_one_dm(TelegramDocument(message).to_dict())
     abbot = Abbot(chat.id, "channel")
     abbot.update_history({"role": "user", "content": message.text})
     bot_debug.log(f"{__name__} chat_id={chat.id}, {user.username} mentioned Abbot")
@@ -593,34 +569,74 @@ async def handle_multiperson_chat_message(message: Message, chat: Chat, user: Us
     return await message.reply_text(answer)
 
 
-@try_except
 async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYPE):
     update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
     message, chat, user = update_data
-    chat_type: ChatType = chat.type
-    valid_chat_types: Tuple[str] = ("channel", "supergroup", "group")
-    if chat_type not in valid_chat_types:
-        bot_error.log(__name__, f"chat_type not in valid_chat_types: {valid_chat_types}")
-        return await context.bot.send_message(
-            chat_id=THE_CREATOR, text=f"chat_id={chat.id} chat_type={chat_type} chat_title={chat.title}"
-        )
-    return await handle_multiperson_chat_message(message, chat, user)
+    group_doc_exists = mongo_abbot.find_one_channel({"id": chat.id})
+    if not group_doc_exists:
+        bot_debug.log(f"handle_group_mention => not group_doc_exists={not group_doc_exists}")
+        return
+    return await handle_group_chat_update(message, chat, user)
 
 
-@try_except
 async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.message.reply_to_message and update.message.reply_to_message.from_user.username == BOT_TELEGRAM_HANDLE:
+    update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
+    message, chat, user = update_data
+    from_user: Optional[User] = try_get(message, "reply_to_message", "from_user")
+    if from_user.is_bot and from_user.username == BOT_TELEGRAM_HANDLE:
+        # TODO: add to db, send to gpt, reply
         pass
 
 
-@try_except
-async def handle_new_member_or_chat(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_insert_group_doc(message: Message, chat: Chat, admins: Tuple[ChatMember]) -> Dict:
+    new_group_doc: TelegramGroupDocument = TelegramGroupDocument(message, admins)
+    bot_debug.log(f"handle_insert_group_doc => new_group_doc={new_group_doc}")
+    new_group_insert = mongo_abbot.insert_one_channel(
+        {
+            "title": chat.title,
+            "id": chat.id,
+            "created_at": datetime.now(),
+            "type": chat.type,
+            "admins": list(admins),
+            "balance": 50000,
+            "message": [],
+            "history": [
+                {"role": "system", "content": BOT_CORE_SYSTEM},
+                {"role": "assistant", "content": INTRODUCTION},
+            ],
+            "config": {"started": True, "introduced": True, "unleashed": False, "count": None},
+        }
+    )
+    if not successful_insert_one(new_group_insert):
+        bot_error.log(__name__, f"handle_added_to_chat => insert failed={new_group_insert}")
+        return error("Insert new group doc success", data=new_group_insert)
+    return success("New group doc inserted", data=new_group_doc)
+
+
+async def handle_added_to_chat(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    bot_debug.log(__name__, f"handle_added_to_chat")
     update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
-    message, _, _ = update_data
+    message, chat, user = update_data
+    bot_debug.log(__name__, f"update_data={update_data}")
+    admins: Tuple[ChatMember] = await chat.get_administrators()
+    abbot_added = False
     for member in message.new_chat_members:
-        if member.username != BOT_TELEGRAM_HANDLE:
-            continue
-        return await message.reply_text("")
+        if member.username == BOT_TELEGRAM_HANDLE:
+            abbot_added = True
+            break
+    if not abbot_added:
+        bot_debug.log(f"handle_added_to_chat => abbot_added={abbot_added}")
+        return
+    group_doc_exists = mongo_abbot.find_one_channel({"id": chat.id})
+    if group_doc_exists:
+        bot_debug.log(f"handle_added_to_chat => group_doc_exists={group_doc_exists}")
+        return
+    response: Dict = await handle_insert_group_doc(message, chat, admins)
+    if not successful(response):
+        admin_list: List = list(admins)
+        bot_error.log(__name__, f"Insert new group doc fail")
+        return await context.bot.send_message(chat_id=try_get(admin_list, 0), text=response.get("message"))
+    return await message.reply_text(chat_id=chat.id, text=INTRODUCTION)
 
 
 class TelegramBotBuilder:
@@ -651,10 +667,7 @@ class TelegramBotBuilder:
         telegram_bot.add_handlers(
             handlers=[
                 MessageHandler(PRIVATE, handle_dm),
-                MessageHandler(
-                    GROUPS & (NEW_CHAT_MEMBERS | CHAT_CREATED),
-                    handle_new_member_or_chat,
-                ),
+                MessageHandler(GROUPS & CHAT_CREATED, handle_added_to_chat),
                 MessageHandler(GROUPS & Entity(MENTION) & Regex(FULL_TELEGRAM_HANDLE), handle_group_mention),
                 MessageHandler(GROUPS & Entity(REPLY), handle_group_reply),
             ]
