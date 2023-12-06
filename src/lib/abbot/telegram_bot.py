@@ -586,7 +586,7 @@ async def handle_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 class TelegramBotBuilder:
-    from lib.abbot.env import BOT_TELEGRAM_TOKEN
+    from lib.abbot.config import BOT_TELEGRAM_TOKEN
 
     def __init__(self):
         bot_debug.log(f"Telegram abbot initializing: name={BOT_NAME} handle={FULL_TELEGRAM_HANDLE}")
