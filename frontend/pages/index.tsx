@@ -5,6 +5,7 @@ import abbot from "@/public/abbot.jpeg";
 import Button from "@/components/Button";
 import Row from "@/components/Row";
 import { useRouter } from "next/router";
+import Toast from "awesome-toast-component";
 
 export default function Abbot() {
   const router = useRouter();
@@ -14,13 +15,15 @@ export default function Abbot() {
   const [channelMode, setChannelMode] = useState(false); // true when a channel button is clicked
 
   // Function to send NOSTR channel invite
-  const sendInvite = async (channelId: string) => {
+  const sendInvite = async (channelId: string, platform: string) => {
     try {
       const response = await fetch("/api/sendInvite", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ channelId }),
+        body: JSON.stringify({ channelId, platform }),
       });
+      const { success, data } = await response.json();
+      new Toast(data, { style: { container: [["background-color", "green"]], message: [["color", "white"]], }, position: "top" });
     } catch (error) {
       console.error(error);
     }
@@ -193,18 +196,16 @@ function PlatformButtons({ onNostrClick, onTelegramClick, platform }) {
   return (
     <Row className="w-full">
       <Button
-        className={`w-full border-[#08252E] border-2 ${
-          platform === "nostr" ? "bg-[#08252E] text-white" : ""
-        }`}
+        className={`w-full border-[#08252E] border-2 ${platform === "nostr" ? "bg-[#08252E] text-white" : ""
+          }`}
         type="button"
         onClick={onNostrClick}
       >
         Use Nostr 🟣
       </Button>
       <Button
-        className={`w-full border-[#08252E] border-2 ml-1 ${
-          platform === "telegram" ? "bg-[#08252E] text-white" : ""
-        }`}
+        className={`w-full border-[#08252E] border-2 ml-1 ${platform === "telegram" ? "bg-[#08252E] text-white" : ""
+          }`}
         type="button"
         onClick={onTelegramClick}
       >
@@ -247,9 +248,8 @@ function ChannelInteraction({
           {isTelegram ? "DM 🤖" : "DM 🟣"}
         </Button>
         <Button
-          className={`w-full border-[#08252E] border-2 mr-1 ${
-            channelMode ? "bg-[#08252E] text-white" : ""
-          }`}
+          className={`w-full border-[#08252E] border-2 mr-1 ${channelMode ? "bg-[#08252E] text-white" : ""
+            }`}
           type="button"
           onClick={handleChannelClick}
         >

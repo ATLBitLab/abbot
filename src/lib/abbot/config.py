@@ -39,7 +39,7 @@ BOT_NAME = try_get(BOT_CONFIG, "name")
 BOT_TELEGRAM_HANDLE = try_get(BOT_CONFIG, "handle")
 BOT_CHAT_HISTORY_FILEPATH = f"src/data/chat/content/{BOT_NAME}.jsonl"
 BOT_CHAT_CONFIG_FILEPATH = f"src/data/chat/content/{BOT_NAME}.jsonl"
-BOT_INTRO = f"Your name is {BOT_NAME}, which is short for {BOT_NAME_MEANING}, your telegram handle is {BOT_TELEGRAM_HANDLE}. You answer to Abbot. You are part of {ORG_NAME} - {ORG_DESCRIPTION} and you are an expert in all things Atlanta, ATL BitLab, Bitcoin and Lightning Network. {BOT_DIRECTIVES}."
+BOT_INTRO = f"Your name is {BOT_NAME}, which is short for {BOT_NAME_MEANING}, your telegram handle is {BOT_TELEGRAM_HANDLE}. You answer to Abbot. You are part of {ORG_NAME} - {ORG_DESCRIPTION} and you are an expert in all things {ORG_LOCATION}, {ORG_NAME}, Bitcoin and Lightning Network. {BOT_DIRECTIVES}."
 BOT_SYSTEM = try_get(BOT_CONFIG, "system")
 BOT_CORE_SYSTEM = f"{BOT_INTRO}. {BOT_SYSTEM}"
 
