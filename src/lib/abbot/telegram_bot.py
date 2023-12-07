@@ -100,24 +100,6 @@ async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # )
 
 
-async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
-    message, chat, _ = update_data
-    message_text: str = message.text
-    args = message_text.split()
-    if args[0] != "/fund":
-        return error()
-    amount: int = int(args[1])
-    strike: Strike = init_payment_processor()
-    description = f"Account topup for {chat.title}"
-    response = strike.get_invoice(str(uuid.uuid1()), description, amount)
-    invoice = try_get(response, "lnInvoice")
-    if not invoice:
-        return error()
-    await message.reply_photo(qr_code(invoice), caption=description)
-    await message.reply_markdown_v2(invoice)
-
-
 async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
     message, chat, user = update_data
@@ -366,6 +348,24 @@ async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
     bot_debug.log(__name__, f"chat_id={chat.id}, {user.username} dms with Abbot")
     answer = abbot.chat_completion()
     return await message.reply_text(answer)
+
+
+async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
+    message, chat, _ = update_data
+    message_text: str = message.text
+    args = message_text.split()
+    if args[0] != "/fund":
+        return error()
+    amount: int = int(args[1])
+    strike: Strike = init_payment_processor()
+    description = f"Account topup for {chat.title}"
+    response = strike.get_invoice(str(uuid.uuid1()), description, amount)
+    invoice = try_get(response, "lnInvoice")
+    if not invoice:
+        return error()
+    await message.reply_photo(qr_code(invoice), caption=description)
+    await message.reply_markdown_v2(invoice)
 
 
 class TelegramBotBuilder:
