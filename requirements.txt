@@ -46,7 +46,6 @@ mdurl==0.1.2
 multidict==6.0.4
 mypy-extensions==1.0.0
 nostr==0.0.2
-nostr-sdk @ file:///Users/bryan/Projects/ATLBit/Lab/Telegram/bindings-python/dist/nostr_sdk-0.0.5-cp311-cp311-macosx_13_0_x86_64.whl#sha256=e1bc32e431b121ab89546f8b6c8d678eca018f7db6103fe8f8fac9304ea1227c
 numpy==1.26.0
 openai==1.3.7
 packaging==23.2
