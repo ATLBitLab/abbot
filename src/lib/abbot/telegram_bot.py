@@ -695,9 +695,9 @@ class TelegramBotBuilder:
         telegram_bot.add_handlers(
             handlers=[
                 MessageHandler(PRIVATE, handle_dm),
-                MessageHandler(GROUPS & CHAT_CREATED, handle_added_to_chat),
-                MessageHandler(GROUPS & Entity(MENTION) & Regex(FULL_TELEGRAM_HANDLE), handle_group_mention),
-                MessageHandler(GROUPS & Entity(REPLY), handle_group_reply),
+                # MessageHandler(GROUPS & CHAT_CREATED, handle_added_to_chat),
+                # MessageHandler(GROUPS & Entity(MENTION) & Regex(FULL_TELEGRAM_HANDLE), handle_group_mention),
+                # MessageHandler(GROUPS & Entity(REPLY), handle_group_reply),
             ]
         )
 
