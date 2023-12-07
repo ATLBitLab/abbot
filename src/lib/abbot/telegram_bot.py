@@ -30,7 +30,7 @@ from constants import HELP_MENU, INTRODUCTION, THE_CREATOR
 from ..logger import bot_debug, bot_error
 from ..utils import error, qr_code, sender_is_group_admin, success, try_get, successful
 from ..db.utils import successful_insert_one, successful_update_one
-from ..db.mongo import GroupConfig, TelegramDocument, TelegramGroupDocument, mongo_abbot
+from ..db.mongo import GroupConfig, TelegramDM, TelegramGroup, mongo_abbot
 from ..abbot.core import Abbot
 from ..abbot.exceptions.exception import try_except
 from ..abbot.config import BOT_CORE_SYSTEM, BOT_NAME, BOT_TELEGRAM_HANDLE
@@ -539,79 +539,56 @@ async def admin_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await message.reply_text(status_data)
 
 
-async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    bot_debug.log(__name__, f"handle_dm")
-    update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
-    message, chat, user = update_data
-    mongo_dm_filter = {"id": chat.id}
-    chat_type: ChatType = chat.type
-    if chat_type != "private":
-        bot_error.log(__name__, f"chat_type not private")
-        return await context.bot.send_message(
-            chat_id=THE_CREATOR, text=f"chat_id={chat.id} chat_type={chat_type} chat_title={chat.title}"
-        )
-    tg_doc: TelegramDocument = TelegramDocument(message=message)
-    tg_doc_dict = tg_doc.to_dict()
-    bot_debug.log(__name__, f"telegram_bot => handle_dm => tg_doc={tg_doc}")
-    bot_debug.log(__name__, f"telegram_bot => handle_dm => tg_doc_dict={tg_doc_dict}")
-
-    tg_dm = mongo_abbot.find_one_dm_and_update(
-        mongo_dm_filter,
-        {"$push": {"messages": message.to_dict(), "history": {"role": "user", "content": message.text}}},
-    )
-    if not tg_dm:
-        insert = mongo_abbot.insert_one_dm(tg_doc_dict)
-        if not successful_insert_one(insert):
-            bot_error.log(__name__, f"telegram_bot => handle_dm => insert failed={insert}")
-        bot_debug.log(__name__, f"telegram_bot => handle_dm => insert={insert}")
-        tg_dm = mongo_abbot.find_one_dm(mongo_dm_filter)
-    bot_debug.log(__name__, f"telegram_bot => handle_dm => tg_dm={tg_dm}")
-    abbot = Abbot(chat.id, "dm", tg_dm)
-    # bot_debug.log(__name__, f"telegram_bot => handle_dm => abbot={abbot.to_dict()}")
-    abbot.update_history({"role": "user", "content": message.text})
-    bot_debug.log(__name__, f"chat_id={chat.id}, {user.username} dms with Abbot")
-    answer = abbot.chat_completion()
-    return await message.reply_text(answer)
-
-
-async def handle_group_chat_update(message: Message, chat: Chat, user: User):
-    # bot_debug.log("group_doc_exists", group_doc_exists)
-    # tg_doc_dict = tg_doc.to_dict()
-    bot_debug.log("tg_doc_dict", "tg_doc_dict")
-    channel = mongo_abbot.find_one_channel({"id": chat.id})
-    bot_debug.log("channel", channel)
-    if not channel:
-        mongo_abbot.insert_one_dm(TelegramDocument(message).to_dict())
-    abbot = Abbot(chat.id, "channel")
-    abbot.update_history({"role": "user", "content": message.text})
-    bot_debug.log(f"{__name__} chat_id={chat.id}, {user.username} mentioned Abbot")
-    answer = abbot.chat_completion()
-    return await message.reply_text(answer)
-
-
 async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYPE):
     update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
     message, chat, user = update_data
-    group_doc_exists = mongo_abbot.find_one_channel({"id": chat.id})
-    if not group_doc_exists:
-        bot_debug.log(f"handle_group_mention => not group_doc_exists={not group_doc_exists}")
-        return
-    return await handle_group_chat_update(message, chat, user)
+    admins: Tuple[ChatMember] = await chat.get_administrators()
+    new_history_entry = {"role": "user", "content": message.text}
+    channel = mongo_abbot.find_one_channel_and_update(
+        {"id": chat.id}, {"$push": {"messages": message.to_dict(), "history": new_history_entry}}
+    )
+
+    if not channel:
+        channel: TelegramGroup = mongo_abbot.insert_one_channel(
+            {
+                "title": chat.title,
+                "id": chat.id,
+                "created_at": datetime.now(),
+                "type": chat.type,
+                "admins": list(admins),
+                "balance": 50000,
+                "message": [],
+                "history": [
+                    {"role": "system", "content": BOT_CORE_SYSTEM},
+                    {"role": "assistant", "content": INTRODUCTION},
+                    {"role": "user", "content": message.text},
+                ],
+                "config": {"started": True, "introduced": True, "unleashed": False, "count": None},
+            }
+        )
+        if not successful_insert_one(channel):
+            bot_error.log(__name__, f"handle_group_mention => insert failed={channel}")
+            return error("Insert channel fail", data=channel)
+        return await message.reply_text(chat_id=chat.id, text=INTRODUCTION)
+
+    abbot = Abbot(chat.id, "channel", channel.history)
+    abbot.update_history_meta(message.text)
+    bot_debug.log(f"{__name__} chat_id={chat.id}, {user.username} mentioned Abbot")
+    answer = abbot.chat_completion()
+
+    return await message.reply_text(answer)
 
 
 async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
     update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
-    message, chat, user = update_data
+    message, _, _ = update_data
     from_user: Optional[User] = try_get(message, "reply_to_message", "from_user")
     if from_user.is_bot and from_user.username == BOT_TELEGRAM_HANDLE:
-        # TODO: add to db, send to gpt, reply
-        pass
+        return await handle_group_mention(update, context)
 
 
-async def handle_insert_group_doc(message: Message, chat: Chat, admins: Tuple[ChatMember]) -> Dict:
-    new_group_doc: TelegramGroupDocument = TelegramGroupDocument(message, admins)
-    bot_debug.log(f"handle_insert_group_doc => new_group_doc={new_group_doc}")
-    new_group_insert = mongo_abbot.insert_one_channel(
+async def handle_insert_channel(chat: Chat, admins: Tuple[ChatMember]) -> Dict:
+    channel = mongo_abbot.insert_one_channel(
         {
             "title": chat.title,
             "id": chat.id,
@@ -627,17 +604,17 @@ async def handle_insert_group_doc(message: Message, chat: Chat, admins: Tuple[Ch
             "config": {"started": True, "introduced": True, "unleashed": False, "count": None},
         }
     )
-    if not successful_insert_one(new_group_insert):
-        bot_error.log(__name__, f"handle_added_to_chat => insert failed={new_group_insert}")
-        return error("Insert new group doc success", data=new_group_insert)
-    return success("New group doc inserted", data=new_group_doc)
+    if not successful_insert_one(channel):
+        bot_error.log(__name__, f"handle_added_to_chat => insert failed={channel}")
+        return error("Insert new group doc success", data=channel)
+    return success("New group doc inserted", data=channel)
 
 
 async def handle_added_to_chat(update: Update, context: ContextTypes.DEFAULT_TYPE):
     bot_debug.log(__name__, f"handle_added_to_chat")
     update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
-    message, chat, user = update_data
-    bot_debug.log(__name__, f"update_data={update_data}")
+    message, chat, _ = update_data
+
     admins: Tuple[ChatMember] = await chat.get_administrators()
     abbot_added = False
     for member in message.new_chat_members:
@@ -647,16 +624,46 @@ async def handle_added_to_chat(update: Update, context: ContextTypes.DEFAULT_TYP
     if not abbot_added:
         bot_debug.log(f"handle_added_to_chat => abbot_added={abbot_added}")
         return
-    group_doc_exists = mongo_abbot.find_one_channel({"id": chat.id})
-    if group_doc_exists:
-        bot_debug.log(f"handle_added_to_chat => group_doc_exists={group_doc_exists}")
+
+    channel = mongo_abbot.find_one_channel({"id": chat.id})
+    if channel:
+        bot_debug.log(f"handle_added_to_chat => channel={channel}")
         return
-    response: Dict = await handle_insert_group_doc(message, chat, admins)
+
+    response: Dict = await handle_insert_channel(chat, admins)
     if not successful(response):
         admin_list: List = list(admins)
-        bot_error.log(__name__, f"Insert new group doc fail")
+        bot_error.log(__name__, f"Insert new channel fail")
         return await context.bot.send_message(chat_id=try_get(admin_list, 0), text=response.get("message"))
+
     return await message.reply_text(chat_id=chat.id, text=INTRODUCTION)
+
+
+async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    bot_debug.log(__name__, f"handle_dm")
+    update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
+    message, chat, user = update_data
+    dm: TelegramDM = mongo_abbot.find_one_dm({"chat": chat.id})
+    if not dm:
+        dm = mongo_abbot.insert_one_dm(
+            {
+                "id": chat.id,
+                "username": message.from_user.username,
+                "created_at": datetime.now(),
+                "messages": [message.to_dict()],
+                "history": [{"role": "system", "content": BOT_CORE_SYSTEM}, {"role": "user", "content": message.text}],
+            }
+        )
+        if not successful_insert_one(dm):
+            bot_error.log(__name__, f"telegram_bot => handle_dm => insert dm failed={dm}")
+        bot_debug.log(__name__, f"telegram_bot => handle_dm => dm={dm}")
+        dm = mongo_abbot.find_one_dm({"id": chat.id})
+    bot_debug.log(__name__, f"telegram_bot => handle_dm => dm={dm}")
+    abbot = Abbot(chat.id, "dm", dm.history)
+    abbot.update_history_meta(message.text)
+    bot_debug.log(__name__, f"chat_id={chat.id}, {user.username} dms with Abbot")
+    answer = abbot.chat_completion()
+    return await message.reply_text(answer)
 
 
 class TelegramBotBuilder:

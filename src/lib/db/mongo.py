@@ -81,7 +81,7 @@ class MongoNostrEvent(NostrEvent, GroupConfig):
 
 # ====== Telegram Types ======
 @to_dict
-class TelegramDocument:
+class TelegramDM:
     def __init__(self, message: Message):
         self.id: int = message.chat.id
         self.username: str = message.from_user.username
@@ -94,7 +94,7 @@ class TelegramDocument:
         pass
 
 
-class TelegramGroupDocument(TelegramDocument, GroupConfig):
+class TelegramGroup(GroupConfig):
     async def __init__(self, message: Message, admins: Tuple[ChatMember]):
         self.title: str = message.chat.title
         self.id: int = message.chat.id
@@ -109,7 +109,6 @@ class TelegramGroupDocument(TelegramDocument, GroupConfig):
             {"role": "user", "content": message.text},
         ]
         self.config = GroupConfig(started=True, introduced=True, unleashed=False, count=None)
-        self.dict = dict(**self)
 
 
 @to_dict
@@ -182,6 +181,9 @@ class MongoAbbot(MongoNostr, MongoTelegram):
 
     def find_one_channel(self, filter: {}) -> Optional[_DocumentType]:
         return self.channels.find_one(filter)
+
+    def find_one_channel_and_update(self, filter: {}, update: Dict) -> Optional[_DocumentType]:
+        return self.channels.find_one_and_update(filter, update, return_document=True)
 
     def find_one_dm(self, filter: {}) -> Optional[_DocumentType]:
         return self.dms.find_one(filter)

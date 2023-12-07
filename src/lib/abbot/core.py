@@ -26,13 +26,11 @@ class Abbot(GroupConfig):
 
     client: OpenAI = OpenAI(api_key=OPENAI_API_KEY)
 
-    def __init__(self, id: str, bot_type: str, doc: Dict):
+    def __init__(self, id: str, bot_type: str, history: List):
         self.id: str = id
         self.bot_type: str = bot_type
-        self.doc: Dict = doc
-
         self.model: str = OPENAI_MODEL
-        self.history: List = [{"role": "system", "content": BOT_CORE_SYSTEM}, *try_get(self.doc, "history")]
+        self.history: List = [{"role": "system", "content": BOT_CORE_SYSTEM}, *history]
         self.history_len: int = len(self.history)
         self.history_tokens: int = self.calculate_history_tokens()
         self.config: GroupConfig = GroupConfig() if self.bot_type != "dm" else None
@@ -122,21 +120,15 @@ class Abbot(GroupConfig):
             return error("update_db => update_one_channel failed")
         return success(try_get(result, "upserted_id"))
 
-    def update_history(self, update: Dict) -> int:
-        self.history.append(update)
-        bot_debug.log(__name__, f"chat_completion => response={self.history}")
-        result: UpdateResult = mongo_abbot.update_one_dm({"id": self.id}, {"$push": {"history": update}})
-        if not successful_update_one(result):
-            bot_error.log(f"update_history failed: {update}")
-            return error("update_history => update_one_channel failed")
+    def update_history_meta(self, content: str) -> int:
         self.history_len += 1
-        self.history_tokens += len(self.tokenize(try_get(update, "content")))
-        return success(try_get(result, "upserted_id"))
+        self.history_tokens += len(self.tokenize(content))
 
     def chat_completion(self) -> str:
         response = self.client.chat.completions.create(messages=self.history, model=self.model)
         answer = try_get(response, "choices", 0, "message", "content")
-        response = self.update_history({"role": "assistant", "content": answer})
+        self.history.append({"role": "assistant", "content": answer})
+        self.update_history_meta(answer)
         bot_debug.log(__name__, f"chat_completion => response={response}")
         if not successful(response):
             bot_error.log(__name__, f"chat_completion => response={response}")
