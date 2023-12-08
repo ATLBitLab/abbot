@@ -688,6 +688,11 @@ available-typed-arrays@^1.0.5:
   resolved "https://registry.yarnpkg.com/available-typed-arrays/-/available-typed-arrays-1.0.5.tgz#92f95616501069d07d10edb2fc37d3e1c65123b7"
   integrity sha512-DMD0KiN46eipeziST1LPP/STfDU0sufISXmjSgvVsoU2tqxctQeASejWcfNtxYKqETM1UxQ8sp2OrSBWpHY6sw==
 
+awesome-toast-component@^2.0.6:
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/awesome-toast-component/-/awesome-toast-component-2.0.6.tgz#d80db624cdb9f3aa245f5ce7b47c5ac09a71e552"
+  integrity sha512-6RjeS+vdlpjyTkGeTDvDwUUghQbcpcbCI68Uy8YoqSclnZyaUIQvIGjNQHWVejYSFyQjlN7nG/ifrwBPCeCd1g==
+
 axe-core@^4.6.2:
   version "4.8.2"
   resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-4.8.2.tgz#2f6f3cde40935825cf4465e3c1c9e77b240ff6ae"

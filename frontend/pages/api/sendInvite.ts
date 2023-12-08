@@ -4,12 +4,12 @@ import NDK, { NDKEvent, NDKPrivateKeySigner, NDKUser, NDKTag } from "@nostr-dev-
 import { RELAYS, NOSTR_CHANNEL_INVITE } from "../../lib/constants"
 import { NOSTR_ATL_BITLAB_SK, NOSTR_ABBOT_PK } from "../../lib/env";
 
-
 interface RequestBody {
-  channelId: string
+  channelId: string,
+  platform: string,
 }
 
-const createInviteEvent = (ndk: NDK, abbot: NDKUser, channelId: string): NDKEvent => {
+const createNostrInviteEvent = (ndk: NDK, abbot: NDKUser, channelId: string): NDKEvent => {
   const event = new NDKEvent(ndk);
 
   event.kind = NOSTR_CHANNEL_INVITE;
@@ -19,12 +19,7 @@ const createInviteEvent = (ndk: NDK, abbot: NDKUser, channelId: string): NDKEven
   return event;
 };
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method !== 'POST') return;
-
+const handleNostr = async (channelId: string) => {
   const signer = new NDKPrivateKeySigner(NOSTR_ATL_BITLAB_SK);
 
   const ndk = new NDK({ explicitRelayUrls: RELAYS, signer });
@@ -32,11 +27,33 @@ export default async function handler(
 
   const abbot = new NDKUser({ npub: NOSTR_ABBOT_PK });
 
-  const body: RequestBody = req.body;
-  const event = createInviteEvent(ndk, abbot, body.channelId);
+  const event = createNostrInviteEvent(ndk, abbot, channelId);
 
   await event.sign();
   await event.publish();
+  return event
+}
 
-  res.status(204)
+const handleTelegram = async (channelId: string) => {
+  // TODO: how to do this
+}
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  try {
+    if (req.method !== 'POST') return;
+
+    const { platform, channelId }: RequestBody = req.body;
+    let data;
+    if (platform === "nostr") {
+      data = await handleNostr(channelId);
+    } else {
+      data = await handleTelegram(channelId);
+    }
+    res.status(204).json({ success: true, data });
+  } catch (error) {
+    res.status(500).json({ success: false, data: error })
+  }
 }

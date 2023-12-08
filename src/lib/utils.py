@@ -8,8 +8,7 @@ from io import BytesIO, open
 from requests import request
 
 from telegram.ext import ContextTypes
-from lib.logger import bot_debug, bot_error
-from lib.abbot.exceptions.exception import try_except
+from lib.logger import bot_debug
 
 
 TELEGRAM_MESSAGE_FIELDS = [
@@ -131,16 +130,16 @@ def to_dict(cls):
 
 
 def error(message: str = "", **kwargs) -> Dict:
-    return {"status": "error", "message": message, **kwargs}
+    return dict(status="error", message=message, **kwargs)
 
 
-def success(message: str = "", **kwargs) -> dict:
-    return {"status": "success", "message": message, **kwargs}
+def success(message: str = "", **kwargs) -> Dict:
+    return dict(status="success", message=message, **kwargs)
 
 
-def successful(response: dict) -> bool:
+def successful(response: Dict) -> bool:
     return response["status"] == "success"
 
 
-def unsuccessful(response: dict) -> bool:
+def unsuccessful(response: Dict) -> bool:
     return not successful(response)
