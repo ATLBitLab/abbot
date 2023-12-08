@@ -9,10 +9,10 @@ import Toast from "awesome-toast-component";
 
 export default function Abbot() {
   const router = useRouter();
-  const [channelId, setChannelId] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [platform, setPlatform] = useState(null); // 'nostr' or 'telegram'
-  const [channelMode, setChannelMode] = useState(false); // true when a channel button is clicked
+  const [channelId, setChannelId] = useState<any>("");
+  const [loading, setLoading] = useState<any>(false);
+  const [platform, setPlatform] = useState<any>(null); // 'nostr' or 'telegram'
+  const [channelMode, setChannelMode] = useState<any>(false); // true when a channel button is clicked
 
   // Function to send NOSTR channel invite
   const sendInvite = async (channelId: string, platform: string) => {
@@ -47,10 +47,10 @@ export default function Abbot() {
   };
 
   // Function to handle form submission
-  const handleFormSubmit = async (e) => {
+  const handleFormSubmit = async (e: any) => {
     e.preventDefault();
     setLoading(true);
-    await sendInvite(channelId);
+    await sendInvite(channelId, platform);
     console.log(`Channel invite sent for ${channelId}`);
     setLoading(false);
   };
@@ -192,7 +192,7 @@ export default function Abbot() {
   );
 }
 
-function PlatformButtons({ onNostrClick, onTelegramClick, platform }) {
+function PlatformButtons({ onNostrClick, onTelegramClick, platform }: any) {
   return (
     <Row className="w-full">
       <Button
@@ -223,7 +223,7 @@ function ChannelInteraction({
   setChannelId,
   loading,
   handleFormSubmit,
-}) {
+}: any) {
   const isTelegram = platform === "telegram";
 
   const handleChannelClick = () => {
@@ -263,6 +263,8 @@ function ChannelInteraction({
           loading={loading}
           handleFormSubmit={handleFormSubmit}
           isTelegram={isTelegram}
+          chatId={null}
+          setChatId={null}
         />
       )}
     </>
@@ -277,7 +279,7 @@ function ChannelForm({
   loading,
   handleFormSubmit,
   isTelegram,
-}) {
+}: any) {
   return (
     <Row className="w-full">
       <form
