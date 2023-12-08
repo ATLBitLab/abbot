@@ -6,7 +6,7 @@ from os.path import abspath
 from datetime import datetime
 from httpx import Response, AsyncClient
 
-from src.lib.abbot.exceptions.exception import try_except
+from lib.abbot.exceptions.exception import try_except
 
 async_client: AsyncClient = AsyncClient(
     base_url="https://api.coinbase.com/v2",
@@ -56,7 +56,7 @@ ENTITY_MENTION = Entity(MENTION)
 
 
 # local
-from constants import HELP_MENU, INTRODUCTION, OPENAI_MODEL, SECONDARY_INTRODUCTION, THE_CREATOR
+from constants import HELP_MENU, INTRODUCTION, OPENAI_MODEL, RULES, SECONDARY_INTRODUCTION, THE_CREATOR
 from ..logger import bot_debug, bot_error
 from ..utils import error, qr_code, success, try_get, successful
 from ..db.utils import successful_insert_one, successful_update_one
@@ -106,6 +106,27 @@ async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     return (message, chat, user)
 
 
+def handle_insert_channel(chat: Chat, admins: Tuple[ChatMember]) -> Dict:
+    insert = mongo_abbot.insert_one_channel(
+        {
+            "title": chat.title,
+            "id": chat.id,
+            "created_at": datetime.now(),
+            "type": chat.type,
+            "admins": list(admins),
+            "balance": 50000,
+            "message": [],
+            "history": DEFAULT_GROUP_HISTORY,
+            "config": {"started": False, "introduced": False, "unleashed": False, "count": None},
+        }
+    )
+    if not successful_insert_one(insert):
+        bot_error.log(__name__, f"handle_chat_creation_members_added => insert failed={insert}")
+        return error("Insert new group doc success", data=insert)
+    group: TelegramGroup = mongo_abbot.find_one_channel({"id": chat.id})
+    return success("New group doc inserted", data=group)
+
+
 @try_except
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
@@ -113,117 +134,108 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await message.reply_text(HELP_MENU)
 
 
-@try_except
-async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
-    message, chat, user = update_data
-    pass
-    # TODO: finish this logic
-    # if abbot.is_stopped():
-    #     return await message.reply_text(f"I'm already stopped for {chat_title}! Please run /start to begin!")
-    # unleashed, count = abbot.is_unleashed()
-    # if unleashed:
-    #     return await message.reply_text(f"I'm already unleashed for {chat_title}! To leash me, please run /leash!")
+# @try_except
+# async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
+#     message, chat, user = update_data
+#     pass
+# TODO: finish this logic
+# if abbot.is_stopped():
+#     return await message.reply_text(f"I'm already stopped for {chat_title}! Please run /start to begin!")
+# unleashed, count = abbot.is_unleashed()
+# if unleashed:
+#     return await message.reply_text(f"I'm already unleashed for {chat_title}! To leash me, please run /leash!")
 
-    # abbot.unleash()
-    # unleashed, count = abbot.is_unleashed()
-    # bot_debug.log(f"{fn} {abbot} unleashed={unleashed}")
-    # return await message.reply_text(
-    #     f"I have been unleashed! I will now respond every {count} messages until"
-    #     "you run /leash or /unleash <insert_new_number> (e.g. /unleash 10)"
-    # )
+# abbot.unleash()
+# unleashed, count = abbot.is_unleashed()
+# bot_debug.log(f"{fn} {abbot} unleashed={unleashed}")
+# return await message.reply_text(
+#     f"I have been unleashed! I will now respond every {count} messages until"
+#     "you run /leash or /unleash <insert_new_number> (e.g. /unleash 10)"
+# )
 
 
-@try_except
-async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
-    message, chat, user = update_data
-    pass
-    # TODO: finish this logic
-    # abbot: Abbot = Abbot(chat_id)
-    # if abbot.is_stopped():
-    #     return await message.reply_text(f"I'm already stopped for {chat_title}! Please run /start to begin!")
-    # leashed, count = abbot.is_leashed()
-    # if leashed:
-    #     return await message.reply_text(f"I'm already leashed for {chat_title}! To unleash me, please run /leash!")
-    # abbot.leash()
-    # leashed, count = abbot.is_leashed()
-    # bot_debug.log(f"{fn} leashed={leashed}")
-    # return await message.reply_text(
-    #     f"I have been leashed! To unleash me again, run /unleash or /unleash <insert_new_number> (e.g. /unleash 10)"
-    # )
+# @try_except
+# async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
+#     update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
+#     message, chat, user = update_data
+#     pass
+# TODO: finish this logic
+# abbot: Abbot = Abbot(chat_id)
+# if abbot.is_stopped():
+#     return await message.reply_text(f"I'm already stopped for {chat_title}! Please run /start to begin!")
+# leashed, count = abbot.is_leashed()
+# if leashed:
+#     return await message.reply_text(f"I'm already leashed for {chat_title}! To unleash me, please run /leash!")
+# abbot.leash()
+# leashed, count = abbot.is_leashed()
+# bot_debug.log(f"{fn} leashed={leashed}")
+# return await message.reply_text(
+#     f"I have been leashed! To unleash me again, run /unleash or /unleash <insert_new_number> (e.g. /unleash 10)"
+# )
 
 
 @try_except
 async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
     update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
-    message, _, __annotations__ = update_data
-    await message.reply_text(
-        "Hey! The name's Abbot but you can think of me as your go-to guide for all things Bitcoin. AKA the virtual Bitcoin whisperer. 😉\n\n"
-        "Here's the lowdown on how to get my attention: \n\n"
-        "1. Slap an @atl_bitlab_bot before your message in the group chat - I'll come running to answer. \n"
-        "2. Feel more comfortable replying directly to my messages? Go ahead! I'm all ears.. err.. code. \n"
-        "3. Fancy a one-on-one chat? Slide into my DMs. \n\n"
-        "Now, enough with the rules! Let's dive into the world of Bitcoin together! \n\n"
-        "Ready. Set. Stack Sats! 🚀"
-    )
+    message, _, _ = update_data
+    await message.reply_text(RULES)
 
 
 @try_except
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
-    message, chat, user = update_data
-    pass
-    # TODO: finish this logic
-    # if is_group_chat:
-    #     is_admin = await sender_is_group_admin(context)
-    #     if not is_admin:
-    #         return await message.reply_text("Forbidden: Admin only!")
-    # else:
-    #     abbot_context = "private"
-    #     bot_debug.log(f"{fn} is_private_chat={is_private_chat}")
-    # bot_debug.log(f"{fn} abbot_context={abbot_context}")
-    # abbot: Abbot = Abbot(chat_id)
-    # if abbot.is_started():
-    #     return await message.reply_text("Abbot already started!")
-    # abbot.start()
-    # started = abbot.is_started()
-    # bot_debug.log(f"{fn} abbot={abbot.to_dict()} started={started}")
-    # await message.reply_photo(MATRIX_IMG_FILEPATH, f"Please wait while we unplug {BOT_NAME} from the Matrix")
-    # response = abbot.chat_completion()
-    # if not response:
-    #     return await context.bot.send_message(
-    #         chat_id=THE_CREATOR,
-    #         text=f"chat_title={chat_title} chat_id={chat_id}",
-    #     )
-    # await message.reply_text(response)
+    message, chat, _ = update_data
+    admins: Tuple[Dict] = [admin.to_dict() for admin in await chat.get_administrators()]
+    group: TelegramGroup = mongo_abbot.find_one_channel({"id": chat.id})
+    if not group:
+        response: Dict = handle_insert_channel(chat, admins)
+        if not successful(response):
+            bot_error.log(__name__, f"Insert new channel fail")
+            return await context.bot.send_message(chat_id=THE_CREATOR, text=response.get("message"))
+        group: TelegramGroup = try_get(response, "data")
+    started: Dict = try_get(group, "config", "started", default=False)
+    bot_debug.log(__name__, f"started={started}")
+    introduced: Dict = try_get(group, "config", "introduced", default=False)
+    bot_debug.log(__name__, f"introduced={introduced}")
+    current_balance: TelegramGroup = mongo_abbot.get_group_balance(chat.id)
+    bot_debug.log(__name__, f"current_balance={current_balance}")
+    if started:
+        answer = f"{BOT_NAME} is already started for your group. Rules of engagement: {RULES}"
+        if current_balance == 0:
+            answer = f"{answer}. Note: Your group SATs balance is 0. Please run /fund to topup."
+        return await message.reply_text(message)
+    await message.reply_photo(MATRIX_IMG_FILEPATH, f"Please wait while {BOT_NAME} is unplugged from the Matrix")
+    await message.reply_text(INTRODUCTION)
+    update: TelegramGroup = mongo_abbot.find_one_channel_and_update(
+        {"id": chat.id}, {"$set": {"config.started": True, "config.introduced": True}}
+    )
 
 
 @try_except
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
-    message, chat, user = update_data
-    pass
-    # TODO: finish this logic    abbot_context = "group"
-    # is_private_chat: bool = chat_type == "private"
-    # is_group_chat: bool = not is_private_chat
-    # if is_group_chat:
-    #     admins = await context.bot.get_chat_administrators(chat_id)
-    #     admin_ids = [admin.user.id for admin in admins]
-    #     if user_id not in admin_ids:
-    #         return await update.message.reply_text("Forbidden: Admin only!")
-    # else:
-    #     abbot_context = "private"
-    #     bot_debug.log(f"{fn} is_private_chat={is_private_chat}")
-    # bot_debug.log(f"{fn} abbot_context={abbot_context}")
-    # abbot: Abbot = Abbot(chat_id)
-    # if not abbot.started:
-    #     await message.reply_text("Abbot isn't started yet! Have an admin run /start")
-    #     return await context.bot.send_message(chat_id=THE_CREATOR, text=f"chat_title={chat_title} chat_id={chat_id}")
-    # started = abbot.stop()
-    # if not started:
-    #     raise Exception(f"Not started! started={started}")
-    # await message.reply_text("Thanks for using Abbot! To restart, use the /start command at any time.")
+    message, chat, _ = update_data
+    admins: Tuple[Dict] = [admin.to_dict() for admin in await chat.get_administrators()]
+    group: TelegramGroup = mongo_abbot.find_one_channel({"id": chat.id})
+    if not group:
+        response: Dict = handle_insert_channel(chat, admins)
+        if not successful(response):
+            bot_error.log(__name__, f"Insert new channel fail")
+            return await context.bot.send_message(chat_id=THE_CREATOR, text=response.get("message"))
+        group: TelegramGroup = try_get(response, "data")
+    started: Dict = try_get(group, "config", "started", default=False)
+    bot_debug.log(__name__, f"started={started}")
+    introduced: Dict = try_get(group, "config", "introduced", default=False)
+    bot_debug.log(__name__, f"introduced={introduced}")
+    current_balance: TelegramGroup = mongo_abbot.get_group_balance(chat.id)
+    bot_debug.log(__name__, f"current_balance={current_balance}")
+    if not started:
+        return await message.reply_text(f"{BOT_NAME} is already stopped for your group. Please run /start to begin.")
+    update: TelegramGroup = mongo_abbot.find_one_channel_and_update(
+        {"id": chat.id}, {"$set": {"config.started": False}}
+    )
+    await message.reply_text("Thanks for using Abbot! Come back soon!")
 
 
 @try_except
@@ -287,27 +299,6 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
         return await handle_group_mention(update, context)
 
 
-def handle_insert_channel(chat: Chat, admins: Tuple[ChatMember]) -> Dict:
-    insert = mongo_abbot.insert_one_channel(
-        {
-            "title": chat.title,
-            "id": chat.id,
-            "created_at": datetime.now(),
-            "type": chat.type,
-            "admins": list(admins),
-            "balance": 50000,
-            "message": [],
-            "history": DEFAULT_GROUP_HISTORY,
-            "config": {"started": True, "introduced": False, "unleashed": False, "count": None},
-        }
-    )
-    if not successful_insert_one(insert):
-        bot_error.log(__name__, f"handle_chat_creation_members_added => insert failed={insert}")
-        return error("Insert new group doc success", data=insert)
-    group: TelegramGroup = mongo_abbot.find_one_channel({"id": chat.id})
-    return success("New group doc inserted", data=group)
-
-
 @try_except
 async def handle_chat_creation_members_added(update: Update, context: ContextTypes.DEFAULT_TYPE):
     bot_debug.log(__name__, f"handle_chat_creation_members_added")
@@ -323,12 +314,10 @@ async def handle_chat_creation_members_added(update: Update, context: ContextTyp
     group: TelegramGroup = mongo_abbot.find_one_channel({"id": chat.id})
     bot_debug.log(__name__, f"group={group}")
     if not group:
-        print("not group")
         response: Dict = handle_insert_channel(chat, admins)
         if not successful(response):
-            admin_list: List = list(admins)
             bot_error.log(__name__, f"Insert new channel fail")
-            return await context.bot.send_message(chat_id=try_get(admin_list, 0, "id"), text=response.get("message"))
+            return await context.bot.send_message(chat_id=THE_CREATOR, text=response.get("message"))
         group: TelegramGroup = try_get(response, "data")
     introduced = try_get(group, "config", "introduced")
     if not introduced:
@@ -431,21 +420,17 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
     bot_debug.log(__name__, f"amount={amount}")
     await message.reply_text("Creating your invoice, please wait ...")
     bot_debug.log(__name__, f"STRIKE={STRIKE}")
-
     description = f"Account topup for {chat.title if chat.type == 'group' else chat.username}"
     cid = str(uuid.uuid1())
     bot_debug.log(__name__, f"description={description} cid={cid}")
-
     response = await STRIKE.get_invoice(cid, description, amount, chat.id)
     bot_debug.log(__name__, f"response={response}")
-
     if not response:
         await context.bot.send_message(chat_id=THE_CREATOR, text=f"Error creating strike invoice")
         return await message.reply_text(
             "InvoiceError: Try again or our alternative payment method at https://abbot.atlbitlab.com"
             "InvoiceError: If the error persists, contact @nonni_io for help"
         )
-
     invoice_id = try_get(response, "invoice_id")
     invoice = try_get(response, "lnInvoice")
     expirationInSec = try_get(response, "expirationInSec")
@@ -487,6 +472,24 @@ async def handle_default(update: Update, context: ContextTypes.DEFAULT_TYPE):
     bot_debug.log(__name__)
     update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
     bot_debug.log(__name__, f"update_data={update_data}")
+    _, chat, _ = update_data
+    admins: Tuple[Dict] = [admin.to_dict() for admin in await chat.get_administrators()]
+    group_filter = {"id": chat.id}
+    group: TelegramGroup = mongo_abbot.find_one_channel(group_filter)
+    if not group:
+        bot_debug.log(__name__, "no group exists")
+        response: Dict = handle_insert_channel(chat, admins)
+        if not successful(response):
+            bot_error.log(__name__, f"Insert new channel fail")
+            return await context.bot.send_message(chat_id=THE_CREATOR, text=response.get("message"))
+        group: TelegramGroup = try_get(response, "data")
+        bot_debug.log(__name__, f"group={group}")
+        return await context.bot.send_message(
+            chat_id=THE_CREATOR, text=f"{BOT_NAME} added to new group:\n\nTitle={chat.title}\nID={chat.id}"
+        )
+    group: TelegramGroup = mongo_abbot.find_one_channel_and_update({"id": chat.id})
+    # mongo_abbot.update_one_channel(group_filter,
+    bot_debug.log(__name__, f"update_data={update_data}")
 
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -513,15 +516,15 @@ class TelegramBotBuilder:
                 CommandHandler("rules", rules),
                 CommandHandler("start", start),
                 CommandHandler("stop", stop),
-                CommandHandler("unleash", unleash),
-                CommandHandler("leash", leash),
+                # CommandHandler("unleash", unleash),
+                # CommandHandler("leash", leash),
                 CommandHandler("balance", balance),
                 CommandHandler("fund", fund),
                 CommandHandler("cancel", fund_cancel),
                 MessageHandler(PRIVATE, handle_dm),
                 MessageHandler(GROUPS & ENTITY_MENTION & REGEX_BOT_TELEGRAM_HANDLE, handle_group_mention),
                 MessageHandler(GROUPS & REPLY, handle_group_reply),
-                MessageHandler(ALL, handle_default),
+                MessageHandler(GROUPS, handle_default),
             ]
         )
 
