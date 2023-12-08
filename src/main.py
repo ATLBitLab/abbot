@@ -21,6 +21,6 @@ if __name__ == "__main__":
         # else:
         #     raise AbbotException("Must specify platform: python src/main.py [--telegram | --nostr] [--dev | --test]")
     except KeyboardInterrupt:
-        bot_debug.log("Interrupt received, shutting down.")
-        bot_debug.log("Shutting down...")
-        bot_debug.log("Shutdown complete.")
+        bot_debug.log(__name__, "Interrupt received, shutting down.")
+        bot_debug.log(__name__, "Shutting down...")
+        bot_debug.log(__name__, "Shutdown complete.")

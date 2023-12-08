@@ -1,18 +1,20 @@
+from typing import Dict
+import httpx
+from httpx import Response
 from abc import ABC, abstractmethod
 from lib.utils import success, try_get
-import httpx
-from lib.abbot.env import PAYMENT_PROCESSOR_KIND, PAYMENT_PROCESSOR_TOKEN, LNBITS_BASE_URL
+from lib.logger import bot_debug
 
 
 def init_payment_processor():
+    PAYMENT_PROCESSOR_KIND = "strike"
+    PAYMENT_PROCESSOR_TOKEN = "A50FA9B3130792435D5EDD067AFAD10B345F84F7927A734C92BBC3F933205B37"
+    LNBITS_BASE_URL = "LNBITS_BASE_URL"
     available_processors = ["strike", "lnbits", "opennode"]
-
     if PAYMENT_PROCESSOR_KIND is None or PAYMENT_PROCESSOR_KIND not in available_processors:
         raise Exception(f"PAYMENT_PROCESSOR_KIND must be one of {', '.join(available_processors)}")
-
-    if not PAYMENT_PROCESSOR_TOKEN.trim():
+    if not PAYMENT_PROCESSOR_TOKEN.strip():
         raise Exception("PAYMENT_PROCESSOR_TOKEN must be a valid API token")
-
     if PAYMENT_PROCESSOR_KIND == "strike":
         return Strike(PAYMENT_PROCESSOR_TOKEN)
     elif PAYMENT_PROCESSOR_KIND == "lnbits":
@@ -44,6 +46,8 @@ class Strike(Processor):
     A Strike payment processor
     """
 
+    CHAT_ID_INVOICE_ID_MAP = {}
+
     def __init__(self, api_key):
         super().__init__()
         assert api_key is not None, "a Strike API key must be supplied"
@@ -56,8 +60,8 @@ class Strike(Processor):
             },
         )
 
-    async def get_invoice(self, correlation_id, description, amount):
-        invoice_resp = await self._client.post(
+    async def get_invoice(self, correlation_id, description, amount, chat_id):
+        invoice_resp: Response = await self._client.post(
             "/invoices",
             json={
                 "correlationId": correlation_id,
@@ -65,23 +69,35 @@ class Strike(Processor):
                 "amount": {"amount": amount, "currency": "USD"},
             },
         )
-        invoice_id = try_get(invoice_resp, "invoiceId")
+        invoice_data: Dict = invoice_resp.json()
+        bot_debug.log(__name__, f"strike => get_invoice => invoice_resp={invoice_resp.text}")
+
+        invoice_id = try_get(invoice_data, "invoiceId")
+        self.CHAT_ID_INVOICE_ID_MAP[chat_id] = invoice_id
+        bot_debug.log(__name__, f"strike => get_invoice => invoice_id={invoice_id}")
+
         quote_resp = await self._client.post(f"/invoices/{invoice_id}/quote")
+        bot_debug.log(__name__, f"strike => get_invoice => quote_resp={quote_resp.text}")
+
+        quote_data: Dict = quote_resp.json()
+        bot_debug.log(__name__, f"strike => get_invoice => quote_data={quote_data}")
 
         return success(
-            "Invoice created",
+            message="Invoice created",
             invoice_id=invoice_id,
-            lnInvoice=try_get(quote_resp, "lnInvoice"),
-            expirationInSec=try_get(quote_resp, "expirationInSec"),
+            lnInvoice=try_get(quote_data, "lnInvoice"),
+            expirationInSec=try_get(quote_data, "expirationInSec"),
         )
 
     async def invoice_is_paid(self, invoice_id):
-        resp = await self._client.get(f"/invoices/{invoice_id}")
-        return try_get(resp, "state") == "PAID"
+        resp: Response = await self._client.get(f"/invoices/{invoice_id}")
+        resp_data: Dict = resp.json()
+        return try_get(resp_data, "state") == "PAID"
 
     async def expire_invoice(self, invoice_id):
-        resp = await self._client.patch(f"/invoices/{invoice_id}/cancel")
-        return try_get(resp, "state") == "CANCELLED"
+        resp: Response = await self._client.patch(f"/invoices/{invoice_id}/cancel")
+        resp_data: Dict = resp.json()
+        return try_get(resp_data, "state") == "CANCELLED"
 
 
 class LNbits(Processor):

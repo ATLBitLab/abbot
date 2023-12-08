@@ -2,6 +2,8 @@ from functools import wraps
 from lib.logger import bot_error, bot_debug
 from traceback import format_exc, format_tb
 
+from lib.abbot.utils import squawk_error
+
 
 class NostrEventNotFoundError(Exception):
     def __init__(self, kind=None, message="Nostr event not found", formatted_traceback=None, custom_stack=None):
@@ -26,8 +28,8 @@ def try_except(fn):
             return fn(*args, **kwargs)
         except Exception as exception:
             abbot_exception = AbbotException(exception, format_exc(), format_tb(exception.__traceback__)[:-1])
-            bot_error.log(f"try_except: {abbot_exception}")
-            return abbot_exception
+            bot_error.log(__name__, f"Exception while handling an update: {abbot_exception}")
+            squawk_error
 
     return wrapper
 

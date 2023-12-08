@@ -11,11 +11,10 @@ from constants import OPENAI_MODEL
 
 from ..db.utils import successful_update_one
 from ..utils import error, success, successful, to_dict, try_get
-from ..abbot.config import BOT_CORE_SYSTEM
+from ..abbot.config import BOT_CORE_SYSTEM_CHANNEL, BOT_CORE_SYSTEM_DM
 from ..db.mongo import GroupConfig, UpdateResult, mongo_abbot
 
 from ..logger import bot_debug, bot_error
-from ..abbot.exceptions.exception import try_except
 
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
 
@@ -27,13 +26,14 @@ class Abbot(GroupConfig):
     client: OpenAI = OpenAI(api_key=OPENAI_API_KEY)
 
     def __init__(self, id: str, bot_type: str, history: List):
+        bot_debug.log(__name__, f"Abbot __init__ => history={history}")
         self.id: str = id
         self.bot_type: str = bot_type
-        self.model: str = OPENAI_MODEL
-        self.history: List = [{"role": "system", "content": BOT_CORE_SYSTEM}, *history]
-        self.history_len: int = len(self.history)
+        self.history: List = history
+        self.history_len: int = len(history)
         self.history_tokens: int = self.calculate_history_tokens()
-        self.config: GroupConfig = GroupConfig() if self.bot_type != "dm" else None
+        self.config: GroupConfig = None if bot_type == "dm" else GroupConfig()
+        self.model: str = OPENAI_MODEL
 
     def __str__(self) -> str:
         return f"Abbot(model={self.model}, id={self.id}, bot_type={self.bot_type}, history_len={self.history_len}, history_tokens={self.history_tokens}, config={self.config})"
@@ -101,7 +101,7 @@ class Abbot(GroupConfig):
         return self.history
 
     def tokenize(self, content: str) -> list:
-        return encoding.encode(content)
+        return encoding.encode(content, allowed_special="all")
 
     def calculate_tokens(self, content: str) -> int:
         return len(self.tokenize(content))
@@ -110,6 +110,7 @@ class Abbot(GroupConfig):
         total = 0
         for data in self.history:
             content = try_get(data, "content")
+            print("content", content)
             total += self.calculate_tokens(content)
         return total
 
@@ -124,12 +125,19 @@ class Abbot(GroupConfig):
         self.history_len += 1
         self.history_tokens += len(self.tokenize(content))
 
+    def update_history(self, update: Dict) -> None:
+        self.history.append(update)
+        self.update_history_meta(try_get(update, "content"))
+
     def chat_completion(self) -> str:
         response = self.client.chat.completions.create(messages=self.history, model=self.model)
         answer = try_get(response, "choices", 0, "message", "content")
-        self.history.append({"role": "assistant", "content": answer})
+        input_tokens = try_get(response, "usage", "prompt_tokens")
+        output_tokens = try_get(response, "usage", "completion_tokens")
+        total_tokens = try_get(response, "usage", "total_tokens")
+        self.update_history({"role": "assistant", "content": answer})
         self.update_history_meta(answer)
-        bot_debug.log(__name__, f"chat_completion => response={response}")
-        if not successful(response):
-            bot_error.log(__name__, f"chat_completion => response={response}")
-        return answer
+        if not answer:
+            bot_debug.log(__name__, f"chat_completion => response={response}")
+            bot_error.log(__name__, f"chat_completion => answer={answer}")
+        return answer, input_tokens, output_tokens, total_tokens

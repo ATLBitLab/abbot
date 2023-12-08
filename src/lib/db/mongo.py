@@ -2,23 +2,19 @@ from abc import abstractmethod
 from datetime import datetime
 from cli_args import TELEGRAM_MODE, TEST_MODE, DEV_MODE
 from typing import Dict, List, Optional, Tuple
-
 from nostr_sdk import PublicKey, EventId, Event
 from telegram import Chat, ChatMember, Message
-
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.cursor import Cursor
 from pymongo.results import InsertOneResult, InsertManyResult, UpdateResult
-
 from bson.typings import _DocumentType
-
 from constants import INTRODUCTION
 from ..logger import bot_error, bot_debug
 from ..utils import to_dict, error, try_get
 from ..abbot.env import DATABASE_CONNECTION_STRING
 from ..abbot.exceptions.exception import try_except
-from ..abbot.config import BOT_CORE_SYSTEM
+from ..abbot.config import BOT_CORE_SYSTEM_DM, BOT_CORE_SYSTEM_CHANNEL
 
 client = MongoClient(host=DATABASE_CONNECTION_STRING)
 
@@ -32,6 +28,7 @@ else:
     telegram_db_name = "telegram"
     nostr_db_name = "nostr"
 
+bot_debug.log(__name__, f"telegram_db_name={telegram_db_name}")
 db_nostr = client.get_database(nostr_db_name)
 nostr_channels = db_nostr.get_collection("channel")
 bot_channel_invites = db_nostr.get_collection("channel_invite")
@@ -40,6 +37,9 @@ nostr_dms = db_nostr.get_collection("dm")
 db_telegram = client.get_database(telegram_db_name)
 telegram_channels = db_telegram.get_collection("channel")
 telegram_dms = db_telegram.get_collection("dm")
+
+db_prices = client.get_database("prices")
+btcusd = db_prices.get_collection("btcusd")
 
 
 @to_dict
@@ -86,8 +86,8 @@ class TelegramDM:
         self.id: int = message.chat.id
         self.username: str = message.from_user.username
         self.created_at: datetime = datetime.now()
-        self.messages = [{"message": message.to_dict()}]
-        self.history = [{"role": "user", "content": message.text}]
+        self.messages = [message.to_dict()]
+        self.history = [{"role": "system", "content": BOT_CORE_SYSTEM_DM}, {"role": "user", "content": message.text}]
 
     @abstractmethod
     def to_dict(self):
@@ -102,10 +102,9 @@ class TelegramGroup(GroupConfig):
         self.type: str = message.chat.type
         self.admins: List = admins
         self.balance: int = 50000
-        self.messages = [{"message": message.to_dict()}]
+        self.messages = []
         self.history = [
-            {"role": "system", "content": BOT_CORE_SYSTEM},
-            {"role": "assistant", "content": INTRODUCTION},
+            {"role": "system", "content": BOT_CORE_SYSTEM_CHANNEL},
             {"role": "user", "content": message.text},
         ]
         self.config = GroupConfig(started=True, introduced=True, unleashed=False, count=None)
@@ -117,23 +116,18 @@ class MongoNostr:
         self.channels = nostr_channels
         self.dms = nostr_dms
 
-    @try_except
     def known_channels(self) -> List[MongoNostrEvent]:
         return [MongoNostrEvent(channel) for channel in self.channels.find()]
 
-    @try_except
     def known_channel_ids(self) -> List[EventId]:
         return [channel.id() for channel in self.known_channels()]
 
-    @try_except
     def known_channel_invite_authors(self) -> List[PublicKey]:
         return [channel.pubkey() for channel in self.known_channels()]
 
-    @try_except
     def known_dms(self) -> List[MongoNostrEvent]:
         return [MongoNostrEvent(dm) for dm in self.dms.find()]
 
-    @try_except
     def known_dm_pubkeys(self) -> List[PublicKey]:
         return [MongoNostrEvent(dm).pubkey() for dm in self.dms.find()]
 
@@ -158,6 +152,9 @@ class MongoAbbot(MongoNostr, MongoTelegram):
     @abstractmethod
     def to_dict(self):
         pass
+
+    def insert_one_price(self, price: Dict) -> InsertOneResult:
+        return btcusd.insert_one(price)
 
     # create docs
     def insert_one_channel(self, channel: Dict) -> InsertOneResult:
@@ -222,6 +219,14 @@ class MongoAbbot(MongoNostr, MongoTelegram):
         if channel_doc == None:
             return error("Channel does not exist")
         return channel_doc
+
+    def get_group_balance(self, id) -> int:
+        group: TelegramGroup = self.find_one_channel({"id": id})
+        return try_get(group, "balance")
+
+    def get_group_history(self, id) -> int:
+        group: TelegramGroup = self.find_one_channel({"id": id})
+        return try_get(group, "history", default=[])
 
 
 db_name = "telegram" if TELEGRAM_MODE else "nostr"
