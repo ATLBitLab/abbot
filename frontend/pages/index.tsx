@@ -243,6 +243,10 @@ function ChannelInteraction(channelInteractionProps: ChannelInteractionProps) {
     setChannelMode(true);
   };
 
+  const handleSetGroupId = (e: { target: { value: any; }; }) => setGroupId(e.target.value)
+
+  const handleSetChannelId = (e: { target: { value: any; }; }) => setChannelId(e.target.value)
+
   return (
     <>
       <Row className="w-full">
@@ -276,8 +280,8 @@ function ChannelInteraction(channelInteractionProps: ChannelInteractionProps) {
           loading={loading}
           handleFormSubmit={handleFormSubmit}
           isTelegram={isTelegram}
-          groupId={null}
-          setGroupId={null}
+          groupId={groupId}
+          handleSetGroupId={handleSetGroupId}
         />
       )}
     </>
