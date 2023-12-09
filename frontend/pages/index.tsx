@@ -334,7 +334,7 @@ function ChannelInteraction({
                 // }
               }}
             >
-              {isTelegram ? "Add Abbot - Telegram App  🤖" : "DM 🟣"}
+              {isTelegram ? "Quick add link  🤖" : "DM 🟣"}
             </Button>
             <Button
               className={`w-full border-[#08252E] border-2 mr-1 ${
@@ -347,7 +347,7 @@ function ChannelInteraction({
                 setManualAddIsClicked(true);
               }}
             >
-              {isTelegram ? "Add Abbot - Manually 🤖" : "Channel 🟣"}
+              {isTelegram ? "Manual Instructions 🤖" : "Channel 🟣"}
             </Button>
           </Row>
           {manualAddIsClicked && <ManualInstructions />}
