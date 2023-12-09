@@ -38,11 +38,14 @@ const handleTelegram = async (channelId: string) => {
   // TODO: how to do this
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
   try {
     if (req.method !== 'POST') return;
-    const { platform } = req.query;
-    const { channelId }: RequestBody = req.body;
+
+    const { platform, channelId }: RequestBody = req.body;
     let data;
     if (platform === "nostr") {
       data = await handleNostr(channelId);

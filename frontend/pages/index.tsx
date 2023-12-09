@@ -9,18 +9,15 @@ import Toast from "awesome-toast-component";
 
 export default function Abbot() {
   const router = useRouter();
-  const [loading, setLoading] = useState<boolean>(false);
-  const [platform, setPlatform] = useState<string>(""); // 'nostr' or 'telegram'
-
-  const [channelId, setChannelId] = useState<string>("");
-  const [groupId, setGroupId] = useState<string>("");
-
-  const [channelMode, setChannelMode] = useState<boolean>(false); // true when a channel button is clicked
+  const [channelId, setChannelId] = useState<any>("");
+  const [loading, setLoading] = useState<any>(false);
+  const [platform, setPlatform] = useState<any>(null); // 'nostr' or 'telegram'
+  const [channelMode, setChannelMode] = useState<any>(false); // true when a channel button is clicked
 
   // Function to send NOSTR channel invite
   const sendInvite = async (channelId: string, platform: string) => {
     try {
-      const response = await fetch(`/api/sendInvite/${platform}`, {
+      const response = await fetch("/api/sendInvite", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ channelId, platform }),
@@ -44,13 +41,13 @@ export default function Abbot() {
 
   // Function to reset to initial state
   const handleBackClick = () => {
-    setPlatform("");
+    setPlatform(null);
     setChannelMode(false);
     setChannelId("");
   };
 
   // Function to handle form submission
-  const handleFormSubmit = async (e: { preventDefault: () => void; }) => {
+  const handleFormSubmit = async (e: any) => {
     e.preventDefault();
     setLoading(true);
     await sendInvite(channelId, platform);
@@ -195,14 +192,7 @@ export default function Abbot() {
   );
 }
 
-interface PlatformButtonProps {
-  onNostrClick: ((e: any) => any) | undefined,
-  onTelegramClick: ((e: any) => any) | undefined,
-  platform: string
-}
-
-function PlatformButtons(platformButtonProps: PlatformButtonProps) {
-  const { onNostrClick, onTelegramClick, platform } = platformButtonProps;
+function PlatformButtons({ onNostrClick, onTelegramClick, platform }: any) {
   return (
     <Row className="w-full">
       <Button
@@ -225,27 +215,20 @@ function PlatformButtons(platformButtonProps: PlatformButtonProps) {
   );
 }
 
-interface ChannelInteractionProps {
-  platform: string;
-  channelMode: boolean;
-  channelId: string;
-  loading: boolean;
-  setChannelMode: ((value: React.SetStateAction<boolean>) => void);
-  setChannelId: ((value: React.SetStateAction<string>) => void);
-  handleFormSubmit: (e: { preventDefault: () => void }) => Promise<void>;
-}
-
-function ChannelInteraction(channelInteractionProps: ChannelInteractionProps) {
-  const { platform, channelMode, channelId, loading, setChannelMode, setChannelId, handleFormSubmit } = channelInteractionProps;
+function ChannelInteraction({
+  platform,
+  setChannelMode,
+  channelMode,
+  channelId,
+  setChannelId,
+  loading,
+  handleFormSubmit,
+}: any) {
   const isTelegram = platform === "telegram";
 
   const handleChannelClick = () => {
     setChannelMode(true);
   };
-
-  const handleSetGroupId = (e: { target: { value: any; }; }) => setGroupId(e.target.value)
-
-  const handleSetChannelId = (e: { target: { value: any; }; }) => setChannelId(e.target.value)
 
   return (
     <>
@@ -276,31 +259,27 @@ function ChannelInteraction(channelInteractionProps: ChannelInteractionProps) {
       {channelMode && (
         <ChannelForm
           channelId={channelId}
-          handleSetChannelId={handleSetChannelId}
+          setChannelId={setChannelId}
           loading={loading}
           handleFormSubmit={handleFormSubmit}
           isTelegram={isTelegram}
-          groupId={groupId}
-          handleSetGroupId={handleSetGroupId}
+          chatId={null}
+          setChatId={null}
         />
       )}
     </>
   );
 }
 
-interface ChannelFormProps {
-  chatId: string;
-  channelId: string;
-  loading: boolean;
-  isTelegram: boolean;
-  handleSetGroupId: ((e: any) => any) | undefined;
-  handleSetChannelId: ((e: any) => any) | undefined;
-  handleFormSubmit: ((e: any) => any) | undefined;
-}
-
-function ChannelForm(channelFormProps: ChannelFormProps) {
-  const { chatId, channelId, loading, isTelegram } = channelFormProps;
-  const { handleSetGroupId, handleSetChannelId, handleFormSubmit, } = channelFormProps;
+function ChannelForm({
+  chatId,
+  setChatId,
+  channelId,
+  setChannelId,
+  loading,
+  handleFormSubmit,
+  isTelegram,
+}: any) {
   return (
     <Row className="w-full">
       <form
@@ -315,7 +294,7 @@ function ChannelForm(channelFormProps: ChannelFormProps) {
             title="Chat ID should be a number"
             className="border-2 border-[#08252E] px-2 text-black flex-grow"
             value={chatId}
-            onChange={handleSetGroupId}
+            onChange={(e) => setChatId(e.target.value)}
             required
           />
         ) : (
@@ -326,7 +305,7 @@ function ChannelForm(channelFormProps: ChannelFormProps) {
             title="Channel ID should be 64 lowercase hex characters"
             className="border-2 border-[#08252E] px-2 text-black flex-grow"
             value={channelId}
-            onChange={handleSetChannelId}
+            onChange={(e) => setChannelId(e.target.value)}
             required
           />
         )}

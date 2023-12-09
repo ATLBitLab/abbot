@@ -103,7 +103,7 @@ export default function Help() {
             To fund Abbot, use a Lightning wallet and scan the provided QR code.
           </li>
           <li>
-            You can also send funds to Abbot's Lightning address directly.
+            You can also send funds to Abbot&apos;s Lightning address directly.
           </li>
           <li>
             Funding Abbot enables enhanced features and supports its operations.
@@ -114,10 +114,10 @@ export default function Help() {
         <h3>How to Add Abbot to Channels</h3>
         <ul>
           <li>
-            Navigate to the channel settings and select 'Add Members' or a
+            Navigate to the channel settings and select &apos;Add Members&apos; or a
             similar option.
           </li>
-          <li>Search for 'Abbot' and add it to your channel.</li>
+          <li>Search for &apos;Abbot&apos; and add it to your channel.</li>
           <li>
             Once added, run the /start command in the channel to activate Abbot.
           </li>
@@ -131,7 +131,7 @@ export default function Help() {
             features.
           </li>
           <li>
-            To customize Abbot's responses, access the settings through the
+            To customize Abbot&apos;s responses, access the settings through the
             command interface.
           </li>
           <li>

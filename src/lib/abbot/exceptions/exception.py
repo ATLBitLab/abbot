@@ -29,7 +29,6 @@ def try_except(fn):
         except Exception as exception:
             abbot_exception = AbbotException(exception, format_exc(), format_tb(exception.__traceback__)[:-1])
             bot_error.log(__name__, f"Exception while handling an update: {abbot_exception}")
-            squawk_error
 
     return wrapper
 

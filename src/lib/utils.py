@@ -8,8 +8,7 @@ from io import BytesIO, open
 from requests import request
 
 from telegram.ext import ContextTypes
-from lib.logger import bot_debug, bot_error
-from lib.abbot.exceptions.exception import try_except
+from lib.logger import bot_debug
 
 
 TELEGRAM_MESSAGE_FIELDS = [
