@@ -250,36 +250,35 @@ function ManualInstructions() {
 function TelegramInstructions() {
   return (
     <>
-      <div className="w-5/6">
-        <ol className="list-decimal text-left">
-          <li>
-            Make sure the device you&#39;re currently using has the Telegram app
-            installed
-          </li>
-          <li>
-            Click the &#34;ADD ABBOT&#34; button below or scan the QR code with
-            your camera
-          </li>
-          <li>
-            Both options will open Telegram and show you a drop down list of all
-            your group chats
-          </li>
-          <li>
-            Select the group you want to add Abbot to and click &#34;OK&#34; or
-            &#34;ADD AS ADMIN&#34;
-          </li>
-          <li>a. If you are not a group admin, you will see &#34;OK&#34;</li>
-          <li>
-            b. If you are a group admin, you will see &#34;ADD AS ADMIN&#34;{" "}
-            <Link href="/help">(Why does Abbot need to be an admin?)</Link>
-          </li>
+       <div className="w-5/6">
+        <ul className="list-decimal text-left">
+          <li>Ensure your device has the Telegram app installed</li>
+          <li>Click the &#34;ADD ABBOT&#34; button below or scan the QR code</li>
+          <li>Select your group from the drop down list on Telegram</li>
+          <li>For non-admin, group members, click &#34;OK&#34;</li>
+          <li>For admin group members, click &#34;ADD AS ADMIN&#34;</li>
           <li>Go to your group chat and follow the instructions Abbot sends</li>
           <li>
-            Have fun! Contact{" "}
-            <Link href="https://t.me/nonni_io">@nonni_io</Link> on Telegram for
-            help
-          </li>
-        </ol>
+            For help, visit the
+            {" "}
+            <Link
+            href={"/help"}
+            className="text-blue-600 underline"
+            >
+              help
+            </Link>
+            {" "}
+            page or contact
+            {" "}
+            <Link
+            className="text-blue-600
+            underline" href="https://t.me/nonni_io"
+            >
+              @nonni_io
+            </Link>
+            {" "}
+            on Telegram</li>
+        </ul>
       </div>
       <Button
         onClick={() => {
