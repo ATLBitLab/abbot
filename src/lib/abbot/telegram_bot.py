@@ -85,7 +85,6 @@ DEFAULT_GROUP_HISTORY = [
 ]
 
 
-@try_except
 async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Tuple[Message, Chat, User]:
     response: Dict = parse_message(update, context)
     message: Message = try_get(response, "data")
@@ -106,7 +105,7 @@ async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     return (message, chat, user)
 
 
-def create_telegram_group_doc(chat: Chat, admins):
+def init_telegram_group_doc(chat: Chat, admins):
     return {
         "title": chat.title,
         "id": chat.id,
@@ -121,7 +120,7 @@ def create_telegram_group_doc(chat: Chat, admins):
 
 
 def handle_insert_channel(chat: Chat, admins: Tuple[ChatMember]) -> Dict:
-    group_doc: TelegramGroup = create_telegram_group_doc(chat, admins)
+    group_doc: TelegramGroup = init_telegram_group_doc(chat, admins)
     insert = mongo_abbot.insert_one_channel(group_doc)
     if not successful_insert_one(insert):
         bot_error.log(__name__, f"handle_chat_creation_members_added => insert failed={insert}")
@@ -151,7 +150,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admins: Tuple[Dict] = [admin.to_dict() for admin in await chat.get_administrators()]
     group: TelegramGroup = mongo_abbot.find_one_channel({"id": chat.id})
     if not group:
-        response: Dict = create_telegram_group_doc(chat, admins)
+        response: Dict = init_telegram_group_doc(chat, admins)
         if not successful(response):
             bot_error.log(__name__, f"Insert new channel fail")
             return await context.bot.send_message(chat_id=THE_CREATOR, text=response.get("message"))
@@ -181,7 +180,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admins: Tuple[Dict] = [admin.to_dict() for admin in await chat.get_administrators()]
     group: TelegramGroup = mongo_abbot.find_one_channel({"id": chat.id})
     if not group:
-        response: Dict = create_telegram_group_doc(chat, admins)
+        response: Dict = init_telegram_group_doc(chat, admins)
         if not successful(response):
             bot_error.log(__name__, f"Insert new channel fail")
             return await context.bot.send_message(chat_id=THE_CREATOR, text=response.get("message"))
@@ -276,7 +275,7 @@ async def handle_chat_creation_members_added(update: Update, context: ContextTyp
     group: TelegramGroup = mongo_abbot.find_one_channel({"id": chat.id})
     bot_debug.log(__name__, f"group={group}")
     if not group:
-        response: Dict = create_telegram_group_doc(chat, admins)
+        response: Dict = init_telegram_group_doc(chat, admins)
         if not successful(response):
             bot_error.log(__name__, f"Insert new channel fail")
             return await context.bot.send_message(chat_id=THE_CREATOR, text=response.get("message"))
@@ -440,7 +439,7 @@ async def handle_default(update: Update, context: ContextTypes.DEFAULT_TYPE):
     group: TelegramGroup = mongo_abbot.find_one_channel(group_filter)
     if not group:
         bot_debug.log(__name__, "no group exists, adding initial group to DB")
-        response: Dict = create_telegram_group_doc(chat, admins)
+        response: Dict = init_telegram_group_doc(chat, admins)
         if not successful(response):
             bot_error.log(__name__, f"Insert new channel fail")
             return await context.bot.send_message(chat_id=THE_CREATOR, text=response.get("message"))
@@ -486,8 +485,8 @@ class TelegramBotBuilder:
                 CommandHandler("fund", fund),
                 CommandHandler("cancel", fund_cancel),
                 MessageHandler(PRIVATE, handle_dm),
-                # MessageHandler(GROUPS & ENTITY_MENTION & REGEX_BOT_TELEGRAM_HANDLE, handle_group_mention),
-                # MessageHandler(GROUPS & REPLY, handle_group_reply),
+                MessageHandler(GROUPS & ENTITY_MENTION & REGEX_BOT_TELEGRAM_HANDLE, handle_group_mention),
+                MessageHandler(GROUPS & REPLY, handle_group_reply),
                 MessageHandler(GROUPS, handle_default),
             ]
         )
