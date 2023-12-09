@@ -234,9 +234,14 @@ function ManualInstructions() {
   return (
     <>
       <ul>
-        <li>Navigate to the channel settings and select &#34;Add Members&#34; or a similar option.</li>
+        <li>
+          Navigate to the channel settings and select &#34;Add Members&#34; or a
+          similar option.
+        </li>
         <li>Search for &#34;Abbot&#34; and add it to your channel.</li>
-        <li>Once added, run the /start command in the channel to activate Abbot.</li>
+        <li>
+          Once added, run the /start command in the channel to activate Abbot.
+        </li>
       </ul>
     </>
   );
@@ -245,24 +250,46 @@ function ManualInstructions() {
 function TelegramInstructions() {
   return (
     <>
-      <ul>
-        <li>Make sure the device you&#39;re currently using has the Telegram app installed</li>
-        <li>Click the &#34;ADD ABBOT&#34; button below or scan the QR code with your camera</li>
-        <li>Both options will open Telegram and show you a drop down list of all your group chats</li>
-        <li>Select the group you want to add Abbot to and click &#34;OK&#34; or &#34;ADD AS ADMIN&#34;</li>
-        <li>a. If you are not a group admin, you will see &#34;OK&#34;</li>
-        <li>b. If you are a group admin, you will see &#34;ADD AS ADMIN&#34; <Link href="/help">(Why does Abbot need to be an admin?)</Link></li>
-        <li>Go to your group chat and follow the instructions Abbot sends</li>
-        <li>Have fun! Contact <Link href="https://t.me/nonni_io">@nonni_io</Link> on Telegram for help</li>
-      </ul>
+       <div className="w-5/6">
+        <ul className="list-decimal text-left">
+          <li>Ensure your device has the Telegram app installed</li>
+          <li>Click the &#34;ADD ABBOT&#34; button below or scan the QR code</li>
+          <li>Select your group from the drop down list on Telegram</li>
+          <li>For non-admin, group members, click &#34;OK&#34;</li>
+          <li>For admin group members, click &#34;ADD AS ADMIN&#34;</li>
+          <li>Go to your group chat and follow the instructions Abbot sends</li>
+          <li>
+            For help, visit the
+            {" "}
+            <Link
+            href={"/help"}
+            className="text-blue-600 underline"
+            >
+              help
+            </Link>
+            {" "}
+            page or contact
+            {" "}
+            <Link
+            className="text-blue-600
+            underline" href="https://t.me/nonni_io"
+            >
+              @nonni_io
+            </Link>
+            {" "}
+            on Telegram</li>
+        </ul>
+      </div>
       <Button
         onClick={() => {
           console.log("Button C clicked");
-          window.open( "https://t.me/atl_bitlab_bot?startgroup=true", "_blank");
+          window.open("https://t.me/atl_bitlab_bot?startgroup=true", "_blank");
         }}
         type="button"
       >
-        <Link href="https://t.me/atl_bitlab_bot?startgroup=true">Add Abbot</Link>
+        <Link href="https://t.me/atl_bitlab_bot?startgroup=true">
+          Add Abbot
+        </Link>
       </Button>
     </>
   );
@@ -334,7 +361,7 @@ function ChannelInteraction({
                 // }
               }}
             >
-              {isTelegram ? "Add Abbot - Telegram App  🤖" : "DM 🟣"}
+              {isTelegram ? "Quick add link  🤖" : "DM 🟣"}
             </Button>
             <Button
               className={`w-full border-[#08252E] border-2 mr-1 ${
@@ -347,7 +374,7 @@ function ChannelInteraction({
                 setManualAddIsClicked(true);
               }}
             >
-              {isTelegram ? "Add Abbot - Manually 🤖" : "Channel 🟣"}
+              {isTelegram ? "Manual Instructions 🤖" : "Channel 🟣"}
             </Button>
           </Row>
           {manualAddIsClicked && <ManualInstructions />}
