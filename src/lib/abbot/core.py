@@ -110,7 +110,6 @@ class Abbot(GroupConfig):
         total = 0
         for data in self.history:
             content = try_get(data, "content")
-            print("content", content)
             total += self.calculate_tokens(content)
         return total
 

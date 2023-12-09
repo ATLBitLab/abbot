@@ -106,20 +106,23 @@ async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     return (message, chat, user)
 
 
-def init_group(chat: Chat, admins: Tuple[ChatMember]) -> Dict:
-    insert = mongo_abbot.insert_one_channel(
-        {
-            "title": chat.title,
-            "id": chat.id,
-            "created_at": datetime.now(),
-            "type": chat.type,
-            "admins": list(admins),
-            "balance": 50000,
-            "message": [],
-            "history": DEFAULT_GROUP_HISTORY,
-            "config": {"started": False, "introduced": False, "unleashed": False, "count": None},
-        }
-    )
+def create_telegram_group_doc(chat: Chat, admins):
+    return {
+        "title": chat.title,
+        "id": chat.id,
+        "created_at": datetime.now(),
+        "type": chat.type,
+        "admins": list(admins),
+        "balance": 50000,
+        "message": [],
+        "history": DEFAULT_GROUP_HISTORY,
+        "config": {"started": False, "introduced": False, "unleashed": False, "count": None},
+    }
+
+
+def handle_insert_channel(chat: Chat, admins: Tuple[ChatMember]) -> Dict:
+    group_doc: TelegramGroup = create_telegram_group_doc(chat, admins)
+    insert = mongo_abbot.insert_one_channel(group_doc)
     if not successful_insert_one(insert):
         bot_error.log(__name__, f"handle_chat_creation_members_added => insert failed={insert}")
         return error("Insert new group doc success", data=insert)
@@ -132,47 +135,6 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
     message, _, _ = update_data
     await message.reply_text(HELP_MENU)
-
-
-# @try_except
-# async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
-#     message, chat, user = update_data
-#     pass
-# TODO: finish this logic
-# if abbot.is_stopped():
-#     return await message.reply_text(f"I'm already stopped for {chat_title}! Please run /start to begin!")
-# unleashed, count = abbot.is_unleashed()
-# if unleashed:
-#     return await message.reply_text(f"I'm already unleashed for {chat_title}! To leash me, please run /leash!")
-
-# abbot.unleash()
-# unleashed, count = abbot.is_unleashed()
-# bot_debug.log(f"{fn} {abbot} unleashed={unleashed}")
-# return await message.reply_text(
-#     f"I have been unleashed! I will now respond every {count} messages until"
-#     "you run /leash or /unleash <insert_new_number> (e.g. /unleash 10)"
-# )
-
-
-# @try_except
-# async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
-#     update_data: Tuple[Message, Chat, User] = await parse_update_data(update, context)
-#     message, chat, user = update_data
-#     pass
-# TODO: finish this logic
-# abbot: Abbot = Abbot(chat_id)
-# if abbot.is_stopped():
-#     return await message.reply_text(f"I'm already stopped for {chat_title}! Please run /start to begin!")
-# leashed, count = abbot.is_leashed()
-# if leashed:
-#     return await message.reply_text(f"I'm already leashed for {chat_title}! To unleash me, please run /leash!")
-# abbot.leash()
-# leashed, count = abbot.is_leashed()
-# bot_debug.log(f"{fn} leashed={leashed}")
-# return await message.reply_text(
-#     f"I have been leashed! To unleash me again, run /unleash or /unleash <insert_new_number> (e.g. /unleash 10)"
-# )
 
 
 @try_except
@@ -189,7 +151,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admins: Tuple[Dict] = [admin.to_dict() for admin in await chat.get_administrators()]
     group: TelegramGroup = mongo_abbot.find_one_channel({"id": chat.id})
     if not group:
-        response: Dict = init_group(chat, admins)
+        response: Dict = create_telegram_group_doc(chat, admins)
         if not successful(response):
             bot_error.log(__name__, f"Insert new channel fail")
             return await context.bot.send_message(chat_id=THE_CREATOR, text=response.get("message"))
@@ -219,7 +181,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admins: Tuple[Dict] = [admin.to_dict() for admin in await chat.get_administrators()]
     group: TelegramGroup = mongo_abbot.find_one_channel({"id": chat.id})
     if not group:
-        response: Dict = init_group(chat, admins)
+        response: Dict = create_telegram_group_doc(chat, admins)
         if not successful(response):
             bot_error.log(__name__, f"Insert new channel fail")
             return await context.bot.send_message(chat_id=THE_CREATOR, text=response.get("message"))
@@ -314,7 +276,7 @@ async def handle_chat_creation_members_added(update: Update, context: ContextTyp
     group: TelegramGroup = mongo_abbot.find_one_channel({"id": chat.id})
     bot_debug.log(__name__, f"group={group}")
     if not group:
-        response: Dict = init_group(chat, admins)
+        response: Dict = create_telegram_group_doc(chat, admins)
         if not successful(response):
             bot_error.log(__name__, f"Insert new channel fail")
             return await context.bot.send_message(chat_id=THE_CREATOR, text=response.get("message"))
@@ -478,7 +440,7 @@ async def handle_default(update: Update, context: ContextTypes.DEFAULT_TYPE):
     group: TelegramGroup = mongo_abbot.find_one_channel(group_filter)
     if not group:
         bot_debug.log(__name__, "no group exists, adding initial group to DB")
-        response: Dict = init_group(chat, admins)
+        response: Dict = create_telegram_group_doc(chat, admins)
         if not successful(response):
             bot_error.log(__name__, f"Insert new channel fail")
             return await context.bot.send_message(chat_id=THE_CREATOR, text=response.get("message"))
@@ -494,9 +456,12 @@ async def handle_default(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
-    error_message = f"Exception while handling an update:\n\tupdate: {update}\n\t{context}"
+    base_message = "Exception while handling Telegram update"
+    update_d = {**update}
+    context_d = {**context}
+    error_message = f"{base_message}\n\tUpdate={update_d}\n\tContext={context_d}"
     bot_error.log(__name__, error_message)
-    await context.bot.send_message(chat_id=THE_CREATOR, text=error_message)
+    await context.bot.send_message(chat_id=THE_CREATOR, text=f"{__name__}: {error_message}")
 
 
 class TelegramBotBuilder:
@@ -517,14 +482,12 @@ class TelegramBotBuilder:
                 CommandHandler("rules", rules),
                 CommandHandler("start", start),
                 CommandHandler("stop", stop),
-                # CommandHandler("unleash", unleash),
-                # CommandHandler("leash", leash),
                 CommandHandler("balance", balance),
                 CommandHandler("fund", fund),
                 CommandHandler("cancel", fund_cancel),
                 MessageHandler(PRIVATE, handle_dm),
-                MessageHandler(GROUPS & ENTITY_MENTION & REGEX_BOT_TELEGRAM_HANDLE, handle_group_mention),
-                MessageHandler(GROUPS & REPLY, handle_group_reply),
+                # MessageHandler(GROUPS & ENTITY_MENTION & REGEX_BOT_TELEGRAM_HANDLE, handle_group_mention),
+                # MessageHandler(GROUPS & REPLY, handle_group_reply),
                 MessageHandler(GROUPS, handle_default),
             ]
         )

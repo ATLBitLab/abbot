@@ -25,8 +25,9 @@ def try_except(fn):
         try:
             return fn(*args, **kwargs)
         except Exception as exception:
-            abbot_exception = AbbotException(exception, format_exc(), format_tb(exception.__traceback__)[:-1])
-            bot_error.log(__name__, f"Exception while handling an update: {abbot_exception}")
+            except_msg = f"{__name__}: {exception}"
+            abbot_exception = AbbotException(except_msg, format_exc(), format_tb(exception.__traceback__)[:-1])
+            bot_error.log(__name__, abbot_exception)
 
     return wrapper
 
