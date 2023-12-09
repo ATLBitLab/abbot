@@ -106,7 +106,7 @@ async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     return (message, chat, user)
 
 
-def handle_insert_channel(chat: Chat, admins: Tuple[ChatMember]) -> Dict:
+def init_group(chat: Chat, admins: Tuple[ChatMember]) -> Dict:
     insert = mongo_abbot.insert_one_channel(
         {
             "title": chat.title,
@@ -189,7 +189,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admins: Tuple[Dict] = [admin.to_dict() for admin in await chat.get_administrators()]
     group: TelegramGroup = mongo_abbot.find_one_channel({"id": chat.id})
     if not group:
-        response: Dict = handle_insert_channel(chat, admins)
+        response: Dict = init_group(chat, admins)
         if not successful(response):
             bot_error.log(__name__, f"Insert new channel fail")
             return await context.bot.send_message(chat_id=THE_CREATOR, text=response.get("message"))
@@ -219,7 +219,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     admins: Tuple[Dict] = [admin.to_dict() for admin in await chat.get_administrators()]
     group: TelegramGroup = mongo_abbot.find_one_channel({"id": chat.id})
     if not group:
-        response: Dict = handle_insert_channel(chat, admins)
+        response: Dict = init_group(chat, admins)
         if not successful(response):
             bot_error.log(__name__, f"Insert new channel fail")
             return await context.bot.send_message(chat_id=THE_CREATOR, text=response.get("message"))
@@ -314,7 +314,7 @@ async def handle_chat_creation_members_added(update: Update, context: ContextTyp
     group: TelegramGroup = mongo_abbot.find_one_channel({"id": chat.id})
     bot_debug.log(__name__, f"group={group}")
     if not group:
-        response: Dict = handle_insert_channel(chat, admins)
+        response: Dict = init_group(chat, admins)
         if not successful(response):
             bot_error.log(__name__, f"Insert new channel fail")
             return await context.bot.send_message(chat_id=THE_CREATOR, text=response.get("message"))
@@ -477,8 +477,8 @@ async def handle_default(update: Update, context: ContextTypes.DEFAULT_TYPE):
     group_filter = {"id": chat.id}
     group: TelegramGroup = mongo_abbot.find_one_channel(group_filter)
     if not group:
-        bot_debug.log(__name__, "no group exists")
-        response: Dict = handle_insert_channel(chat, admins)
+        bot_debug.log(__name__, "no group exists, adding initial group to DB")
+        response: Dict = init_group(chat, admins)
         if not successful(response):
             bot_error.log(__name__, f"Insert new channel fail")
             return await context.bot.send_message(chat_id=THE_CREATOR, text=response.get("message"))
@@ -487,14 +487,15 @@ async def handle_default(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return await context.bot.send_message(
             chat_id=THE_CREATOR, text=f"{BOT_NAME} added to new group:\n\nTitle={chat.title}\nID={chat.id}"
         )
-    group: TelegramGroup = mongo_abbot.find_one_channel_and_update({"id": chat.id})
-    # mongo_abbot.update_one_channel(group_filter,
+    group: TelegramGroup = mongo_abbot.find_one_channel_and_update(
+        {"id": chat.id}, {"$set": {"config.started": True, "config.introduced": True}}
+    )
     bot_debug.log(__name__, f"update_data={update_data}")
 
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
     error_message = f"Exception while handling an update:\n\tupdate: {update}\n\t{context}"
-    bot_error.log(__name__, error_message, exc_info=context.error)
+    bot_error.log(__name__, error_message)
     await context.bot.send_message(chat_id=THE_CREATOR, text=error_message)
 
 
