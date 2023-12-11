@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
+import Link from "next/link";
 import abbot from "@/public/abbot.jpeg";
 import Button from "@/components/Button";
 import Row from "@/components/Row";
 import { useRouter } from "next/router";
 import Toast from "awesome-toast-component";
+import ChannelForm from "./ChannelForm";
 
 export default function Abbot() {
   const router = useRouter();
@@ -13,6 +15,8 @@ export default function Abbot() {
   const [loading, setLoading] = useState<any>(false);
   const [platform, setPlatform] = useState<any>(null); // 'nostr' or 'telegram'
   const [channelMode, setChannelMode] = useState<any>(false); // true when a channel button is clicked
+  const [manualAddIsClicked, setManualAddIsClicked] = useState<any>(false);
+  const [telegramAddIsClicked, setTelegramAddIsClicked] = useState<any>(false);
 
   // Function to send NOSTR channel invite
   const sendInvite = async (channelId: string, platform: string) => {
@@ -23,7 +27,13 @@ export default function Abbot() {
         body: JSON.stringify({ channelId, platform }),
       });
       const { success, data } = await response.json();
-      new Toast(data, { style: { container: [["background-color", "green"]], message: [["color", "white"]], }, position: "top" });
+      new Toast(data, {
+        style: {
+          container: [["background-color", "green"]],
+          message: [["color", "white"]],
+        },
+        position: "top",
+      });
     } catch (error) {
       console.error(error);
     }
@@ -158,6 +168,10 @@ export default function Abbot() {
                 setChannelId={setChannelId}
                 loading={loading}
                 handleFormSubmit={handleFormSubmit}
+                manualAddIsClicked={manualAddIsClicked}
+                setManualAddIsClicked={setManualAddIsClicked}
+                telegramAddIsClicked={telegramAddIsClicked}
+                setTelegramAddIsClicked={setTelegramAddIsClicked}
               />
             )}
             {platform && (
@@ -196,22 +210,82 @@ function PlatformButtons({ onNostrClick, onTelegramClick, platform }: any) {
   return (
     <Row className="w-full">
       <Button
-        className={`w-full border-[#08252E] border-2 ${platform === "nostr" ? "bg-[#08252E] text-white" : ""
-          }`}
+        className={`w-full border-[#08252E] border-2 ${platform === "nostr" ? "bg-[#08252E] text-white" : ""}`}
         type="button"
         onClick={onNostrClick}
       >
         Use Nostr 🟣
       </Button>
       <Button
-        className={`w-full border-[#08252E] border-2 ml-1 ${platform === "telegram" ? "bg-[#08252E] text-white" : ""
-          }`}
+        className={`w-full border-[#08252E] border-2 ml-1 ${platform === "telegram" ? "bg-[#08252E] text-white" : ""}`}
         type="button"
         onClick={onTelegramClick}
       >
         Use Telegram 🤖
       </Button>
     </Row>
+  );
+}
+
+function ManualInstructions() {
+  return (
+    <div className="w-5/6">
+        <ul className="list-decimal text-left">
+        <li>Open Telegram and find your group</li>
+        <li>In group settings, select &#34;Add&#34;</li>
+        <li>Search for and select &#34;Abbot - ATL BitLab Bot&#34;</li>
+        <li>Click &#34;Add&#34;</li>
+        <li>Go to group chat and run /start or /start@atl_bitlab_bot</li>
+      </ul>
+    </div>
+  );
+}
+
+function TelegramInstructions() {
+  return (
+    <>
+      <div className="w-5/6">
+        <ul className="list-decimal text-left">
+          <li>Ensure your device has the Telegram app installed</li>
+          <li>Click the &#34;ADD ABBOT&#34; button below or scan the QR code</li>
+          <li>Select your group from the drop down list on Telegram</li>
+          <li>For non-admin, group members, click &#34;OK&#34;</li>
+          <li>For admin group members, click &#34;ADD AS ADMIN&#34;</li>
+          <li>Go to your group chat and follow the instructions Abbot sends</li>
+          <li>
+            For help, visit the
+            {" "}
+            <Link
+              href={"/help"}
+              className="text-blue-600 underline"
+            >
+              help
+            </Link>
+            {" "}
+            page or contact
+            {" "}
+            <Link
+              className="text-blue-600
+            underline" href="https://t.me/nonni_io"
+            >
+              @nonni_io
+            </Link>
+            {" "}
+            on Telegram</li>
+        </ul>
+      </div>
+      <Button
+        onClick={() => {
+          console.log("Button C clicked");
+          window.open("https://t.me/atl_bitlab_bot?startgroup=true", "_blank");
+        }}
+        type="button"
+      >
+        <Link href="https://t.me/atl_bitlab_bot?startgroup=true">
+          Add Abbot
+        </Link>
+      </Button>
+    </>
   );
 }
 
@@ -223,12 +297,13 @@ function ChannelInteraction({
   setChannelId,
   loading,
   handleFormSubmit,
+  manualAddIsClicked,
+  setManualAddIsClicked,
+  telegramAddIsClicked,
+  setTelegramAddIsClicked,
 }: any) {
   const isTelegram = platform === "telegram";
 
-  const handleChannelClick = () => {
-    setChannelMode(true);
-  };
 
   return (
     <>
@@ -248,56 +323,70 @@ function ChannelInteraction({
           {isTelegram ? "DM 🤖" : "DM 🟣"}
         </Button>
         <Button
-          className={`w-full border-[#08252E] border-2 mr-1 ${channelMode ? "bg-[#08252E] text-white" : ""
-            }`}
+          className={`w-full border-[#08252E] border-2 mr-1 ${channelMode ? "bg-[#08252E] text-white" : ""}`}
           type="button"
-          onClick={handleChannelClick}
+          onClick={() => setChannelMode(true)}
         >
-          {isTelegram ? "Channel 🤖" : "Channel 🟣"}
+          {isTelegram ? "Group Chat 🤖" : "Channel 🟣"}
         </Button>
       </Row>
       {channelMode && (
-        <ChannelForm
-          channelId={channelId}
-          setChannelId={setChannelId}
-          loading={loading}
-          handleFormSubmit={handleFormSubmit}
-          isTelegram={isTelegram}
-          chatId={null}
-          setChatId={null}
-        />
+        <>
+          {
+            isTelegram && (
+              <Row className="w-full">
+                <Button
+                  className={`w-full border-[#08252E] border-2 mr-1 ${telegramAddIsClicked && "bg-[#08252E] text-white"}`}
+                  type="button"
+                  onClick={() => {
+                    if (!isTelegram) {
+                      return window.location.href =
+                        "https://www.nostrchat.io/dm/npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk";
+                    }
+                    setManualAddIsClicked(false);
+                    setTelegramAddIsClicked(true);
+                  }}
+                >
+                  Quick add 🤖
+                </Button>
+                <Button
+                  className={`w-full border-[#08252E] border-2 mr-1 ${manualAddIsClicked && "bg-[#08252E] text-white"}`}
+                  type="button"
+                  onClick={() => {
+                    setTelegramAddIsClicked(false);
+                    setManualAddIsClicked(true);
+                  }}
+                >
+                  Manual add 🤖
+                </Button>
+              </Row>
+            ) || (
+              <ChannelForm
+                value={channelId}
+                onChange={setChannelId}
+                disabled={loading}
+                onSubmit={handleFormSubmit}
+                required
+              />
+            )
+          }
+
+          {manualAddIsClicked && <ManualInstructions />}
+          {telegramAddIsClicked && <TelegramInstructions />}
+        </>
       )}
     </>
   );
 }
 
-function ChannelForm({
-  chatId,
-  setChatId,
-  channelId,
-  setChannelId,
-  loading,
-  handleFormSubmit,
-  isTelegram,
-}: any) {
-  return (
-    <Row className="w-full">
-      <form
-        className="w-full flex justify-between items-center"
-        onSubmit={handleFormSubmit}
-      >
-        {isTelegram ? (
-          <input
-            type="text"
-            placeholder="Enter your Telegram chat ID"
-            pattern="\\d+"
-            title="Chat ID should be a number"
-            className="border-2 border-[#08252E] px-2 text-black flex-grow"
-            value={chatId}
-            onChange={(e) => setChatId(e.target.value)}
-            required
-          />
-        ) : (
+/*
+  function ChannelForm({ channelId, setChannelId, loading, handleFormSubmit }: any) {
+    return (
+      <Row className="w-full">
+        <form
+          className="w-full flex justify-between items-center"
+          onSubmit={handleFormSubmit}
+        >
           <input
             type="text"
             placeholder="Enter your NOSTR channel ID"
@@ -308,15 +397,15 @@ function ChannelForm({
             onChange={(e) => setChannelId(e.target.value)}
             required
           />
-        )}
-        <button
-          type="submit"
-          className="border-2 border-[#08252E] px-8 bg-[#08252E] text-white ml-2"
-          disabled={loading}
-        >
-          {loading ? "Loading..." : "Join"}
-        </button>
-      </form>
-    </Row>
-  );
-}
+          <button
+            type="submit"
+            className="border-2 border-[#08252E] px-8 bg-[#08252E] text-white ml-2"
+            disabled={loading}
+          >
+            {loading ? "Loading..." : "Join"}
+          </button>
+        </form>
+      </Row>
+    );
+  }
+*/

@@ -2,4 +2,4 @@
 source "$HOME/environments/.abbot_venv/bin/activate"
 BASE_DIR="$HOME/abbot"
 cd "$BASE_DIR"
-python3 src/main.py
+python3 src/main.py --telegram --log

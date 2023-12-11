@@ -44,7 +44,7 @@ def parse_message_data(message: Message) -> Dict:
 def parse_chat(message: Message, context: ContextTypes.DEFAULT_TYPE) -> Dict:
     chat: Chat = try_get(message, "chat")
     if not chat:
-        error_message = f"{__name__} No message: update={message.to_json()} context={context}"
+        error_message = f"{__name__} No chat: update={message.to_json()} context={context}"
         return dict(status="error", data=error_message)
     bot_debug.log(f"{__name__} chat={chat}")
     return dict(status="success", data=chat)
@@ -62,7 +62,7 @@ def parse_chat_data(chat: Chat) -> Dict:
 def parse_user(message: Message, context: ContextTypes.DEFAULT_TYPE) -> Dict:
     user: User = try_get(message, "from_user")
     if not user:
-        error_message = f"{__name__} No message: update={message.to_json()} context={context}"
+        error_message = f"{__name__} No user: update={message.to_json()} context={context}"
         return dict(status="error", data=error_message)
     bot_debug.log(f"{__name__} {user}")
     return dict(status="success", data=user)

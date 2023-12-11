@@ -2,19 +2,25 @@ from abc import abstractmethod
 from datetime import datetime
 from cli_args import TELEGRAM_MODE, TEST_MODE, DEV_MODE
 from typing import Dict, List, Optional, Tuple
+
 from nostr_sdk import PublicKey, EventId, Event
+
 from telegram import Chat, ChatMember, Message
+
 from pymongo import MongoClient
 from pymongo.collection import Collection
 from pymongo.cursor import Cursor
 from pymongo.results import InsertOneResult, InsertManyResult, UpdateResult
 from bson.typings import _DocumentType
-from constants import INTRODUCTION
-from ..logger import bot_error, bot_debug
-from ..utils import to_dict, error, try_get
+
+# from constants import INTRODUCTION
+from ..logger import bot_debug
+from ..utils import success, to_dict, error, try_get
 from ..abbot.env import DATABASE_CONNECTION_STRING
-from ..abbot.exceptions.exception import try_except
-from ..abbot.config import BOT_CORE_SYSTEM_DM, BOT_CORE_SYSTEM_CHANNEL
+from ..abbot.config import BOT_SYSTEM_CORE_DMS, BOT_SYSTEM_CORE_GROUPS
+from ..abbot.telegram_bot import DEFAULT_DM_HISTORY, DEFAULT_GROUP_HISTORY
+
+# from ..abbot.exceptions.exception import try_except
 
 client = MongoClient(host=DATABASE_CONNECTION_STRING)
 
@@ -29,24 +35,27 @@ else:
     nostr_db_name = "nostr"
 
 bot_debug.log(__name__, f"telegram_db_name={telegram_db_name}")
-db_nostr = client.get_database(nostr_db_name)
-nostr_channels = db_nostr.get_collection("channel")
-bot_channel_invites = db_nostr.get_collection("channel_invite")
-nostr_dms = db_nostr.get_collection("dm")
 
-db_telegram = client.get_database(telegram_db_name)
-telegram_channels = db_telegram.get_collection("channel")
-telegram_dms = db_telegram.get_collection("dm")
+nostr_db = client.get_database(nostr_db_name)
+nostr_channels = nostr_db.get_collection("channel")
+nostr_dms = nostr_db.get_collection("dm")
+nostr_channel_invites = nostr_db.get_collection("channel_invite")
+
+telegram_db = client.get_database(telegram_db_name)
+telegram_groups = telegram_db.get_collection("group")
+telegram_dms = telegram_db.get_collection("dm")
+
+bitcoin_prices = client.get_database("bitcoin_prices")
+btcusd = bitcoin_prices.get_collection("btcusd")
 
 db_prices = client.get_database("prices")
 btcusd = db_prices.get_collection("btcusd")
 
-
 @to_dict
 class GroupConfig:
-    def __init__(self, started=False, introduced=False, unleashed=False, count=None):
-        self.started: bool = started
+    def __init__(self, introduced=False, started=False, unleashed=False, count=None):
         self.introduced: bool = introduced
+        self.started: bool = started
         self.unleashed: bool = unleashed
         self.count: int = count
 
@@ -55,7 +64,7 @@ class GroupConfig:
         pass
 
     def update_config(self, data: dict):
-        return {**self.to_dict(), **data}
+        return success("", data={**self.to_dict(), **data})
 
 
 # ====== Nostr ======
@@ -76,7 +85,7 @@ class MongoNostrEvent(NostrEvent, GroupConfig):
         self.messages = []
         self.history = []
         if self.nostr_event.kind() != 4:
-            self.group_config = GroupConfig.__init__(started=True, introduced=True, unleashed=False, count=None)
+            self.groups_config = GroupConfig.__init__(started=True, introduced=True, unleashed=False, count=None)
 
 
 # ====== Telegram Types ======
@@ -87,7 +96,7 @@ class TelegramDM:
         self.username: str = message.from_user.username
         self.created_at: datetime = datetime.now()
         self.messages = [message.to_dict()]
-        self.history = [{"role": "system", "content": BOT_CORE_SYSTEM_DM}, {"role": "user", "content": message.text}]
+        self.history = DEFAULT_DM_HISTORY
 
     @abstractmethod
     def to_dict(self):
@@ -95,38 +104,38 @@ class TelegramDM:
 
 
 class TelegramGroup(GroupConfig):
-    async def __init__(self, message: Message, admins: Tuple[ChatMember]):
+    def __init__(self, message: Message, admins: Tuple[ChatMember]):
         self.title: str = message.chat.title
         self.id: int = message.chat.id
         self.created_at: datetime = datetime.now()
         self.type: str = message.chat.type
         self.admins: List = admins
         self.balance: int = 50000
-        self.messages = []
-        self.history = []
-        self.config = GroupConfig(started=True, introduced=True, unleashed=False, count=None)
+        self.messages = [message.to_dict()]
+        self.history = DEFAULT_GROUP_HISTORY
+        self.config = GroupConfig(introduced=True, started=False, unleashed=False, count=None)
 
 
 @to_dict
 class MongoNostr:
     def __init__(self):
-        self.channels = nostr_channels
-        self.dms = nostr_dms
+        self.groups = nostr_channels
+        self.direct_messages = nostr_dms
 
     def known_channels(self) -> List[MongoNostrEvent]:
-        return [MongoNostrEvent(channel) for channel in self.channels.find()]
+        return success("", data=[MongoNostrEvent(channel) for channel in self.groups.find()])
 
     def known_channel_ids(self) -> List[EventId]:
-        return [channel.id() for channel in self.known_channels()]
+        return success("", data=[channel.id() for channel in self.known_channels()])
 
     def known_channel_invite_authors(self) -> List[PublicKey]:
-        return [channel.pubkey() for channel in self.known_channels()]
+        return success("", data=[channel.pubkey() for channel in self.known_channels()])
 
     def known_dms(self) -> List[MongoNostrEvent]:
-        return [MongoNostrEvent(dm) for dm in self.dms.find()]
+        return success("", data=[MongoNostrEvent(dm) for dm in self.direct_messages.find()])
 
     def known_dm_pubkeys(self) -> List[PublicKey]:
-        return [MongoNostrEvent(dm).pubkey() for dm in self.dms.find()]
+        return success("", data=[MongoNostrEvent(dm).pubkey() for dm in self.direct_messages.find()])
 
 
 @to_dict
@@ -140,11 +149,11 @@ class MongoAbbot(MongoNostr, MongoTelegram):
     def __init__(self, db_name):
         self.db_name = db_name
         if db_name == "telegram":
-            self.channels: Collection[_DocumentType] = telegram_channels
-            self.dms: Collection[_DocumentType] = telegram_dms
+            self.groups: Collection[_DocumentType] = telegram_groups
+            self.direct_messages: Collection[_DocumentType] = telegram_dms
         elif db_name == "nostr":
-            self.channels: Collection[_DocumentType] = nostr_channels
-            self.dms: Collection[_DocumentType] = nostr_dms
+            self.groups: Collection[_DocumentType] = nostr_channels
+            self.direct_messages: Collection[_DocumentType] = nostr_dms
 
     @abstractmethod
     def to_dict(self):
@@ -153,77 +162,93 @@ class MongoAbbot(MongoNostr, MongoTelegram):
     def insert_one_price(self, price: Dict) -> InsertOneResult:
         return btcusd.insert_one(price)
 
-    # create docs
-    def insert_one_channel(self, channel: Dict) -> InsertOneResult:
-        return self.channels.insert_one(channel)
+    def find_prices_cursor(self) -> InsertOneResult:
+        return btcusd.find()
 
-    def insert_many_channels(self, channels: List[Dict]) -> InsertManyResult:
-        return self.channels.insert_many(channels)
+    def find_prices(self) -> List:
+        return [price for price in btcusd.find()]
+
+    # create docs
+    def insert_one_group(self, channel: Dict) -> InsertOneResult:
+        return self.groups.insert_one(channel)
+
+    def insert_many_groups(self, groups: List[Dict]) -> InsertManyResult:
+        return self.groups.insert_many(groups)
 
     def insert_one_dm(self, direct_message: Dict) -> InsertOneResult:
-        return self.dms.insert_one(direct_message)
+        return self.direct_messages.insert_one(direct_message)
 
     def insert_many_dms(self, direct_messages: List[Dict]) -> InsertManyResult:
-        return self.dms.insert_many(direct_messages)
+        return self.direct_messages.insert_many(direct_messages)
 
-    # read documents
-    def find_channels(self, filter: {}) -> List[Optional[_DocumentType]]:
-        return [channel for channel in self.channels.find(filter)]
+    # read
+    def find_groups(self, filter: Dict) -> List[Optional[_DocumentType]]:
+        return [channel for channel in self.groups.find(filter, {"_id": 0})]
 
-    def find_channels_cursor(self, filter: {}) -> Cursor:
-        return self.channels.find(filter)
+    def find_groups_cursor(self, filter: Dict) -> Cursor:
+        return self.groups.find(filter, {"_id": 0})
 
-    def find_one_channel(self, filter: {}) -> Optional[_DocumentType]:
-        return self.channels.find_one(filter)
+    def find_one_group(self, filter: Dict) -> Optional[_DocumentType]:
+        return self.groups.find_one(filter, {"_id": 0})
 
-    def find_one_channel_and_update(self, filter: {}, update: Dict) -> Optional[_DocumentType]:
-        return self.channels.find_one_and_update(filter, update, return_document=True)
+    def find_one_group_and_update(self, filter: Dict, update: Dict) -> Optional[_DocumentType]:
+        return self.groups.find_one_and_update(
+            filter,
+            update,
+            return_document=True,
+            upsert=True,
+            projection={"_id": 0},
+        )
 
-    def find_one_dm(self, filter: {}) -> Optional[_DocumentType]:
-        return self.dms.find_one(filter)
+    def find_one_dm(self, filter: Dict) -> Optional[_DocumentType]:
+        return self.direct_messages.find_one(filter, {"_id": 0})
 
-    def find_one_dm_and_update(self, filter: {}, update: Dict) -> Optional[_DocumentType]:
-        return self.dms.find_one_and_update(filter, update, return_document=True)
+    def find_one_dm_and_update(self, filter: Dict, update: Dict) -> Optional[_DocumentType]:
+        return self.direct_messages.find_one_and_update(
+            filter,
+            update,
+            return_document=True,
+            upsert=True,
+            projection={"_id": 0},
+        )
 
-    def find_dms(self, filter: {}) -> List[Optional[_DocumentType]]:
-        return [dm for dm in self.dms.find(filter)]
+    def find_dms(self, filter: Dict) -> List[Optional[_DocumentType]]:
+        return [dm for dm in self.direct_messages.find(filter, {"_id": 0})]
 
-    def find_dms_cursor(self, filter: {}) -> Cursor:
-        return self.dms.find(filter)
+    def find_dms_cursor(self, filter: Dict) -> Cursor:
+        return self.direct_messages.find(filter, {"_id": 0})
 
     # update docs
-    def update_one(self, collection: str, filter: {}, update: Dict, upsert: bool = True) -> UpdateResult:
+    def update_one(self, collection: str, filter: Dict, update: Dict) -> UpdateResult:
         if collection == "dm":
-            return self.update_one_dm(filter, update, upsert)
+            return self.update_one_dm(filter, update, return_document=True, upsert=True)
         else:
-            return self.update_one_channel(filter, update, upsert)
+            return self.update_one_group(filter, update, return_document=True, upsert=True)
 
-    def update_one_history(self, collection: str, filter: {}, update: Dict, upsert: bool = True) -> UpdateResult:
-        if collection == "dm":
-            return self.dms.update_one(filter, {"$push": {"history": update}}, upsert)
-        else:
-            return self.channels.update_one(filter, {"$push": {"history": update}}, upsert)
+    def update_one_group(self, filter: Dict, update: Dict) -> UpdateResult:
+        return self.groups.update_one(filter, update, return_document=True, upsert=True)
 
-    def update_one_channel(self, filter: {}, update: Dict, upsert: bool = True) -> UpdateResult:
-        return self.channels.update_one(filter, {"$set": {**update}}, upsert)
-
-    def update_one_dm(self, filter, update: Dict, upsert: bool = True) -> UpdateResult:
-        return self.dms.update_one(filter, update, upsert)
+    def update_one_dm(self, filter, update: Dict) -> UpdateResult:
+        return self.direct_messages.update_one(filter, update, return_document=True, upsert=True)
 
     # custom reads
     def get_group_config(self, id: str) -> Optional[_DocumentType]:
-        channel_doc = self.find_one_channel({"id": id})
+        channel_doc = self.find_one_group({"id": id})
         if channel_doc == None:
             return error("Channel does not exist")
         return channel_doc
 
     def get_group_balance(self, id) -> int:
-        group: TelegramGroup = self.find_one_channel({"id": id})
+        group: TelegramGroup = self.find_one_group({"id": id})
         return try_get(group, "balance")
 
     def get_group_history(self, id) -> int:
-        group: TelegramGroup = self.find_one_channel({"id": id})
+        group: TelegramGroup = self.find_one_group({"id": id})
         return try_get(group, "history", default=[])
+
+    def get_dm_history(self, id) -> int:
+        dm: TelegramDM = self.find_one_dm({"id": id})
+        return try_get(dm, "history", default=[])
 
 
 db_name = "telegram" if TELEGRAM_MODE else "nostr"

@@ -44,15 +44,15 @@ BOT_USER_ID = try_get(BOT_CONFIG, "user_id")
 
 BOT_NAME = try_get(BOT_CONFIG, "name")
 BOT_TELEGRAM_HANDLE = try_get(BOT_CONFIG, "handle")
-BOT_CHAT_HISTORY_FILEPATH = f"src/data/chat/content/{BOT_NAME}.jsonl"
-BOT_CHAT_CONFIG_FILEPATH = f"src/data/chat/content/{BOT_NAME}.jsonl"
-BOT_INTRO = f"Your name is {BOT_NAME}, which is short for {BOT_NAME_MEANING}, your telegram handle is {BOT_TELEGRAM_HANDLE}. You answer to Abbot. You are part of {ORG_NAME} - {ORG_DESCRIPTION} and you are an expert in all things {ORG_LOCATION}, {ORG_NAME}, Bitcoin and Lightning Network. {BOT_DIRECTIVES}."
+BOT_INTRO = f"Your name is {BOT_NAME}, which is short for {BOT_NAME_MEANING}, your telegram handle is {BOT_TELEGRAM_HANDLE}. You answer to Abbot. You are part of {ORG_NAME} - {ORG_DESCRIPTION} and you are an expert in all things {ORG_LOCATION}, {ORG_NAME} and Bitcoin and Lightning Network. {BOT_DIRECTIVES}"
+
 BOT_SYSTEM = try_get(BOT_CONFIG, "system")
-BOT_SYSTEM_BASE = try_get(BOT_CONFIG, "system", "base")
-BOT_SYSTEM_DM = try_get(BOT_CONFIG, "system", "dm")
-BOT_SYSTEM_CHANNEL = try_get(BOT_CONFIG, "system", "channel")
-BOT_CORE_SYSTEM_DM = f"{BOT_INTRO}. {BOT_SYSTEM_DM} {BOT_SYSTEM_BASE}"
-BOT_CORE_SYSTEM_CHANNEL = f"{BOT_INTRO}. {BOT_SYSTEM_CHANNEL} {BOT_SYSTEM_BASE}"
+BOT_SYSTEM_DMS = try_get(BOT_SYSTEM, "dms")
+BOT_SYSTEM_GROUPS = try_get(BOT_SYSTEM, "groups")
+BOT_SYSTEM_CORE = try_get(BOT_SYSTEM, "core")
+
+BOT_SYSTEM_CORE_DMS = f"{BOT_SYSTEM_DMS}. {BOT_INTRO}. {BOT_SYSTEM_CORE}"
+BOT_SYSTEM_CORE_GROUPS = f"{BOT_SYSTEM_GROUPS}. {BOT_INTRO}. {BOT_SYSTEM_CORE}"
 
 BOT_NAME = f"t{BOT_NAME}" if TEST_MODE or DEV_MODE else BOT_NAME
 BOT_TELEGRAM_HANDLE = f"test_{BOT_TELEGRAM_HANDLE}" if TEST_MODE or DEV_MODE else BOT_TELEGRAM_HANDLE

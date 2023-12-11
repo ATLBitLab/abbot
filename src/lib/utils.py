@@ -1,6 +1,6 @@
 from functools import wraps
 import json
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Optional
 
 from qrcode import make
 from os.path import abspath
@@ -38,6 +38,32 @@ def try_set(obj, value, *keys, **kwargs):
             except Exception:
                 return default
     return obj
+
+
+def try_get(obj, *fields, **kwargs):
+    default = kwargs.pop("default", None)
+    if kwargs:
+        unexpected_kw = kwargs[kwargs.keys()[0]]
+        raise TypeError("try_get received unexpected keyword argument", unexpected_kw)
+    for field in fields:
+        try:
+            obj = obj[field]
+        except (AttributeError, KeyError, TypeError, IndexError):
+            try:
+                obj = getattr(obj, field)
+            except Exception:
+                return default
+    return obj
+
+
+def try_dumps(data: Dict, **kwargs) -> Dict:
+    if type(data) != dict:
+        return error("Data is not dict", data=data)
+    try:
+        data_dump = json.dumps(data, indent=4)
+        return success("Success data dumped", data=data_dump)
+    except:
+        return error("Data is not dict", data=data)
 
 
 def try_get(obj, *fields, **kwargs):
@@ -129,15 +155,46 @@ def to_dict(cls):
     return cls
 
 
-def error(message: str = "", **kwargs) -> Dict:
-    return dict(status="error", message=message, **kwargs)
+"""
+def to_dict(cls):
+    print("to_dict")
+    cls_name = f"{cls.__name__}: @to_dict: "
+    if hasattr(cls, "to_dict"):
+        bot_error.log(f"{cls_name}", f"already has method 'to_dict'")
+        return
+
+    def to_dict(self):
+        self_dict: Dict = vars(self)
+        result = {}
+        for key, val in self_dict.items():
+            if hasattr(val, "to_dict") and callable(val.to_dict):
+                result[key] = val.to_dict()
+            else:
+                result[key] = val
+        return result
+
+    setattr(cls, "to_dict", to_dict)
+    return cls
+"""
 
 
-def success(message: str = "", **kwargs) -> Dict:
-    return dict(status="success", message=message, **kwargs)
+def fn_name(fn):
+    @wraps(fn)
+    def wrapper():
+        return fn.__name__
+
+    return wrapper
 
 
-def successful(response: Dict) -> bool:
+def error(msg: str = "", **kwargs) -> Dict:
+    return dict(status="error", msg=msg, **kwargs)
+
+
+def success(msg: str = "", **kwargs) -> Dict:
+    return dict(status="success", msg=msg, **kwargs)
+
+
+def successful(response: Dict, data: Optional[Any] = None) -> bool:
     return response["status"] == "success"
 
 
