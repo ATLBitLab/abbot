@@ -48,6 +48,8 @@ telegram_dms = telegram_db.get_collection("dm")
 bitcoin_prices = client.get_database("bitcoin_prices")
 btcusd = bitcoin_prices.get_collection("btcusd")
 
+db_prices = client.get_database("prices")
+btcusd = db_prices.get_collection("btcusd")
 
 @to_dict
 class GroupConfig:
