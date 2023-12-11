@@ -13,6 +13,16 @@ RAW_MESSAGE_JL_FILE = abspath("src/data/raw_messages.jsonl")
 MATRIX_IMG_FILEPATH = abspath("src/assets/unplugging_matrix.jpg")
 KOOLAID_GIF_FILEPATH = abspath("src/assets/koolaid.gif")
 
+FULL_TELEGRAM_HANDLE = f"@{BOT_TELEGRAM_HANDLE}"
+RAW_MESSAGE_JL_FILE = abspath("src/data/raw_messages.jsonl")
+MATRIX_IMG_FILEPATH = abspath("src/assets/unplugging_matrix.jpg")
+KOOLAID_GIF_FILEPATH = abspath("src/assets/koolaid.gif")
+DEFAULT_GROUP_HISTORY = [
+    {"role": "system", "content": BOT_SYSTEM_CORE_GROUPS},
+    {"role": "assistant", "content": INTRODUCTION},
+]
+DEFAULT_DM_HISTORY = [{"role": "system", "content": BOT_SYSTEM_CORE_DMS}]
+
 # packages
 from telegram import Bot, Update, Message, Chat, User
 from telegram.constants import MessageEntityType, ParseMode
@@ -84,6 +94,8 @@ from ..abbot.exceptions.exception import AbbotException
 
 strike: Strike = init_payment_processor()
 price_provider: Coinbase = init_price_provider()
+
+STRIKE: Strike = init_payment_processor()
 
 import tiktoken
 
@@ -350,12 +362,12 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
             message = reply_to_message
         chat: Chat = try_get(update_data, "chat") or try_get(update, "effective_chat")
         user: User = try_get(update_data, "user") or try_get(update, "effective_user")
-        
+
         debug_bot.log(log_name, f"message={message}")
         message_text, message_date = parse_message_data(message)
         debug_bot.log(log_name, f"message_text={message_text} message_date={message_date}")
         debug_bot.log(log_name, f"chat={chat}")
-        
+
         chat_id, chat_title, chat_type = parse_chat_data(chat)
         debug_bot.log(log_name, f"chat_id={chat_id} chat_title={chat_title} chat_type={chat_type}")
 
@@ -363,7 +375,6 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
             admins: Any = [admin.to_dict() for admin in await chat.get_administrators()]
             debug_bot.log(log_name, f"admins={admins}")
 
-        
         user_id, username = parse_user_data(user)
         if not username:
             username = try_get(user, "first_name", default=user_id)
