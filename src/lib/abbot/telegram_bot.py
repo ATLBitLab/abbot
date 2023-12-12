@@ -254,20 +254,29 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "type": chat.type,
                 "admins": admins,
                 "balance": 50000,
-                "messages": [message.to_dict()],
                 "history": DEFAULT_GROUP_HISTORY,
-                "config": {"started": True, "introduced": True, "unleashed": False, "count": None},
             },
             "$push": {"messages": message.to_dict()},
-            "$set": {"config.started": True, "config.introduced": True},
         },
     )
 
-    if not group:
-        no_group_squawk = f"no group exists for group.id={chat.id}"
-        bot_debug.log(log_name, no_group_squawk)
-        await message.reply_text("Failed to start Abbot. Try again or contact @nonni_io for assistance")
-        return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=no_group_squawk)
+    # group_id: int = try_get(group, "id")
+    # group_title: str = try_get(group, "title")
+    # group_added = f"New group added"
+    # group_not_added = f"Group add fail"
+    # group_info = f"\n\ngroup_id={group_id}\ngroup_title={group_title}"
+    # group_squawk = f"{log_name}: {group_not_added}: {group_info}"
+    # group_msg = f"{group_added}: {group_info}"
+    # if not group:
+    #     bot_error.log(log_name, group_msg)
+    #     return await context.bot.send_message(chat_id=THE_CREATOR, text=group_squawk)
+    # bot_debug.log(log_name, f"{group_added}: {group_info}")
+    # await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=group_msg)
+    # if not group:
+    #     no_group_squawk = f"no group exists for group.id={chat.id}"
+    #     bot_debug.log(log_name, no_group_squawk)
+    #     await message.reply_text("Failed to start Abbot. Try again or contact @nonni_io for assistance")
+    #     return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=no_group_squawk)
 
     started: Dict = try_get(group, "config", "started", default=False)
     bot_debug.log(log_name, f"started={started}")
@@ -289,19 +298,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await message.reply_photo(MATRIX_IMG_FILEPATH, f"Please wait while {BOT_NAME} is unplugged from the Matrix")
     time.sleep(5)
-    group_id: int = try_get(group, "id")
-    group_title: str = try_get(group, "title")
-    group_added = f"New group added"
-    group_not_added = f"Group add fail"
-    group_info = f"\n\ngroup_id={group_id}\ngroup_title={group_title}"
-    group_squawk = f"{log_name}: {group_not_added}: {group_info}"
-    group_msg = f"{group_added}: {group_info}"
-    if not group:
-        bot_error.log(log_name, group_msg)
-        return await context.bot.send_message(chat_id=THE_CREATOR, text=group_squawk)
 
-    bot_debug.log(log_name, f"{group_added}: {group_info}")
-    await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=group_msg)
+    group: TelegramGroup = mongo_abbot.find_one_group_and_update(
+        {"id": chat.id},
+        {
+            "$set": {"config.started": True, "config.introduced": True},
+        },
+    )
+
     return await message.reply_text(INTRODUCTION)
 
 
@@ -314,7 +318,6 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     message: Message = try_get(update_data, "message")
     chat: Chat = try_get(update_data, "chat")
-    user: User = try_get(update_data, "user")
 
     admins: Any = [admin.to_dict() for admin in await chat.get_administrators()]
     group: TelegramGroup = mongo_abbot.find_one_group({"id": chat.id})
