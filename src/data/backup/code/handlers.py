@@ -6,10 +6,10 @@ from os.path import abspath
 from telegram import Update, Message, Chat, User
 from telegram.ext import ContextTypes
 
-from constants import HELP_MENU, THE_CREATOR
+from constants import HELP_MENU, THE_ARCHITECT_ID
 from lib.admin.admin_service import AdminService
 from lib.abbot.core import Abbot
-from lib.logger import bot_debug, bot_error
+from lib.logger import debug_bot, error_bot
 from lib.utils import sender_is_group_admin, try_get, successful
 from lib.abbot.exceptions.exception import try_except, AbbotException
 from lib.abbot.config import BOT_CORE_SYSTEM, BOT_NAME, BOT_TELEGRAM_HANDLE, ORG_TELEGRAM_HANDLE
@@ -48,7 +48,7 @@ for content, config in zip(GROUP_CONTENT_FILES, GROUP_CONFIG_FILES):
     context = "group"
     chat_id = int(content.split(".")[0])
     name = f"{context}{BOT_NAME}{chat_id}"
-    bot_debug.log(f"main => context={context} chat_id={chat_id} name={name}")
+    debug_bot.log(f"main => context={context} chat_id={chat_id} name={name}")
     group_abbot = Abbot(
         name,
         ORG_TELEGRAM_HANDLE,
@@ -64,7 +64,7 @@ for content, config in zip(PRIVATE_CONTENT_FILES, PRIVATE_CONFIG_FILES):
     context = "private"
     chat_id = int(content.split(".")[0])
     name = f"{context}{BOT_NAME}{chat_id}"
-    bot_debug.log(f"main => context={context} chat_id={chat_id} name={name}")
+    debug_bot.log(f"main => context={context} chat_id={chat_id} name={name}")
     private_abbot = Abbot(
         name,
         BOT_TELEGRAM_HANDLE,
@@ -75,7 +75,7 @@ for content, config in zip(PRIVATE_CONTENT_FILES, PRIVATE_CONFIG_FILES):
     ALL_ABBOTS.append(private_abbot)
 
 abbots: Bots = Bots(ALL_ABBOTS)
-admin = AdminService(THE_CREATOR, THE_CREATOR)
+admin = AdminService(THE_ARCHITECT_ID, THE_ARCHITECT_ID)
 admin.status = "running"
 
 
@@ -83,10 +83,10 @@ admin.status = "running"
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "handle_message:"
     if not update or not context:
-        return bot_error.log(f"{fn} No update or context")
+        return error_bot.log(f"{fn} No update or context")
 
-    bot_debug.log(f"{fn} Update={update}")
-    bot_debug.log(f"{fn} Context={context}")
+    debug_bot.log(f"{fn} Update={update}")
+    debug_bot.log(f"{fn} Context={context}")
 
     response: dict = parse_message(update, context)
     message: Message = try_get(response, "data")
@@ -121,24 +121,24 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     all_data: dict = dict(**message_data, **chat_data, **user_data)
     for k, v in all_data.items():
-        bot_debug.log(f"{fn} {k}={v}")
+        debug_bot.log(f"{fn} {k}={v}")
 
     abbot_message = dict(role="user", content=message_text)
     if is_group_chat and "test" not in BOT_TELEGRAM_HANDLE:
-        bot_debug.log(f"{fn} is_group_chat={is_group_chat}")
-        bot_debug.log(f"{fn} test not in BOT_TELEGRAM_HANDLE={BOT_TELEGRAM_HANDLE}")
+        debug_bot.log(f"{fn} is_group_chat={is_group_chat}")
+        debug_bot.log(f"{fn} test not in BOT_TELEGRAM_HANDLE={BOT_TELEGRAM_HANDLE}")
         message_dump = json.dumps(
             {"message": {**message_data}, "chat": {**chat_data}, "user": {**user_data}, "abbot": abbot_message}
         )
-        bot_debug.log(f"{fn} message_dump={message_dump}")
+        debug_bot.log(f"{fn} message_dump={message_dump}")
         raw_messages_jsonl = open(RAW_MESSAGE_JL_FILE, "a")
         raw_messages_jsonl.write(message_dump)
         raw_messages_jsonl.write("\n")
         raw_messages_jsonl.close()
     else:
         abbot_context = "private"
-        bot_debug.log(f"{fn} is_private_chat={is_private_chat}")
-    bot_debug.log(f"{fn} abbot_context={abbot_context}")
+        debug_bot.log(f"{fn} is_private_chat={is_private_chat}")
+    debug_bot.log(f"{fn} abbot_context={abbot_context}")
 
     abbot: Abbot = try_get(abbots, chat_id)
     if not abbot:
@@ -176,29 +176,29 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     replied_to_abbot = try_get(message_reply_from, "username") == handle
     if is_private_chat:
         abbot.update_chat_history(abbot_message)
-        bot_debug.log(f"{fn} is private, not group_in_name")
+        debug_bot.log(f"{fn} is private, not group_in_name")
         answer = abbot.chat_history_completion()
     else:
         chat_history_len: int = abbot.chat_history_len
         is_unleashed, count = abbot.is_unleashed()
-        bot_debug.log(f"{fn} group_in_name: name={abbot.name}")
+        debug_bot.log(f"{fn} group_in_name: name={abbot.name}")
         if handle not in message_text and handle not in message_reply_text:
-            bot_debug.log(f"{fn} handle not in message_text or message_reply_text")
+            debug_bot.log(f"{fn} handle not in message_text or message_reply_text")
             return
         if not replied_to_abbot:
-            bot_debug.log(f"{fn} not replied_to_abbot!")
+            debug_bot.log(f"{fn} not replied_to_abbot!")
             return
         if not is_unleashed or not count:
-            bot_debug.log(f"{fn} not is_unleashed or not count")
+            debug_bot.log(f"{fn} not is_unleashed or not count")
             return
         if chat_history_len % count != 0:
-            bot_debug.log(f"{fn} chat_history_len % count != 0!")
+            debug_bot.log(f"{fn} chat_history_len % count != 0!")
             return
-        bot_debug.log(f"{fn} All checks passed!")
+        debug_bot.log(f"{fn} All checks passed!")
         answer = abbot.chat_history_completion()
     # if not answer:
     #     await context.bot.send_message(
-    #         chat_id=THE_CREATOR,
+    #         chat_id=THE_ARCHITECT_ID,
     #         text=f"{abbot.name} completion failed ⛔️: abbot={abbot} answer={answer}",
     #     )
     # i = 0
@@ -228,7 +228,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # log all data for debugging
     all_data: dict = dict(**message_data, **chat_data, **user_data)
     for k, v in all_data.items():
-        bot_debug.log(f"{fn} {k}={v}")
+        debug_bot.log(f"{fn} {k}={v}")
     await message.reply_text(HELP_MENU)
 
 
@@ -266,7 +266,7 @@ async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # log all data for debugging
     all_data: dict = dict(**message_data, **chat_data, **user_data)
     for k, v in all_data.items():
-        bot_debug.log(f"{fn} {k}={v}")
+        debug_bot.log(f"{fn} {k}={v}")
 
     abbot_context = "group"
     if is_private_chat:
@@ -276,7 +276,7 @@ async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not is_admin:
             return await message.reply_text(f"Forbidden: Admin only. {username} is not an admin of {chat_title}.")
 
-    bot_debug.log(f"{fn} abbot_context={abbot_context}")
+    debug_bot.log(f"{fn} abbot_context={abbot_context}")
     abbot: Abbot = try_get(abbots, chat_id)
     if not abbot:
         # TODO: dont do this
@@ -290,7 +290,7 @@ async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     abbot.unleash()
     abbot.update_abbots(chat_id, abbot)
     unleashed, count = abbot.is_unleashed()
-    bot_debug.log(f"{fn} {abbot.name} unleashed={unleashed}")
+    debug_bot.log(f"{fn} {abbot.name} unleashed={unleashed}")
     return await message.reply_text(
         f"I have been unleashed! I will now respond every {count} messages until"
         "you run /leash or /unleash <insert_new_number> (e.g. /unleash 10)"
@@ -320,14 +320,14 @@ async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # log all data for debugging
     all_data: dict = dict(**message_data, **chat_data, **user_data)
     for k, v in all_data.items():
-        bot_debug.log(f"{fn} {k}={v}")
+        debug_bot.log(f"{fn} {k}={v}")
     if is_private_chat:
         abbot_context = "private"
     elif is_group_chat:
         is_admin = await sender_is_group_admin(context, chat_id, user_id)
         if not is_admin:
             return await message.reply_text(f"Forbidden: Admin only. {username} is not an admin of {chat_title}.")
-    bot_debug.log(f"{fn} abbot_context={abbot_context}")
+    debug_bot.log(f"{fn} abbot_context={abbot_context}")
     abbot: Abbot = try_get(abbots, chat_id)
     if not abbot:
         # TODO: dont do this
@@ -341,7 +341,7 @@ async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     abbot.leash()
     leashed, count = abbot.is_leashed()
     abbot.update_abbots(chat_id, abbot)
-    bot_debug.log(f"{fn} {abbot.name} leashed={leashed}")
+    debug_bot.log(f"{fn} {abbot.name} leashed={leashed}")
     return await message.reply_text(
         f"I have been leashed! To unleash me again, run /unleash or /unleash <insert_new_number> (e.g. /unleash 10)"
     )
@@ -354,26 +354,26 @@ async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat: Chat = try_get(message, "chat")
     user: User = try_get(message, "from_user")
     if not message or not chat or not user:
-        bot_error.log(f"{fn} missing message: {message}")
-        bot_error.log(f"{fn} missing chat: {chat}")
-        bot_error.log(f"{fn} missing user: {user}")
+        error_bot.log(f"{fn} missing message: {message}")
+        error_bot.log(f"{fn} missing chat: {chat}")
+        error_bot.log(f"{fn} missing user: {user}")
         return
-    bot_debug.log(f"{fn} message={message}")
-    bot_debug.log(f"{fn} chat={chat}")
-    bot_debug.log(f"{fn} user={user}")
+    debug_bot.log(f"{fn} message={message}")
+    debug_bot.log(f"{fn} chat={chat}")
+    debug_bot.log(f"{fn} user={user}")
     chat_id: int = try_get(chat, "id")
     user_id: int = try_get(user, "id")
     username: int = try_get(user, "username")
     chat_type: str = try_get(chat, "type")
     if not chat_id or not chat_type or not user_id:
-        bot_error.log(f"{fn} missing chat id: {chat_id}")
-        bot_error.log(f"{fn} missing chat type: {chat_type}")
-        bot_error.log(f"{fn} missing user id: {user_id}")
+        error_bot.log(f"{fn} missing chat id: {chat_id}")
+        error_bot.log(f"{fn} missing chat type: {chat_type}")
+        error_bot.log(f"{fn} missing user id: {user_id}")
         return
-    bot_debug.log(f"{fn} chat_id={chat_id}")
-    bot_debug.log(f"{fn} chat_type={chat_type}")
-    bot_debug.log(f"{fn} user_id={user_id}")
-    bot_debug.log(f"{fn} executed by username={username} user_id={user_id}")
+    debug_bot.log(f"{fn} chat_id={chat_id}")
+    debug_bot.log(f"{fn} chat_type={chat_type}")
+    debug_bot.log(f"{fn} user_id={user_id}")
+    debug_bot.log(f"{fn} executed by username={username} user_id={user_id}")
     await message.reply_text(
         "Hey! The name's Abbot but you can think of me as your go-to guide for all things Bitcoin. AKA the virtual Bitcoin whisperer. 😉\n\n"
         "Here's the lowdown on how to get my attention: \n\n"
@@ -419,7 +419,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     abbot_context = "group"
     all_data: dict = dict(**message_data, **chat_data, **user_data)
     for k, v in all_data.items():
-        bot_debug.log(f"{fn} {k}={v}")
+        debug_bot.log(f"{fn} {k}={v}")
 
     abbot_context = "group"
     is_private_chat = chat_type == "private"
@@ -430,8 +430,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return await message.reply_text("Forbidden: Admin only!")
     else:
         abbot_context = "private"
-        bot_debug.log(f"{fn} is_private_chat={is_private_chat}")
-    bot_debug.log(f"{fn} abbot_context={abbot_context}")
+        debug_bot.log(f"{fn} is_private_chat={is_private_chat}")
+    debug_bot.log(f"{fn} abbot_context={abbot_context}")
     abbot: Abbot = try_get(abbots, chat_id)
     if not abbot:
         name = f"{abbot_context}{BOT_NAME}{chat_id}"
@@ -440,12 +440,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return await message.reply_text("Abbot already started!")
     abbot.start()
     started = abbot.is_started()
-    bot_debug.log(f"{fn} abbot={abbot.to_dict()} started={started}")
+    debug_bot.log(f"{fn} abbot={abbot.to_dict()} started={started}")
     await message.reply_photo(MATRIX_IMG_FILEPATH, f"Please wait while we unplug {BOT_NAME} from the Matrix")
     response = abbot.chat_history_completion()
     if not response:
         return await context.bot.send_message(
-            chat_id=THE_CREATOR,
+            chat_id=THE_ARCHITECT_ID,
             text=f"chat_title={chat_title} chat_id={chat_id}",
         )
     await message.reply_text(response)
@@ -458,25 +458,25 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat: Chat = try_get(message, "chat")
     user: User = try_get(message, "from_user")
     if not message or not chat or not user:
-        bot_error.log(f"{fn} missing message: {message}")
-        bot_error.log(f"{fn} missing chat: {chat}")
-        bot_error.log(f"{fn} missing user: {user}")
+        error_bot.log(f"{fn} missing message: {message}")
+        error_bot.log(f"{fn} missing chat: {chat}")
+        error_bot.log(f"{fn} missing user: {user}")
         return
-    bot_debug.log(f"{fn} message={message}")
-    bot_debug.log(f"{fn} chat={chat}")
-    bot_debug.log(f"{fn} user={user}")
+    debug_bot.log(f"{fn} message={message}")
+    debug_bot.log(f"{fn} chat={chat}")
+    debug_bot.log(f"{fn} user={user}")
     chat_id: int = try_get(chat, "id")
     user_id: int = try_get(user, "id")
     chat_type: str = try_get(chat, "type")
     chat_title: str = try_get(chat, "title")
     if not chat_id or not chat_type or not user_id:
-        bot_error.log(f"{fn} missing chat id: {chat_id}")
-        bot_error.log(f"{fn} missing chat type: {chat_type}")
-        bot_error.log(f"{fn} missing user id: {user_id}")
+        error_bot.log(f"{fn} missing chat id: {chat_id}")
+        error_bot.log(f"{fn} missing chat type: {chat_type}")
+        error_bot.log(f"{fn} missing user id: {user_id}")
         return
-    bot_debug.log(f"{fn} chat_id={chat_id}")
-    bot_debug.log(f"{fn} chat_type={chat_type}")
-    bot_debug.log(f"{fn} user_id={user_id}")
+    debug_bot.log(f"{fn} chat_id={chat_id}")
+    debug_bot.log(f"{fn} chat_type={chat_type}")
+    debug_bot.log(f"{fn} user_id={user_id}")
     abbot_context = "group"
     is_private_chat = chat_type == "private"
     is_group_chat = chat_type == "group"
@@ -487,17 +487,19 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return await update.message.reply_text("Forbidden: Admin only!")
     else:
         abbot_context = "private"
-        bot_debug.log(f"{fn} is_private_chat={is_private_chat}")
-    bot_debug.log(f"{fn} abbot_context={abbot_context}")
+        debug_bot.log(f"{fn} is_private_chat={is_private_chat}")
+    debug_bot.log(f"{fn} abbot_context={abbot_context}")
     abbot: Abbot = try_get(abbots, chat_id)
     if not abbot:
         abbot: Abbot = Abbot(
             f"{abbot_context}{BOT_NAME}{chat_id}", BOT_TELEGRAM_HANDLE, BOT_CORE_SYSTEM, abbot_context, chat_id
         )
-    bot_debug.log(f"{fn} abbot: {json.dumps(abbot.to_dict())}")
+    debug_bot.log(f"{fn} abbot: {json.dumps(abbot.to_dict())}")
     if not abbot.started:
         await message.reply_text("Abbot isn't started yet! Have an admin run /start")
-        return await context.bot.send_message(chat_id=THE_CREATOR, text=f"chat_title={chat_title} chat_id={chat_id}")
+        return await context.bot.send_message(
+            chat_id=THE_ARCHITECT_ID, text=f"chat_title={chat_title} chat_id={chat_id}"
+        )
     started = abbot.stop()
     if not started:
         raise Exception(f"Not started! started={started}")
@@ -509,7 +511,7 @@ async def admin_plugin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "_admin_plugin:"
     chat_id: int = try_get(update, "message", "chat", "id")
     user_id: int = try_get(update, "message", "from_user", "id")
-    if user_id != THE_CREATOR:
+    if user_id != THE_ARCHITECT_ID:
         return
     admin: AdminService = AdminService(user_id, chat_id)
     admin.stop_service()
@@ -533,7 +535,7 @@ async def admin_kill(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id: int = try_get(chat, "id")
     user: User = try_get(message, "from_user")
     user_id: int = try_get(user, "id")
-    if user_id != THE_CREATOR:
+    if user_id != THE_ARCHITECT_ID:
         return
     admin: AdminService = AdminService(user_id, chat_id)
     admin.kill_service()
@@ -547,7 +549,7 @@ async def admin_nap(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id: int = try_get(chat, "id")
     user: User = try_get(message, "from_user")
     user_id: int = try_get(user, "id")
-    if user_id != THE_CREATOR:
+    if user_id != THE_ARCHITECT_ID:
         return
     admin: AdminService = AdminService(user_id, chat_id)
     admin.sleep_service()
@@ -559,11 +561,11 @@ async def admin_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message: Message = try_get(update, "message")
     user: User = try_get(message, "from_user")
     user_id: int = try_get(user, "id")
-    if user_id != THE_CREATOR:
+    if user_id != THE_ARCHITECT_ID:
         return
     abbots_dict: dict = abbots.get_abbots()
     for bot in abbots_dict:
         abbot: Abbot = bot
         status_data = json.dumps(abbot.get_state(), indent=4)
-        bot_debug.log(f"statuses => {abbot.name} status_data={status_data}")
+        debug_bot.log(f"statuses => {abbot.name} status_data={status_data}")
         await message.reply_text(status_data)

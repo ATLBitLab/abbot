@@ -1,15 +1,21 @@
 from typing import Dict
+from abc import ABC, abstractmethod
+
+import time
 import httpx
 from httpx import Response
-from abc import ABC, abstractmethod
-from lib.utils import success, try_get
-from lib.logger import bot_debug
+from pymongo.results import InsertOneResult
+
+from lib.db.mongo import mongo_abbot
+from lib.logger import debug_bot, error_bot
+from lib.db.utils import successful_insert_one
+from lib.abbot.env import PAYMENT_PROCESSOR_KIND, PRICE_PROVIDER_KIND, LNBITS_BASE_URL
+from lib.utils import error, success, successful_response, try_get
 
 
 def init_payment_processor():
-    PAYMENT_PROCESSOR_KIND = "strike"
-    PAYMENT_PROCESSOR_TOKEN = "A50FA9B3130792435D5EDD067AFAD10B345F84F7927A734C92BBC3F933205B37"
-    LNBITS_BASE_URL = "LNBITS_BASE_URL"
+    from lib.abbot.env import PAYMENT_PROCESSOR_TOKEN
+
     available_processors = ["strike", "lnbits", "opennode"]
     if PAYMENT_PROCESSOR_KIND is None or PAYMENT_PROCESSOR_KIND not in available_processors:
         raise Exception(f"PAYMENT_PROCESSOR_KIND must be one of {', '.join(available_processors)}")
@@ -23,7 +29,7 @@ def init_payment_processor():
         return OpenNode(PAYMENT_PROCESSOR_TOKEN)
 
 
-class Processor(ABC):
+class PaymentProcessor(ABC):
     """
     An abstract class that all payment processors should implement.
     """
@@ -41,7 +47,7 @@ class Processor(ABC):
         pass
 
 
-class Strike(Processor):
+class Strike(PaymentProcessor):
     """
     A Strike payment processor
     """
@@ -60,6 +66,9 @@ class Strike(Processor):
             },
         )
 
+    def to_dict(self):
+        return vars(self)
+
     async def get_invoice(self, correlation_id, description, amount, chat_id):
         invoice_resp: Response = await self._client.post(
             "/invoices",
@@ -70,17 +79,17 @@ class Strike(Processor):
             },
         )
         invoice_data: Dict = invoice_resp.json()
-        bot_debug.log(__name__, f"strike => get_invoice => invoice_resp={invoice_resp.text}")
+        debug_bot.log(__name__, f"strike => get_invoice => invoice_resp={invoice_resp.text}")
 
         invoice_id = try_get(invoice_data, "invoiceId")
         self.CHAT_ID_INVOICE_ID_MAP[chat_id] = invoice_id
-        bot_debug.log(__name__, f"strike => get_invoice => invoice_id={invoice_id}")
+        debug_bot.log(__name__, f"strike => get_invoice => invoice_id={invoice_id}")
 
         quote_resp = await self._client.post(f"/invoices/{invoice_id}/quote")
-        bot_debug.log(__name__, f"strike => get_invoice => quote_resp={quote_resp.text}")
+        debug_bot.log(__name__, f"strike => get_invoice => quote_resp={quote_resp.text}")
 
         quote_data: Dict = quote_resp.json()
-        bot_debug.log(__name__, f"strike => get_invoice => quote_data={quote_data}")
+        debug_bot.log(__name__, f"strike => get_invoice => quote_data={quote_data}")
 
         return success(
             message="Invoice created",
@@ -99,8 +108,24 @@ class Strike(Processor):
         resp_data: Dict = resp.json()
         return try_get(resp_data, "state") == "CANCELLED"
 
+    async def get_bitcoin_price(self):
+        # TODO: implement
+        raise NotImplementedError("")
+        # response: Response = await self._client.get("/prices/BTC-USD/spot")
+        # if not successful_response(response):
+        #     return error("Failed to get bitcoin price", data=response)
+        # json = response.json()
+        # if not json:
+        #     return error("Failed to parse json resposne", data=response)
+        # resp_data = try_get(json, "data")
+        # if not resp_data:
+        #     return error("No response data", data=json)
+        # doc_data = {**resp_data, "_id": int(time.time())}
+        # doc = CoinbasePrice(**doc_data).to_dict()
+        # return success(data=doc)
 
-class LNbits(Processor):
+
+class LNbits(PaymentProcessor):
     """
     An LNbits payment processor
     """
@@ -149,7 +174,7 @@ class LNbits(Processor):
         pass
 
 
-class OpenNode(Processor):
+class OpenNode(PaymentProcessor):
     """
     An OpenNode payment processor
     """
@@ -190,3 +215,65 @@ class OpenNode(Processor):
     async def expire_invoice(self, invoice_id):
         """OpenNode doesn't seem to have an explicit way to expire an invoice"""
         pass
+
+
+def init_price_provider():
+    from lib.abbot.env import PAYMENT_PROCESSOR_TOKEN
+
+    available_providers = ["coinbase", "strike"]
+    if PRICE_PROVIDER_KIND is None or PRICE_PROVIDER_KIND not in available_providers:
+        raise Exception(f"PRICE_PROVIDER_KIND must be one of {', '.join(available_providers)}")
+    if PRICE_PROVIDER_KIND == "strike":
+        return Strike(PAYMENT_PROCESSOR_TOKEN)
+    elif PRICE_PROVIDER_KIND == "coinbase":
+        return Coinbase()
+
+
+class CoinbasePrice:
+    def __init__(self, _id, amount, base, currency):
+        self._id: int = _id
+        self.amount: float = float(amount)
+        self.base: str = base
+        self.currency: str = currency
+
+    def to_dict(self):
+        return vars(self)
+
+
+class Provider(ABC):
+    @abstractmethod
+    def get_bitcoin_price(self):
+        pass
+
+
+class Coinbase(Provider):
+    def __init__(self, api_key=None):
+        super().__init__()
+        self._client = httpx.AsyncClient(
+            base_url="https://api.coinbase.com/v2",
+            headers={
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            },
+        )
+
+    async def get_bitcoin_price(self):
+        log_name: str = f"{__name__}: get_bitcoin_price"
+        response: Response = await self._client.get("/prices/BTC-USD/spot")
+        if not successful_response(response):
+            return error("Failed to get bitcoin price", data=response)
+        json = response.json()
+        if not json:
+            return error("Failed to parse json resposne", data=response)
+        resp_data = try_get(json, "data")
+        if not resp_data:
+            return error("No response data", data=json)
+        price_data = {**resp_data, "_id": int(time.time())}
+        price_doc: CoinbasePrice = CoinbasePrice(**price_data).to_dict()
+        insert_result: InsertOneResult = mongo_abbot.insert_one_price(price_doc)
+        if not successful_insert_one(insert_result):
+            error_message = f"response={response} \n json={json} \n resp_data={resp_data}"
+            error_message = f"{error_message} \n price_data={price_data} \n price_doc={price_doc}"
+            error_message = f"{error_message} \n insert_result={insert_result}"
+            error_bot.log(log_name, error_message)
+        return success(data=price_doc, amount=try_get(price_doc, "amount"))

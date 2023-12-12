@@ -1,5 +1,5 @@
 from functools import wraps
-from lib.logger import bot_error, bot_debug
+from lib.logger import error_bot, debug_bot
 from traceback import format_exc, format_tb
 
 
@@ -27,7 +27,7 @@ def try_except(fn):
         except Exception as exception:
             except_msg = f"{__name__}: {exception}"
             abbot_exception = AbbotException(except_msg, format_exc(), format_tb(exception.__traceback__)[:-1])
-            bot_error.log(__name__, abbot_exception)
+            error_bot.log(__name__, abbot_exception)
             pass
 
     return wrapper
@@ -40,7 +40,7 @@ def try_except_raise(fn):
             return fn(*args, **kwargs)
         except Exception as exception:
             abbot_exception = AbbotException(exception, format_exc(), format_tb(exception.__traceback__)[:-1])
-            bot_error.log(f"try_except: {abbot_exception}")
+            error_bot.log(f"try_except: {abbot_exception}")
             return abbot_exception
 
     return wrapper
@@ -56,7 +56,7 @@ def log_me_if(predicate):
         def wrapper(*args, **kwargs):
             r = func(*args, **kwargs)
             if predicate(r):
-                bot_debug.log()
+                debug_bot.log()
             return r
 
         return wrapper
