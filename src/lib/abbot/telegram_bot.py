@@ -343,19 +343,25 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
 
     chat_id_filter = {"id": chat.id}
     admins: Any = [admin.to_dict() for admin in await chat.get_administrators()]
-    group: TelegramGroup = mongo_abbot.find_one_group(chat_id_filter)
-    if not group:
-        response: Dict = handle_insert_group(message, chat, admins)
-        if not successful(response):
-            bot_error.log(log_name, f"response={response}")
-            msg = f"{log_name}: Failed to insert group: handle_insert_group.response={response}"
-            return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=msg)
-        group: TelegramGroup = try_get(response, "data")
-    bot_debug.log(log_name, f"group={group}")
-    current_balance: TelegramGroup = mongo_abbot.get_group_balance(chat.id)
+    group: TelegramGroup = mongo_abbot.find_one_group_and_update(
+        chat_id_filter,
+        {
+            "$push": {"messages": message.to_dict(), "history": {"$each": group_history}},
+            "$set": {
+                "title": chat.title,
+                "id": chat.id,
+                "type": chat.type,
+                "admins": admins,
+                "balance": new_balance,
+                "history": DEFAULT_GROUP_HISTORY,
+                "config": {"started": False, "introduced": False, "unleashed": False, "count": None},
+            },
+        },
+    )
+    current_balance: TelegramGroup = mongo_abbot.get_group_balance(chat_id_filter)
     if current_balance == 0:
         return await message.reply_text("No Funds: Your wallet is empty. Please run /fund to topup.")
-    group_history: List = try_get(group, "history")
+    group_history: List = mongo_abbot.get_group_history(chat_id_filter)
     bot_debug.log(log_name, f"group_history={group_history[-1]}")
 
     group_history.append({"role": "user", "content": f"{chat.username} said: {message.text} on {message.date}"})
