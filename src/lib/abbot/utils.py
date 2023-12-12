@@ -8,8 +8,6 @@ from telegram import Message, Update, Chat, User
 from constants import OPENAI_MODEL, THE_CREATOR
 
 from ..utils import try_get
-from ..db.mongo import MongoAbbot, TelegramGroup
-from ..abbot.config import BOT_RESPONSES
 from ..logger import bot_debug, bot_error
 
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
@@ -81,19 +79,8 @@ async def squawk_error(error_message: str, context: ContextTypes.DEFAULT_TYPE) -
     return await context.bot.send_message(chat_id=THE_CREATOR, text=error_message)
 
 
-def get_bot_response(response_type: str, index: int = None) -> str:
-    response_list = try_get(BOT_RESPONSES, response_type)
-    index = randrange(len(response_list)) if not index else index
-    return try_get(response_list, index)
-
-
 def calculate_tokens(history: List) -> int:
     total = 0
     for data in history:
         total += len(encoding.encode(try_get(data, "content"), allowed_special="all"))
     return total
-
-
-def get_current_group_sats_balance(chat_id: int):
-    channel: TelegramGroup = MongoAbbot.find_one_channel({"id": chat_id})
-    return try_get(channel, "balance")

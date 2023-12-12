@@ -7,6 +7,7 @@ import traceback
 from os.path import abspath
 from datetime import datetime
 from httpx import Response, AsyncClient
+from traitlets import default
 
 async_client: AsyncClient = AsyncClient(
     base_url="https://api.coinbase.com/v2",
@@ -31,10 +32,12 @@ from constants import (
     THE_CREATOR,
 )
 from ..abbot.config import (
+    BOT_LIGHTNING_ADDRESS,
     BOT_SYSTEM_CORE_DMS,
     BOT_SYSTEM_CORE_GROUPS,
     BOT_NAME,
     BOT_TELEGRAM_HANDLE,
+    BOT_TELEGRAM_SUPPORT_CONTACT,
     ORG_INPUT_TOKEN_COST,
     ORG_OUTPUT_TOKEN_COST,
     ORG_PER_TOKEN_COST_DIV,
@@ -245,14 +248,32 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat: Chat = try_get(update_data, "chat")
 
     admins: Any = [admin.to_dict() for admin in await chat.get_administrators()]
-    blank_group_doc: Dict[TelegramGroup] = create_telegram_group_doc(message, chat, admins)
-    group: TelegramGroup = mongo_abbot.find_one_group_and_update({"id": chat.id}, blank_group_doc)
+    group: TelegramGroup = mongo_abbot.find_one_group_and_update(
+        {"id": chat.id},
+        {
+            "$setOnInsert": {"balance": 50000, "history": DEFAULT_GROUP_HISTORY},
+            "$push": {"messages": message.to_dict()},
+            "$set": {"title": chat.title, "id": chat.id, "type": chat.type, "admins": admins},
+        },
+    )
 
-    if not group:
-        no_group_squawk = f"no group exists for group.id={chat.id}"
-        bot_debug.log(log_name, no_group_squawk)
-        await message.reply_text("Failed to start Abbot. Try again or contact @nonni_io for assistance")
-        return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=no_group_squawk)
+    # group_id: int = try_get(group, "id")
+    # group_title: str = try_get(group, "title")
+    # group_added = f"New group added"
+    # group_not_added = f"Group add fail"
+    # group_info = f"\n\ngroup_id={group_id}\ngroup_title={group_title}"
+    # group_squawk = f"{log_name}: {group_not_added}: {group_info}"
+    # group_msg = f"{group_added}: {group_info}"
+    # if not group:
+    #     bot_error.log(log_name, group_msg)
+    #     return await context.bot.send_message(chat_id=THE_CREATOR, text=group_squawk)
+    # bot_debug.log(log_name, f"{group_added}: {group_info}")
+    # await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=group_msg)
+    # if not group:
+    #     no_group_squawk = f"no group exists for group.id={chat.id}"
+    #     bot_debug.log(log_name, no_group_squawk)
+    #     await message.reply_text("Failed to start Abbot. Try again or contact @nonni_io for assistance")
+    #     return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=no_group_squawk)
 
     started: Dict = try_get(group, "config", "started", default=False)
     bot_debug.log(log_name, f"started={started}")
@@ -274,19 +295,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await message.reply_photo(MATRIX_IMG_FILEPATH, f"Please wait while {BOT_NAME} is unplugged from the Matrix")
     time.sleep(5)
-    group_id: int = try_get(group, "id")
-    group_title: str = try_get(group, "title")
-    group_added = f"New group added"
-    group_not_added = f"Group add fail"
-    group_info = f"\n\ngroup_id={group_id}\ngroup_title={group_title}"
-    group_squawk = f"{log_name}: {group_not_added}: {group_info}"
-    group_msg = f"{group_added}: {group_info}"
-    if not group:
-        bot_error.log(log_name, group_msg)
-        return await context.bot.send_message(chat_id=THE_CREATOR, text=group_squawk)
 
-    bot_debug.log(log_name, f"{group_added}: {group_info}")
-    await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=group_msg)
+    group: TelegramGroup = mongo_abbot.find_one_group_and_update(
+        {"id": chat.id},
+        {
+            "$set": {"config.started": True, "config.introduced": True},
+        },
+    )
+
     return await message.reply_text(INTRODUCTION)
 
 
@@ -299,7 +315,6 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     message: Message = try_get(update_data, "message")
     chat: Chat = try_get(update_data, "chat")
-    user: User = try_get(update_data, "user")
 
     admins: Any = [admin.to_dict() for admin in await chat.get_administrators()]
     group: TelegramGroup = mongo_abbot.find_one_group({"id": chat.id})
@@ -463,27 +478,6 @@ async def handle_chat_creation_members_added(update: Update, context: ContextTyp
     #     )
 
 
-async def handle_find_or_insert_dm(chat: Chat):
-    log_name: str = f"{__name__}: handle_find_or_insert_dm"
-    dm: TelegramDM = mongo_abbot.find_one_dm({"id": chat.id})
-    bot_debug.log(log_name, f"handle_dm => dm={dm}")
-    dm: TelegramDM = mongo_abbot.insert_one_dm(
-        {
-            "id": chat.id,
-            "username": chat.username,
-            "created_at": datetime.now(),
-            "messages": [],
-            "history": DEFAULT_DM_HISTORY,
-        }
-    )
-    if not successful_insert_one(dm):
-        bot_error.log(log_name, f"handle_dm => insert dm failed={dm}")
-        msg = f"{log_name}: Failed to insert dm:"
-        msg = f"{msg} dm={dm}\nchat=(id={chat.id}, title=({chat.title})"
-        return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=msg)
-    dm: TelegramDM = mongo_abbot.find_one_dm({"id": chat.id})
-
-
 @try_except
 async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
     log_name: str = f"{__name__}: handle_chat_creation_members_added"
@@ -495,21 +489,32 @@ async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat: Chat = try_get(update_data, "chat")
     user: User = try_get(update_data, "user")
 
-    if not dm:
-        handle_find_or_insert_dm()
+    dm: TelegramDM = mongo_abbot.find_one_dm_and_update(
+        {"id": chat.id},
+        {
+            "$setOnInsert": {"created_at": datetime.now().isoformat()},
+            "$set": {"id": chat.id, "username": chat.title},
+            "$push": {
+                "messages": message.to_dict(),
+                "history": {"role": "user", "content": f"{chat.username} said: {message.text} on {message.date}"},
+            },
+        },
+    )
 
-    bot_debug.log(log_name, f"dm={dm}")
+    bot_debug.log(log_name, f"handle_dm => found or inserted chat=(id={chat.id}, user=({user.username}")
+    dm_msg = f"dm={dm}\nchat=(id={chat.id}, title=({chat.title})"
+    await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=dm_msg)
+
     dm_history: List = try_get(dm, "history")
-    dm_history.append({"role": "user", "content": message.text})
     bot_debug.log(log_name, f"dm_history={dm_history[-1]}")
+
     abbot = Abbot(chat.id, "dm", dm_history)
     answer, _, _, _ = abbot.chat_completion()
-    dm_history = abbot.get_history()
     dm: TelegramDM = mongo_abbot.find_one_group_and_update(
         {"id": chat.id},
-        {"$push": {"messages": message.to_dict(), "history": {"$each": dm_history}}},
+        {"$push": {"history": {"role": "assistant", "content": answer}}},
     )
-    bot_debug.log(log_name, f"chat_id={chat.id}, {user.username} dms with Abbot")
+    bot_debug.log(log_name, f"{dm_msg}\nAbbot DMs with {user.username}")
     return await message.reply_text(answer)
 
 
@@ -524,8 +529,8 @@ async def balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
     sats_balance = try_get(group, "balance", default=0)
     usd_balance = sats_to_usd(int(sats_balance))
     group_msg = f"⚡️ Group: {chat.title} ⚡️ "
-    sats_balance_msg = f"⚡️ SATs Balance: {sats_balance} sats ⚡️"
-    usd_balance_msg = f"⚡️ USD Balance: {usd_balance} ⚡️"
+    sats_balance_msg = f"⚡️ SAT Balance: {sats_balance} ⚡️"
+    usd_balance_msg = f"💰 USD Balance: {usd_balance} 💰"
     return await message.reply_text(f"{group_msg} \n {sats_balance_msg} \n {usd_balance_msg}")
 
 
@@ -586,7 +591,7 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     message: Message = try_get(update_data, "message")
     chat: Chat = try_get(update_data, "chat")
-    # user: User = try_get(update_data, "user")
+    user: User = try_get(update_data, "user")
 
     message_text: str = message.text
     bot_debug.log(log_name, f"message_text={message_text}")
@@ -610,9 +615,11 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
     currency_unit = currency_unit.lower()
     bot_debug.log(log_name, f"currency_unit={currency_unit}")
     if currency_unit == "sats":
-        symbol = "₿"
+        symbol = ""
+        # ₿
         amount = sats_to_usd(amount)
     elif currency_unit == "usd":
+        currency_unit = ""
         symbol = "$"
         amount = sats_to_usd(amount)
     else:
@@ -620,20 +627,24 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await message.reply_text("Creating your invoice, please wait ...")
     bot_debug.log(log_name, f"STRIKE={STRIKE}")
-
+    chat_type: str = try_get(chat, "type")
     chat_id: int = try_get(chat, "id")
-    topup_for = try_get(chat, "title", default="")
-    topup_by = try_get(chat, "username", default="")
+    topup_for: str = try_get(chat, "username") if chat_type == "dm" else try_get(chat, "title")
+    topup_by: str = try_get(chat, "username", default="") if chat_type == "dm" else try_get(user, "username")
+
+    d0 = f"{chat_type.capitalize()} balance topup"
+    d1 = f"\n\nTitle: {topup_for}\n\nSender: @{topup_by}\n\nAmount: {symbol}{amount} {currency_unit}"
+    description = f"{d0} {d1}"
 
     cid = str(uuid.uuid1())
-    description = f"Balance topup for {topup_for} by @{topup_by} for {symbol}{amount} {currency_unit}"
     bot_debug.log(log_name, f"description={description} cid={cid}")
-
     response = await STRIKE.get_invoice(cid, description, amount, chat.id)
     bot_debug.log(log_name, f"response={response}")
 
     create_squawk = f"Failed to create strike invoice: {json.dumps(response)}"
-    create_fail = "Failed to create invoice. Please try again or pay to abbot@atlbitlab.com and contact @nonni_io"
+    create_fail_0 = f"Failed to create invoice. Please try again"
+    create_fail_1 = f"or pay to {BOT_LIGHTNING_ADDRESS} and contact @{BOT_TELEGRAM_SUPPORT_CONTACT}"
+    create_fail = f"{create_fail_0} {create_fail_1}"
     if not successful(response):
         await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=create_squawk)
         return await message.reply_text(create_fail)
