@@ -245,8 +245,23 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat: Chat = try_get(update_data, "chat")
 
     admins: Any = [admin.to_dict() for admin in await chat.get_administrators()]
-    blank_group_doc: Dict[TelegramGroup] = create_telegram_group_doc(message, chat, admins)
-    group: TelegramGroup = mongo_abbot.find_one_group_and_update({"id": chat.id}, blank_group_doc)
+    group: TelegramGroup = mongo_abbot.find_one_group_and_update(
+        {"id": chat.id},
+        {
+            "$setOnInsert": {
+                "title": chat.title,
+                "id": chat.id,
+                "type": chat.type,
+                "admins": admins,
+                "balance": 50000,
+                "messages": [message.to_dict()],
+                "history": DEFAULT_GROUP_HISTORY,
+                "config": {"started": True, "introduced": True, "unleashed": False, "count": None},
+            },
+            "$push": {"messages": message.to_dict()},
+            "$set": {"config.started": True, "config.introduced": True},
+        },
+    )
 
     if not group:
         no_group_squawk = f"no group exists for group.id={chat.id}"
