@@ -350,12 +350,10 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
             message = reply_to_message
         chat: Chat = try_get(update_data, "chat") or try_get(update, "effective_chat")
         user: User = try_get(update_data, "user") or try_get(update, "effective_user")
-
         debug_bot.log(log_name, f"message={message}")
         message_text, message_date = parse_message_data(message)
         debug_bot.log(log_name, f"message_text={message_text} message_date={message_date}")
         debug_bot.log(log_name, f"chat={chat}")
-
         chat_id, chat_title, chat_type = parse_chat_data(chat)
         debug_bot.log(log_name, f"chat_id={chat_id} chat_title={chat_title} chat_type={chat_type}")
 
