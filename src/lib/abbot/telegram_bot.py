@@ -373,7 +373,7 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
     group_history: List = try_get(group, "history")
     bot_debug.log(log_name, f"group_history={group_history[-1]}")
 
-    group_history.append({"role": "user", "content": f"{chat.username} said: {message.text} on {message.date}"})
+    group_history.append({"role": "user", "content": f"{user.username} said: {message.text} on {message.date}"})
     bot_debug.log(log_name, f"group_history={group_history[-1]}")
 
     abbot = Abbot(chat.id, "group", group_history)
