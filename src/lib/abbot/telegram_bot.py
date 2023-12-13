@@ -415,6 +415,8 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
     debug_bot.log(log_name, f"admins={admins}")
 
     chat_id_filter = {"id": chat_id}
+    group_history.append({"role": "user", "content": f"{user.username} said: {message.text} on {message.date}"})
+    bot_debug.log(log_name, f"group_history={group_history[-1]}")
 
     group_history = mongo_abbot.get_group_history(chat_id_filter)
     if not group_history:
