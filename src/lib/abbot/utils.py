@@ -42,10 +42,19 @@ def parse_message_data(message: Message) -> Dict:
 
 
 def parse_chat(message: Message, context: ContextTypes.DEFAULT_TYPE) -> Dict:
+    log_name: str = f"{__name__}: parse_chat"
+
     chat: Chat = try_get(message, "chat")
     if not chat:
         error_message = f"{__name__} No chat: update={message.to_json()} context={context}"
         return dict(status="error", data=error_message)
+    """
+    if not message:
+        error_message = f"{log_name}: parse message fail: no message:\n\nupdate={update.to_json()}\n\ncontext={context}"
+        bot_error.log(log_name, error_message)
+        return error(error_message, data=update)
+    bot_debug.log(f"{log_name} parse message success: message{message}")
+    """
     bot_debug.log(f"{__name__} chat={chat}")
     return dict(status="success", data=chat)
 

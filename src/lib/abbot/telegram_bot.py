@@ -105,13 +105,14 @@ async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     log_name: str = f"{__name__}: parse_update_data"
 
     response: Dict = parse_message(update, context)
-    message: Message = try_get(response, "data")
     if not successful(response):
-        error_message = try_get(response, "data")
-        bot_error.log(log_name, f"parse_message failed:\n\nresponse={response}\nmessage={message}")
+        error_message: str = try_get(response, "data")
+        bot_error.log(log_name, f"parse_message failed:\n\nresponse={response}\nerror_message={error_message}")
         await squawk_error(error_message, context)
         bot_error.log(log_name, f"parse_message failed:\n\nerror_message={error_message}")
-        return error("Failed to parse message from update", data=dict(message=message, error=error_message))
+        return error(f"Parse message from update failed: {error_message}", data=message)
+
+    message: Message = try_get(response, "data")
 
     response: Dict = parse_chat(message, context)
     chat: Chat = try_get(response, "data")
@@ -120,7 +121,7 @@ async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         bot_error.log(log_name, f"parse_chat failed:\n\nresponse={response}\nmessage={message}")
         await squawk_error(error_message, context)
         bot_error.log(log_name, f"parse_chat failed:\n\nerror_message={error_message}")
-        return error("Failed to parse chat from update", data=dict(chat=chat, error=error_message))
+        return error(f"Failed to parse chat from update: {error_message}", data=chat)
 
     response: Dict = parse_user(message, context)
     user: User = try_get(response, "data")
@@ -129,9 +130,9 @@ async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         bot_error.log(log_name, f"parse_user failed:\n\nresponse={response}\nmessage={message}")
         await squawk_error(user, context)
         bot_error.log(log_name, f"parse_user failed:\n\nerror_message={error_message}")
-        return error("Failed to parse user from update", data=dict(user=user, error=error_message))
+        return error(f"Failed to parse user from update: {error_message}", data=user)
 
-    return success("Success parse update", message=message, chat=chat, user=user)
+    return success("Parse update success", message=message, chat=chat, user=user)
 
 
 async def balance_remaining(input_token_count: int, output_token_count: int, current_group_balance: int):
