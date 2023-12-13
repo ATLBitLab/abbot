@@ -7,7 +7,7 @@ from telegram import Message, Update, Chat, User
 
 from constants import OPENAI_MODEL, THE_CREATOR
 
-from ..utils import try_get
+from ..utils import success, try_get, error
 from ..logger import bot_debug, bot_error
 
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
@@ -23,12 +23,14 @@ async def get_chat_admins(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -> D
 
 
 def parse_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Dict:
+    log_name: str = f"{__name__}: parse_message"
     message: Message = try_get(update, "message")
     if not message:
-        error_message = f"{__name__} No message: update={update.to_json()} context={context}"
-        return dict(status="error", data=error_message)
-    bot_debug.log(f"{__name__} message={message}")
-    return dict(status="success", data=message)
+        error_message = f"{log_name}: parse message fail: no message:\n\nupdate={update.to_json()}\n\ncontext={context}"
+        bot_error.log(log_name, error_message)
+        return error(error_message, data=update)
+    bot_debug.log(f"{log_name} parse message success: message{message}")
+    return success("Parse message success", data=message)
 
 
 def parse_message_data(message: Message) -> Dict:
@@ -75,7 +77,7 @@ def parse_user_data(user: User) -> Dict:
 
 
 async def squawk_error(error_message: str, context: ContextTypes.DEFAULT_TYPE) -> Message:
-    bot_error.log(f"{__name__} {error_message}")
+    bot_error.log(f"{__name__}\n\n{error_message}")
     return await context.bot.send_message(chat_id=THE_CREATOR, text=error_message)
 
 
