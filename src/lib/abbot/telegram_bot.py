@@ -140,7 +140,7 @@ async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 async def balance_remaining(input_token_count: int, output_token_count: int, current_group_balance: int):
     log_name: str = f"{__name__}: balance_remaining"
 
-    response: Dict[CoinbasePrice] = price_provider.get_bitcoin_price()
+    response: Dict[CoinbasePrice] = await price_provider.get_bitcoin_price()
     debug_bot.log(log_name, f"response={response}")
     data = try_get(response, "data")
     amount = try_get(data, "amount")
