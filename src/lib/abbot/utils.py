@@ -31,12 +31,13 @@ def parse_message_data(message: Message) -> Dict:
     debug_bot.log(f"{log_name}: text={message_text}, date={message_date}")
     return message_text, message_date
 
+
 def parse_message_data_keys(message, keys):
     extra_data = dict()
     for key in keys:
-    if kwargs:
-        for kwarg in kwargs:
-            extra_data[kwarg] = try_get(message, kwarg)
+        extra_data[key] = try_get(message, key)
+    return extra_data
+
 
 def parse_chat(message: Message, context: ContextTypes.DEFAULT_TYPE) -> Dict:
     log_name: str = f"{__name__}: parse_chat"

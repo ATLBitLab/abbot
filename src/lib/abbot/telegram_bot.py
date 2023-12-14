@@ -22,9 +22,12 @@ from constants import (
     THE_CREATOR,
 )
 from ..abbot.config import (
+    BOT_GROUP_CONFIG_DEFAULT,
     BOT_LIGHTNING_ADDRESS,
     BOT_SYSTEM_CORE_DMS,
+    BOT_SYSTEM_OBJECT_DMS,
     BOT_SYSTEM_CORE_GROUPS,
+    BOT_SYSTEM_OBJECT_GROUPS,
     BOT_NAME,
     BOT_TELEGRAM_HANDLE,
     BOT_TELEGRAM_SUPPORT_CONTACT,
@@ -34,12 +37,9 @@ from ..abbot.config import (
     ORG_TOKEN_COST_MULT,
 )
 
-FULL_TELEGRAM_HANDLE = f"@{BOT_TELEGRAM_HANDLE}"
 RAW_MESSAGE_JL_FILE = abspath("src/data/raw_messages.jsonl")
 MATRIX_IMG_FILEPATH = abspath("src/assets/unplugging_matrix.jpg")
 KOOLAID_GIF_FILEPATH = abspath("src/assets/koolaid.gif")
-DEFAULT_GROUP_HISTORY = [{"role": "system", "content": BOT_SYSTEM_CORE_GROUPS}]
-DEFAULT_DM_HISTORY = [{"role": "system", "content": BOT_SYSTEM_CORE_DMS}]
 
 # packages
 from telegram import ChatMember, Update, Message, Chat, User
@@ -63,7 +63,7 @@ GROUP_CHAT_CREATED = StatusUpdate.CHAT_CREATED
 NEW_GROUP_CHAT_MEMBERS = StatusUpdate.NEW_CHAT_MEMBERS
 LEFT_GROUP_CHAT_MEMEBERS = StatusUpdate.LEFT_CHAT_MEMBER
 REGEX_BOT_TELEGRAM_HANDLE = Regex(BOT_TELEGRAM_HANDLE)
-FILTER_MENTION_ABBOT = Mention(FULL_TELEGRAM_HANDLE)
+FILTER_MENTION_ABBOT = Mention(BOT_TELEGRAM_HANDLE)
 ENTITY_MENTION = Entity(MENTION)
 
 # local
@@ -175,7 +175,7 @@ def create_telegram_group_doc(message: Message, chat: Chat, admins: Tuple[ChatMe
         "admins": list(admins),
         "balance": 50000,
         "messages": [message.to_dict()],
-        "history": DEFAULT_GROUP_HISTORY,
+        "history": BOT_SYSTEM_OBJECT_GROUPS,
         "config": {"started": False, "introduced": False, "unleashed": False, "count": None},
     }
 
@@ -255,39 +255,48 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     debug_bot.log(log_name, f"update_data={update_data}")
 
     message: Message = try_get(update_data, "message")
+    message_text, message_date = parse_message_data(message)
+
     chat: Chat = try_get(update_data, "chat")
+    chat_id, chat_title, chat_type = parse_chat_data(chat)
+
+    user: User = try_get(update_data, "user")
+    username, _ = parse_user_data(user)
 
     admins: Any = [admin.to_dict() for admin in await chat.get_administrators()]
+    debug_bot.log(log_name, f"admins={admins}")
+
     group: TelegramGroup = mongo_abbot.find_one_group_and_update(
         {"id": chat.id},
         {
-            "$setOnInsert": {
-                "created_at": datetime.now().isoformat(),
-                "balance": 50000,
-                "history": DEFAULT_GROUP_HISTORY,
-            },
+            "$set": {"title": chat.title, "id": chat.id, "type": chat.type, "admins": admins},
             "$push": {
                 "messages": message.to_dict(),
                 "history": {
                     "$each": [
                         {"role": "assistant", "content": f"Please wait while {BOT_NAME} is unplugged from the Matrix"},
                         {"role": "assistant", "content": INTRODUCTION},
+                        {"role": "user", "content": f"{username} said: {message_text} on {message_date}"},
                     ]
                 },
             },
-            "$set": {"title": chat.title, "id": chat.id, "type": chat.type, "admins": admins},
+            "$setOnInsert": {
+                "created_at": datetime.now().isoformat(),
+                "balance": 50000,
+                "history": [BOT_SYSTEM_OBJECT_GROUPS],
+                "config": BOT_GROUP_CONFIG_DEFAULT,
+            },
         },
     )
-    # mongo_abbot.find_one_dm(
-    #     {
-    #         "id": chat.id,
-    #         "history": {
-    #             "$elemMatch": {"role": "user", "content": {"$in": ["/start", f"/start@{BOT_TELEGRAM_HANDLE}"]}}
-    #         },
-    #     }
-    # )
+
     started: Dict = try_get(group, "config", "started", default=False)
     debug_bot.log(log_name, f"started={started}")
+    if started:
+        answer = f"{BOT_NAME} already started for your group. Rules of engagement: {RULES}"
+        if current_balance == 0:
+            answer = f"{answer}. Wallet Balance: 0 sats. Please run /fund <amount_in_sats> to topup (e.g. /fund 50000)."
+        debug_bot.log(log_name, f"answer={answer}")
+        return await message.reply_text(answer)
 
     introduced: Dict = try_get(group, "config", "introduced", default=False)
     debug_bot.log(log_name, f"introduced={introduced}")
@@ -296,13 +305,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if current_balance == 0:
         await message.reply_text("Note: Group balance is 0 sats. Please run /fund to topup (e.g. /fund 50000 sats).")
     debug_bot.log(log_name, f"current_balance={current_balance}")
-
-    if started:
-        answer = f"{BOT_NAME} already started for your group. Rules of engagement: {RULES}"
-        if current_balance == 0:
-            answer = f"{answer}. Wallet Balance: 0 sats. Please run /fund <amount_in_sats> to topup (e.g. /fund 50000)."
-        debug_bot.log(log_name, f"answer={answer}")
-        return await message.reply_text(answer)
 
     await message.reply_photo(MATRIX_IMG_FILEPATH, f"Please wait while {BOT_NAME} is unplugged from the Matrix")
     time.sleep(5)
@@ -325,33 +327,51 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     debug_bot.log(log_name, f"update_data={update_data}")
 
     message: Message = try_get(update_data, "message")
+    debug_bot.log(log_name, f"message={message}")
+
     chat: Chat = try_get(update_data, "chat")
+    debug_bot.log(log_name, f"chat={chat}")
+
+    chat_id, chat_title, chat_type = parse_chat_data(chat)
+    debug_bot.log(log_name, f"chat_id, chat_title, chat_type={chat_id, chat_title, chat_type}")
 
     admins: Any = [admin.to_dict() for admin in await chat.get_administrators()]
-    group: TelegramGroup = mongo_abbot.find_one_group({"id": chat.id})
-    if not group:
-        response: Dict = handle_insert_group(message, chat, admins)
-        if not successful(response):
-            error_bot.log(log_name, f"response={response}")
-            msg = f"{log_name}: Failed to insert group: handle_insert_group.response={response}"
-            return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=msg)
-        group: TelegramGroup = try_get(response, "data")
+    debug_bot.log(log_name, f"admins={admins}")
 
-    started: Dict = try_get(group, "config", "started", default=False)
+    group_config: Dict = mongo_abbot.get_group_config({"id": chat_id})
+    debug_bot.log(log_name, f"group_config={group_config}")
+    if not group_config:
+        return message.reply_text("Group does not exist. Did you run /start?")
+
+    started: bool = not try_get(group_config, "started")
     debug_bot.log(log_name, f"started={started}")
+    stopped: bool = not started
+    debug_bot.log(log_name, f"stopped={stopped}")
+    if stopped:
+        reply_text_err = f"{BOT_NAME} has not been started. Please run the /start command first."
+        abbot_squawk = f"{log_name}: {reply_text_err} - chat_id={chat_id}, chat_title={chat_title}"
+        error_bot.log(log_name, abbot_squawk)
+        await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
+        return await message.reply_text(reply_text_err)
 
-    if not started:
-        return await message.reply_text(f"{BOT_NAME} already stopped for your group. Please run /start to begin.")
+    group: TelegramGroup = mongo_abbot.find_one_group_and_update(
+        {"id": chat_id},
+        {
+            "$set": {"id": chat_id, "title": chat_title, "type": chat_type, "admins": admins, "config.started": False},
+            "$push": {"messages": message.to_dict()},
+            "$setOnInsert": {"created_at": datetime.now().isoformat()},
+        },
+    )
+    debug_bot.log(log_name, f"group={group}")
+    is_stopped: bool = not try_get(group, "config", "started")
+    if not is_stopped:
+        reply_text_err = f"Failed to stop {BOT_NAME}. Please contact @nonni_io for assistance."
+        abbot_squawk = f"{log_name}: {reply_text_err} => chat_id={chat_id}, chat_title={chat_title}"
+        error_bot.log(log_name, abbot_squawk)
+        await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
+        return await message.reply_text(reply_text_err)
 
-    group: TelegramGroup = mongo_abbot.find_one_group_and_update({"id": chat.id}, {"$set": {"config.started": False}})
-    error_bot.log(log_name, f"group={group}")
-    if not group:
-        error_bot.log(log_name, f"not group")
-        return await context.bot.send_message(
-            chat_id=THE_CREATOR,
-            text=f"{log_name}: find & update group fail: chat.id={chat.id} chat.title={chat.title}",
-        )
-    await message.reply_text("Thanks for using Abbot! Come back soon!")
+    await message.reply_text(f"Stop successful. Thanks for using {BOT_NAME}! Come back soon!")
 
 
 @try_except
@@ -363,76 +383,86 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
     debug_bot.log(log_name, f"update_data={update_data}")
 
     message: Message = try_get(update_data, "message")
-    chat: Chat = try_get(update_data, "chat")
-    user: User = try_get(update_data, "user")
-    debug_bot.log(log_name, f"{user.username} message tagged abbot in chat {chat.title} (chat_id={chat.id})")
+    message_text, message_date = parse_message_data(message)
 
-    chat_id_filter = {"id": chat.id}
+    chat: Chat = try_get(update_data, "chat")
+    chat_id, chat_title, chat_type = parse_chat_data(chat)
+
+    group_config: Dict = mongo_abbot.get_group_config({"id": chat_id})
+    if not group_config:
+        reply_text_err = f"{BOT_NAME} is stopped. Please run the /start command?"
+        abbot_squawk = f"{log_name}: {reply_text_err}: id={chat_id}, title={chat_title}"
+        error_bot.log(log_name, f"No group_config! {group_config}")
+        await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
+        return message.reply_text(reply_text_err)
+    debug_bot.log(log_name, f"group_config={group_config}")
+
+    started: bool = not try_get(group_config, "started")
+    debug_bot.log(log_name, f"started={started}")
+    stopped: bool = not started
+    debug_bot.log(log_name, f"stopped={stopped}")
+    if stopped:
+        reply_text_err = f"{BOT_NAME} has not been started. Please run the /start command first."
+        abbot_squawk = f"{log_name}: {reply_text_err}: id={chat_id}, title={chat_title}"
+        error_bot.log(log_name, abbot_squawk)
+        await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
+        return await message.reply_text(reply_text_err)
+
+    user: User = try_get(update_data, "user")
+    username, _ = parse_user_data(user)
+
     admins: Any = [admin.to_dict() for admin in await chat.get_administrators()]
-    group: TelegramGroup = mongo_abbot.find_one_group_and_update(
-        chat_id_filter,
-        {
-            "$setOnInsert": {"created_at": datetime.now().isoformat()},
-            "$push": {"messages": message.to_dict(), "history": {"$each": group_history}},
-            "$set": {
-                "title": chat.title,
-                "id": chat.id,
-                "type": chat.type,
-                "admins": admins,
-                "balance": new_balance,
-                "history": DEFAULT_GROUP_HISTORY,
-                "config": {"started": False, "introduced": False, "unleashed": False, "count": None},
-            },
-        },
-    )
+    debug_bot.log(log_name, f"admins={admins}")
+
+    chat_id_filter = {"id": chat_id}
+
+    group_history = mongo_abbot.get_group_history(chat_id_filter)
+    if not group_history:
+        return message.reply_text("Group does not exist. Did you run /start?")
+
+    abbot = Abbot(chat_id, "group", group_history)
+    answer, input_tokens, output_tokens, _ = abbot.chat_completion()
+
     current_balance: TelegramGroup = mongo_abbot.get_group_balance(chat_id_filter)
     if current_balance == 0:
-        return await message.reply_text("No Funds: Your wallet is empty. Please run /fund to topup.")
-    group_history: List = mongo_abbot.get_group_history(chat_id_filter)
-    debug_bot.log(log_name, f"group_history={group_history[-1]}")
-
-    group_history.append({"role": "user", "content": f"{chat.username} said: {message.text} on {message.date}"})
-    debug_bot.log(log_name, f"group_history={group_history[-1]}")
-
-    abbot = Abbot(chat.id, "group", group_history)
-    answer, input_tokens, output_tokens, _ = abbot.chat_completion()
+        return await message.reply_text("No Funds Available. Please run /fund to topup.")
 
     response: Dict = await balance_remaining(input_tokens, output_tokens, current_balance)
     if not successful(response):
         error_bot.log(log_name, f"response={response}")
         msg = f"{log_name}: Failed to calculate balance:"
-        msg = f"{msg} balance_remaining.response={response}\nchat=(id={chat.id}, title=({chat.title})"
+        msg = f"{msg} balance_remaining.response={response}\nchat=(id={chat_id}, title=({chat_title})"
         return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=msg)
-    new_balance: int = try_get(response, "data", default=0)
-    error_bot.log(log_name, f"new_balance={new_balance}")
+
+    remaining_balance: int = try_get(response, "data", default=0)
+    error_bot.log(log_name, f"remaining_balance={remaining_balance}")
+
     group: TelegramGroup = mongo_abbot.find_one_group_and_update(
         chat_id_filter,
         {
-            "$push": {"messages": message.to_dict(), "history": {"$each": group_history}},
-            "$set": {"balance": new_balance},
+            "$set": {
+                "id": chat_id,
+                "title": chat_title,
+                "type": chat_type,
+                "admins": admins,
+                "balance": remaining_balance,
+            },
+            "$push": {
+                "messages": message.to_dict(),
+                "history": {"role": "user", "content": f"{username} said: {message_text} on {message_date}"},
+            },
         },
     )
     debug_bot.log(log_name, f"group={group}")
-    if not group:
-        error_bot.log(log_name, f"not group")
-        return await context.bot.send_message(
-            chat_id=THE_CREATOR, text=f"{log_name}: find & update group fail: chat.id={chat.id} chat.title={chat.title}"
-        )
-
     return await message.reply_text(answer)
 
 
 @try_except
 async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
     log_name: str = f"{__name__}: handle_group_reply: "
-
     update_data: Dict = await parse_update_data(update, context)
     debug_bot.log(log_name, f"update_data={update_data}")
-
     message: Message = try_get(update_data, "message")
-    chat: Chat = try_get(update_data, "chat")
-    user: User = try_get(update_data, "user")
-
     from_user: Optional[User] = try_get(message, "reply_to_message", "from_user")
     if from_user.is_bot and from_user.username == BOT_TELEGRAM_HANDLE:
         return await handle_group_mention(update, context, reply=True)
@@ -445,40 +475,43 @@ async def handle_chat_creation_members_added(update: Update, context: ContextTyp
     debug_bot.log(log_name, f"update_data={update_data}")
 
     message: Message = try_get(update_data, "message")
-    message_text, message_date = parse_message_data(message)
-    
+    # message_text, message_date = parse_message_data(message)
+
     message_data: Dict = parse_message_data_keys(message, keys=["group_chat_created", "new_chat_members"])
     group_chat_created = message_data.get("group_chat_created", None)
     new_chat_members = message_data.get("new_chat_members", None)
 
     chat: Chat = try_get(update_data, "chat")
     chat_id, chat_title, chat_type = parse_chat_data(chat)
-    
-    user: User = try_get(update_data, "user")
-    username, _ = parse_user_data(user)
-    
+
+    # user: User = try_get(update_data, "user")
+    # username, _ = parse_user_data(user)
+
     admins: Any = [admin.to_dict() for admin in await chat.get_administrators()]
     debug_bot.log(log_name, f"admins={admins}")
 
     if not group_chat_created and new_chat_members:
         if BOT_TELEGRAM_HANDLE not in [username for username in new_chat_members]:
             return debug_bot.log(log_name, "Abbot not added to group")
-    
-    new_history_obj: Dict = {"role": "user", "content": f"{username} said: {message_text} on {message_date}"}
+    new_message_dict = message.to_dict()
     group: TelegramGroup = mongo_abbot.find_one_group_and_update(
         {"id": chat_id},
         {
-            "$set": {"id": chat_id, "title": chat_title, "type": chat_type, "admins": admins},
-            "$push": {
-                "messages": message.to_dict(),
-                "history": {"role": "user", "content": f"{username} said: {message_text} on {message_date}"}
+            "$set": {
+                "id": chat_id,
+                "title": chat_title,
+                "type": chat_type,
+                "admins": admins,
             },
+            "$push": {"messages": new_message_dict},
             "$setOnInsert": {
                 "created_at": datetime.now().isoformat(),
                 "balance": 50000,
-                "history": [*DEFAULT_GROUP_HISTORY, new_history_obj],
+                "messages": [],
+                "history": [BOT_SYSTEM_OBJECT_GROUPS],
             },
-        })
+        },
+    )
     debug_bot.log(log_name, f"group={group}")
     group_title: str = try_get(group, "title")
     group_id: str = try_get(group, "id")
@@ -496,10 +529,10 @@ async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     message: Message = try_get(update_data, "message")
     message_text, message_date = parse_message_data(message)
-    
+
     chat: Chat = try_get(update_data, "chat")
     chat_id, _, chat_type = parse_chat_data(chat)
-    
+
     user: User = try_get(update_data, "user")
     username, _ = parse_user_data(user)
     if not username:
@@ -511,12 +544,14 @@ async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
         {
             "$set": {"id": chat_id, "username": username, "type": chat_type},
             "$push": {
-                "messages": message.to_dict(),
-                "history": {
-                    "$each": [*DEFAULT_DM_HISTORY, {"role": "user", "content": f"{username} said: {message_text} on {message_date}"}]
-                },
+                "messages": [message.to_dict()],
+                "history": {"role": "user", "content": f"{username} said: {message_text} on {message_date}"},
             },
-            "$setOnInsert": {"created_at": datetime.now().isoformat()},
+            "$setOnInsert": {
+                "created_at": datetime.now().isoformat(),
+                "messages": [],
+                "history": [BOT_SYSTEM_OBJECT_DMS],
+            },
         },
     )
 
@@ -716,6 +751,13 @@ async def handle_bot_kicked(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
 
+"""
+async def handle_chat_migrated():
+        => check for old chat doc
+        => update old id -> new id
+"""
+
+
 @try_except
 async def handle_default_group(update: Update, context: ContextTypes.DEFAULT_TYPE):
     log_name: str = f"{__name__}: handle_default_group"
@@ -723,33 +765,30 @@ async def handle_default_group(update: Update, context: ContextTypes.DEFAULT_TYP
     debug_bot.log(log_name, f"update_data={update_data}")
 
     message: Message = try_get(update_data, "message")
-    message_text, message_date: Dict = parse_message_data(chat)
-    
+    message_text, message_date = parse_message_data(chat)
+
     chat: Chat = try_get(update_data, "chat")
     chat_id, chat_title, chat_type = parse_chat_data(chat)
-    
+
     user: User = try_get(update_data, "user")
     _, username = parse_user_data(user)
-    
+
     username: str = try_get(chat, "username") or try_get(user, "username")
     admins: Any = [admin.to_dict() for admin in await chat.get_administrators()]
-    
+
     group: TelegramGroup = mongo_abbot.find_one_group_and_update(
         {"id": chat_id},
         {
+            "$set": {"id": chat_id, "title": chat_title, "type": chat_type, "admins": admins},
+            "$push": {
+                "messages": message.to_dict(),
+                "history": {"role": "user", "content": f"{username} said: {message_text} on {message_date}"},
+            },
             "$setOnInsert": {
                 "created_at": datetime.now().isoformat(),
                 "balance": 50000,
-                "history": DEFAULT_GROUP_HISTORY,
-            },
-            "$set": {"title": chat_title, "id": chat_id, "type": chat_type, "admins": admins},
-            "$push": {
-                "messages": message.to_dict(),
-                "history": {
-                    "$each": [
-                        {"role": "user", "content": f"{username} said: {message_text} on {message_date}"}
-                    ]
-                },
+                "messages": [],
+                "history": [BOT_SYSTEM_OBJECT_GROUPS],
             },
         },
     )
@@ -790,10 +829,10 @@ class TelegramBotBuilder:
     from lib.abbot.config import BOT_TELEGRAM_TOKEN
 
     def __init__(self):
-        log_name: str = f"{__name__}: TelegramBotBuilder.__init__"
-        debug_bot.log(log_name, f"Telegram abbot initializing: name={BOT_NAME} handle={FULL_TELEGRAM_HANDLE}")
+        log_name: str = f"{__name__}: TelegramBotBuilder.__init__()"
+        # debug_bot.log(log_name, f"Telegram abbot initializing: name={BOT_NAME} handle={BOT_TELEGRAM_HANDLE}")
         telegram_bot = ApplicationBuilder().token(self.BOT_TELEGRAM_TOKEN).build()
-        debug_bot.log(log_name, f"Telegram abbot initialized")
+        # debug_bot.log(log_name, f"Telegram abbot initialized")
 
         # Add command handlers
         telegram_bot.add_handlers(

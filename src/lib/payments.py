@@ -5,14 +5,14 @@ import time
 import httpx
 from httpx import Response
 
-from ..lib.utils import error, success, successful_response, to_dict, try_get
-from ..lib.logger import debug_bot
+from lib.utils import error, success, successful_response, to_dict, try_get
+from lib.logger import debug_bot
 
-from ..lib.abbot.env import PAYMENT_PROCESSOR_KIND, PRICE_PROVIDER_KIND, LNBITS_BASE_URL
+from lib.abbot.env import PAYMENT_PROCESSOR_KIND, PRICE_PROVIDER_KIND, LNBITS_BASE_URL
 
 
 def init_payment_processor():
-    from ..lib.abbot.env import PAYMENT_PROCESSOR_TOKEN
+    from lib.abbot.env import PAYMENT_PROCESSOR_TOKEN
 
     available_processors = ["strike", "lnbits", "opennode"]
     if PAYMENT_PROCESSOR_KIND is None or PAYMENT_PROCESSOR_KIND not in available_processors:
@@ -200,7 +200,7 @@ class OpenNode(PaymentProcessor):
 
 
 def init_price_provider():
-    from ..lib.abbot.env import PAYMENT_PROCESSOR_TOKEN
+    from lib.abbot.env import PAYMENT_PROCESSOR_TOKEN
 
     available_providers = ["coinbase", "strike"]
     if PRICE_PROVIDER_KIND is None or PRICE_PROVIDER_KIND not in available_providers:

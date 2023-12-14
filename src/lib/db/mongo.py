@@ -13,14 +13,10 @@ from pymongo.cursor import Cursor
 from pymongo.results import InsertOneResult, InsertManyResult, UpdateResult
 from bson.typings import _DocumentType
 
-# from constants import INTRODUCTION
 from ..logger import debug_bot
 from ..utils import success, to_dict, error, try_get
 from ..abbot.env import DATABASE_CONNECTION_STRING
-from ..abbot.config import BOT_SYSTEM_CORE_DMS, BOT_SYSTEM_CORE_GROUPS
-from ..abbot.telegram_bot import DEFAULT_DM_HISTORY, DEFAULT_GROUP_HISTORY
-
-# from ..abbot.exceptions.exception import try_except
+from ..abbot.config import BOT_SYSTEM_OBJECT_GROUPS, BOT_SYSTEM_OBJECT_DMS
 
 client = MongoClient(host=DATABASE_CONNECTION_STRING)
 
@@ -93,11 +89,12 @@ class MongoNostrEvent(NostrEvent, GroupConfig):
 @to_dict
 class TelegramDM:
     def __init__(self, message: Message):
+        self.created_at: datetime = datetime.now()
         self.id: int = message.chat.id
         self.username: str = message.from_user.username
-        self.created_at: datetime = datetime.now()
+        self.type: str = message.chat.type
         self.messages = [message.to_dict()]
-        self.history = DEFAULT_DM_HISTORY
+        self.history = [BOT_SYSTEM_OBJECT_DMS]
 
     @abstractmethod
     def to_dict(self):
@@ -106,15 +103,15 @@ class TelegramDM:
 
 class TelegramGroup(GroupConfig):
     def __init__(self, message: Message, admins: Tuple[ChatMember]):
-        self.title: str = message.chat.title
-        self.id: int = message.chat.id
         self.created_at: datetime = datetime.now()
+        self.id: int = message.chat.id
+        self.title: str = message.chat.title
         self.type: str = message.chat.type
         self.admins: List = admins
         self.balance: int = 50000
         self.messages = [message.to_dict()]
-        self.history = DEFAULT_GROUP_HISTORY
-        self.config = GroupConfig(introduced=True, started=False, unleashed=False, count=None)
+        self.history = [BOT_SYSTEM_OBJECT_GROUPS]
+        self.config = GroupConfig(introduced=False, started=False, unleashed=False, count=None)
 
 
 @to_dict
@@ -233,8 +230,8 @@ class MongoAbbot(MongoNostr, MongoTelegram):
         return self.direct_messages.update_one(filter, update, return_document=True, upsert=True)
 
     # custom reads
-    def get_group_config(self, id: str) -> Optional[_DocumentType]:
-        channel_doc = self.find_one_group({"id": id})
+    def get_group_config(self, filter: {}) -> Optional[_DocumentType]:
+        channel_doc = self.find_one_group()
         if channel_doc == None:
             return error("Channel does not exist")
         return channel_doc
@@ -243,8 +240,8 @@ class MongoAbbot(MongoNostr, MongoTelegram):
         group: TelegramGroup = self.find_one_group({"id": id})
         return try_get(group, "balance")
 
-    def get_group_history(self, id) -> int:
-        group: TelegramGroup = self.find_one_group({"id": id})
+    def get_group_history(self, filter: {}) -> int:
+        group: TelegramGroup = self.find_one_group(filter)
         return try_get(group, "history", default=[])
 
     def get_dm_history(self, id) -> int:

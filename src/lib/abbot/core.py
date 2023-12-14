@@ -6,9 +6,8 @@ from abc import abstractmethod
 from typing import List, Dict
 
 from constants import OPENAI_MODEL
-from src.lib.abbot.telegram_bot import FULL_TELEGRAM_HANDLE
-
 from ..db.utils import successful_update_one
+from ..abbot.config import BOT_TELEGRAM_HANDLE
 from ..utils import error, success, to_dict, try_get
 from ..db.mongo import GroupConfig, UpdateResult, mongo_abbot
 
@@ -140,7 +139,7 @@ class Abbot(GroupConfig):
         output_tokens = try_get(response, "usage", "completion_tokens")
         total_tokens = try_get(response, "usage", "total_tokens")
         self.update_history(
-            {"role": "assistant", "content": f'{FULL_TELEGRAM_HANDLE} said: "{answer}" on {datetime.now().isoformat()}'}
+            {"role": "assistant", "content": f'{BOT_TELEGRAM_HANDLE} said: "{answer}" on {datetime.now().isoformat()}'}
         )
         if not answer:
             debug_bot.log(__name__, f"chat_completion => response={response}")
