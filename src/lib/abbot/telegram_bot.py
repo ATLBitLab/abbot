@@ -23,6 +23,7 @@ from constants import (
 )
 from ..abbot.config import (
     BOT_GROUP_CONFIG_DEFAULT,
+    BOT_GROUP_CONFIG_STARTED,
     BOT_LIGHTNING_ADDRESS,
     BOT_SYSTEM_CORE_DMS,
     BOT_SYSTEM_OBJECT_DMS,
@@ -309,8 +310,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     "id": chat_id,
                     "type": chat_type,
                     "admins": admins,
-                    "config.started": True,
-                    "config.introduced": True,
+                    "config": BOT_GROUP_CONFIG_STARTED,
                 },
                 "$push": {
                     "messages": new_message_dict,
@@ -449,7 +449,7 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
         chat_id_filter = {"id": chat_id}
         group_config: Dict = mongo_abbot.get_group_config(chat_id_filter)
         if not group_config:
-            reply_text_err = f"{BOT_NAME} is stopped. Please run the /start command?"
+            reply_text_err = f"{BOT_NAME} is stopped. Please run the /start command."
             abbot_squawk = f"{log_name}: {reply_text_err}: id={chat_id}, title={chat_title}"
             error_bot.log(log_name, f"No group_config! {group_config}")
             await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
