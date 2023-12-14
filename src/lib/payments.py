@@ -106,6 +106,22 @@ class Strike(PaymentProcessor):
         resp_data: Dict = resp.json()
         return try_get(resp_data, "state") == "CANCELLED"
 
+    async def get_bitcoin_price(self):
+        # TODO: implement
+        raise NotImplementedError("")
+        # response: Response = await self._client.get("/prices/BTC-USD/spot")
+        # if not successful_response(response):
+        #     return error("Failed to get bitcoin price", data=response)
+        # json = response.json()
+        # if not json:
+        #     return error("Failed to parse json resposne", data=response)
+        # resp_data = try_get(json, "data")
+        # if not resp_data:
+        #     return error("No response data", data=json)
+        # doc_data = {**resp_data, "_id": int(time.time())}
+        # doc = CoinbasePrice(**doc_data).to_dict()
+        # return success(data=doc)
+
 
 class LNbits(PaymentProcessor):
     """

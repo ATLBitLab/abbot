@@ -456,7 +456,7 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
             return await message.reply_text(reply_text_err)
         debug_bot.log(log_name, f"group_config={group_config}")
 
-        started: bool = not try_get(group_config, "started")
+        started: bool = try_get(group_config, "started")
         debug_bot.log(log_name, f"started={started}")
         stopped: bool = not started
         debug_bot.log(log_name, f"stopped={stopped}")
