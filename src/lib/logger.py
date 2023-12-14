@@ -68,5 +68,5 @@ class BotLogger:
         debug_log.debug(message)
 
 
-bot_error = BotLogger("error", LOG_MODE)
-bot_debug = BotLogger("debug", LOG_MODE)
+error_bot = BotLogger("error", LOG_MODE)
+debug_bot = BotLogger("debug", LOG_MODE)

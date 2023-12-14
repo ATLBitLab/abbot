@@ -1,6 +1,7 @@
 from functools import wraps
 import json
 from typing import Any, Callable, Dict, Optional
+from httpx import Response
 
 from qrcode import make
 from os.path import abspath
@@ -8,7 +9,7 @@ from io import BytesIO, open
 from requests import request
 
 from telegram.ext import ContextTypes
-from lib.logger import bot_debug
+from lib.logger import debug_bot
 
 
 TELEGRAM_MESSAGE_FIELDS = [
@@ -119,7 +120,7 @@ def qr_code(data):
 def opt_in(context: str, chat_id: int) -> bool:
     fn = "opt_in:"
     config_file_name = f"src/data/chat/{context}/config/{chat_id}.json"
-    bot_debug.log(f"{fn} config_file_name={config_file_name}")
+    debug_bot.log(f"{fn} config_file_name={config_file_name}")
     config_file_path = abspath(config_file_name)
     with open(config_file_path, "w") as config:
         json.dump({"started": True, "sent_intro": False}, config)
@@ -129,7 +130,7 @@ def opt_in(context: str, chat_id: int) -> bool:
 def opt_out(context: str, chat_id: int) -> bool:
     fn = "opt_out:"
     config_file_name = f"src/data/chat/{context}/config/{chat_id}.json"
-    bot_debug.log(f"{fn} config_file_name={config_file_name}")
+    debug_bot.log(f"{fn} config_file_name={config_file_name}")
     config_file_path = abspath(config_file_name)
     with open(config_file_path, "w") as config:
         json.dump({"started": False, "sent_intro": True}, config)
@@ -160,7 +161,7 @@ def to_dict(cls):
     print("to_dict")
     cls_name = f"{cls.__name__}: @to_dict: "
     if hasattr(cls, "to_dict"):
-        bot_error.log(f"{cls_name}", f"already has method 'to_dict'")
+        error_bot.log(f"{cls_name}", f"already has method 'to_dict'")
         return
 
     def to_dict(self):
@@ -196,6 +197,10 @@ def success(msg: str = "", **kwargs) -> Dict:
 
 def successful(response: Dict, data: Optional[Any] = None) -> bool:
     return response["status"] == "success"
+
+
+def successful_response(response: Response) -> bool:
+    return response.status_code == 200
 
 
 def unsuccessful(response: Dict) -> bool:

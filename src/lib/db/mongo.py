@@ -14,7 +14,7 @@ from pymongo.results import InsertOneResult, InsertManyResult, UpdateResult
 from bson.typings import _DocumentType
 
 # from constants import INTRODUCTION
-from ..logger import bot_debug
+from ..logger import debug_bot
 from ..utils import success, to_dict, error, try_get
 from ..abbot.env import DATABASE_CONNECTION_STRING
 from ..abbot.config import BOT_SYSTEM_CORE_DMS, BOT_SYSTEM_CORE_GROUPS
@@ -34,7 +34,7 @@ else:
     telegram_db_name = "telegram"
     nostr_db_name = "nostr"
 
-bot_debug.log(__name__, f"telegram_db_name={telegram_db_name}")
+debug_bot.log(__name__, f"telegram_db_name={telegram_db_name}")
 
 nostr_db = client.get_database(nostr_db_name)
 nostr_channels = nostr_db.get_collection("channel")

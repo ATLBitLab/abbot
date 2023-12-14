@@ -13,6 +13,8 @@ BOT_NOSTR_SK: str = try_get(env, "BOT_NOSTR_SK")
 PAYMENT_PROCESSOR_KIND: str = try_get(env, "PAYMENT_PROCESSOR_KIND")
 PAYMENT_PROCESSOR_TOKEN: str = try_get(env, "PAYMENT_PROCESSOR_TOKEN")
 
+PRICE_PROVIDER_KIND: str = try_get(env, "PRICE_PROVIDER_KIND", default=PAYMENT_PROCESSOR_KIND)
+
 LNBITS_BASE_URL: Optional[str] = try_get(env, "LNBITS_BASE_URL")
 
 OPENAI_API_KEY: Optional[str] = try_get(env, "OPENAI_API_KEY")
