@@ -231,22 +231,24 @@ class MongoAbbot(MongoNostr, MongoTelegram):
 
     # custom reads
     def get_group_config(self, filter: {}) -> Optional[_DocumentType]:
-        channel_doc = self.find_one_group()
-        if channel_doc == None:
-            return error("Channel does not exist")
-        return channel_doc
+        group: TelegramGroup = self.find_one_group(filter)
+        return try_get(group, "config")
 
-    def get_group_balance(self, id) -> int:
-        group: TelegramGroup = self.find_one_group({"id": id})
+    def get_group_balance(self, filter: {}) -> int:
+        group: TelegramGroup = self.find_one_group(filter)
         return try_get(group, "balance")
 
     def get_group_history(self, filter: {}) -> int:
         group: TelegramGroup = self.find_one_group(filter)
         return try_get(group, "history", default=[])
 
-    def get_dm_history(self, id) -> int:
-        dm: TelegramDM = self.find_one_dm({"id": id})
+    def get_dm_history(self, filter) -> int:
+        dm: TelegramDM = self.find_one_dm(filter)
         return try_get(dm, "history", default=[])
+
+    def group_does_exist(self, filter) -> int:
+        group: TelegramGroup = self.find_one_dm(filter)
+        return group != None
 
 
 db_name = "telegram" if TELEGRAM_MODE else "nostr"

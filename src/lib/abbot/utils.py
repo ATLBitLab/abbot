@@ -13,7 +13,7 @@ from ..logger import debug_bot, error_bot
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
 
 
-def parse_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Dict:
+def parse_message(update: Update) -> Dict:
     log_name: str = f"{__name__}: parse_message"
     message: Message = try_get(update, "message")
     if not message:
@@ -39,7 +39,7 @@ def parse_message_data_keys(message, keys):
     return extra_data
 
 
-def parse_chat(message: Message, context: ContextTypes.DEFAULT_TYPE) -> Dict:
+def parse_chat(message: Message) -> Dict:
     log_name: str = f"{__name__}: parse_chat"
     chat: Chat = try_get(message, "chat")
     if not chat:
@@ -59,7 +59,7 @@ def parse_chat_data(chat: Chat) -> Dict:
     return chat_id, chat_title, chat_type
 
 
-def parse_user(message: Message, context: ContextTypes.DEFAULT_TYPE) -> Dict:
+def parse_user(message: Message) -> Dict:
     log_name: str = f"{__name__}: parse_user"
     user: User = try_get(message, "from_user")
     if not user:
