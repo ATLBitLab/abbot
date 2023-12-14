@@ -35,7 +35,7 @@ BOT_SHORT_FOR = try_get(BOT_CONFIG, "short_for")
 BOT_JOB = try_get(BOT_CONFIG, "job")
 BOT_TELEGRAM = try_get(BOT_CONFIG, "telegram")
 
-BOT_TELEGRAM_HANDLE = try_get(BOT_TELEGRAM, "username")
+BOT_TELEGRAM_USERNAME = try_get(BOT_TELEGRAM, "username")
 BOT_TELEGRAM_USER_ID = try_get(BOT_TELEGRAM, "user_id")
 BOT_TELEGRAM_CONTEXT = try_get(BOT_TELEGRAM, "context")
 BOT_TELEGRAM_SUPPORT_CONTACT = try_get(BOT_TELEGRAM, "support_contact")
@@ -54,9 +54,14 @@ BOT_SYSTEM_CORE = try_get(BOT_SYSTEM, "core")
 BOT_DIRECTIVE = try_get(BOT_SYSTEM, "directive")
 
 BOT_NAME = f"t{BOT_NAME}" if TEST_MODE or DEV_MODE else BOT_NAME
-BOT_TELEGRAM_HANDLE = f"test_{BOT_TELEGRAM_HANDLE}" if TEST_MODE or DEV_MODE else BOT_TELEGRAM_HANDLE
+BOT_TELEGRAM_USERNAME = f"test_{BOT_TELEGRAM_USERNAME}" if TEST_MODE or DEV_MODE else BOT_TELEGRAM_USERNAME
+BOT_TELEGRAM_HANDLE = f"@{BOT_TELEGRAM_USERNAME}"
 BOT_TELEGRAM_TOKEN = TEST_BOT_TELEGRAM_HANDLE if TEST_MODE or DEV_MODE else BOT_TELEGRAM_TOKEN
 
 BOT_INTRO = f"Your name is {BOT_NAME}, which is short for {BOT_SHORT_FOR}, your telegram handle is {BOT_TELEGRAM_HANDLE}. You answer to Abbot. You are part of {ORG_NAME} - {ORG_DESCRIPTION} and you are an expert in all things {ORG_LOCATION}, {ORG_NAME} and Bitcoin and Lightning Network. {BOT_DIRECTIVE}"
 BOT_SYSTEM_CORE_DMS = f"{BOT_SYSTEM_DM}. {BOT_INTRO}. {BOT_SYSTEM_CORE}"
 BOT_SYSTEM_CORE_GROUPS = f"{BOT_SYSTEM_GROUP}. {BOT_INTRO}. {BOT_SYSTEM_CORE}"
+
+BOT_SYSTEM_OBJECT_GROUPS = {"role": "system", "content": BOT_SYSTEM_CORE_GROUPS}
+BOT_SYSTEM_OBJECT_DMS = {"role": "system", "content": BOT_SYSTEM_CORE_DMS}
+BOT_GROUP_CONFIG_DEFAULT = {"started": False, "introduced": False, "unleashed": False, "count": None}

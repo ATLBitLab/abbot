@@ -8,7 +8,7 @@ from typing import Dict, List, Optional, Set, Tuple, Callable, Tuple
 
 from nostr_sdk import Keys, Client, Filter, Event, EventId, EventBuilder, PublicKey, SecretKey, nip04_decrypt
 
-from lib.logger import bot_debug, bot_error
+from lib.logger import debug_bot, error_bot
 
 from lib.db.utils import successful_insert_one
 from lib.db.mongo import MongoNostrEvent, NostrEvent, MongoNostr, InsertOneResult
@@ -114,13 +114,13 @@ class NostrBotBuilder:
     @try_except
     def add_relays_connect_and_start_client(self):
         fn = __name__
-        bot_debug.log(fn, "add_relays_and_connect")
+        debug_bot.log(fn, "add_relays_and_connect")
         for relay in RELAYS:
-            bot_debug.log(fn, f"Adding relay {relay}")
+            debug_bot.log(fn, f"Adding relay {relay}")
             self.client.add_relay(relay)
             self.client.connect()
         sub_id = uuid.uuid4().hex
-        bot_debug.log(fn, f"Subscriptions added with id {sub_id}")
+        debug_bot.log(fn, f"Subscriptions added with id {sub_id}")
         self.client.start()
 
     @try_except
@@ -151,24 +151,24 @@ class NostrBotBuilder:
                     event_json: dict = json.loads(event.as_json())
                     kind: int = event.kind()
                     db_nostr_event: MongoNostrEvent = MongoNostrEvent(event_json)
-                    bot_debug.log(fn, f"db_nostr_event {db_nostr_event}")
+                    debug_bot.log(fn, f"db_nostr_event {db_nostr_event}")
                     if kind == 4:
                         result: InsertOneResult = mongo_nostr.insert_one_dm(db_nostr_event.to_dict())
-                        bot_debug.log(fn, f"dm={dm}")
+                        debug_bot.log(fn, f"dm={dm}")
                         if not successful_insert_one(result):
-                            bot_error.log(fn, f"inset_one_dm Failed")
+                            error_bot.log(fn, f"inset_one_dm Failed")
                             result: InsertOneResult = mongo_nostr.insert_one_dm(db_nostr_event)
-                            bot_debug.log(fn, f"result {result}")
+                            debug_bot.log(fn, f"result {result}")
                             dm: Dict = mongo_nostr.find_one_dm({"id": event.pubkey()})
                             if not successful_insert_one(result):
-                                bot_error.log(f"insert_dm failed: {event_json}")
+                                error_bot.log(f"insert_dm failed: {event_json}")
                                 time.sleep(1)
                         # IPython.embed()
                         self.handle_dm(event)
                     # elif kind == 40:
                     #     result: InsertOneResult = mongo_nostr.insert_one_channel(nostr_event_dict)
                     #     if not successful_insert_one(result):
-                    #         bot_error.log(f"insert_one_channel failed: {nostr_event_dict}")
+                    #         error_bot.log(f"insert_one_channel failed: {nostr_event_dict}")
                     #         time.sleep(1)
                     #     self.handle_channel_create(nostr_event)
                     # elif kind in [41, 42, 43, 44]:
@@ -176,35 +176,35 @@ class NostrBotBuilder:
                     #         {"id": nostr_event.id}, {"$push": {"messages": nostr_event_dict}}
                     #     )
                     #     if not successful_update_many(result):
-                    #         bot_error.log(f"update_one_channel failed: {nostr_event_dict}")
+                    #         error_bot.log(f"update_one_channel failed: {nostr_event_dict}")
                     #         time.sleep(1)
                     #     self.handle_channel_event(kind, nostr_event_dict)
         except AbbotException as abbot_exception:
             abbot_exception = AbbotException(
                 abbot_exception, format_exc(), format_tb(abbot_exception.__traceback__)[:-1]
             )
-            bot_error.log(f"Main Loop Error: {abbot_exception}")
+            error_bot.log(f"Main Loop Error: {abbot_exception}")
             time.sleep(5)
 
     @try_except
     def handle_dm(self, dm_event: Event):
         fn = __name__
-        bot_debug.log(fn, f"dm_event={dm_event}")
-        bot_debug.log(fn, f"type(dm_event)={type(dm_event)}")
+        debug_bot.log(fn, f"dm_event={dm_event}")
+        debug_bot.log(fn, f"type(dm_event)={type(dm_event)}")
         content: str = self.decrypt_direct_message(dm_event)
         sender: str = dm_event.pubkey().to_hex()
-        bot_debug.log(fn, f"content={content}")
-        bot_debug.log(fn, f"sender={sender}")
-        bot_debug.log(fn, f"self.public_key={self.public_key}")
+        debug_bot.log(fn, f"content={content}")
+        debug_bot.log(fn, f"sender={sender}")
+        debug_bot.log(fn, f"self.public_key={self.public_key}")
         IPython.embed()
         abbot = Abbot(sender, "dm")
-        bot_debug.log(fn, f"abbot: {abbot}")
+        debug_bot.log(fn, f"abbot: {abbot}")
         abbot.update_history({"role": "user", "content": content})
         answer: str = abbot.chat_completion()
-        bot_debug.log(fn, f"content={content}")
+        debug_bot.log(fn, f"content={content}")
 
         event_id: str = self.send_direct_message(answer, dm_event)
-        bot_debug.log(fn, f"handle_dm: {event_id}")
+        debug_bot.log(fn, f"handle_dm: {event_id}")
 
     @try_except
     def handle_channel_event(self):

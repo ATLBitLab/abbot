@@ -7,80 +7,98 @@ from telegram import Message, Update, Chat, User
 
 from constants import OPENAI_MODEL, THE_CREATOR
 
-from ..utils import try_get
-from ..logger import bot_debug, bot_error
+from ..utils import success, try_get, error
+from ..logger import debug_bot, error_bot
 
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
 
 
-async def get_chat_admins(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -> Dict:
-    chat_admins = await context.bot.get_chat_administrators(chat_id)
-    admin_ids = [try_get(admin, "user", "id") for admin in chat_admins]
-    admin_usernames = [try_get(admin, "user", "username") for admin in chat_admins]
-    chat_admin_data = dict(ids=admin_ids, usernames=admin_usernames)
-    bot_debug.log(f"{__name__} chat_admin_data={chat_admin_data}")
-    return chat_admin_data
-
-
-def parse_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Dict:
+def parse_message(update: Update) -> Dict:
+    log_name: str = f"{__name__}: parse_message"
     message: Message = try_get(update, "message")
     if not message:
-        error_message = f"{__name__} No message: update={update.to_json()} context={context}"
-        return dict(status="error", data=error_message)
-    bot_debug.log(f"{__name__} message={message}")
-    return dict(status="success", data=message)
+        error_message = f"{log_name}: No message data"
+        error_bot.log(log_name, error_message)
+        return error(error_message, data=update.to_json())
+    debug_bot.log(f"{log_name} parse message success: message{message}")
+    return success("Parse message success", data=message)
 
 
 def parse_message_data(message: Message) -> Dict:
+    log_name: str = f"{__name__}: parse_message_data"
     message_text = try_get(message, "text")
     message_date = try_get(message, "date")
-    message_data: dict = dict(status="success", text=message_text, date=message_date)
-    bot_debug.log(f"{__name__} message_data={message_data}")
-    return message_data
+    debug_bot.log(f"{log_name}: text={message_text}, date={message_date}")
+    return message_text, message_date
 
 
-def parse_chat(message: Message, context: ContextTypes.DEFAULT_TYPE) -> Dict:
+def parse_message_data_keys(message, keys):
+    extra_data = dict()
+    for key in keys:
+        extra_data[key] = try_get(message, key)
+    return extra_data
+
+
+def parse_chat(message: Message) -> Dict:
+    log_name: str = f"{__name__}: parse_chat"
     chat: Chat = try_get(message, "chat")
     if not chat:
-        error_message = f"{__name__} No chat: update={message.to_json()} context={context}"
-        return dict(status="error", data=error_message)
-    bot_debug.log(f"{__name__} chat={chat}")
-    return dict(status="success", data=chat)
+        error_message = f"{log_name}: No chat data"
+        error_bot.log(log_name, error_message)
+        return error(error_message, data=message.to_json())
+    debug_bot.log(f"{log_name}: chat={chat}")
+    return success("Parse chat success", data=chat)
 
 
 def parse_chat_data(chat: Chat) -> Dict:
+    log_name: str = f"{__name__}: parse_chat_data"
     chat_id: int = try_get(chat, "id")
     chat_title: str = try_get(chat, "title")
     chat_type: str = try_get(chat, "type")
-    chat_data = dict(id=chat_id, title=chat_title, type=chat_type)
-    bot_debug.log(f"{__name__} chat_data={chat_data}")
-    return chat_data
+    debug_bot.log(f"{log_name}: chat_id={chat_id} chat_title={chat_title} chat_type={chat_type}")
+    return chat_id, chat_title, chat_type
 
 
-def parse_user(message: Message, context: ContextTypes.DEFAULT_TYPE) -> Dict:
+def parse_user(message: Message) -> Dict:
+    log_name: str = f"{__name__}: parse_user"
     user: User = try_get(message, "from_user")
     if not user:
-        error_message = f"{__name__} No user: update={message.to_json()} context={context}"
-        return dict(status="error", data=error_message)
-    bot_debug.log(f"{__name__} {user}")
+        error_message = f"{log_name}: No user data"
+        error_bot.log(log_name, error_message)
+        return error(error_message, data=message.to_json())
+    debug_bot.log(f"{log_name}: {user}")
     return dict(status="success", data=user)
 
 
 def parse_user_data(user: User) -> Dict:
+    log_name: str = f"{__name__}: parse_user_data"
     user_id: int = try_get(user, "id")
     username: int = try_get(user, "username")
-    user_data = dict(user_id=user_id, username=username)
-    bot_debug.log(f"{__name__} {user_data}")
-    return user_data
+    debug_bot.log(f"{log_name}: user_id={user_id} username={username}")
+    return username, user_id
+
+
+async def get_chat_admins(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -> Dict:
+    log_name: str = f"{__name__}: get_chat_admins"
+    chat_admins = await context.bot.get_chat_administrators(chat_id)
+    admin_ids = [try_get(admin, "user", "id") for admin in chat_admins]
+    admin_usernames = [try_get(admin, "user", "username") for admin in chat_admins]
+    chat_admin_data = dict(ids=admin_ids, usernames=admin_usernames)
+    debug_bot.log(f"{log_name}: chat_admin_data={chat_admin_data}")
+    return chat_admin_data
 
 
 async def squawk_error(error_message: str, context: ContextTypes.DEFAULT_TYPE) -> Message:
-    bot_error.log(f"{__name__} {error_message}")
+    log_name: str = f"{__name__}: squawk_error"
+    error_bot.log(f"{log_name}: {error_message}")
     return await context.bot.send_message(chat_id=THE_CREATOR, text=error_message)
 
 
 def calculate_tokens(history: List) -> int:
     total = 0
     for data in history:
-        total += len(encoding.encode(try_get(data, "content"), allowed_special="all"))
+        content = try_get(data, "content")
+        if not content:
+            continue
+        total += len(encoding.encode(content, allowed_special="all"))
     return total

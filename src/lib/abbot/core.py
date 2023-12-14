@@ -1,3 +1,4 @@
+from datetime import datetime
 import time
 import tiktoken
 from openai import OpenAI
@@ -5,12 +6,12 @@ from abc import abstractmethod
 from typing import List, Dict
 
 from constants import OPENAI_MODEL
-
 from ..db.utils import successful_update_one
+from ..abbot.config import BOT_TELEGRAM_HANDLE
 from ..utils import error, success, to_dict, try_get
 from ..db.mongo import GroupConfig, UpdateResult, mongo_abbot
 
-from ..logger import bot_debug, bot_error
+from ..logger import debug_bot, error_bot
 
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
 
@@ -23,7 +24,7 @@ class Abbot(GroupConfig):
 
     def __init__(self, id: str, bot_type: str, history: List):
         log_name: str = f"{__name__}: Abbot.__init__():"
-        bot_debug.log(log_name, f"history={history}")
+        debug_bot.log(log_name, f"history={history}")
         self.id: str = id
         self.bot_type: str = bot_type
         self.history: List = history
@@ -31,10 +32,9 @@ class Abbot(GroupConfig):
         self.history_tokens: int = self.calculate_history_tokens()
         if bot_type == "group":
             self.config: GroupConfig = GroupConfig()
-        self.model: str = OPENAI_MODEL
 
     def __str__(self) -> str:
-        return f"Abbot(model={self.model}, id={self.id}, bot_type={self.bot_type}, history_len={self.history_len}, history_tokens={self.history_tokens}, config={self.config})"
+        return f"Abbot(model={OPENAI_MODEL}, id={self.id}, bot_type={self.bot_type}, history_len={self.history_len}, history_tokens={self.history_tokens}, config={self.config})"
 
     @abstractmethod
     def to_dict(self) -> dict:
@@ -120,7 +120,7 @@ class Abbot(GroupConfig):
     def update_db(self, update: Dict) -> Dict | UpdateResult:
         result: UpdateResult = mongo_abbot.update_one(self.bot_type, {"id": self.id}, update)
         if not successful_update_one(result):
-            bot_error.log(f"update_db failed: {update}")
+            error_bot.log(f"update_db failed: {update}")
             return error("update_db => update_one_channel failed")
         return success(try_get(result, "upserted_id"))
 
@@ -133,13 +133,15 @@ class Abbot(GroupConfig):
         self.update_history_tokens(try_get(update, "content"))
 
     def chat_completion(self) -> str:
-        response = self.client.chat.completions.create(messages=self.history, model=self.model)
+        response = self.client.chat.completions.create(messages=self.history, model=OPENAI_MODEL)
         answer = try_get(response, "choices", 0, "message", "content")
         input_tokens = try_get(response, "usage", "prompt_tokens")
         output_tokens = try_get(response, "usage", "completion_tokens")
         total_tokens = try_get(response, "usage", "total_tokens")
-        self.update_history({"role": "assistant", "content": answer})
+        self.update_history(
+            {"role": "assistant", "content": f'{BOT_TELEGRAM_HANDLE} said: "{answer}" on {datetime.now().isoformat()}'}
+        )
         if not answer:
-            bot_debug.log(__name__, f"chat_completion => response={response}")
-            bot_error.log(__name__, f"chat_completion => answer={answer}")
+            debug_bot.log(__name__, f"chat_completion => response={response}")
+            error_bot.log(__name__, f"chat_completion => answer={answer}")
         return answer, input_tokens, output_tokens, total_tokens
