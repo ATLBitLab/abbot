@@ -199,6 +199,31 @@ export default function Abbot() {
                 Abbot Help 🚀
               </Button>
             </Row>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <h3>Socials</h3>
+                <ul className="flex flex-col space-y-2">
+                  <li>
+                    🐦 <a target="_blank" rel="noreferrer" href="https://twitter.com/atlbitlabbot">Twitter</a>
+                  </li>
+                  <li>
+                    🟣 <a target="_blank" rel="noreferrer" href="https://primal.net/p/npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk">Nostr</a>
+                  </li>
+                  <li>
+                    ⚡️ <a target="_blank" rel="noreferrer" href="https://getalby.com/p/atlbitlabbot">Ably: abbot@getalby.com</a>
+                  </li>
+                  <li>
+                    ⚡️ <a target="_blank" rel="noreferrer" href="http://eepurl.com/iii9tv">LN Address: abbot@atlbitlab.com</a>
+                  </li>
+                  <li>
+                    📧 <a target="_blank" rel="noreferrer" href="https://nostr.atlbitlab.com">Email: abbot@atlbitlab.com</a>
+                  </li>
+                  <li>
+                    💻 <a target="_blank" rel="noreferrer" href="https://github.com/ATLBitLabBot">GitHub</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
         )}
       </main>
@@ -230,7 +255,7 @@ function PlatformButtons({ onNostrClick, onTelegramClick, platform }: any) {
 function ManualInstructions() {
   return (
     <div className="w-5/6">
-        <ul className="list-decimal text-left">
+      <ul className="list-decimal text-left">
         <li>Open Telegram and find your group</li>
         <li>In group settings, select &#34;Add&#34;</li>
         <li>Search for and select &#34;Abbot - ATL BitLab Bot&#34;</li>

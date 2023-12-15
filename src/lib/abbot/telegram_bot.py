@@ -22,7 +22,7 @@ from telegram.ext import (
     CommandHandler,
     MessageHandler,
 )
-from telegram.ext.filters import ChatType, StatusUpdate, Regex, Entity, REPLY, Mention
+from telegram.ext.filters import ChatType, StatusUpdate, Regex, Entity, Mention, REPLY
 
 from constants import (
     ABBOT_SQUAWKS,
@@ -42,6 +42,7 @@ from ..abbot.config import (
     BOT_NAME,
     BOT_TELEGRAM_HANDLE,
     BOT_TELEGRAM_SUPPORT_CONTACT,
+    BOT_TELEGRAM_USERNAME,
     ORG_INPUT_TOKEN_COST,
     ORG_OUTPUT_TOKEN_COST,
     ORG_PER_TOKEN_COST_DIV,
@@ -61,6 +62,7 @@ LEFT_GROUP_CHAT_MEMEBERS = StatusUpdate.LEFT_CHAT_MEMBER
 REGEX_BOT_TELEGRAM_HANDLE = Regex(BOT_TELEGRAM_HANDLE)
 FILTER_MENTION_ABBOT = Mention(BOT_TELEGRAM_HANDLE)
 ENTITY_MENTION = Entity(MENTION)
+ENTITY_REPLY = Entity(REPLY)
 
 # local
 from ..logger import debug_bot, error_bot
@@ -101,25 +103,25 @@ async def get_live_price() -> int:
     return int(amount)
 
 
-def usd_to_sats(usd_amount: int) -> int:
+async def usd_to_sats(usd_amount: int) -> int:
     price_dict: Dict[CoinbasePrice] = mongo_abbot.find_prices()[-1]
     btc_price_usd: int = try_get(price_dict, "amount")
     if btc_price_usd:
         if type(btc_price_usd) != int:
             btc_price_usd: int = int(btc_price_usd)
     else:
-        btc_price_usd: int = get_live_price()
+        btc_price_usd: int = await get_live_price()
     return int((usd_amount / int(btc_price_usd)) * SATOSHIS_PER_BTC)
 
 
-def sats_to_usd(sats_amount: int) -> int:
+async def sats_to_usd(sats_amount: int) -> int:
     price_dict: Dict[CoinbasePrice] = mongo_abbot.find_prices()[-1]
     btc_price_usd: int = try_get(price_dict, "amount")
     if btc_price_usd:
         if type(btc_price_usd) != int:
             btc_price_usd: int = int(btc_price_usd)
     else:
-        btc_price_usd: int = get_live_price()
+        btc_price_usd: int = await get_live_price()
     return int((sats_amount / SATOSHIS_PER_BTC) * int(btc_price_usd))
 
 
@@ -138,7 +140,7 @@ async def balance_remaining(input_token_count: int, output_token_count: int, cur
     debug_bot.log(log_name, f"now={now}")
     if btcusd_doc or now - timestamp >= 900:
         debug_bot.log(log_name, f"now - timestamp={now - timestamp}")
-        btcusd_price: int = get_live_price()
+        btcusd_price: int = await get_live_price()
     btcusd_price = float(btcusd_price)
 
     cost_input_tokens = (input_token_count / ORG_PER_TOKEN_COST_DIV) * (ORG_INPUT_TOKEN_COST * ORG_TOKEN_COST_MULT)
@@ -209,7 +211,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     BOT_SYSTEM_OBJECT_GROUPS,
                     {"role": "assistant", "content": f"Please wait while {BOT_NAME} is unplugged from the Matrix"},
                     {"role": "assistant", "content": INTRODUCTION},
-                    {"role": "user", "content": f"{username} said: {message_text} on {message_date}"},
+                    {"role": "user", "content": f"@{username} said: {message_text} on {message_date}"},
                 ],
                 "config": BOT_GROUP_CONFIG_DEFAULT,
             }
@@ -231,7 +233,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     "history": {
                         "$each": [
                             {"role": "assistant", "content": INTRODUCTION},
-                            {"role": "user", "content": f"{username} said: {message_text} on {message_date}"},
+                            {"role": "user", "content": f"@{username} said: {message_text} on {message_date}"},
                         ]
                     },
                 },
@@ -242,7 +244,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if current_balance == 0:
             group_msg = f"⚡️ Group: {chat_title} ⚡️ "
             sats_balance_msg = f"⚡️ Bitcoin Balance: {current_balance} SATs ⚡️"
-            usd_balance = sats_to_usd(current_balance)
+            usd_balance = await sats_to_usd(current_balance)
             usd_balance_msg = f"💰 Dollar Balance: {usd_balance} USD 💰"
             fund_msg = "Please run /fund <amount> <currency> to topup (e.g. /fund 50000 sats or /fund 10 usd)."
             await message.reply_text(f"{group_msg} \n {sats_balance_msg} \n {usd_balance_msg} \n {fund_msg}")
@@ -332,7 +334,7 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
         update_data: Dict = try_get(response, "data")
         debug_bot.log(log_name, f"update_data={update_data}")
 
-        message: Message = try_get(update_data, "message")
+        message: Message = try_get(update_data, "reply_to_message") if reply else try_get(update_data, "message")
         debug_bot.log(log_name, f"message={message}")
         message_text, message_date = parse_message_data(message)
         debug_bot.log(log_name, f"message_text={message_text} message_date={message_date}")
@@ -361,7 +363,8 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
             abbot_squawk = f"{log_name}: {reply_text_err}: id={chat_id}, title={chat_title}"
             error_bot.log(log_name, abbot_squawk)
             await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
-            # return await message.reply_text(reply_text_err)
+            await message.reply_text(reply_text_err)
+            return await handle_default_group(update, context)
 
         user: User = try_get(update_data, "user")
         user_id, username = parse_user_data(user)
@@ -374,7 +377,7 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
             {
                 "$push": {
                     "messages": message.to_dict(),
-                    "history": {"role": "user", "content": f"{username} said: {message_text} on {message_date}"},
+                    "history": {"role": "user", "content": f"@{username} said: {message_text} on {message_date}"},
                 },
             },
         )
@@ -430,8 +433,13 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
         debug_bot.log(log_name, f"update_data={update_data}")
 
         message: Message = try_get(update_data, "message")
-        from_user: Optional[User] = try_get(message, "reply_to_message", "from_user")
-        if from_user.is_bot and from_user.username == BOT_TELEGRAM_HANDLE:
+        debug_bot.log(log_name, f"message={message}")
+        reply_to_message: Optional[Message] = try_get(message, "reply_to_message")
+        debug_bot.log(log_name, f"reply_to_message={reply_to_message}")
+        from_user: Optional[User] = try_get(reply_to_message, "from_user")
+        debug_bot.log(log_name, f"from_user={from_user}")
+
+        if from_user.is_bot and from_user.username == BOT_TELEGRAM_USERNAME:
             return await handle_group_mention(update, context, reply=True)
     except AbbotException as abbot_exception:
         return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=f"{log_name}: {abbot_exception}")
@@ -510,12 +518,13 @@ async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message_text, message_date = parse_message_data(message)
 
         chat: Chat = try_get(update_data, "chat")
-        chat_id, _, chat_type = parse_chat_data(chat)
+        chat_id, chat_title, chat_type = parse_chat_data(chat)
 
         user: User = try_get(update_data, "user")
-        user_id, username = parse_user_data(user)
-        if not username:
-            username = try_get(chat, "username")
+        # user_id, username = parse_user_data(user)
+        first_name: int = try_get(user, "first_name") or try_get(chat, "first_name")
+        user_id: int = try_get(user, "id")
+        username: int = try_get(user, "username") or try_get(chat, "username")
 
         chat_id = try_get(chat, "id")
         new_message_dict = message.to_dict()
@@ -526,7 +535,7 @@ async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "$set": {"id": chat_id, "username": username, "type": chat_type},
                 "$push": {
                     "messages": new_message_dict,
-                    "history": {"role": "user", "content": f"{username} said: {message_text} on {message_date}"},
+                    "history": {"role": "user", "content": f"@{username} said: {message_text} on {message_date}"},
                 },
                 "$setOnInsert": {
                     "created_at": datetime.now().isoformat(),
@@ -577,7 +586,7 @@ async def balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 chat_id_filter, {"$set": {"balance": int(group_balance)}}
             )
             group_balance = try_get(group, "balance", default=0)
-        usd_balance = sats_to_usd(group_balance)
+        usd_balance = await sats_to_usd(group_balance)
         group_msg = f"⚡️ Group: {chat.title} ⚡️"
         sats_balance_msg = f"⚡️ SAT Balance: {group_balance} ⚡️"
         usd_balance_msg = f"💰 USD Balance: {usd_balance} 💰"
@@ -671,11 +680,11 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if currency_unit == "sats":
             symbol = ""
             # ₿
-            amount = sats_to_usd(amount)
+            amount = await sats_to_usd(amount)
         elif currency_unit == "usd":
             currency_unit = ""
             symbol = "$"
-            amount = sats_to_usd(amount)
+            amount = await sats_to_usd(amount)
         else:
             return await message.reply_text(f"{invoice_error_unit}\n\n{sats_example}\n\n{usd_example}")
 
@@ -800,13 +809,12 @@ async def handle_default_group(update: Update, context: ContextTypes.DEFAULT_TYP
         debug_bot.log(log_name, f"user={user}")
         user_id, username = parse_user_data(user)
         username: str = username or try_get(chat, "username", default=user_id)
-        group_admins: Any = None
-        if chat_type != "private":
-            group_admins: Any = [admin.to_dict() for admin in await chat.get_administrators()]
-
+        debug_bot.log(log_name, f"user={user}")
+        group_admins: Any = [admin.to_dict() for admin in await chat.get_administrators()]
+        # debug_bot.log(log_name, f"user={user}")
         chat_id_filter = {"id": chat_id}
         new_message_dict = message.to_dict()
-        new_history_dict = {"role": "user", "content": f"{username} said: {message_text} on {message_date}"}
+        new_history_dict = {"role": "user", "content": f"@{username} said: {message_text} on {message_date}"}
         group_update = {
             "$set": {"title": chat_title, "id": chat_id, "type": chat_type, "admins": group_admins},
             "$push": {
@@ -814,8 +822,29 @@ async def handle_default_group(update: Update, context: ContextTypes.DEFAULT_TYP
                 "history": new_history_dict,
             },
         }
+        # debug_bot.log(log_name, f"user={user}")
         group: TelegramGroup = mongo_abbot.find_one_group(chat_id_filter)
-        if not group:
+        # debug_bot.log(log_name, f"user={user}")
+        # debug_bot.log(log_name, f"user={user}")
+        if group:
+            group_history: List = try_get(group, "history")
+            # debug_bot.log(log_name, f"user={user}")
+            group_history = [*group_history, new_history_dict]
+            token_count: int = calculate_tokens(group_history)
+            group_update = {
+                "$set": {
+                    "title": chat_title,
+                    "id": chat_id,
+                    "type": chat_type,
+                    "admins": group_admins,
+                    "tokens": token_count,
+                },
+                "$push": {
+                    "messages": new_message_dict,
+                    "history": new_history_dict,
+                },
+            }
+        else:
             group_update = {
                 "$set": {
                     "created_at": datetime.now().isoformat(),
@@ -829,20 +858,12 @@ async def handle_default_group(update: Update, context: ContextTypes.DEFAULT_TYP
                     "config": BOT_GROUP_CONFIG_DEFAULT,
                 }
             }
-            if group_admins:
-                group_update["admins"] = group_admins
 
-        group_history: List = try_get(group, "history")
-        if group_history:
-            group_history = [*group_history, new_history_dict]
-            token_count: int = calculate_tokens(group_history)
-            group: TelegramGroup = mongo_abbot.find_one_group_and_update(
-                chat_id_filter, {"$set": {"tokens": token_count}}
-            )
-
+        group: TelegramGroup = mongo_abbot.find_one_group_and_update(chat_id_filter, group_update)
         group_id: int = try_get(group, "id")
         group_title: str = try_get(group, "title")
         msg = f"Existing group updated:\n\ngroup_id={group_id}\ngroup_title={group_title}"
+        # debug_bot.log(log_name, f"user={user}")
         return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=msg)
     except AbbotException as abbot_exception:
         return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=f"{log_name}: {abbot_exception}")
