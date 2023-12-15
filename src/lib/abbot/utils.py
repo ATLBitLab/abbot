@@ -25,7 +25,7 @@ async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         return error(f"Parse message from update failed", data=error_message)
     message: Message = try_get(response, "data")
 
-    response: Dict = parse_chat(message)
+    response: Dict = parse_chat(message, update)
     if not successful(response):
         error_message = try_get(response, "msg")
         error_data = try_get(response, "data")
@@ -48,7 +48,7 @@ async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 
 def parse_message(update: Update) -> Dict:
     log_name: str = f"{__name__}: parse_message"
-    message: Message = try_get(update, "message")
+    message: Message = try_get(update, "message") or try_get(update, "effective_message")
     if not message:
         error_message = f"{log_name}: No message data"
         error_bot.log(log_name, error_message)
@@ -72,9 +72,9 @@ def parse_message_data_keys(message, keys):
     return extra_data
 
 
-def parse_chat(message: Message) -> Dict:
+def parse_chat(message: Message, update: Update) -> Dict:
     log_name: str = f"{__name__}: parse_chat"
-    chat: Chat = try_get(message, "chat")
+    chat: Chat = try_get(message, "chat") or try_get(update, "effective_chat")
     if not chat:
         error_message = f"{log_name}: No chat data"
         error_bot.log(log_name, error_message)
