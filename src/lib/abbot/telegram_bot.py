@@ -871,9 +871,9 @@ class TelegramBotBuilder:
 
     def __init__(self):
         log_name: str = f"{__name__}: TelegramBotBuilder.__init__()"
-        # debug_bot.log(log_name, f"Telegram abbot initializing: name={BOT_NAME} handle={BOT_TELEGRAM_HANDLE}")
+        debug_bot.log(log_name, f"Telegram abbot initializing: name={BOT_NAME} handle={BOT_TELEGRAM_HANDLE}")
         telegram_bot = ApplicationBuilder().token(self.BOT_TELEGRAM_TOKEN).build()
-        # debug_bot.log(log_name, f"Telegram abbot initialized")
+        debug_bot.log(log_name, f"Telegram abbot initialized")
 
         # Add command handlers
         telegram_bot.add_handlers(
