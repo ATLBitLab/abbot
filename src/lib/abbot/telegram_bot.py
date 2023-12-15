@@ -109,7 +109,7 @@ def usd_to_sats(usd_amount: int) -> int:
             btc_price_usd: int = int(btc_price_usd)
     else:
         btc_price_usd: int = get_live_price()
-    return (usd_amount / int(btc_price_usd)) * SATOSHIS_PER_BTC
+    return int((usd_amount / int(btc_price_usd)) * SATOSHIS_PER_BTC)
 
 
 def sats_to_usd(sats_amount: int) -> int:
@@ -120,7 +120,7 @@ def sats_to_usd(sats_amount: int) -> int:
             btc_price_usd: int = int(btc_price_usd)
     else:
         btc_price_usd: int = get_live_price()
-    return (sats_amount / SATOSHIS_PER_BTC) * int(btc_price_usd)
+    return int((sats_amount / SATOSHIS_PER_BTC) * int(btc_price_usd))
 
 
 async def balance_remaining(input_token_count: int, output_token_count: int, current_group_balance: int):
@@ -568,12 +568,18 @@ async def balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         message: Message = try_get(update_data, "message")
         chat: Chat = try_get(update_data, "chat")
-        group: TelegramGroup = mongo_abbot.find_one_group({"id": chat.id})
+        chat_id_filter = {"id": chat.id}
+        group: TelegramGroup = mongo_abbot.find_one_group(chat_id_filter)
 
-        sats_balance = try_get(group, "balance", default=0)
-        usd_balance = sats_to_usd(sats_balance)
+        group_balance = try_get(group, "balance", default=0)
+        if group_balance and type(group_balance) == float:
+            group: TelegramGroup = mongo_abbot.find_one_dm_and_update(
+                chat_id_filter, {"$set": {"balance": int(group_balance)}}
+            )
+            group_balance = try_get(group, "balance", default=0)
+        usd_balance = sats_to_usd(group_balance)
         group_msg = f"⚡️ Group: {chat.title} ⚡️"
-        sats_balance_msg = f"⚡️ SAT Balance: {sats_balance} ⚡️"
+        sats_balance_msg = f"⚡️ SAT Balance: {group_balance} ⚡️"
         usd_balance_msg = f"💰 USD Balance: {usd_balance} 💰"
         return await message.reply_text(f"{group_msg}\n{sats_balance_msg}\n{usd_balance_msg}")
     except AbbotException as abbot_exception:
