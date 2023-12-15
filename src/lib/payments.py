@@ -4,11 +4,13 @@ from abc import ABC, abstractmethod
 import time
 import httpx
 from httpx import Response
+from pymongo.results import InsertOneResult
 
-from lib.utils import error, success, successful_response, to_dict, try_get
-from lib.logger import debug_bot
-
+from lib.db.mongo import mongo_abbot
+from lib.logger import debug_bot, error_bot
+from lib.db.utils import successful_insert_one
 from lib.abbot.env import PAYMENT_PROCESSOR_KIND, PRICE_PROVIDER_KIND, LNBITS_BASE_URL
+from lib.utils import error, success, successful_response, try_get
 
 
 def init_payment_processor():
@@ -256,6 +258,7 @@ class Coinbase(Provider):
         )
 
     async def get_bitcoin_price(self):
+        log_name: str = f"{__name__}: get_bitcoin_price"
         response: Response = await self._client.get("/prices/BTC-USD/spot")
         if not successful_response(response):
             return error("Failed to get bitcoin price", data=response)
@@ -265,6 +268,12 @@ class Coinbase(Provider):
         resp_data = try_get(json, "data")
         if not resp_data:
             return error("No response data", data=json)
-        doc_data = {**resp_data, "_id": int(time.time())}
-        doc = CoinbasePrice(**doc_data).to_dict()
-        return success(data=doc)
+        price_data = {**resp_data, "_id": int(time.time())}
+        price_doc: CoinbasePrice = CoinbasePrice(**price_data).to_dict()
+        insert_result: InsertOneResult = mongo_abbot.insert_one_price(price_doc)
+        if not successful_insert_one(insert_result):
+            error_message = f"response={response} \n json={json} \n resp_data={resp_data}"
+            error_message = f"{error_message} \n price_data={price_data} \n price_doc={price_doc}"
+            error_message = f"{error_message} \n insert_result={insert_result}"
+            error_bot.log(log_name, error_message)
+        return success(data=price_doc, amount=try_get(price_doc, "amount"))

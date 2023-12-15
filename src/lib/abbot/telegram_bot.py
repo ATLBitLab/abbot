@@ -68,6 +68,7 @@ from ..utils import error, qr_code, success, try_get, successful
 from ..db.mongo import TelegramDM, TelegramGroup, mongo_abbot
 from ..abbot.core import Abbot
 from ..abbot.utils import (
+    calculate_tokens,
     parse_chat_data,
     parse_message_data,
     parse_message_data_keys,
@@ -85,45 +86,69 @@ import tiktoken
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
 
 
-def usd_to_sats(usd_amount: int):
-    btc_price = mongo_abbot.find_prices()[-1]
-    return (usd_amount / btc_price) * SATOSHIS_PER_BTC
+async def get_live_price() -> int:
+    log_name: str = f"{__name__}: get_live_price"
+    response: Dict[CoinbasePrice] = await price_provider.get_bitcoin_price()
+    debug_bot.log(log_name, f"response={response}")
+    data = try_get(response, "data")
+    amount = try_get(data, "amount")
+    if not data or not amount:
+        error_message = try_get(response, "msg")
+        error_data = try_get(response, "data")
+        error_bot.log(log_name, f"response={response} error_message={error_message} error_data={error_data}")
+        return error(error_message, data=error_data)
+    debug_bot.log(log_name, f"data={data} \n amount={amount}")
+    return int(amount)
 
 
-def sats_to_usd(sats_amount: int):
-    btc_price = mongo_abbot.find_prices()[-1]
-    return (sats_amount / SATOSHIS_PER_BTC) * btc_price
+def usd_to_sats(usd_amount: int) -> int:
+    price_dict: Dict[CoinbasePrice] = mongo_abbot.find_prices()[-1]
+    btc_price_usd: int = try_get(price_dict, "amount")
+    if btc_price_usd:
+        if type(btc_price_usd) != int:
+            btc_price_usd: int = int(btc_price_usd)
+    else:
+        btc_price_usd: int = get_live_price()
+    return (usd_amount / int(btc_price_usd)) * SATOSHIS_PER_BTC
+
+
+def sats_to_usd(sats_amount: int) -> int:
+    price_dict: Dict[CoinbasePrice] = mongo_abbot.find_prices()[-1]
+    btc_price_usd: int = try_get(price_dict, "amount")
+    if btc_price_usd:
+        if type(btc_price_usd) != int:
+            btc_price_usd: int = int(btc_price_usd)
+    else:
+        btc_price_usd: int = get_live_price()
+    return (sats_amount / SATOSHIS_PER_BTC) * int(btc_price_usd)
 
 
 async def balance_remaining(input_token_count: int, output_token_count: int, current_group_balance: int):
     log_name: str = f"{__name__}: balance_remaining"
-
     btcusd_doc = mongo_abbot.find_prices()[-1]
-    timestamp: int = try_get(btcusd_doc, "_id", default=0)
-    amount: float = try_get(btcusd_doc, "amount")
-    now: int = int(time.time())
-    if btcusd_doc or now - timestamp:
-        response: Dict[CoinbasePrice] = await price_provider.get_bitcoin_price()
-        debug_bot.log(log_name, f"response={response}")
-        data = try_get(response, "data")
-        amount = try_get(data, "amount")
-        if not data or not amount:
-            error_message = try_get(response, "msg")
-            error_data = try_get(response, "data")
-            error_bot.log(log_name, f"response={response} error_message={error_message} error_data={error_data}")
-            return error(error_message, data=error_data)
-        debug_bot.log(log_name, f"data={data} \n amount={amount}")
+    debug_bot.log(log_name, f"btcusd_doc={btcusd_doc}")
 
-    price_usd = float(amount)
-    mongo_abbot.insert_one_price(data)
+    timestamp: int = try_get(btcusd_doc, "_id", default=0)
+    debug_bot.log(log_name, f"timestamp={timestamp}")
+
+    btcusd_price: float = try_get(btcusd_doc, "amount")
+    debug_bot.log(log_name, f"btcusd_price={btcusd_price}")
+
+    now: int = int(time.time())
+    debug_bot.log(log_name, f"now={now}")
+    if btcusd_doc or now - timestamp >= 900:
+        debug_bot.log(log_name, f"now - timestamp={now - timestamp}")
+        btcusd_price: int = get_live_price()
+    btcusd_price = float(btcusd_price)
+
     cost_input_tokens = (input_token_count / ORG_PER_TOKEN_COST_DIV) * (ORG_INPUT_TOKEN_COST * ORG_TOKEN_COST_MULT)
     cost_output_tokens = (output_token_count / ORG_PER_TOKEN_COST_DIV) * (ORG_OUTPUT_TOKEN_COST * ORG_TOKEN_COST_MULT)
     total_token_cost_usd = cost_input_tokens + cost_output_tokens
-    total_token_cost_sats = (total_token_cost_usd / price_usd) * SATOSHIS_PER_BTC
+    total_token_cost_sats = (total_token_cost_usd / btcusd_price) * SATOSHIS_PER_BTC
     if total_token_cost_sats > current_group_balance or current_group_balance == 0:
         return 0
     remaining_balance = current_group_balance - total_token_cost_sats
-    return success("Success calculate remaining balance", data=remaining_balance)
+    return success("Success calculate remaining balance", data=int(remaining_balance))
 
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -546,12 +571,11 @@ async def balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
         group: TelegramGroup = mongo_abbot.find_one_group({"id": chat.id})
 
         sats_balance = try_get(group, "balance", default=0)
-        usd_balance = sats_to_usd(int(sats_balance))
-        group_msg = f"⚡️ Group: {chat.title} ⚡️ "
+        usd_balance = sats_to_usd(sats_balance)
+        group_msg = f"⚡️ Group: {chat.title} ⚡️"
         sats_balance_msg = f"⚡️ SAT Balance: {sats_balance} ⚡️"
         usd_balance_msg = f"💰 USD Balance: {usd_balance} 💰"
-
-        return await message.reply_text(f"{group_msg} \n {sats_balance_msg} \n {usd_balance_msg}")
+        return await message.reply_text(f"{group_msg}\n{sats_balance_msg}\n{usd_balance_msg}")
     except AbbotException as abbot_exception:
         return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=f"{log_name}: {abbot_exception}")
 
@@ -769,18 +793,19 @@ async def handle_default_group(update: Update, context: ContextTypes.DEFAULT_TYP
         user: User = try_get(update_data, "user")
         debug_bot.log(log_name, f"user={user}")
         user_id, username = parse_user_data(user)
-        username: str = username or try_get(chat, "username") or user_id
+        username: str = username or try_get(chat, "username", default=user_id)
         group_admins: Any = None
         if chat_type != "private":
             group_admins: Any = [admin.to_dict() for admin in await chat.get_administrators()]
 
         chat_id_filter = {"id": chat_id}
         new_message_dict = message.to_dict()
+        new_history_dict = {"role": "user", "content": f"{username} said: {message_text} on {message_date}"}
         group_update = {
             "$set": {"title": chat_title, "id": chat_id, "type": chat_type, "admins": group_admins},
             "$push": {
                 "messages": new_message_dict,
-                "history": {"role": "user", "content": f"{username} said: {message_text} on {message_date}"},
+                "history": new_history_dict,
             },
         }
         group: TelegramGroup = mongo_abbot.find_one_group(chat_id_filter)
@@ -800,7 +825,15 @@ async def handle_default_group(update: Update, context: ContextTypes.DEFAULT_TYP
             }
             if group_admins:
                 group_update["admins"] = group_admins
-        group: TelegramGroup = mongo_abbot.find_one_group_and_update(chat_id_filter, group_update)
+
+        group_history: List = try_get(group, "history")
+        if group_history:
+            group_history = [*group_history, new_history_dict]
+            token_count: int = calculate_tokens(group_history)
+            group: TelegramGroup = mongo_abbot.find_one_group_and_update(
+                chat_id_filter, {"$set": {"tokens": token_count}}
+            )
+
         group_id: int = try_get(group, "id")
         group_title: str = try_get(group, "title")
         msg = f"Existing group updated:\n\ngroup_id={group_id}\ngroup_title={group_title}"

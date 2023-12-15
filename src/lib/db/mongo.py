@@ -14,7 +14,7 @@ from pymongo.results import InsertOneResult, InsertManyResult, UpdateResult
 from bson.typings import _DocumentType
 
 from ..logger import debug_bot
-from ..utils import success, to_dict, error, try_get
+from ..utils import success, to_dict, try_get
 from ..abbot.env import DATABASE_CONNECTION_STRING
 from ..abbot.config import BOT_SYSTEM_OBJECT_GROUPS, BOT_SYSTEM_OBJECT_DMS
 
