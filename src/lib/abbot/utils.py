@@ -7,10 +7,43 @@ from telegram import Message, Update, Chat, User
 
 from constants import OPENAI_MODEL, THE_CREATOR
 
-from ..utils import success, try_get, error
+from ..utils import success, successful, try_get, error
 from ..logger import debug_bot, error_bot
 
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
+
+
+async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Dict:
+    log_name: str = f"{__name__}: parse_update_data"
+
+    response: Dict = parse_message(update)
+    if not successful(response):
+        error_message = try_get(response, "msg")
+        error_data = try_get(response, "data")
+        error_bot.log(log_name, f"response={response}\nerror_message={error_message}\nerror_data={error_data}")
+        await squawk_error(error_message, context)
+        return error(f"Parse message from update failed", data=error_message)
+    message: Message = try_get(response, "data")
+
+    response: Dict = parse_chat(message)
+    if not successful(response):
+        error_message = try_get(response, "msg")
+        error_data = try_get(response, "data")
+        error_bot.log(log_name, f"response={response}\nerror_message={error_message}\nerror_data={error_data}")
+        await squawk_error(error_message, context)
+        return error(f"Failed to parse chat from update: {error_message}", data=error_data)
+    chat: Chat = try_get(response, "data")
+
+    response: Dict = parse_user(message)
+    if not successful(response):
+        error_message = try_get(response, "msg")
+        error_data = try_get(response, "data")
+        error_bot.log(log_name, f"response={response}\nerror_message={error_message}\nerror_data={error_data}")
+        await squawk_error(user, context)
+        return error(f"Failed to parse user from update: {error_message}", data=error_data)
+    user: User = try_get(response, "data")
+
+    return success("Parse update success", data=dict(message=message, chat=chat, user=user))
 
 
 def parse_message(update: Update) -> Dict:
@@ -75,7 +108,7 @@ def parse_user_data(user: User) -> Dict:
     user_id: int = try_get(user, "id")
     username: int = try_get(user, "username")
     debug_bot.log(f"{log_name}: user_id={user_id} username={username}")
-    return username, user_id
+    return user_id, username
 
 
 async def get_chat_admins(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -> Dict:
