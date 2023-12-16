@@ -134,7 +134,7 @@ export default function Abbot() {
           content="https://t.me/atl_bitlab_bot"
         />
       </Head>
-      <main className="mx-auto max-w-4xl text-white flex flex-col items-center gap-2 my-16 pb-16 px-8">
+      <main className="mx-auto max-w-4xl flex flex-col items-center gap-2 my-16 pb-16 px-8">
         {loading ? (
           <div className="flex justify-center mt-[40%]"></div>
         ) : (
