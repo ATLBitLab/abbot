@@ -134,6 +134,27 @@ export default function Abbot() {
           content="https://t.me/atl_bitlab_bot"
         />
       </Head>
+      <div className="max-w-xl m-4 flex flex-row space-x-10 justify-start">
+        <div className="gap-8">
+          <ul className="flex flex-row space-x-4">
+            <li>
+              <a target="_blank" rel="noreferrer" href="https://twitter.com/atlbitlabbot">🐦</a>
+            </li>
+            <li>
+              <a target="_blank" rel="noreferrer" href="https://primal.net/p/npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk">🟣</a>
+            </li>
+            <li>
+              <a target="_blank" rel="noreferrer" href="http://eepurl.com/iii9tv">⚡️</a>
+            </li>
+            <li>
+              <a target="_blank" rel="noreferrer" href="mailto:abbot@atlbitlab.com">📧</a>
+            </li>
+            <li>
+              <a target="_blank" rel="noreferrer" href="https://github.com/ATLBitLabBot">💻</a>
+            </li>
+          </ul>
+        </div>
+      </div>
       <main className="mx-auto max-w-4xl text-white flex flex-col items-center gap-2 my-16 pb-16 px-8">
         {loading ? (
           <div className="flex justify-center mt-[40%]"></div>
@@ -199,31 +220,6 @@ export default function Abbot() {
                 Abbot Help 🚀
               </Button>
             </Row>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div>
-                <h3>Socials</h3>
-                <ul className="flex flex-col space-y-2">
-                  <li>
-                    🐦 <a target="_blank" rel="noreferrer" href="https://twitter.com/atlbitlabbot">Twitter</a>
-                  </li>
-                  <li>
-                    🟣 <a target="_blank" rel="noreferrer" href="https://primal.net/p/npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk">Nostr</a>
-                  </li>
-                  <li>
-                    ⚡️ <a target="_blank" rel="noreferrer" href="https://getalby.com/p/atlbitlabbot">Ably: abbot@getalby.com</a>
-                  </li>
-                  <li>
-                    ⚡️ <a target="_blank" rel="noreferrer" href="http://eepurl.com/iii9tv">LN Address: abbot@atlbitlab.com</a>
-                  </li>
-                  <li>
-                    📧 <a target="_blank" rel="noreferrer" href="https://nostr.atlbitlab.com">Email: abbot@atlbitlab.com</a>
-                  </li>
-                  <li>
-                    💻 <a target="_blank" rel="noreferrer" href="https://github.com/ATLBitLabBot">GitHub</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
           </div>
         )}
       </main>
@@ -280,19 +276,13 @@ function TelegramInstructions() {
           <li>
             For help, visit the
             {" "}
-            <Link
-              href={"/help"}
-              className="text-blue-600 underline"
-            >
+            <Link href={"/help"} className="text-blue-600 underline">
               help
             </Link>
             {" "}
             page or contact
             {" "}
-            <Link
-              className="text-blue-600
-            underline" href="https://t.me/nonni_io"
-            >
+            <Link className="text-blue-600 underline" href="https://t.me/nonni_io">
               @nonni_io
             </Link>
             {" "}
