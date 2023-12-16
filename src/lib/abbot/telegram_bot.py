@@ -125,7 +125,7 @@ async def sats_to_usd(sats_amount: int) -> int:
     return int((sats_amount / SATOSHIS_PER_BTC) * int(btc_price_usd))
 
 
-async def balance_remaining(input_token_count: int, output_token_count: int, current_group_balance: int):
+async def balance_remaining(input_token_count: int, output_token_count: int, current_group_balance_sats: int):
     log_name: str = f"{__name__}: balance_remaining"
     btcusd_doc = mongo_abbot.find_prices()[-1]
     debug_bot.log(log_name, f"btcusd_doc={btcusd_doc}")
@@ -147,10 +147,10 @@ async def balance_remaining(input_token_count: int, output_token_count: int, cur
     cost_output_tokens = (output_token_count / ORG_PER_TOKEN_COST_DIV) * (ORG_OUTPUT_TOKEN_COST * ORG_TOKEN_COST_MULT)
     total_token_cost_usd = cost_input_tokens + cost_output_tokens
     total_token_cost_sats = (total_token_cost_usd / btcusd_price) * SATOSHIS_PER_BTC
-    if total_token_cost_sats > current_group_balance or current_group_balance == 0:
+    if total_token_cost_sats > current_group_balance_sats or current_group_balance_sats == 0:
         return 0
-    remaining_balance = current_group_balance - total_token_cost_sats
-    return success("Success calculate remaining balance", data=int(remaining_balance))
+    remaining_balance_sats = current_group_balance_sats - total_token_cost_sats
+    return success("Success calculate remaining balance", data=int(remaining_balance_sats))
 
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -390,11 +390,11 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
         abbot = Abbot(chat_id, "group", group_history)
         answer, input_tokens, output_tokens, _ = abbot.chat_completion()
 
-        current_balance: TelegramGroup = mongo_abbot.get_group_balance(chat_id_filter)
-        if current_balance == 0:
+        group_balance_sats: TelegramGroup = mongo_abbot.get_group_balance(chat_id_filter)
+        if group_balance_sats == 0:
             return await message.reply_text("No Funds Available. Please run /fund to topup.")
 
-        response: Dict = await balance_remaining(input_tokens, output_tokens, current_balance)
+        response: Dict = await balance_remaining(input_tokens, output_tokens, group_balance_sats)
         if not successful(response):
             error_bot.log(log_name, f"response={response}")
             msg = f"{log_name}: Failed to calculate balance:"
@@ -402,6 +402,12 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
             return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=msg)
 
         remaining_balance: int = try_get(response, "data", default=0)
+        if remaining_balance == 0:
+            usd_balance = await sats_to_usd(group_balance)
+            group_msg = f"⚡️ Group: {chat.title} ⚡️"
+            sats_balance_msg = f"⚡️ SAT Balance: {group_balance} ⚡️"
+            usd_balance_msg = f"💰 USD Balance: {usd_balance} 💰"
+            answer = f"{answer}\n\Group  is our of SATs. Please run /fund to topup."
         error_bot.log(log_name, f"remaining_balance={remaining_balance}")
 
         group: TelegramGroup = mongo_abbot.find_one_group_and_update(
@@ -870,7 +876,7 @@ async def handle_default_group(update: Update, context: ContextTypes.DEFAULT_TYP
 
 
 async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    log_name: str = f"{__name__}: TelegramBotBuilder.__init__"
+    log_name: str = f"{__name__}: error_handler"
 
     exception = context.error
     formatted_traceback = "".join(traceback.format_exception(None, exception, exception.__traceback__))
@@ -881,21 +887,20 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     # error_bot.log(log_name, base_message)
 
     error_bot.log(log_name, "Exception while handling update")
-
-    error_bot.log(log_name, f"Update={update.to_dict()}")
-    error_bot.log(log_name, f"Context={context}")
+    update_dict = update.to_dict()
+    error_bot.log(log_name, f"Update={json.dumps(update_dict, indent=4)}")
 
     error_bot.log(log_name, f"Exception: {exception}")
     error_bot.log(log_name, f"Traceback: {formatted_traceback}")
 
-    await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=f"{log_name}: {exception}")
+    await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=f"{log_name}: {base_message}")
 
 
 class TelegramBotBuilder:
     from lib.abbot.config import BOT_TELEGRAM_TOKEN
 
     def __init__(self):
-        log_name: str = f"{__name__}: TelegramBotBuilder.__init__()"
+        log_name: str = f"{__name__}: TelegramBotBuilder()"
         debug_bot.log(log_name, f"Telegram abbot initializing: name={BOT_NAME} handle={BOT_TELEGRAM_HANDLE}")
         telegram_bot = ApplicationBuilder().token(self.BOT_TELEGRAM_TOKEN).build()
         debug_bot.log(log_name, f"Telegram abbot initialized")

@@ -9,7 +9,7 @@ now = datetime.now()
 debug_log = getLogger("abbot_debug_logger")
 debug_log.setLevel(DEBUG)
 
-debug_formatter = Formatter("[%(asctime)s] debug - %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S.%f")
+debug_formatter = Formatter("[%(asctime)s] debug - %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
 
 # File handler for debug logger
 debug_file_handler = FileHandler(abspath("src/data/logs/debug.log"))
@@ -28,10 +28,10 @@ debug_log.addHandler(debug_console_handler)
 error_log = getLogger("abbot_error_logger")
 error_log.setLevel(ERROR)
 
-error_formatter = Formatter("[%(asctime)s] error - %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S.%f")
+error_formatter = Formatter("[%(asctime)s] error - %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
 
 # File handler for error logger
-error_file_handler = FileHandler(abspath("src/data/logs/debug.log"))
+error_file_handler = FileHandler(abspath("src/data/logs/error.log"))
 error_file_handler.setLevel(ERROR)
 error_file_handler.setFormatter(error_formatter)
 
@@ -63,6 +63,7 @@ class BotLogger:
 
     def _error(self, message: str):
         error_log.error(message)
+        debug_log.debug(message)
 
     def _debug(self, message: str):
         debug_log.debug(message)

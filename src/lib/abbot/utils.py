@@ -13,39 +13,6 @@ from ..logger import debug_bot, error_bot
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
 
 
-async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Dict:
-    log_name: str = f"{__name__}: parse_update_data"
-
-    response: Dict = parse_message(update)
-    if not successful(response):
-        error_message = try_get(response, "msg")
-        error_data = try_get(response, "data")
-        error_bot.log(log_name, f"response={response}\nerror_message={error_message}\nerror_data={error_data}")
-        await squawk_error(error_message, context)
-        return error(f"Parse message from update failed", data=error_message)
-    message: Message = try_get(response, "data")
-
-    response: Dict = parse_chat(message, update)
-    if not successful(response):
-        error_message = try_get(response, "msg")
-        error_data = try_get(response, "data")
-        error_bot.log(log_name, f"response={response}\nerror_message={error_message}\nerror_data={error_data}")
-        await squawk_error(error_message, context)
-        return error(f"Failed to parse chat from update: {error_message}", data=error_data)
-    chat: Chat = try_get(response, "data")
-
-    response: Dict = parse_user(message)
-    if not successful(response):
-        error_message = try_get(response, "msg")
-        error_data = try_get(response, "data")
-        error_bot.log(log_name, f"response={response}\nerror_message={error_message}\nerror_data={error_data}")
-        await squawk_error(user, context)
-        return error(f"Failed to parse user from update: {error_message}", data=error_data)
-    user: User = try_get(response, "data")
-
-    return success("Parse update success", data=dict(message=message, chat=chat, user=user))
-
-
 def parse_message(update: Update) -> Dict:
     log_name: str = f"{__name__}: parse_message"
     message: Message = try_get(update, "message") or try_get(update, "effective_message")
@@ -70,6 +37,40 @@ def parse_message_data_keys(message, keys):
     for key in keys:
         extra_data[key] = try_get(message, key)
     return extra_data
+
+
+async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Dict:
+    log_name: str = f"{__name__}: parse_update_data"
+
+    response: Dict = parse_message(update)
+    if not successful(response):
+        error_message = try_get(response, "msg")
+        error_data = try_get(response, "data")
+        log_msg = f"response={response}\nerror_message={error_message}\nerror_data={error_data}"
+        error_bot.log(log_name, log_msg)
+        await squawk_error(error_message, context)
+        return error(f"Parse message from update failed", data=error_message)
+    message: Message = try_get(response, "data")
+
+    response: Dict = parse_chat(message, update)
+    if not successful(response):
+        error_message = try_get(response, "msg")
+        error_data = try_get(response, "data")
+        error_bot.log(log_name, f"response={response}\nerror_message={error_message}\nerror_data={error_data}")
+        await squawk_error(error_message, context)
+        return error(f"Failed to parse chat from update: {error_message}", data=error_data)
+    chat: Chat = try_get(response, "data")
+
+    response: Dict = parse_user(message)
+    if not successful(response):
+        error_message = try_get(response, "msg")
+        error_data = try_get(response, "data")
+        error_bot.log(log_name, f"response={response}\nerror_message={error_message}\nerror_data={error_data}")
+        await squawk_error(user, context)
+        return error(f"Failed to parse user from update: {error_message}", data=error_data)
+    user: User = try_get(response, "data")
+
+    return success("Parse update success", data=dict(message=message, chat=chat, user=user))
 
 
 def parse_chat(message: Message, update: Update) -> Dict:
