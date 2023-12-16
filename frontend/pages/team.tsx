@@ -3,7 +3,7 @@ import Head from "next/head";
 import Image from "next/image";
 import React, { useState } from "react";
 import { Space_Mono } from "next/font/google";
-import abbot from "@/public/abbot.jpeg";
+import abbot from "@/public/abbot.jpg";
 import Member from "@/components/Member";
 import Button from "@/components/Button";
 import Row from "@/components/Row";
@@ -87,7 +87,7 @@ export default function Team() {
         <meta property="og:title" content="Abbot" />
         <meta
           property="og:image"
-          content="https://atlbitlab.com/abbot/abbot.jpeg"
+          content="https://atlbitlab.com/abbot/abbot.jpg"
         />
         <meta property="og:site_name" content="Telegram" />
         <meta
@@ -98,7 +98,7 @@ export default function Team() {
         <meta property="twitter:title" content="Abbot" />
         <meta
           property="twitter:image"
-          content="https://atlbitlab.com/abbot/abbot.jpeg"
+          content="https://atlbitlab.com/abbot/abbot.jpg"
         />
         <meta property="twitter:site" content="@Telegram" />
 

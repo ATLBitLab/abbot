@@ -2,12 +2,17 @@ import React, { useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
-import abbot from "@/public/abbot.jpeg";
+import { useRouter } from "next/router";
+
+import Toast from "awesome-toast-component";
+
 import Button from "@/components/Button";
 import Row from "@/components/Row";
-import { useRouter } from "next/router";
-import Toast from "awesome-toast-component";
-import ChannelForm from "./ChannelForm";
+
+import abbot from "@/public/abbot.jpg";
+import quickAdd from "@/public/quickadd.png"
+
+import ChannelForm from "@/components/ChannelForm";
 
 export default function Abbot() {
   const router = useRouter();
@@ -77,7 +82,7 @@ export default function Abbot() {
         <meta property="og:title" content="Abbot" />
         <meta
           property="og:image"
-          content="https://atlbitlab.com/abbot/abbot.jpeg"
+          content="https://atlbitlab.com/abbot/abbot.jpg"
         />
         <meta property="og:site_name" content="Telegram" />
         <meta
@@ -88,7 +93,7 @@ export default function Abbot() {
         <meta property="twitter:title" content="Abbot" />
         <meta
           property="twitter:image"
-          content="https://atlbitlab.com/abbot/abbot.jpeg"
+          content="https://atlbitlab.com/abbot/abbot.jpg"
         />
         <meta property="twitter:site" content="@Telegram" />
 
@@ -180,30 +185,34 @@ export default function Abbot() {
               onTelegramClick={handleTelegramClick}
               platform={platform}
             />
-            {platform && (
-              <ChannelInteraction
-                platform={platform}
-                setChannelMode={setChannelMode}
-                channelMode={channelMode}
-                channelId={channelId}
-                setChannelId={setChannelId}
-                loading={loading}
-                handleFormSubmit={handleFormSubmit}
-                manualAddIsClicked={manualAddIsClicked}
-                setManualAddIsClicked={setManualAddIsClicked}
-                telegramAddIsClicked={telegramAddIsClicked}
-                setTelegramAddIsClicked={setTelegramAddIsClicked}
-              />
-            )}
-            {platform && (
-              <Button
-                className="w-full border-[#08252E] border-2 px-8 mt-4"
-                type="button"
-                onClick={handleBackClick}
-              >
-                Back
-              </Button>
-            )}
+            {
+              platform && (
+                <ChannelInteraction
+                  platform={platform}
+                  setChannelMode={setChannelMode}
+                  channelMode={channelMode}
+                  channelId={channelId}
+                  setChannelId={setChannelId}
+                  loading={loading}
+                  handleFormSubmit={handleFormSubmit}
+                  manualAddIsClicked={manualAddIsClicked}
+                  setManualAddIsClicked={setManualAddIsClicked}
+                  telegramAddIsClicked={telegramAddIsClicked}
+                  setTelegramAddIsClicked={setTelegramAddIsClicked}
+                />
+              )
+            }
+            {
+              platform && (
+                <Button
+                  className="w-full border-[#08252E] border-2 px-8 mt-4"
+                  type="button"
+                  onClick={handleBackClick}
+                >
+                  Back
+                </Button>
+              )
+            }
             <Row className="w-full">
               <Button
                 className="w-full border-[#08252E] border-2 mr-1"
@@ -263,12 +272,20 @@ function ManualInstructions() {
 }
 
 function TelegramInstructions() {
+  const handleAddAbbot = () => window.open("https://t.me/atl_bitlab_bot?startgroup=true", "_blank");
+
   return (
     <>
       <div className="w-5/6">
+        <Row className="mb-6">
+          <Button onClick={handleAddAbbot} type="button">
+            Add Abbot
+          </Button>
+          <Image src={quickAdd} alt={"quick-add-abbot-to-telegram"} />
+        </Row>
         <ul className="list-decimal text-left">
           <li>Ensure your device has the Telegram app installed</li>
-          <li>Click the &#34;ADD ABBOT&#34; button below or scan the QR code</li>
+          <li>Click the &#34;ADD ABBOT&#34; button above or scan the QR code</li>
           <li>Select your group from the drop down list on Telegram</li>
           <li>For non-admin, group members, click &#34;OK&#34;</li>
           <li>For admin group members, click &#34;ADD AS ADMIN&#34;</li>
@@ -289,17 +306,6 @@ function TelegramInstructions() {
             on Telegram</li>
         </ul>
       </div>
-      <Button
-        onClick={() => {
-          console.log("Button C clicked");
-          window.open("https://t.me/atl_bitlab_bot?startgroup=true", "_blank");
-        }}
-        type="button"
-      >
-        <Link href="https://t.me/atl_bitlab_bot?startgroup=true">
-          Add Abbot
-        </Link>
-      </Button>
     </>
   );
 }

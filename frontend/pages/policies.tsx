@@ -3,7 +3,7 @@ import Head from "next/head";
 import Image from "next/image";
 import React from "react";
 import { Space_Mono } from "next/font/google";
-import abbot from "public/abbot.jpeg";
+import abbot from "public/abbot.jpg";
 import Button from "@/components/Button";
 import { useRouter } from 'next/router';
 import Row from "@/components/Row";
@@ -24,12 +24,12 @@ export default function Policies() {
                 <link rel="icon" href="/atl-bitlab-favicon.png" />
 
                 <meta property="og:title" content="Abbot" />
-                <meta property="og:image" content="https://atlbitlab.com/abbot/abbot.jpeg" />
+                <meta property="og:image" content="https://atlbitlab.com/abbot/abbot.jpg" />
                 <meta property="og:site_name" content="Telegram" />
                 <meta property="og:description" content="Helpful bitcoiner bot from Atlanta by ATL BitLab. Est. block 797812." />
 
                 <meta property="twitter:title" content="Abbot" />
-                <meta property="twitter:image" content="https://atlbitlab.com/abbot/abbot.jpeg" />
+                <meta property="twitter:image" content="https://atlbitlab.com/abbot/abbot.jpg" />
                 <meta property="twitter:site" content="@Telegram" />
 
                 <meta property="al:ios:app_store_id" content="686449807" />
@@ -81,8 +81,8 @@ export default function Policies() {
                 <br />
                 <h3>How do I remove my data from Abbot?</h3>
                 <ul>
-                    <li>/amnesia wipes all messages between two points in time.</li>
-                    <li>/neuralyze wipes all messages between you (or your group) and Abbot.</li>
+                    <li>/amnesia wipes all messages between two points in time. (Coming soon!)</li>
+                    <li>/neuralyze wipes all messages between you (or your group) and Abbot. (Coming soon!)</li>
                 </ul>
                 <Row className="w-2/3 my-10">
 
