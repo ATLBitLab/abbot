@@ -755,7 +755,7 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
 
         assistant_history_update = {
             "role": "assistant",
-            "content": f"{BOT_TELEGRAM_HANDLE} said: {answer} on {datetime.now().isoformat()}",
+            "content": answer,
         }
         group_history = abbot.get_history()
         token_count: int = calculate_tokens(group_history)
@@ -921,7 +921,7 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
             debug_bot.log(log_name, f"sats_remaining={sats_remaining}")
             assistant_history_update = {
                 "role": "assistant",
-                "content": f"{BOT_TELEGRAM_HANDLE} said: {answer} on {datetime.now().isoformat()}",
+                "content": answer,
             }
             group_history = abbot.get_history()
             token_count: int = calculate_tokens(group_history)
@@ -941,61 +941,64 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
 async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         log_name: str = f"{FILE_NAME}: handle_chat_creation_members_added"
+        debug_bot.log(log_name, update)
+        debug_bot.log(log_name, context)
+        return await update.message.reply_text("DMs are temporarily disabled! Come back soon!")
 
-        response: Dict = await parse_update_data(update, context)
-        if not successful(response):
-            debug_bot.log(log_name, f"Failed to parse_update_data response={response}")
+        # response: Dict = await parse_update_data(update, context)
+        # if not successful(response):
+        #     debug_bot.log(log_name, f"Failed to parse_update_data response={response}")
 
-        update_data: Dict = try_get(response, "data")
-        debug_bot.log(log_name, f"update_data={update_data}")
+        # update_data: Dict = try_get(response, "data")
+        # debug_bot.log(log_name, f"update_data={update_data}")
 
-        message: Message = try_get(update_data, "message")
-        message_text, message_date = parse_message_data(message)
+        # message: Message = try_get(update_data, "message")
+        # message_text, message_date = parse_message_data(message)
 
-        chat: Chat = try_get(update_data, "chat")
-        chat_id, chat_title, chat_type = parse_chat_data(chat)
+        # chat: Chat = try_get(update_data, "chat")
+        # chat_id, chat_title, chat_type = parse_chat_data(chat)
 
-        user: User = try_get(update_data, "user")
-        # user_id, username = parse_user_data(user)
-        first_name: int = try_get(user, "first_name") or try_get(chat, "first_name")
-        user_id: int = try_get(user, "id")
-        username: int = try_get(user, "username") or try_get(chat, "username")
+        # user: User = try_get(update_data, "user")
+        # # user_id, username = parse_user_data(user)
+        # first_name: int = try_get(user, "first_name") or try_get(chat, "first_name")
+        # user_id: int = try_get(user, "id")
+        # username: int = try_get(user, "username") or try_get(chat, "username")
 
-        chat_id = try_get(chat, "id")
-        new_message_dict = message.to_dict()
-        chat_id_filter = {"id": chat_id}
-        dm: TelegramDM = mongo_abbot.find_one_dm_and_update(
-            chat_id_filter,
-            {
-                "$set": {"id": chat_id, "username": username, "type": chat_type},
-                "$push": {
-                    "messages": new_message_dict,
-                    "history": {"role": "user", "content": f"@{username} said: {message_text} on {message_date}"},
-                },
-                "$setOnInsert": {
-                    "created_at": datetime.now().isoformat(),
-                    "messages": [new_message_dict],
-                    "history": [BOT_SYSTEM_OBJECT_DMS],
-                },
-            },
-        )
+        # chat_id = try_get(chat, "id")
+        # new_message_dict = message.to_dict()
+        # chat_id_filter = {"id": chat_id}
+        # dm: TelegramDM = mongo_abbot.find_one_dm_and_update(
+        #     chat_id_filter,
+        #     {
+        #         "$set": {"id": chat_id, "username": username, "type": chat_type},
+        #         "$push": {
+        #             "messages": new_message_dict,
+        #             "history": {"role": "user", "content": f"@{username} said: {message_text} on {message_date}"},
+        #         },
+        #         "$setOnInsert": {
+        #             "created_at": datetime.now().isoformat(),
+        #             "messages": [new_message_dict],
+        #             "history": [BOT_SYSTEM_OBJECT_DMS],
+        #         },
+        #     },
+        # )
 
-        debug_bot.log(log_name, f"handle_dm => found or inserted chat=(id={chat.id}, user=({user.username}")
-        dm_msg = f"dm={dm}\nchat=(id={chat.id}, title=({chat.title})"
-        await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=dm_msg)
+        # debug_bot.log(log_name, f"handle_dm => found or inserted chat=(id={chat.id}, user=({user.username}")
+        # dm_msg = f"dm={dm}\nchat=(id={chat.id}, title=({chat.title})"
+        # await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=dm_msg)
 
-        dm_history: List = try_get(dm, "history")
-        debug_bot.log(log_name, f"dm_history={dm_history[-1]}")
+        # dm_history: List = try_get(dm, "history")
+        # debug_bot.log(log_name, f"dm_history={dm_history[-1]}")
 
-        abbot = Abbot(chat.id, "dm", dm_history)
-        answer, _, _, _ = abbot.chat_completion()
-        # TODO: Add balance to DMs
-        dm: TelegramDM = mongo_abbot.find_one_group_and_update(
-            chat_id_filter,
-            {"$push": {"history": {"role": "assistant", "content": answer}}},
-        )
-        debug_bot.log(log_name, f"{dm_msg}\nAbbot DMs with {user.username}")
-        return await message.reply_text(answer)
+        # abbot = Abbot(chat.id, "dm", dm_history)
+        # answer, _, _, _ = abbot.chat_completion()
+        # # TODO: Add balance to DMs
+        # dm: TelegramDM = mongo_abbot.find_one_group_and_update(
+        #     chat_id_filter,
+        #     {"$push": {"history": {"role": "assistant", "content": answer}}},
+        # )
+        # debug_bot.log(log_name, f"{dm_msg}\nAbbot DMs with {user.username}")
+        # return await message.reply_text(answer)
     except AbbotException as abbot_exception:
         await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=f"{log_name}: {abbot_exception}")
 
