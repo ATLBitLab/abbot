@@ -19,9 +19,9 @@ def parse_message(update: Update) -> Dict:
     log_name: str = f"{FILE_NAME}: parse_message"
     message_update: Optional[Message] = try_get(update, "message")
     edited_message: Optional[Message] = try_get(update, "edited_message")
-    effective_message: Optional[Message] = try_get(update, "effective_message")
+    effective_message: Optional[Message] = try_get(update, "_effective_message")
     message: Optional[Message] = message_update or edited_message or effective_message
-    if not message and not edited_message and not effective_message:
+    if not message:
         error_message = f"{log_name}: No message, edited_message or effective_message"
         error_bot.log(log_name, error_message)
         update_dict = update.to_json()
@@ -46,6 +46,49 @@ def parse_message_data_keys(message, keys):
     return extra_data
 
 
+def parse_chat(message: Message, update: Update) -> Dict:
+    log_name: str = f"{FILE_NAME}: parse_chat"
+    chat_update: Chat = try_get(message, "chat")
+    effective_chat: Optional[Chat] = try_get(update, "_effective_chat")
+    chat: Optional[Chat] = chat_update or effective_chat
+    if not chat:
+        error_message = f"{log_name}: No chat or effective_chat data"
+        error_bot.log(log_name, error_message)
+        return error(error_message, data=message.to_json())
+    debug_bot.log(f"{log_name}: chat={chat}")
+    return success(data=chat)
+
+
+def parse_chat_data(chat: Chat) -> Dict:
+    log_name: str = f"{FILE_NAME}: parse_chat_data"
+    chat_id: int = try_get(chat, "id")
+    chat_title: str = try_get(chat, "title")
+    chat_type: str = try_get(chat, "type")
+    debug_bot.log(f"{log_name}: chat_id={chat_id} chat_title={chat_title} chat_type={chat_type}")
+    return chat_id, chat_title, chat_type
+
+
+def parse_user(message: Message, update: Update) -> Dict:
+    log_name: str = f"{FILE_NAME}: parse_user"
+    user_update: Optional[User] = try_get(message, "from_user")
+    effective_user: Optional[User] = try_get(update, "_effective_user")
+    user: Optional[User] = user_update or effective_user
+    if not user:
+        error_message = f"{log_name}: No user or effective_user data"
+        error_bot.log(log_name, error_message)
+        return error(error_message, data=message.to_json())
+    debug_bot.log(f"{log_name}: {user}")
+    return success(data=user)
+
+
+def parse_user_data(user: User) -> Dict:
+    log_name: str = f"{FILE_NAME}: parse_user_data"
+    user_id: int = try_get(user, "id")
+    username: int = try_get(user, "username")
+    debug_bot.log(f"{log_name}: user_id={user_id} username={username}")
+    return user_id, username
+
+
 async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Dict:
     log_name: str = f"{FILE_NAME}: parse_update_data"
 
@@ -68,7 +111,7 @@ async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         return error(f"Failed to parse chat from update: {error_message}", data=error_data)
     chat: Chat = try_get(response, "data")
 
-    response: Dict = parse_user(message)
+    response: Dict = parse_user(message, update)
     if not successful(response):
         error_message = try_get(response, "msg")
         error_data = try_get(response, "data")
@@ -78,45 +121,6 @@ async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     user: User = try_get(response, "data")
 
     return success("Parse update success", data=dict(message=message, chat=chat, user=user))
-
-
-def parse_chat(message: Message, update: Update) -> Dict:
-    log_name: str = f"{FILE_NAME}: parse_chat"
-    chat: Chat = try_get(message, "chat") or try_get(update, "effective_chat")
-    if not chat:
-        error_message = f"{log_name}: No chat data"
-        error_bot.log(log_name, error_message)
-        return error(error_message, data=message.to_json())
-    debug_bot.log(f"{log_name}: chat={chat}")
-    return success("Parse chat success", data=chat)
-
-
-def parse_chat_data(chat: Chat) -> Dict:
-    log_name: str = f"{FILE_NAME}: parse_chat_data"
-    chat_id: int = try_get(chat, "id")
-    chat_title: str = try_get(chat, "title")
-    chat_type: str = try_get(chat, "type")
-    debug_bot.log(f"{log_name}: chat_id={chat_id} chat_title={chat_title} chat_type={chat_type}")
-    return chat_id, chat_title, chat_type
-
-
-def parse_user(message: Message) -> Dict:
-    log_name: str = f"{FILE_NAME}: parse_user"
-    user: User = try_get(message, "from_user")
-    if not user:
-        error_message = f"{log_name}: No user data"
-        error_bot.log(log_name, error_message)
-        return error(error_message, data=message.to_json())
-    debug_bot.log(f"{log_name}: {user}")
-    return dict(status="success", data=user)
-
-
-def parse_user_data(user: User) -> Dict:
-    log_name: str = f"{FILE_NAME}: parse_user_data"
-    user_id: int = try_get(user, "id")
-    username: int = try_get(user, "username")
-    debug_bot.log(f"{log_name}: user_id={user_id} username={username}")
-    return user_id, username
 
 
 async def get_chat_admins(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -> Dict:
