@@ -1,31 +1,38 @@
-import tiktoken
+from typing import Dict, List, Optional
 
-from typing import Dict, List
-from random import randrange
+import tiktoken
+from json import dumps
 from telegram.ext import ContextTypes
 from telegram import Message, Update, Chat, User
 
-from constants import OPENAI_MODEL, THE_CREATOR
+from constants import OPENAI_MODEL, THE_ARCHITECT_ID
 
 from ..utils import success, successful, try_get, error
 from ..logger import debug_bot, error_bot
 
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
 
+FILE_NAME = __name__
+
 
 def parse_message(update: Update) -> Dict:
-    log_name: str = f"{__name__}: parse_message"
-    message: Message = try_get(update, "message") or try_get(update, "effective_message")
-    if not message:
-        error_message = f"{log_name}: No message data"
+    log_name: str = f"{FILE_NAME}: parse_message"
+    message_update: Optional[Message] = try_get(update, "message")
+    edited_message: Optional[Message] = try_get(update, "edited_message")
+    effective_message: Optional[Message] = try_get(update, "effective_message")
+    message: Optional[Message] = message_update or edited_message or effective_message
+    if not message and not edited_message and not effective_message:
+        error_message = f"{log_name}: No message, edited_message or effective_message"
         error_bot.log(log_name, error_message)
-        return error(error_message, data=update.to_json())
-    debug_bot.log(f"{log_name} parse message success: message{message}")
-    return success("Parse message success", data=message)
+        update_dict = update.to_json()
+        error_bot.log(log_name, f"update={dumps(update_dict, indent=4)}")
+        return error(error_message, data=update_dict)
+    debug_bot.log(f"{log_name} message{message}")
+    return success(data=message)
 
 
 def parse_message_data(message: Message) -> Dict:
-    log_name: str = f"{__name__}: parse_message_data"
+    log_name: str = f"{FILE_NAME}: parse_message_data"
     message_text = try_get(message, "text")
     message_date = try_get(message, "date")
     debug_bot.log(f"{log_name}: text={message_text}, date={message_date}")
@@ -40,7 +47,7 @@ def parse_message_data_keys(message, keys):
 
 
 async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Dict:
-    log_name: str = f"{__name__}: parse_update_data"
+    log_name: str = f"{FILE_NAME}: parse_update_data"
 
     response: Dict = parse_message(update)
     if not successful(response):
@@ -74,7 +81,7 @@ async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 
 
 def parse_chat(message: Message, update: Update) -> Dict:
-    log_name: str = f"{__name__}: parse_chat"
+    log_name: str = f"{FILE_NAME}: parse_chat"
     chat: Chat = try_get(message, "chat") or try_get(update, "effective_chat")
     if not chat:
         error_message = f"{log_name}: No chat data"
@@ -85,7 +92,7 @@ def parse_chat(message: Message, update: Update) -> Dict:
 
 
 def parse_chat_data(chat: Chat) -> Dict:
-    log_name: str = f"{__name__}: parse_chat_data"
+    log_name: str = f"{FILE_NAME}: parse_chat_data"
     chat_id: int = try_get(chat, "id")
     chat_title: str = try_get(chat, "title")
     chat_type: str = try_get(chat, "type")
@@ -94,7 +101,7 @@ def parse_chat_data(chat: Chat) -> Dict:
 
 
 def parse_user(message: Message) -> Dict:
-    log_name: str = f"{__name__}: parse_user"
+    log_name: str = f"{FILE_NAME}: parse_user"
     user: User = try_get(message, "from_user")
     if not user:
         error_message = f"{log_name}: No user data"
@@ -105,7 +112,7 @@ def parse_user(message: Message) -> Dict:
 
 
 def parse_user_data(user: User) -> Dict:
-    log_name: str = f"{__name__}: parse_user_data"
+    log_name: str = f"{FILE_NAME}: parse_user_data"
     user_id: int = try_get(user, "id")
     username: int = try_get(user, "username")
     debug_bot.log(f"{log_name}: user_id={user_id} username={username}")
@@ -113,7 +120,7 @@ def parse_user_data(user: User) -> Dict:
 
 
 async def get_chat_admins(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -> Dict:
-    log_name: str = f"{__name__}: get_chat_admins"
+    log_name: str = f"{FILE_NAME}: get_chat_admins"
     chat_admins = await context.bot.get_chat_administrators(chat_id)
     admin_ids = [try_get(admin, "user", "id") for admin in chat_admins]
     admin_usernames = [try_get(admin, "user", "username") for admin in chat_admins]
@@ -123,9 +130,9 @@ async def get_chat_admins(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -> D
 
 
 async def squawk_error(error_message: str, context: ContextTypes.DEFAULT_TYPE) -> Message:
-    log_name: str = f"{__name__}: squawk_error"
+    log_name: str = f"{FILE_NAME}: squawk_error"
     error_bot.log(f"{log_name}: {error_message}")
-    return await context.bot.send_message(chat_id=THE_CREATOR, text=error_message)
+    return await context.bot.send_message(chat_id=THE_ARCHITECT_ID, text=error_message)
 
 
 def calculate_tokens(history: List) -> int:
@@ -140,7 +147,7 @@ def calculate_tokens(history: List) -> int:
 
 """
 def update_telegram_group_doc(existing: Dict, update: Dict) -> Dict:
-    log_name: str = f"{__name__}: update_telegram_group_doc"
+    log_name: str = f"{FILE_NAME}: update_telegram_group_doc"
     chat_id = try_get(existing, "id")
     doc_filter = {"id": chat_id}
     updates = {}
@@ -163,7 +170,7 @@ def update_telegram_group_doc(existing: Dict, update: Dict) -> Dict:
         group = {**group, "created_at": json_util.dumps(created_at)}
     return success("Success update group doc", data=group)
 def create_telegram_group_doc(message: Message, chat: Chat, admins: Tuple[ChatMember]) -> Dict:
-    log_name: str = f"{__name__}: create_telegram_group_doc: "
+    log_name: str = f"{FILE_NAME}: create_telegram_group_doc: "
     debug_bot.log(log_name, f"creating doc for chat.id={chat.id}")
     return {
         "title": chat.title,
@@ -177,7 +184,7 @@ def create_telegram_group_doc(message: Message, chat: Chat, admins: Tuple[ChatMe
         "config": {"started": False, "introduced": False, "unleashed": False, "count": None},
     }
 def handle_insert_group(message: Message, chat: Chat, admins: Tuple[ChatMember]) -> Dict:
-    log_name: str = f"{__name__}: handle_insert_group"
+    log_name: str = f"{FILE_NAME}: handle_insert_group"
     group_doc: TelegramGroup = create_telegram_group_doc(message, chat, admins)
     insert: InsertOneResult = mongo_abbot.insert_one_group(group_doc)
     if not successful_insert_one(insert):

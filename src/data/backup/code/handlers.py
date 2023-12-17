@@ -6,7 +6,7 @@ from os.path import abspath
 from telegram import Update, Message, Chat, User
 from telegram.ext import ContextTypes
 
-from constants import HELP_MENU, THE_CREATOR
+from constants import HELP_MENU, THE_ARCHITECT_ID
 from lib.admin.admin_service import AdminService
 from lib.abbot.core import Abbot
 from lib.logger import debug_bot, error_bot
@@ -75,7 +75,7 @@ for content, config in zip(PRIVATE_CONTENT_FILES, PRIVATE_CONFIG_FILES):
     ALL_ABBOTS.append(private_abbot)
 
 abbots: Bots = Bots(ALL_ABBOTS)
-admin = AdminService(THE_CREATOR, THE_CREATOR)
+admin = AdminService(THE_ARCHITECT_ID, THE_ARCHITECT_ID)
 admin.status = "running"
 
 
@@ -198,7 +198,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         answer = abbot.chat_history_completion()
     # if not answer:
     #     await context.bot.send_message(
-    #         chat_id=THE_CREATOR,
+    #         chat_id=THE_ARCHITECT_ID,
     #         text=f"{abbot.name} completion failed ⛔️: abbot={abbot} answer={answer}",
     #     )
     # i = 0
@@ -445,7 +445,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     response = abbot.chat_history_completion()
     if not response:
         return await context.bot.send_message(
-            chat_id=THE_CREATOR,
+            chat_id=THE_ARCHITECT_ID,
             text=f"chat_title={chat_title} chat_id={chat_id}",
         )
     await message.reply_text(response)
@@ -497,7 +497,9 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     debug_bot.log(f"{fn} abbot: {json.dumps(abbot.to_dict())}")
     if not abbot.started:
         await message.reply_text("Abbot isn't started yet! Have an admin run /start")
-        return await context.bot.send_message(chat_id=THE_CREATOR, text=f"chat_title={chat_title} chat_id={chat_id}")
+        return await context.bot.send_message(
+            chat_id=THE_ARCHITECT_ID, text=f"chat_title={chat_title} chat_id={chat_id}"
+        )
     started = abbot.stop()
     if not started:
         raise Exception(f"Not started! started={started}")
@@ -509,7 +511,7 @@ async def admin_plugin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     fn = "_admin_plugin:"
     chat_id: int = try_get(update, "message", "chat", "id")
     user_id: int = try_get(update, "message", "from_user", "id")
-    if user_id != THE_CREATOR:
+    if user_id != THE_ARCHITECT_ID:
         return
     admin: AdminService = AdminService(user_id, chat_id)
     admin.stop_service()
@@ -533,7 +535,7 @@ async def admin_kill(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id: int = try_get(chat, "id")
     user: User = try_get(message, "from_user")
     user_id: int = try_get(user, "id")
-    if user_id != THE_CREATOR:
+    if user_id != THE_ARCHITECT_ID:
         return
     admin: AdminService = AdminService(user_id, chat_id)
     admin.kill_service()
@@ -547,7 +549,7 @@ async def admin_nap(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id: int = try_get(chat, "id")
     user: User = try_get(message, "from_user")
     user_id: int = try_get(user, "id")
-    if user_id != THE_CREATOR:
+    if user_id != THE_ARCHITECT_ID:
         return
     admin: AdminService = AdminService(user_id, chat_id)
     admin.sleep_service()
@@ -559,7 +561,7 @@ async def admin_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message: Message = try_get(update, "message")
     user: User = try_get(message, "from_user")
     user_id: int = try_get(user, "id")
-    if user_id != THE_CREATOR:
+    if user_id != THE_ARCHITECT_ID:
         return
     abbots_dict: dict = abbots.get_abbots()
     for bot in abbots_dict:
