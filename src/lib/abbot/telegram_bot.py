@@ -13,16 +13,6 @@ RAW_MESSAGE_JL_FILE = abspath("src/data/raw_messages.jsonl")
 MATRIX_IMG_FILEPATH = abspath("src/assets/unplugging_matrix.jpg")
 KOOLAID_GIF_FILEPATH = abspath("src/assets/koolaid.gif")
 
-FULL_TELEGRAM_HANDLE = f"@{BOT_TELEGRAM_HANDLE}"
-RAW_MESSAGE_JL_FILE = abspath("src/data/raw_messages.jsonl")
-MATRIX_IMG_FILEPATH = abspath("src/assets/unplugging_matrix.jpg")
-KOOLAID_GIF_FILEPATH = abspath("src/assets/koolaid.gif")
-DEFAULT_GROUP_HISTORY = [
-    {"role": "system", "content": BOT_SYSTEM_CORE_GROUPS},
-    {"role": "assistant", "content": INTRODUCTION},
-]
-DEFAULT_DM_HISTORY = [{"role": "system", "content": BOT_SYSTEM_CORE_DMS}]
-
 # packages
 from telegram import Bot, Update, Message, Chat, User
 from telegram.constants import MessageEntityType, ParseMode
@@ -94,8 +84,6 @@ from ..abbot.exceptions.exception import AbbotException
 
 strike: Strike = init_payment_processor()
 price_provider: Coinbase = init_price_provider()
-
-STRIKE: Strike = init_payment_processor()
 
 import tiktoken
 
