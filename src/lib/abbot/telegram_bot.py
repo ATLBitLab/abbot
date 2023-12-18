@@ -1,8 +1,8 @@
 # core
-import json
 import time
 import uuid
 import traceback
+from json import dumps
 
 from os.path import abspath
 from datetime import datetime
@@ -63,7 +63,7 @@ MESSAGE_OR_EDITED = UpdateType.MESSAGES
 
 # local
 from ..logger import debug_bot, error_bot
-from ..utils import error, qr_code, success, try_get, successful
+from ..utils import error, qr_code, safe_cast_to_int, success, try_get, successful
 from ..db.mongo import TelegramDM, TelegramGroup, mongo_abbot
 from ..abbot.core import Abbot
 from ..abbot.utils import (
@@ -89,10 +89,8 @@ FILE_NAME = __name__
 # ---------------------------------------------------------------------------------------
 # --                      Telegram Handlers Helper Functions                           --
 # ---------------------------------------------------------------------------------------
-
-
 async def get_live_price() -> int:
-    log_name: str = f"{FILE_NAME}: get_live_price"
+    log_name: str = f"{FILE_NAME}: get_live_price: "
     response: Dict[CoinbasePrice] = await price_provider.get_bitcoin_price()
     debug_bot.log(log_name, f"response={response}")
     data = try_get(response, "data")
@@ -114,10 +112,10 @@ async def usd_to_sat(usd_amount: int) -> int:
             btc_price_usd: int = int(btc_price_usd)
     else:
         btc_price_usd: int = await get_live_price()
-    amount = int((usd_amount / int(btc_price_usd)) * SATOSHIS_PER_BTC)
-    if amount <= 0:
-        amount = 2500
-    return amount
+    sats = int((usd_amount / btc_price_usd) * SATOSHIS_PER_BTC)
+    if sats <= 0:
+        sats = 50
+    return sats
 
 
 async def sat_to_usd(sats_amount: int) -> int:
@@ -128,10 +126,10 @@ async def sat_to_usd(sats_amount: int) -> int:
             btc_price_usd: int = int(btc_price_usd)
     else:
         btc_price_usd: int = await get_live_price()
-    amount = float((sats_amount / SATOSHIS_PER_BTC) * int(btc_price_usd))
-    if amount <= 0:
-        amount = 1
-    return amount
+    usd = float((sats_amount / SATOSHIS_PER_BTC) * int(btc_price_usd))
+    if usd <= 0.01:
+        usd = 0.01
+    return usd
 
 
 async def recalc_balance_sats(in_token_count: int, out_token_count: int, current_balance: int, bot: Bot):
@@ -244,7 +242,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         update_data: Dict = try_get(response, "data")
         debug_bot.log(log_name, f"update_data={update_data}")
         message: Message = try_get(update_data, "message")
-        await message.reply_text(HELP_MENU)
+        await message.reply_markdown_v2(f"{HELP_MENU}")
     except AbbotException as abbot_exception:
         return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=f"{log_name}: {abbot_exception}")
 
@@ -258,7 +256,7 @@ async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
         update_data: Dict = try_get(response, "data")
         debug_bot.log(log_name, f"update_data={update_data}")
         message: Message = try_get(update_data, "message")
-        await message.reply_text(RULES)
+        await message.reply_markdown_v2(RULES)
     except AbbotException as abbot_exception:
         return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=f"{log_name}: {abbot_exception}")
 
@@ -334,7 +332,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         current_balance: TelegramGroup = mongo_abbot.get_group_balance(chat_id_filter)
         if current_balance == 0:
             group_msg = f"⚡️ Group: {chat_title} ⚡️ "
-            sats_balance_msg = f"⚡️ Bitcoin Balance: {current_balance} SATs ⚡️"
+            sats_balance_msg = f"⚡️ Bitcoin Balance: {current_balance} SAT ⚡️"
             usd_balance = await sat_to_usd(current_balance)
             usd_balance_msg = f"💰 Dollar Balance: {usd_balance} USD 💰"
             fund_msg = "Please run /fund <amount> <currency> to topup (e.g. /fund 50000 sats or /fund 10 usd)."
@@ -343,7 +341,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await message.reply_photo(MATRIX_IMG_FILEPATH, f"Please wait while {BOT_NAME} is unplugged from the Matrix")
 
-        time.sleep(5)
+        time.sleep(3)
 
         await message.reply_text(INTRODUCTION)
     except AbbotException as abbot_exception:
@@ -440,6 +438,7 @@ async def balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         message: Message = try_get(update_data, "message")
         chat: Chat = try_get(update_data, "chat")
+        chat_title: str = try_get(chat, "title")
         chat_id_filter = {"id": chat.id}
         group: TelegramGroup = mongo_abbot.find_one_group(chat_id_filter)
 
@@ -450,7 +449,7 @@ async def balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             group_balance = try_get(group, "balance", default=0)
         usd_balance = await sat_to_usd(group_balance)
-        group_msg = f"⚡️ Group: {chat.title} ⚡️"
+        group_msg = f"⚡️ Group: {chat_title} ⚡️"
         sats_balance_msg = f"⚡️ SAT Balance: {group_balance} ⚡️"
         usd_balance_msg = f"💰 USD Balance: {usd_balance} 💰"
         return await message.reply_text(f"{group_msg}\n{sats_balance_msg}\n{usd_balance_msg}")
@@ -470,90 +469,160 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
         debug_bot.log(log_name, f"update_data={update_data}")
 
         message: Message = try_get(update_data, "message")
+        debug_bot.log(log_name, f"message={message}")
+        message_text, message_date = parse_message_data(message)
+        debug_bot.log(log_name, f"message_text={message_text} message_date={message_date}")
+
         chat: Chat = try_get(update_data, "chat")
+        debug_bot.log(log_name, f"chat={chat}")
+        chat_id, chat_title, chat_type = parse_chat_data(chat)
+        debug_bot.log(log_name, f"chat_id={chat_id} chat_title={chat_title} chat_type={chat_type}")
+
         user: User = try_get(update_data, "user")
+        debug_bot.log(log_name, f"user={user}")
+        _, username = parse_user_data(user)
+        debug_bot.log(log_name, f"username={username}")
+        message_text: str = message_text.split()
 
-        message_text: str = message.text
-        debug_bot.log(log_name, f"message_text={message_text}")
-
-        args = message_text.split()
-        args_len = len(args)
+        args = message_text
         debug_bot.log(log_name, f"args={args}")
-        sats_example = "For sats: /fund 50000 sats"
-        usd_example = "For usd: /fund 10 usd"
-        invoice_error_args = (
-            "InvoiceError: Missing amount and currency unit. Did you pass an amount and a currency unit?"
-        )
-        invoice_error_unit = "InvoiceError: Unrecognized currency unit. Did you pass one of usd or sats?"
-        if args_len < 2:
-            return await message.reply_text(f"{invoice_error_args}.\n\n{sats_example}\n\n{usd_example}")
-        elif args_len < 3:
-            return await message.reply_text(f"{invoice_error_args}\n\n{sats_example}\n\n{usd_example}")
 
-        amount: int = int(try_get(args, 1))
-        debug_bot.log(log_name, f"amount={amount}")
+        invalid_usage = "Invalid usage"
+        amount_currency_required = f"{invalid_usage}: Amount & currency required"
+        currency_required = f"{invalid_usage}: Currency required"
+        amount_must_be = f"{invalid_usage}: Amount must be a number greater than 0"
+        currency_must_be = f'{invalid_usage}: Currency must be either "sat" or "usd"'
+        sat_example = "Request SAT invoice: /fund 50000 sat"
+        usd_example = "Request USD invoice: /fund 10 usd"
 
-        currency_unit: str = try_get(args, 2, default="sats")
-        currency_unit = currency_unit.lower()
-        debug_bot.log(log_name, f"currency_unit={currency_unit}")
-        if currency_unit == "sats":
-            symbol = ""
-            # ₿
-            invoice_amount = await sat_to_usd(amount)
-            balance = amount
-        elif currency_unit == "usd":
-            currency_unit = ""
-            symbol = "$"
-            invoice_amount = amount
-            balance = await usd_to_sat(amount)
-        else:
-            return await message.reply_text(f"{invoice_error_unit}\n\n{sats_example}\n\n{usd_example}")
+        args_len = len(args)
+        if args_len == 2:
+            return await message.reply_text(f"{currency_required}\n\n{sat_example}\n\n{usd_example}")
+        elif args_len == 1:
+            return await message.reply_text(f"{amount_currency_required}\n\n{sat_example}\n\n{usd_example}")
+
+        if args_len == 3:
+            requested_amount: int = safe_cast_to_int(try_get(args, 1))
+            debug_bot.log(log_name, f"requested_amount={requested_amount}")
+
+            requested_currency: str = try_get(args, 2, default="SAT").upper()
+            debug_bot.log(log_name, f"requested_currency={requested_currency}")
+
+            if requested_amount == 0:
+                return await message.reply_text(f"{amount_must_be}\n\n{sat_example}\n\n{usd_example}")
+            elif requested_currency not in ("SAT", "SATS", "USD"):
+                return await message.reply_text(f"{currency_must_be}\n\n{sat_example}\n\n{usd_example}")
+
+        req_emoji = "⚡️"
+        req_symbol = "₿"
+        cnv_emoji = "💰"
+        cnv_symbol = "$"
+        sat_amount = requested_amount
+        usd_amount = await sat_to_usd(sat_amount)
+        balance_inc = requested_amount
+        if requested_currency == "USD":
+            req_emoji = "💰"
+            req_symbol = "$"
+            cnv_emoji = "⚡️"
+            cnv_symbol = "₿"
+            sat_amount = await usd_to_sat(usd_amount)
+            usd_amount = requested_amount
+            balance_inc = sat_amount
+
+        debug_bot.log(log_name, f"req_emoji={req_emoji}")
+        debug_bot.log(log_name, f"req_symbol={req_symbol}")
+        debug_bot.log(log_name, f"sat_amount={sat_amount}")
+        debug_bot.log(log_name, f"usd_amount={usd_amount}")
+        debug_bot.log(log_name, f"balance_inc={balance_inc}")
 
         await message.reply_text("Creating your invoice, please wait ...")
-        debug_bot.log(log_name, f"strike={strike}")
-        debug_bot.log(log_name, f"amount={amount}")
-        debug_bot.log(log_name, f"invoice_amount={invoice_amount}")
 
         chat_type: str = try_get(chat, "type")
+        debug_bot.log(log_name, f"chat_type={chat_type}")
+
         chat_id: int = try_get(chat, "id")
-        topup_for: str = try_get(chat, "username") if chat_type == "dm" else try_get(chat, "title")
-        topup_by: str = try_get(chat, "username", default="") if chat_type == "dm" else try_get(user, "username")
+        debug_bot.log(log_name, f"chat_id={chat_id}")
 
-        d0 = f"{chat_type.capitalize()} balance topup"
-        d1 = f"\n\nTitle: {topup_for}\n\nSender: @{topup_by}\n\nAmount: {symbol}{amount} {currency_unit}"
-        description = f"{d0} {d1}"
+        title_detail: str = f"{username} x Abbot" if chat_type == "private" else chat_title
+        debug_bot.log(log_name, f"title_detail={title_detail}")
 
-        cid = str(uuid.uuid1())
-        debug_bot.log(log_name, f"description={description} cid={cid}")
-        response = await strike.get_invoice(cid, description, invoice_amount, chat_id)
+        requester_detail: str = f"@{username}"
+        debug_bot.log(log_name, f"requester={requester_detail}")
+
+        chat_details = f"*🤖 Chat 🤖*\n*Type*\n\t{chat_type}\n*Title*\n\t{title_detail}"
+        chat_details = f"{chat_details}\n*Requester*\n\t{requester_detail}"
+
+        sat_per_dollar: int = price_provider.get_latest_bitcoin_price()
+
+        inv_details = "*⚡️ Invoice Details ⚡️*\n\n"
+        inv_date = f"*🗓️ Date 🗓️*\n\t{message_date}\n"
+        inv_amount = f"{req_symbol}{requested_amount} {requested_currency}"
+        inv_amt_req = f"*{req_emoji} Amount Requested {req_emoji}*\n\t{inv_amount}\n"
+        inv_fx = f"*📈 Exchange Rate 📈*\n\t$1 = ⚡️{sat_per_dollar}\n\t"
+        invoice_next_line = f"{inv_fx}*📝 Description 📝*\n\tTopup Abbot balance"
+        if sat_per_dollar:
+            invoice_next_line = f""
+
+        inv_details_msg = (
+            f"{inv_details}{inv_date}{inv_amt_req}\n\t{inv_amount}\n{invoice_next_line}\n{inv_description}"
+        )
+        inv_expiration = f"🕰️ Expires in *_57_* seconds on {message_date + 57} 🕰️"
+        description = ""
+        debug_bot.log(log_name, f"description={description} coorelation_id={coorelation_id}")
+        f"""
+        *⚡️ Invoice Details ⚡️*
+
+        *🗓️ Date 🗓️*
+            {message_date} 
+        *💰 Amount Requested 💰*
+            $1 USD
+            {req_symbol}{requested_amount} {requested_currency}
+        *📈 Exchange Rate 📈*
+            $1 USD = ⚡️ 2434 SAT
+            $1 USD = ⚡️ {sat_per_dollar} SAT
+        *⚡️ Amount Conversion ⚡️*
+            ⚡️ 2500 SAT
+            {cnv_emoji} snv_
+        *📝 Description 📝*
+            Topup Abbot balance
+        
+        """
+
+        coorelation_id = str(uuid.uuid1())
+        response = await strike.get_invoice(coorelation_id, description, usd_amount, chat_id)
         debug_bot.log(log_name, f"response={response}")
 
-        create_squawk = f"Failed to create strike invoice: {json.dumps(response)}"
-        create_fail_0 = f"Failed to create invoice. Please try again"
-        create_fail_1 = f"or pay to {BOT_LIGHTNING_ADDRESS} and contact @{BOT_TELEGRAM_SUPPORT_CONTACT}"
-        create_fail = f"{create_fail_0} {create_fail_1}"
+        invoice_creation_failed = f"Invoice creation failed"
+        abbot_squawk = f"{invoice_creation_failed}: {dumps(response, indent=2)}"
+        reply_msg = f"{invoice_creation_failed} try command again /fund {requested_amount} {requested_currency}"
+        reply_msg = f"{reply_msg} or pay amount {req_symbol}{requested_amount}"
+        reply_msg = f"{reply_msg} to {BOT_LIGHTNING_ADDRESS} & contact @{BOT_TELEGRAM_SUPPORT_CONTACT} for confirmation"
         if not successful(response):
-            await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=create_squawk)
-            return await message.reply_text(create_fail)
+            await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
+            return await message.reply_text(reply_msg)
 
         invoice_id = try_get(response, "invoice_id")
         invoice = try_get(response, "lnInvoice")
-        expirationInSec = try_get(response, "expirationInSec")
+        expiration_in_sec = try_get(response, "expirationInSec")
         strike.CHAT_ID_INVOICE_ID_MAP[chat_id] = invoice_id
-        if None in (invoice_id, invoice, expirationInSec):
-            await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=create_squawk)
-            return await message.reply_text(create_fail)
-
-        await message.reply_photo(photo=qr_code(invoice), caption=f"{description}\n\nExpires in: {expirationInSec}")
-        await message.reply_markdown_v2(invoice)
+        if None in (invoice_id, invoice, expiration_in_sec):
+            await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
+            return await message.reply_text(reply_msg)
+        now = int(time.time())
+        expiration_time = now + expiration_in_sec
+        await message.reply_photo(
+            photo=qr_code(invoice),
+            caption=f"{description}\n\Expiration: {expiration_time} ({expiration_in_sec} seonds)",
+        )
+        await message.reply_markdown_v2(f"`{invoice}`")
 
         cancel_squawk = f"Failed to cancel strike invoice: description={description}, invoice_id={invoice_id}"
         cancel_fail = "Failed to cancel invoice. Please try again or pay to abbot@atlbitlab.com and contact {THE_ARCHITECT_HANDLE}"
         is_paid = False
-        while expirationInSec >= 0 and not is_paid:
-            debug_bot.log(log_name, f"expirationInSec={expirationInSec}")
-            if expirationInSec == 0:
-                debug_bot.log(log_name, f"expirationInSec == 0, cancelling invoice_id={invoice_id}")
+        while expiration_in_sec >= 0 and not is_paid:
+            debug_bot.log(log_name, f"expiration_in_sec={expiration_in_sec}")
+            if expiration_in_sec == 0:
+                debug_bot.log(log_name, f"expiration_in_sec == 0, cancelling invoice_id={invoice_id}")
                 cancelled = await strike.expire_invoice(invoice_id)
                 debug_bot.log(log_name, f"cancelled={cancelled}")
                 if not cancelled:
@@ -561,18 +630,18 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     return await message.reply_text(cancel_fail)
             is_paid = await strike.invoice_is_paid(invoice_id)
             debug_bot.log(log_name, f"is_paid={is_paid}")
-            expirationInSec -= 1
+            expiration_in_sec -= 1
             time.sleep(1)
 
         if is_paid:
             group: TelegramGroup = mongo_abbot.find_one_group_and_update(
-                {"id": chat.id}, {"$inc": {"balance": balance}}
+                {"id": chat.id}, {"$inc": {"balance": balance_inc}}
             )
             if not group:
                 error_bot.log(log_name, f"not group")
                 return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=group)
-            balance: int = try_get(group, "balance", default=amount)
-            await message.reply_text(f"Invoice Paid! ⚡️ {chat.title} balance: {balance} sats ⚡️")
+            balance: int = try_get(group, "balance", default=requested_amount)
+            await message.reply_text(f"Invoice Paid! ⚡️ {chat_title} balance: {balance} sats ⚡️")
         else:
             await message.reply_text(f"Invoice expired! Please run {message_text} again.")
     except AbbotException as abbot_exception:
@@ -799,17 +868,13 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
         chat_id, chat_title, chat_type = parse_chat_data(chat)
         debug_bot.log(log_name, f"chat_id={chat_id} chat_title={chat_title} chat_type={chat_type}")
 
-        if chat_type in ("group", "supergroup", "channel"):
-            admins: Any = [admin.to_dict() for admin in await chat.get_administrators()]
-            debug_bot.log(log_name, f"admins={admins}")
-
         _, username = parse_user_data(user)
         if not username:
             username = try_get(user, "first_name")
 
         reply_to_message: Optional[Message] = try_get(message, "reply_to_message")
-        debug_bot.log(log_name, f"reply_to_message={reply_to_message.__str__()}")
-        # debug_bot.log(log_name, f"reply_to_message={json.dumps(reply_to_message.to_dict(), indent=2)}")
+        debug_bot.log(log_name, f"reply_to_message={reply_to_message}")
+
         reply_to_message_from_user: Optional[User] = try_get(reply_to_message, "from_user")
         replied_to_bot = try_get(reply_to_message_from_user, "is_bot")
         debug_bot.log(log_name, f"replied_to_bot={replied_to_bot}")
@@ -817,7 +882,7 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
         replied_to_abbot = try_get(reply_to_message_from_user, "username") == BOT_TELEGRAM_USERNAME
         debug_bot.log(log_name, f"replied_to_abbot={replied_to_abbot}")
 
-        if replied_to_bot and replied_to_abbot:
+        if chat_type in ("group", "supergroup", "channel") and replied_to_bot and replied_to_abbot:
             chat_id_filter = {"id": chat_id}
             stopped_err = f"{BOT_NAME} not started - Please run /start{BOT_TELEGRAM_HANDLE}"
             no_group_or_config_err = "No group or group config"
@@ -856,6 +921,9 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 new_history_dict = {"role": "user", "content": f"someone said: {message_text} on {message_date}"}
             elif username and not message_date:
                 new_history_dict = {"role": "user", "content": f"@{username} said: {message_text}"}
+
+            admins: Any = [admin.to_dict() for admin in await chat.get_administrators()]
+            debug_bot.log(log_name, f"admins={admins}")
 
             new_message_dict = message.to_dict()
             group: TelegramGroup = mongo_abbot.find_one_group_and_update(
@@ -919,10 +987,7 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 debug_bot.log(log_name, abbot_squawk)
                 await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
             debug_bot.log(log_name, f"sats_remaining={sats_remaining}")
-            assistant_history_update = {
-                "role": "assistant",
-                "content": answer,
-            }
+            assistant_history_update = {"role": "assistant", "content": answer}
             group_history = abbot.get_history()
             token_count: int = calculate_tokens(group_history)
             group: TelegramGroup = mongo_abbot.find_one_group_and_update(
@@ -941,64 +1006,64 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
 async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         log_name: str = f"{FILE_NAME}: handle_chat_creation_members_added"
-        debug_bot.log(log_name, update)
-        debug_bot.log(log_name, context)
-        return await update.message.reply_text("DMs are temporarily disabled! Come back soon!")
+        # debug_bot.log(log_name, update)
+        # debug_bot.log(log_name, context)
+        # return await update.message.reply_text("DMs are temporarily disabled! Come back soon!")
 
-        # response: Dict = await parse_update_data(update, context)
-        # if not successful(response):
-        #     debug_bot.log(log_name, f"Failed to parse_update_data response={response}")
+        response: Dict = await parse_update_data(update, context)
+        if not successful(response):
+            debug_bot.log(log_name, f"Failed to parse_update_data response={response}")
 
-        # update_data: Dict = try_get(response, "data")
-        # debug_bot.log(log_name, f"update_data={update_data}")
+        update_data: Dict = try_get(response, "data")
+        debug_bot.log(log_name, f"update_data={update_data}")
 
-        # message: Message = try_get(update_data, "message")
-        # message_text, message_date = parse_message_data(message)
+        message: Message = try_get(update_data, "message")
+        message_text, message_date = parse_message_data(message)
 
-        # chat: Chat = try_get(update_data, "chat")
-        # chat_id, chat_title, chat_type = parse_chat_data(chat)
+        chat: Chat = try_get(update_data, "chat")
+        chat_id, chat_title, chat_type = parse_chat_data(chat)
 
-        # user: User = try_get(update_data, "user")
-        # # user_id, username = parse_user_data(user)
-        # first_name: int = try_get(user, "first_name") or try_get(chat, "first_name")
-        # user_id: int = try_get(user, "id")
-        # username: int = try_get(user, "username") or try_get(chat, "username")
+        user: User = try_get(update_data, "user")
+        # user_id, username = parse_user_data(user)
+        first_name: int = try_get(user, "first_name") or try_get(chat, "first_name")
+        user_id: int = try_get(user, "id")
+        username: int = try_get(user, "username") or try_get(chat, "username")
 
-        # chat_id = try_get(chat, "id")
-        # new_message_dict = message.to_dict()
-        # chat_id_filter = {"id": chat_id}
-        # dm: TelegramDM = mongo_abbot.find_one_dm_and_update(
-        #     chat_id_filter,
-        #     {
-        #         "$set": {"id": chat_id, "username": username, "type": chat_type},
-        #         "$push": {
-        #             "messages": new_message_dict,
-        #             "history": {"role": "user", "content": f"@{username} said: {message_text} on {message_date}"},
-        #         },
-        #         "$setOnInsert": {
-        #             "created_at": datetime.now().isoformat(),
-        #             "messages": [new_message_dict],
-        #             "history": [BOT_SYSTEM_OBJECT_DMS],
-        #         },
-        #     },
-        # )
+        chat_id = try_get(chat, "id")
+        new_message_dict = message.to_dict()
+        chat_id_filter = {"id": chat_id}
+        dm: TelegramDM = mongo_abbot.find_one_dm_and_update(
+            chat_id_filter,
+            {
+                "$set": {"id": chat_id, "username": username, "type": chat_type},
+                "$push": {
+                    "messages": new_message_dict,
+                    "history": {"role": "user", "content": f"@{username} said: {message_text} on {message_date}"},
+                },
+                "$setOnInsert": {
+                    "created_at": datetime.now().isoformat(),
+                    "messages": [new_message_dict],
+                    "history": [BOT_SYSTEM_OBJECT_DMS],
+                },
+            },
+        )
 
-        # debug_bot.log(log_name, f"handle_dm => found or inserted chat=(id={chat.id}, user=({user.username}")
-        # dm_msg = f"dm={dm}\nchat=(id={chat.id}, title=({chat.title})"
-        # await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=dm_msg)
+        debug_bot.log(log_name, f"handle_dm => found or inserted chat=(id={chat.id}, user=({user.username}")
+        dm_msg = f"dm={dm}\nchat=(id={chat.id}, title=({chat.title})"
+        await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=dm_msg)
 
-        # dm_history: List = try_get(dm, "history")
-        # debug_bot.log(log_name, f"dm_history={dm_history[-1]}")
+        dm_history: List = try_get(dm, "history")
+        debug_bot.log(log_name, f"dm_history={dm_history[-1]}")
 
-        # abbot = Abbot(chat.id, "dm", dm_history)
-        # answer, _, _, _ = abbot.chat_completion()
-        # # TODO: Add balance to DMs
-        # dm: TelegramDM = mongo_abbot.find_one_group_and_update(
-        #     chat_id_filter,
-        #     {"$push": {"history": {"role": "assistant", "content": answer}}},
-        # )
-        # debug_bot.log(log_name, f"{dm_msg}\nAbbot DMs with {user.username}")
-        # return await message.reply_text(answer)
+        abbot = Abbot(chat.id, "dm", dm_history)
+        answer, _, _, _ = abbot.chat_completion()
+        # TODO: Add balance to DMs
+        dm: TelegramDM = mongo_abbot.find_one_group_and_update(
+            chat_id_filter,
+            {"$push": {"history": {"role": "assistant", "content": answer}}},
+        )
+        debug_bot.log(log_name, f"{dm_msg}\nAbbot DMs with {user.username}")
+        return await message.reply_text(answer)
     except AbbotException as abbot_exception:
         await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=f"{log_name}: {abbot_exception}")
 
@@ -1134,7 +1199,7 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
     error_bot.log(log_name, "Exception while handling update")
     update_dict = update.to_dict()
-    error_bot.log(log_name, f"Update={json.dumps(update_dict, indent=4)}")
+    error_bot.log(log_name, f"Update={dumps(update_dict, indent=4)}")
 
     error_bot.log(log_name, f"Exception: {exception}")
     error_bot.log(log_name, f"Traceback: {formatted_traceback}")

@@ -1,28 +1,45 @@
-CONFIG_JSON_FILEPATH = "src/data/config.json"
-OPENAI_MODEL = "gpt-4-1106-preview"
-THE_ARCHITECT_ID = 1711738045
-THE_ARCHITECT_USERNAME = "nonni_io"
-THE_ARCHITECT_HANDLE = f"@{THE_ARCHITECT_USERNAME}"
-ABBOT_SQUAWKS = -1002139786317
-SATOSHIS_PER_BTC = 100000000
-HELP_MENU = """
-Available Commands
-1. /start
-Description: Start Abbot in your channel. Channel admin only.
-2. /stop
-Description: Stop Abbot in your channel. Channel admin only.
-3. /help
-Description: Show help menu"""
-RULES = """
-1. In group chats, tag me in your message @atl_bitlab_bot and I'll come running to answer.
-2. Reply directly to my messages, and I'll hit you back ASAP.
-3. Looking for a private chat? Slide into my DMs, they don't cost any sats.
-4. Group chat messages cost SATs. New groups get a FREE 50k sat balance!
-5. Once your free 50k runs out, you gotta top up! Run /fund 50000 (or any amount) & I'll send an invoice!
+from typing import List
+
+
+CONFIG_JSON_FILEPATH: str = "src/data/config.json"
+OPENAI_MODEL: str = "gpt-4-1106-preview"
+THE_ARCHITECT_ID: int = 1711738045
+THE_ARCHITECT_USERNAME: str = "nonni_io"
+THE_ARCHITECT_HANDLE: str = f"@{THE_ARCHITECT_USERNAME}"
+ABBOT_SQUAWKS: int = -1002139786317
+SATOSHIS_PER_BTC: int = 100000000
+HELP_MENU = """You can interact with me by sending these commands:
+
+*About Me*
+/help \- return detailed command list and how to use them
+/rules \- return rules list for how to interact with Abbot
+
+*Manage Me*
+/start \- start Abbot in group
+/stop \- stops Abbot in group
+
+*Manage Paying Me*
+/balance \- return group balance in USD and SATs
+/fund \- return an invoice ⚡️ to topup your balance
+/cancel \- cancel the most recently requested invoice\n"""
+
+RULES: str = """To get me to respond to your messages, you must have a positive SAT balance \& take one of these actions
+
+🤖 Tag my handle \@atl\_bitlab\_bot in your group message
+🤖 Reply directly to my group message
+🤖 Slide into my DMs to chat directly
+🤖 I get paid in SATs ⚡️ New groups get 50\,000 *_FREE_* sats\!
+🤖 Topup your balance by running /fund for an invoice ⚡️
 """
-INTRODUCTION = f"""Hey! The name's Abbot but you can think of me as your go-to guide for all things Bitcoin.
-AKA the virtual Bitcoin whisperer. 😉 Here's the lowdown on how to get my attention:
-{RULES}
-Now, enough with the rules! Let's dive into the world of Bitcoin together! Ready. Set. Stack Sats! 🚀
-"""
-SECONDARY_INTRODUCTION = """👋 Whats up, my fellow bitcoiners!? My name is Abbot! I'm part of the ATL BitLab fam - your go-to spot for all things Bitcoin and Lightning in Atlanta - and I'm here to party nakamoto-style! Consider me your bitcoin concierge. Hmu anytime by tagging me (@atl_bitlab_bot) in your post or replying to my messages. Now, let's stack some sats and chat about bitcoin! 😎💻"""
+
+INTRODUCTION: str = f"""Hey! The name's Abbot but you can think of me as your go-to guide for all things Bitcoin. AKA the virtual Bitcoin whisperer 😉\n\nHere's the lowdown on how to get my attention:\n\n{RULES}\n\nNow, enough with the rules! Let's dive into the world of Bitcoin together! Ready. Set. Stack Sats! 🚀"""
+SECONDARY_INTRODUCTION: str = """👋 Whats up, my fellow bitcoiners!? My name is Abbot! I'm part of the ATL BitLab fam - your go-to spot for all things Bitcoin and Lightning in Atlanta - and I'm here to party nakamoto-style! Consider me your bitcoin concierge. Hmu anytime by tagging me (@atl_bitlab_bot) in your post or replying to my messages. Now, let's stack some sats and chat about bitcoin! 😎💻"""
+RELAYS: List[str] = [
+    "wss://relay1.nostrchat.io",
+    "wss://relay2.nostrchat.io",
+    "wss://relay.damus.io",
+    "wss://nos.lol",
+    "wss://relay.primal.net",
+    "wss://relay.snort.social",
+    "wss://nostr.atlbitlab.com",
+]

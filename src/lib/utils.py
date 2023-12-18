@@ -205,3 +205,13 @@ def successful_response(response: Response) -> bool:
 
 def unsuccessful(response: Dict) -> bool:
     return not successful(response)
+
+
+def safe_cast_to_int(value, default=0):
+    if value is None:
+        return default
+
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return default

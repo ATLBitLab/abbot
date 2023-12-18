@@ -8,6 +8,7 @@ from lib.abbot.env import BOT_TELEGRAM_TOKEN, TEST_BOT_TELEGRAM_HANDLE
 ORG_CONFIG = json_loader(CONFIG_JSON_FILEPATH, "org")
 BOT_CONFIG = json_loader(CONFIG_JSON_FILEPATH, "bot")
 
+# Bot Static Data
 ORG_NAME = try_get(ORG_CONFIG, "name")
 ORG_SLUG = try_get(ORG_CONFIG, "slug")
 ORG_ADMINS = try_get(ORG_CONFIG, "admins")
@@ -30,29 +31,27 @@ ORG_TELEGRAM_HANDLE = ORG_TELEGRAM.replace("https://t.me/", "@")
 ORG_TWITTER = try_get(ORG_CONFIG, "twitter")
 ORG_TWITTER_HANDLE = ORG_TELEGRAM.replace("https://twitter.com/", "@")
 
+# Bot Static Data
 BOT_NAME = try_get(BOT_CONFIG, "name")
 BOT_SHORT_FOR = try_get(BOT_CONFIG, "short_for")
 BOT_JOB = try_get(BOT_CONFIG, "job")
 BOT_TELEGRAM = try_get(BOT_CONFIG, "telegram")
-
 BOT_TELEGRAM_USERNAME = try_get(BOT_TELEGRAM, "username")
 BOT_TELEGRAM_USER_ID = try_get(BOT_TELEGRAM, "user_id")
 BOT_TELEGRAM_CONTEXT = try_get(BOT_TELEGRAM, "context")
 BOT_TELEGRAM_SUPPORT_CONTACT = try_get(BOT_TELEGRAM, "support_contact")
-
 BOT_LIGHTNING = try_get(BOT_CONFIG, "lightning")
 BOT_LIGHTNING_ADDRESS = try_get(BOT_LIGHTNING, "address")
-
 BOT_NOSTR = try_get(BOT_CONFIG, "nostr")
 BOT_NOSTR_PK = try_get(BOT_NOSTR, "pk")
 BOT_NOSTR_NPUB = try_get(BOT_NOSTR, "npub")
-
 BOT_SYSTEM = try_get(BOT_CONFIG, "system")
 BOT_SYSTEM_DM = try_get(BOT_SYSTEM, "dm")
 BOT_SYSTEM_GROUP = try_get(BOT_SYSTEM, "group")
 BOT_SYSTEM_CORE = try_get(BOT_SYSTEM, "core")
 BOT_DIRECTIVE = try_get(BOT_SYSTEM, "directive")
 
+# Bot Dynamic + Static Data
 BOT_NAME = f"t{BOT_NAME}" if TEST_MODE or DEV_MODE else BOT_NAME
 BOT_TELEGRAM_USERNAME = f"test_{BOT_TELEGRAM_USERNAME}" if TEST_MODE or DEV_MODE else BOT_TELEGRAM_USERNAME
 BOT_TELEGRAM_HANDLE = f"@{BOT_TELEGRAM_USERNAME}"

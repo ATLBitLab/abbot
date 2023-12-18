@@ -1,16 +1,18 @@
-from typing import Dict
+from typing import Dict, Optional
 from abc import ABC, abstractmethod
 
 import time
 import httpx
 from httpx import Response
+from bson.typings import _DocumentType
 from pymongo.results import InsertOneResult
 
 from lib.db.mongo import mongo_abbot
 from lib.logger import debug_bot, error_bot
 from lib.db.utils import successful_insert_one
 from lib.abbot.env import PAYMENT_PROCESSOR_KIND, PRICE_PROVIDER_KIND, LNBITS_BASE_URL
-from lib.utils import error, success, successful_response, try_get
+from lib.utils import error, safe_cast_to_int, success, successful_response, try_get
+from src.constants import SATOSHIS_PER_BTC
 
 
 def init_payment_processor():
@@ -230,11 +232,12 @@ def init_price_provider():
 
 
 class CoinbasePrice:
-    def __init__(self, _id, amount, base, currency):
+    def __init__(self, _id, amount, base, currency, sats):
         self._id: int = _id
         self.amount: float = float(amount)
         self.base: str = base
         self.currency: str = currency
+        self.sats: int = sats
 
     def to_dict(self):
         return vars(self)
@@ -268,7 +271,8 @@ class Coinbase(Provider):
         resp_data = try_get(json, "data")
         if not resp_data:
             return error("No response data", data=json)
-        price_data = {**resp_data, "_id": int(time.time())}
+        price = try_get(resp_data, "amount")
+        price_data = {**resp_data, "_id": int(time.time()), "sats": safe_cast_to_int(SATOSHIS_PER_BTC / price)}
         price_doc: CoinbasePrice = CoinbasePrice(**price_data).to_dict()
         insert_result: InsertOneResult = mongo_abbot.insert_one_price(price_doc)
         if not successful_insert_one(insert_result):
@@ -277,3 +281,7 @@ class Coinbase(Provider):
             error_message = f"{error_message} \n insert_result={insert_result}"
             error_bot.log(log_name, error_message)
         return success(data=price_doc, amount=try_get(price_doc, "amount"))
+
+    def get_latest_bitcoin_price(self) -> Optional[_DocumentType]:
+        price_dict: Dict[CoinbasePrice] = mongo_abbot.find_prices()[-1]
+        return try_get(price_dict, "sats")
