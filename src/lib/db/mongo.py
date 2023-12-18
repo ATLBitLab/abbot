@@ -1,11 +1,11 @@
 from abc import abstractmethod
 from datetime import datetime
-from cli_args import TELEGRAM_MODE, TEST_MODE, DEV_MODE
+from bot_args import TELEGRAM_MODE, TEST_MODE, DEV_MODE
 from typing import Dict, List, Optional, Tuple
 
 from nostr_sdk import PublicKey, EventId, Event
 
-from telegram import Chat, ChatMember, Message
+from telegram import ChatMember, Message
 
 from pymongo import MongoClient
 from pymongo.collection import Collection

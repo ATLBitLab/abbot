@@ -1,9 +1,11 @@
-from cli_args import DEV_MODE, TEST_MODE
+from bot_args import DEV_MODE, TEST_MODE
 
 from lib.utils import try_get
 from lib.utils import json_loader, try_get
-from constants import CONFIG_JSON_FILEPATH
 from lib.abbot.env import BOT_TELEGRAM_TOKEN, TEST_BOT_TELEGRAM_HANDLE
+
+SATOSHIS_PER_BTC: int = 100000000
+CONFIG_JSON_FILEPATH: str = "src/data/config.json"
 
 ORG_CONFIG = json_loader(CONFIG_JSON_FILEPATH, "org")
 BOT_CONFIG = json_loader(CONFIG_JSON_FILEPATH, "bot")
@@ -35,6 +37,56 @@ ORG_TWITTER_HANDLE = ORG_TELEGRAM.replace("https://twitter.com/", "@")
 BOT_NAME = try_get(BOT_CONFIG, "name")
 BOT_SHORT_FOR = try_get(BOT_CONFIG, "short_for")
 BOT_JOB = try_get(BOT_CONFIG, "job")
+<<<<<<< Updated upstream
+=======
+BOT_SQUAWKS = try_get(BOT_CONFIG, "")
+BOT_HELP_MENU = try_get(BOT_CONFIG, "")
+BOT_INTRODUCTION = try_get(BOT_CONFIG, "")
+BOT_OPENAI_MODEL = try_get(BOT_CONFIG, "")
+BOT_RULES = try_get(BOT_CONFIG, "")
+'''
+OPENAI_MODEL: str = ""
+THE_ARCHITECT_ID: int = 1711738045
+THE_ARCHITECT_USERNAME: str = "nonni_io"
+THE_ARCHITECT_HANDLE: str = f"@{THE_ARCHITECT_USERNAME}"
+
+HELP_MENU = """You can interact with me by sending these commands:
+
+*About Me*
+/help \- return detailed command list and how to use them
+/rules \- return rules list for how to interact with Abbot
+
+*Manage Me*
+/start \- start Abbot in group
+/stop \- stops Abbot in group
+
+*Manage Paying Me*
+/balance \- return group balance in USD and SATs
+/fund \- return an invoice ⚡️ to topup your balance
+/cancel \- cancel the most recently requested invoice"""
+RULES = """To get me to respond to your messages, you must have a positive SAT balance \& take one of these actions
+
+🤖 Tag my handle \@atl\_bitlab\_bot in your group message
+🤖 Reply directly to my group message
+🤖 Slide into my DMs to chat directly
+⚡️ I work for SATs\! New groups get 50\,000 *_FREE_* sats
+⚡️ To keep your SATs above 0, use /fund to get an invoice
+
+Want more details about me? Checkout my website: https\:\/\/abbot\.atlbitlab\.com\/"""
+INTRODUCTION = f"""What up fam, the name\'s Abbot but you can think of me as your go\-to guide for all things Bitcoin 🟠\n\n{RULES}\nNow\, enough with the rules\! Let\'s dive into the world of Bitcoin together\! Ready\. Set\. Stack Sats\! 🚀"""
+RELAYS = [
+    "wss://relay1.nostrchat.io",
+    "wss://relay2.nostrchat.io",
+    "wss://relay.damus.io",
+    "wss://nos.lol",
+    "wss://relay.primal.net",
+    "wss://relay.snort.social",
+    "wss://nostr.atlbitlab.com",
+]
+'''
+
+
+>>>>>>> Stashed changes
 BOT_TELEGRAM = try_get(BOT_CONFIG, "telegram")
 BOT_TELEGRAM_USERNAME = try_get(BOT_TELEGRAM, "username")
 BOT_TELEGRAM_USER_ID = try_get(BOT_TELEGRAM, "user_id")

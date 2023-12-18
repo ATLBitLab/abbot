@@ -1,4 +1,4 @@
-from cli_args import DEV_MODE, LOG_MODE
+from bot_args import DEV_MODE, LOG_MODE
 from typing import Optional
 from os.path import abspath
 from datetime import datetime

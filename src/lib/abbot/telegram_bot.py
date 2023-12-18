@@ -19,17 +19,6 @@ from telegram.constants import MessageEntityType, ParseMode
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler
 from telegram.ext.filters import ChatType, StatusUpdate, Regex, Entity, Mention, UpdateFilter, UpdateType, REPLY
 
-from constants import (
-    ABBOT_SQUAWKS,
-    HELP_MENU,
-    INTRODUCTION,
-    OPENAI_MODEL,
-    RULES,
-    SATOSHIS_PER_BTC,
-    THE_ARCHITECT_ID,
-    THE_ARCHITECT_USERNAME,
-    THE_ARCHITECT_HANDLE,
-)
 from ..abbot.config import (
     BOT_GROUP_CONFIG_DEFAULT,
     BOT_GROUP_CONFIG_STARTED,
@@ -44,6 +33,15 @@ from ..abbot.config import (
     ORG_OUTPUT_TOKEN_COST,
     ORG_PER_TOKEN_COST_DIV,
     ORG_TOKEN_COST_MULT,
+    BOT_SQUAWKS,
+    HELP_MENU,
+    INTRODUCTION,
+    OPENAI_MODEL,
+    RULES,
+    SATOSHIS_PER_BTC,
+    THE_ARCHITECT_ID,
+    THE_ARCHITECT_USERNAME,
+    THE_ARCHITECT_HANDLE,
 )
 
 MARKDOWN_V2 = ParseMode.MARKDOWN_V2

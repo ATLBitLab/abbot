@@ -1,6 +1,6 @@
-from cli_args import DEV_MODE, TEST_MODE, TELEGRAM_MODE, NOSTR_MODE
-from lib.abbot.exceptions.exception import AbbotException
 from lib.logger import debug_bot
+from lib.abbot.exceptions.exception import AbbotException
+from bot_args import DEV_MODE, TEST_MODE, TELEGRAM_MODE, NOSTR_MODE
 
 # from lib.abbot.nostr_bot import NostrBotBuilder
 from lib.abbot.telegram_bot import TelegramBotBuilder

@@ -49,10 +49,14 @@
         "name": "Abbot",
         "short_for": "ATL BitLab Bot",
         "job": "helpful bitcoin bot and software engineer",
+        "squawk": -1002139786317,
+        "llm": {
+            "kind": "openai",
+            "model": "gpt-4-1106-preview"
+        },
         "telegram": {
             "username": "atl_bitlab_bot",
             "user_id": 6142365892,
-            "context": "online telegram group chat",
             "support_contact": "nonni_io"
         },
         "lightning": {
