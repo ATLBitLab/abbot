@@ -16,7 +16,7 @@ KOOLAID_GIF_FILEPATH = abspath("src/assets/koolaid.gif")
 # packages
 from telegram import Bot, Update, Message, Chat, User
 from telegram.constants import MessageEntityType, ParseMode
-from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, BaseHandler
+from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler
 from telegram.ext.filters import ChatType, StatusUpdate, Regex, Entity, Mention, UpdateFilter, UpdateType, REPLY
 
 from constants import (
@@ -49,9 +49,9 @@ from ..abbot.config import (
 MARKDOWN_V2 = ParseMode.MARKDOWN_V2
 MENTION = MessageEntityType.MENTION
 
-GROUPS = ChatType.GROUPS
-GROUP = ChatType.GROUP
-PRIVATE = ChatType.PRIVATE
+CHAT_TYPE_GROUPS = ChatType.GROUPS
+CHAT_TYPE_GROUP = ChatType.GROUP
+CHAT_TYPE_PRIVATE = ChatType.PRIVATE
 CHAT_CREATED = StatusUpdate.CHAT_CREATED
 NEW_CHAT_MEMBERS = StatusUpdate.NEW_CHAT_MEMBERS
 LEFT_CHAT_MEMEBERS = StatusUpdate.LEFT_CHAT_MEMBER
@@ -242,7 +242,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         update_data: Dict = try_get(response, "data")
         debug_bot.log(log_name, f"update_data={update_data}")
         message: Message = try_get(update_data, "message")
-        await message.reply_markdown_v2(f"{HELP_MENU}")
+        await message.reply_markdown_v2(HELP_MENU)
     except AbbotException as abbot_exception:
         return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=f"{log_name}: {abbot_exception}")
 
@@ -256,7 +256,7 @@ async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
         update_data: Dict = try_get(response, "data")
         debug_bot.log(log_name, f"update_data={update_data}")
         message: Message = try_get(update_data, "message")
-        await message.reply_markdown_v2(RULES)
+        await message.reply_markdown_v2(RULES, disable_web_page_preview=True)
     except AbbotException as abbot_exception:
         return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=f"{log_name}: {abbot_exception}")
 
@@ -1219,8 +1219,11 @@ class TelegramBotBuilder:
         # Add command handlers
         telegram_bot.add_handlers(
             handlers=[
-                MessageHandler(GROUPS & (NEW_CHAT_MEMBERS | CHAT_CREATED), handle_chat_creation_members_added),
-                MessageHandler(UpdateFilter(GROUPS & MESSAGE_OR_EDITED), handle_edited),
+                MessageHandler(CHAT_TYPE_PRIVATE, handle_dm),
+                MessageHandler(
+                    CHAT_TYPE_GROUPS & (NEW_CHAT_MEMBERS | CHAT_CREATED), handle_chat_creation_members_added
+                ),
+                MessageHandler(UpdateFilter(CHAT_TYPE_GROUPS & MESSAGE_OR_EDITED), handle_edited),
             ]
         )
 
@@ -1228,8 +1231,8 @@ class TelegramBotBuilder:
             handlers=[
                 CommandHandler("help", help),
                 CommandHandler("rules", rules),
-                CommandHandler("start", start),
-                CommandHandler("stop", stop),
+                CommandHandler("start", start, CHAT_TYPE_GROUPS),
+                CommandHandler("stop", stop, CHAT_TYPE_GROUPS),
                 CommandHandler("balance", balance),
                 CommandHandler("fund", fund),
                 CommandHandler("cancel", fund_cancel),
@@ -1238,11 +1241,10 @@ class TelegramBotBuilder:
 
         telegram_bot.add_handlers(
             handlers=[
-                MessageHandler(PRIVATE, handle_dm),
-                MessageHandler(GROUPS & FILTER_MENTION_ABBOT, handle_group_mention),
-                MessageHandler(GROUPS & REPLY, handle_group_reply),
-                MessageHandler(GROUPS & LEFT_CHAT_MEMEBERS, handle_bot_kicked),
-                MessageHandler(GROUPS, handle_default_group),
+                MessageHandler(CHAT_TYPE_GROUPS & FILTER_MENTION_ABBOT, handle_group_mention),
+                MessageHandler(CHAT_TYPE_GROUPS & REPLY, handle_group_reply),
+                MessageHandler(CHAT_TYPE_GROUPS & LEFT_CHAT_MEMEBERS, handle_bot_kicked),
+                MessageHandler(CHAT_TYPE_GROUPS, handle_default_group),
             ]
         )
         telegram_bot.add_error_handler(error_handler)

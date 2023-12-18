@@ -7,12 +7,13 @@ from httpx import Response
 from bson.typings import _DocumentType
 from pymongo.results import InsertOneResult
 
+from constants import SATOSHIS_PER_BTC
+
 from lib.db.mongo import mongo_abbot
 from lib.logger import debug_bot, error_bot
 from lib.db.utils import successful_insert_one
 from lib.abbot.env import PAYMENT_PROCESSOR_KIND, PRICE_PROVIDER_KIND, LNBITS_BASE_URL
 from lib.utils import error, safe_cast_to_int, success, successful_response, try_get
-from src.constants import SATOSHIS_PER_BTC
 
 
 def init_payment_processor():

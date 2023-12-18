@@ -28,11 +28,13 @@ RULES: str = """To get me to respond to your messages, you must have a positive 
 🤖 Tag my handle \@atl\_bitlab\_bot in your group message
 🤖 Reply directly to my group message
 🤖 Slide into my DMs to chat directly
-🤖 I get paid in SATs ⚡️ New groups get 50\,000 *_FREE_* sats\!
-🤖 Topup your balance by running /fund for an invoice ⚡️
+⚡️ I work for SATs\! New groups get 50\,000 *_FREE_* sats
+⚡️ To keep your SATs above 0, use /fund to get an invoice
+
+Want more details about me? Checkout my website: https\:\/\/abbot\.atlbitlab\.com\/
 """
 
-INTRODUCTION: str = f"""Hey! The name's Abbot but you can think of me as your go-to guide for all things Bitcoin. AKA the virtual Bitcoin whisperer 😉\n\nHere's the lowdown on how to get my attention:\n\n{RULES}\n\nNow, enough with the rules! Let's dive into the world of Bitcoin together! Ready. Set. Stack Sats! 🚀"""
+INTRODUCTION: str = f"""What up fam, the name\'s Abbot but you can think of me as your go\-to guide for all things Bitcoin 🟠\n\n{RULES}\nNow\, enough with the rules\! Let\'s dive into the world of Bitcoin together\! Ready\. Set\. Stack Sats\! 🚀"""
 SECONDARY_INTRODUCTION: str = """👋 Whats up, my fellow bitcoiners!? My name is Abbot! I'm part of the ATL BitLab fam - your go-to spot for all things Bitcoin and Lightning in Atlanta - and I'm here to party nakamoto-style! Consider me your bitcoin concierge. Hmu anytime by tagging me (@atl_bitlab_bot) in your post or replying to my messages. Now, let's stack some sats and chat about bitcoin! 😎💻"""
 RELAYS: List[str] = [
     "wss://relay1.nostrchat.io",
