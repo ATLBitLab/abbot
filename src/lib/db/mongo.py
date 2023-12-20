@@ -247,8 +247,12 @@ class MongoAbbot(MongoNostr, MongoTelegram):
         return try_get(dm, "history", default=[])
 
     def group_does_exist(self, filter) -> int:
-        group: TelegramGroup = self.find_one_dm(filter)
+        group: TelegramGroup = self.find_one_group(filter)
         return group != None
+
+    def dm_does_exist(self, filter) -> int:
+        dm: TelegramDM = self.find_one_dm(filter)
+        return dm != None
 
 
 db_name = "telegram" if TELEGRAM_MODE else "nostr"

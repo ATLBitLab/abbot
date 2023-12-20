@@ -19,9 +19,9 @@ FILE_NAME = __name__
 
 @to_dict
 class Abbot(GroupConfig):
-    from lib.abbot.env import OPENAI_API_KEY
+    from ..abbot.env import OPENAI_API_KEY, OPENAI_ORG_ID
 
-    client: OpenAI = OpenAI(api_key=OPENAI_API_KEY)
+    client: OpenAI = OpenAI(organization=OPENAI_ORG_ID, api_key=OPENAI_API_KEY)
 
     def __init__(self, id: str, bot_type: str, history: List):
         log_name: str = f"{__name__}: Abbot.__init__():"
