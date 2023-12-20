@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { ReactNode, useState } from "react";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,6 +13,29 @@ import abbot from "@/public/abbot.jpg";
 import quickAdd from "@/public/quickadd.png"
 
 import ChannelForm from "@/components/ChannelForm";
+
+const estBlock = "https://mempool.space/block/000000000000000000000f9b0f09e68af01ae61e6f96659d992a3618ca850dec";
+const atlBitLabDotCom = "https://atlbitlab.com";
+const linkClasses = "text-[#0398B8] underline";
+
+interface AbbotLinkProps {
+  href: string;
+  className?: string;
+  children: ReactNode;
+}
+
+const AbbotLink = (props: AbbotLinkProps) => {
+  return (
+    <Link
+      target="_blank"
+      rel="noreferrer"
+      href={props.href}
+      className={props.className ?? linkClasses}
+    >
+      {props.children}
+    </Link>
+  )
+}
 
 export default function Abbot() {
   const router = useRouter();
@@ -77,12 +100,12 @@ export default function Abbot() {
           Meet Abbot: the helpful Atlanta bitcoiner bot | ATL BitLab
         </title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/atl-bitlab-favicon.png" />
+        <link rel="icon" href="/favicon.ico" />
 
         <meta property="og:title" content="Abbot" />
         <meta
           property="og:image"
-          content="https://atlbitlab.com/abbot/abbot.jpg"
+          content="/abbot.jpg"
         />
         <meta property="og:site_name" content="Telegram" />
         <meta
@@ -93,7 +116,7 @@ export default function Abbot() {
         <meta property="twitter:title" content="Abbot" />
         <meta
           property="twitter:image"
-          content="https://atlbitlab.com/abbot/abbot.jpg"
+          content="/abbot.jpg"
         />
         <meta property="twitter:site" content="@Telegram" />
 
@@ -148,14 +171,17 @@ export default function Abbot() {
             <li>
               <a target="_blank" rel="noreferrer" href="https://primal.net/p/npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk">🟣</a>
             </li>
-            <li>
-              <a target="_blank" rel="noreferrer" href="http://eepurl.com/iii9tv">⚡️</a>
-            </li>
+            {/* <li>
+              <a target="_blank" rel="noreferrer" href="abbot@atlbitlab.com">⚡️</a>
+            </li> */}
             <li>
               <a target="_blank" rel="noreferrer" href="mailto:abbot@atlbitlab.com">📧</a>
             </li>
             <li>
-              <a target="_blank" rel="noreferrer" href="https://github.com/ATLBitLabBot">💻</a>
+              <a target="_blank" rel="noreferrer" href="https://github.com/ATLBitLabBot/me">💻</a>
+            </li>
+            <li>
+              <a target="_blank" rel="noreferrer" href="/bitcoin.pdf">🥚</a>
             </li>
           </ul>
         </div>
@@ -170,8 +196,9 @@ export default function Abbot() {
             </a>
             <h4>Sup fam, I&apos;m Abbot</h4>
             <h5>
-              I&apos;m a helpful bitcoiner bot from Atlanta created by ATL
-              BitLab. Est. block 797812.
+              I&apos;m a helpful bitcoiner bot from Atlanta created by <AbbotLink href={atlBitLabDotCom}>ATL BitLab</AbbotLink>
+              <br />
+              Est. block <AbbotLink href={estBlock}>797812</AbbotLink>
             </h5>
             <Button
               className="w-full border-[#08252E] border-2 px-8 mt-4"
@@ -293,15 +320,15 @@ function TelegramInstructions() {
           <li>
             For help, visit the
             {" "}
-            <Link href={"/help"} className="text-blue-600 underline">
+            <AbbotLink href={"/help"}>
               help
-            </Link>
+            </AbbotLink>
             {" "}
             page or contact
             {" "}
-            <Link className="text-blue-600 underline" href="https://t.me/nonni_io">
+            <AbbotLink href="https://t.me/nonni_io">
               @nonni_io
-            </Link>
+            </AbbotLink>
             {" "}
             on Telegram</li>
         </ul>
@@ -325,6 +352,11 @@ function ChannelInteraction({
 }: any) {
   const isTelegram = platform === "telegram";
 
+  const openUrlInNewTab = (url: string) => window.open(url, "_blank");
+  const nostrChatURL = "https://www.nostrchat.io/dm/npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk";
+  const tgAbbotURL = "tg://resolve?domain=atl_bitlab_bot";
+
+  const handleSetChannelMode = () => setChannelMode(true)
 
   return (
     <>
@@ -333,12 +365,9 @@ function ChannelInteraction({
           className="w-full border-[#08252E] border-2 mr-1"
           type="button"
           onClick={() => {
-            if (isTelegram) {
-              window.location.href = "tg://resolve?domain=atl_bitlab_bot";
-            } else {
-              window.location.href =
-                "https://www.nostrchat.io/dm/npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk";
-            }
+            if (!isTelegram)
+              return openUrlInNewTab(nostrChatURL)
+            openUrlInNewTab(tgAbbotURL);
           }}
         >
           {isTelegram ? "DM 🤖" : "DM 🟣"}
@@ -346,7 +375,7 @@ function ChannelInteraction({
         <Button
           className={`w-full border-[#08252E] border-2 mr-1 ${channelMode ? "bg-[#08252E] text-white" : ""}`}
           type="button"
-          onClick={() => setChannelMode(true)}
+          onClick={handleSetChannelMode}
         >
           {isTelegram ? "Group Chat 🤖" : "Channel 🟣"}
         </Button>
@@ -361,8 +390,7 @@ function ChannelInteraction({
                   type="button"
                   onClick={() => {
                     if (!isTelegram) {
-                      return window.location.href =
-                        "https://www.nostrchat.io/dm/npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk";
+                      return
                     }
                     setManualAddIsClicked(false);
                     setTelegramAddIsClicked(true);
@@ -392,8 +420,8 @@ function ChannelInteraction({
             )
           }
 
-          {manualAddIsClicked && <ManualInstructions />}
-          {telegramAddIsClicked && <TelegramInstructions />}
+          {isTelegram && manualAddIsClicked ? <ManualInstructions /> : <></>}
+          {isTelegram && telegramAddIsClicked ? <TelegramInstructions /> : <></>}
         </>
       )}
     </>
