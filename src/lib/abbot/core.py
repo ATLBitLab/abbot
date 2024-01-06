@@ -29,8 +29,8 @@ class Abbot(GroupConfig):
         self.id: str = id
         self.bot_type: str = bot_type
         self.history: List = history
-        self.history_tokens: int = 0
         self.history_len: int = len(history)
+        self.history_tokens: int = self.calculate_history_tokens(history)
         if bot_type == "group":
             self.config: GroupConfig = GroupConfig()
 
@@ -108,13 +108,14 @@ class Abbot(GroupConfig):
     def calculate_tokens(self, content: str) -> int:
         return len(self.tokenize(content))
 
-    def calculate_history_tokens(self) -> int:
+    def calculate_history_tokens(self, history=None) -> int:
         log_name: str = f"{FILE_NAME}: calculate_history_tokens"
+        debug_bot.log(log_name, f"history={history}")
         total = 0
-        for data in self.history:
-            debug_bot.log(log_name, f"data={data}")
+        if not history:
+            history = self.history
+        for data in history:
             content = try_get(data, "content")
-            debug_bot.log(log_name, f"content={content}")
             if not content:
                 continue
             total += self.calculate_tokens(content)

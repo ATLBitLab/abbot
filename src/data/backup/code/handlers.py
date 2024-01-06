@@ -15,7 +15,7 @@ from lib.abbot.exceptions.exception import try_except, AbbotException
 from lib.abbot.config import BOT_CORE_SYSTEM, BOT_NAME, BOT_TELEGRAM_HANDLE, ORG_TELEGRAM_HANDLE
 from lib.abbot.utils import (
     parse_chat,
-    parse_chat_data,
+    parse_group_chat_data,
     parse_message,
     parse_message_data,
     parse_user,
@@ -102,7 +102,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not successful(response):
         error_message = try_get(message, "data")
         return await squawk_error(error_message, context)
-    chat_data: dict = parse_chat_data(chat)
+    chat_data: dict = parse_group_chat_data(chat)
     chat_id: int = try_get(chat_data, "id")
     chat_type: str = try_get(chat_data, "type")
     is_private_chat = chat_type == "private"
@@ -224,7 +224,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user: User = parse_user(message)
     user_data: dict = parse_user_data(user)
     message_data: dict = parse_message_data(message)
-    chat_data: dict = parse_chat_data(chat)
+    chat_data: dict = parse_group_chat_data(chat)
     # log all data for debugging
     all_data: dict = dict(**message_data, **chat_data, **user_data)
     for k, v in all_data.items():
@@ -247,7 +247,7 @@ async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not successful(response):
         data = chat
         return await squawk_error(data, context)
-    chat_data: dict = parse_chat_data(chat)
+    chat_data: dict = parse_group_chat_data(chat)
     chat_id: int = try_get(chat_data, "id")
     chat_title: str = try_get(chat_data, "title")
     chat_type: str = try_get(chat_data, "type")
@@ -304,7 +304,7 @@ async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message_data: dict = parse_message_data(message)
 
     chat: Chat = parse_chat(update, message)
-    chat_data: dict = parse_chat_data(chat)
+    chat_data: dict = parse_group_chat_data(chat)
     chat_id: int = try_get(chat_data, "id")
     chat_title: str = try_get(chat_data, "title")
     chat_type: str = try_get(chat_data, "type")
@@ -402,7 +402,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not successful(response):
         error_message = try_get(message, "data")
         return squawk_error(error_message, context)
-    chat_data: dict = parse_chat_data(chat)
+    chat_data: dict = parse_group_chat_data(chat)
     chat_id: int = try_get(chat_data, "id")
     chat_type: str = try_get(chat_data, "type")
     is_private_chat = chat_type == "private"

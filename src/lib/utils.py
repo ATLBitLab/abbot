@@ -195,7 +195,7 @@ def success(msg: str = "", **kwargs) -> Dict:
     return dict(status="success", msg=msg, **kwargs)
 
 
-def successful(response: Dict, data: Optional[Any] = None) -> bool:
+def successful(response: Dict) -> bool:
     return response["status"] == "success"
 
 

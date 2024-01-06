@@ -1,5 +1,5 @@
 from typing import List
-
+from os.path import abspath
 
 CONFIG_JSON_FILEPATH: str = "src/data/config.json"
 OPENAI_MODEL: str = "gpt-4-1106-preview"
@@ -8,20 +8,19 @@ THE_ARCHITECT_USERNAME: str = "nonni_io"
 THE_ARCHITECT_HANDLE: str = f"@{THE_ARCHITECT_USERNAME}"
 ABBOT_SQUAWKS: int = -1002139786317
 SATOSHIS_PER_BTC: int = 100000000
-HELP_MENU = """You can interact with me by sending these commands:
+HELP_MENU = """You can interact with me by sending these commands\:
 
 *About Me*
-/help \- return detailed command list and how to use them
-/rules \- return rules list for how to interact with Abbot
+/help \- returns detailed command list and how to use them
+/rules \- returns rules list for how to interact with Abbot
 
 *Manage Me*
-/start \- start Abbot in group
-/stop \- stops Abbot in group
+/start \- starts Abbot in a group chat
+/stop \- stops Abbot in group chat
 
-*Manage Paying Me*
-/balance \- return group balance in USD and SATs
-/fund \- return an invoice ⚡️ to topup your balance
-/cancel \- cancel the most recently requested invoice\n"""
+*Pay Me*
+/balance \- request group chat balance in USD & SATs
+/fund \- request invoice to topup group chat balance ⚡️\n"""
 
 RULES: str = """To get me to respond to your messages, you must have a positive SAT balance \& take one of these actions
 
@@ -46,3 +45,7 @@ RELAYS: List[str] = [
     "wss://relay.snort.social",
     "wss://nostr.atlbitlab.com",
 ]
+RAW_MESSAGE_JL_FILE = abspath("src/data/raw_messages.jsonl")
+MATRIX_IMG_FILEPATH = abspath("src/assets/unplugging_matrix.jpg")
+KOOLAID_GIF_FILEPATH = abspath("src/assets/koolaid.gif")
+ESCAPE_MARKDOWN_V2_CHARS = "_*[]()~`>#+-=|{}.!"

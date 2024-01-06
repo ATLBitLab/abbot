@@ -66,3 +66,5 @@ BOT_SYSTEM_OBJECT_GROUPS = {"role": "system", "content": BOT_SYSTEM_CORE_GROUPS}
 BOT_SYSTEM_OBJECT_DMS = {"role": "system", "content": BOT_SYSTEM_CORE_DMS}
 BOT_GROUP_CONFIG_DEFAULT = {"started": False, "introduced": False, "unleashed": False, "count": None}
 BOT_GROUP_CONFIG_STARTED = {"started": True, "introduced": True, "unleashed": False, "count": None}
+BOT_GROUP_CONFIG_STOPPED = {"started": False, "introduced": True, "unleashed": False, "count": None}
+BOT_GROUP_CONFIG_UNLEASHED = {"started": True, "introduced": True, "unleashed": True, "count": 5}

@@ -108,7 +108,7 @@ class TelegramGroup(GroupConfig):
         self.title: str = message.chat.title
         self.type: str = message.chat.type
         self.admins: List = admins
-        self.balance: int = 50000
+        self.balance: int = 5000
         self.messages = [message.to_dict()]
         self.history = [BOT_SYSTEM_OBJECT_GROUPS]
         self.config = GroupConfig(introduced=False, started=False, unleashed=False, count=None)

@@ -13,22 +13,6 @@ from lib.abbot.env import PAYMENT_PROCESSOR_KIND, PRICE_PROVIDER_KIND, LNBITS_BA
 from lib.utils import error, success, successful_response, try_get
 
 
-def init_payment_processor():
-    from lib.abbot.env import PAYMENT_PROCESSOR_TOKEN
-
-    available_processors = ["strike", "lnbits", "opennode"]
-    if PAYMENT_PROCESSOR_KIND is None or PAYMENT_PROCESSOR_KIND not in available_processors:
-        raise Exception(f"PAYMENT_PROCESSOR_KIND must be one of {', '.join(available_processors)}")
-    if not PAYMENT_PROCESSOR_TOKEN.strip():
-        raise Exception("PAYMENT_PROCESSOR_TOKEN must be a valid API token")
-    if PAYMENT_PROCESSOR_KIND == "strike":
-        return Strike(PAYMENT_PROCESSOR_TOKEN)
-    elif PAYMENT_PROCESSOR_KIND == "lnbits":
-        return LNbits(LNBITS_BASE_URL, PAYMENT_PROCESSOR_TOKEN)
-    elif PAYMENT_PROCESSOR_KIND == "opennode":
-        return OpenNode(PAYMENT_PROCESSOR_TOKEN)
-
-
 class PaymentProcessor(ABC):
     """
     An abstract class that all payment processors should implement.
@@ -92,10 +76,10 @@ class Strike(PaymentProcessor):
         debug_bot.log(__name__, f"strike => get_invoice => quote_data={quote_data}")
 
         return success(
-            message="Invoice created",
+            "Invoice created",
             invoice_id=invoice_id,
-            lnInvoice=try_get(quote_data, "lnInvoice"),
-            expirationInSec=try_get(quote_data, "expirationInSec"),
+            ln_invoice=try_get(quote_data, "lnInvoice"),
+            expiration_in_sec=try_get(quote_data, "expirationInSec"),
         )
 
     async def invoice_is_paid(self, invoice_id):
@@ -277,3 +261,19 @@ class Coinbase(Provider):
             error_message = f"{error_message} \n insert_result={insert_result}"
             error_bot.log(log_name, error_message)
         return success(data=price_doc, amount=try_get(price_doc, "amount"))
+
+
+def init_payment_processor() -> Strike | LNbits | OpenNode:
+    from lib.abbot.env import PAYMENT_PROCESSOR_TOKEN
+
+    available_processors = ["strike", "lnbits", "opennode"]
+    if PAYMENT_PROCESSOR_KIND is None or PAYMENT_PROCESSOR_KIND not in available_processors:
+        raise Exception(f"PAYMENT_PROCESSOR_KIND must be one of {', '.join(available_processors)}")
+    if not PAYMENT_PROCESSOR_TOKEN.strip():
+        raise Exception("PAYMENT_PROCESSOR_TOKEN must be a valid API token")
+    if PAYMENT_PROCESSOR_KIND == "strike":
+        return Strike(PAYMENT_PROCESSOR_TOKEN)
+    elif PAYMENT_PROCESSOR_KIND == "lnbits":
+        return LNbits(LNBITS_BASE_URL, PAYMENT_PROCESSOR_TOKEN)
+    elif PAYMENT_PROCESSOR_KIND == "opennode":
+        return OpenNode(PAYMENT_PROCESSOR_TOKEN)

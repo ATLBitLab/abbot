@@ -1,3 +1,4 @@
+from re import L
 from typing import Dict, List, Optional
 
 import tiktoken
@@ -5,7 +6,7 @@ from json import dumps
 from telegram.ext import ContextTypes
 from telegram import Message, Update, Chat, User
 
-from constants import OPENAI_MODEL, THE_ARCHITECT_ID
+from constants import ABBOT_SQUAWKS, OPENAI_MODEL, THE_ARCHITECT_ID
 
 from ..utils import success, successful, try_get, error
 from ..logger import debug_bot, error_bot
@@ -59,13 +60,22 @@ def parse_chat(message: Message, update: Update) -> Dict:
     return success(data=chat)
 
 
-def parse_chat_data(chat: Chat) -> Dict:
-    log_name: str = f"{FILE_NAME}: parse_chat_data"
+def parse_group_chat_data(chat: Chat) -> Dict:
+    log_name: str = f"{FILE_NAME}: parse_group_chat_data"
     chat_id: int = try_get(chat, "id")
     chat_title: str = try_get(chat, "title")
     chat_type: str = try_get(chat, "type")
     debug_bot.log(f"{log_name}: chat_id={chat_id} chat_title={chat_title} chat_type={chat_type}")
     return chat_id, chat_title, chat_type
+
+
+def parse_dm_chat_data(chat: Chat) -> Dict:
+    log_name: str = f"{FILE_NAME}: parse_dm_chat_data"
+    dm_user_id: int = try_get(chat, "id")
+    dm_username: str = try_get(chat, "username")
+    dm_first_name: str = try_get(chat, "first_name")
+    debug_bot.log(f"{log_name}: dm_user_id={dm_user_id} dm_username={dm_username} dm_first_name={dm_first_name}")
+    return dm_user_id, dm_username, dm_first_name
 
 
 def parse_user(message: Message, update: Update) -> Dict:
@@ -85,8 +95,10 @@ def parse_user_data(user: User) -> Dict:
     log_name: str = f"{FILE_NAME}: parse_user_data"
     user_id: int = try_get(user, "id")
     username: int = try_get(user, "username")
-    debug_bot.log(f"{log_name}: user_id={user_id} username={username}")
-    return user_id, username
+    first_name: int = try_get(user, "first_name")
+
+    debug_bot.log(f"{log_name}: user_id={user_id} username={username} first_name={first_name}")
+    return user_id, username, first_name
 
 
 async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Dict:
@@ -98,7 +110,7 @@ async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         error_data = try_get(response, "data")
         log_msg = f"response={response}\nerror_message={error_message}\nerror_data={error_data}"
         error_bot.log(log_name, log_msg)
-        await squawk_error(error_message, context)
+        await bot_squawk(error_message, context)
         return error(f"Parse message from update failed", data=error_message)
     message: Message = try_get(response, "data")
 
@@ -107,7 +119,7 @@ async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         error_message = try_get(response, "msg")
         error_data = try_get(response, "data")
         error_bot.log(log_name, f"response={response}\nerror_message={error_message}\nerror_data={error_data}")
-        await squawk_error(error_message, context)
+        await bot_squawk(error_message, context)
         return error(f"Failed to parse chat from update: {error_message}", data=error_data)
     chat: Chat = try_get(response, "data")
 
@@ -116,7 +128,7 @@ async def parse_update_data(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         error_message = try_get(response, "msg")
         error_data = try_get(response, "data")
         error_bot.log(log_name, f"response={response}\nerror_message={error_message}\nerror_data={error_data}")
-        await squawk_error(user, context)
+        await bot_squawk(user, context)
         return error(f"Failed to parse user from update: {error_message}", data=error_data)
     user: User = try_get(response, "data")
 
@@ -133,10 +145,16 @@ async def get_chat_admins(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -> D
     return chat_admin_data
 
 
-async def squawk_error(error_message: str, context: ContextTypes.DEFAULT_TYPE) -> Message:
-    log_name: str = f"{FILE_NAME}: squawk_error"
+async def bot_squawk_architect(error_message: str, context: ContextTypes.DEFAULT_TYPE) -> Message:
+    log_name: str = f"{FILE_NAME}: bot_squawk"
     error_bot.log(f"{log_name}: {error_message}")
     return await context.bot.send_message(chat_id=THE_ARCHITECT_ID, text=error_message)
+
+
+async def bot_squawk(abbot_squawk: str, context: ContextTypes.DEFAULT_TYPE) -> Message:
+    log_name: str = f"{FILE_NAME}: bot_squawk"
+    error_bot.log(f"{log_name}: {abbot_squawk}")
+    await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
 
 
 def calculate_tokens(history: List) -> int:
