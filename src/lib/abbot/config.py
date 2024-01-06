@@ -2,9 +2,9 @@ from cli_args import DEV_MODE, TEST_MODE
 
 from lib.utils import try_get
 from lib.utils import json_loader, try_get
-from constants import CONFIG_JSON_FILEPATH
 from lib.abbot.env import BOT_TELEGRAM_TOKEN, TEST_BOT_TELEGRAM_HANDLE
 
+CONFIG_JSON_FILEPATH: str = "src/data/config.json"
 ORG_CONFIG = json_loader(CONFIG_JSON_FILEPATH, "org")
 BOT_CONFIG = json_loader(CONFIG_JSON_FILEPATH, "bot")
 

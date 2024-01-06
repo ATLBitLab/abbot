@@ -1,9 +1,7 @@
 from typing import List
 from os.path import abspath
-
 from lib.abbot.config import BOT_TELEGRAM_HANDLE_MD
 
-CONFIG_JSON_FILEPATH: str = "src/data/config.json"
 OPENAI_MODEL: str = "gpt-4-1106-preview"
 THE_ARCHITECT_ID: int = 1711738045
 THE_ARCHITECT_USERNAME: str = "nonni_io"
