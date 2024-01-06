@@ -617,10 +617,16 @@ async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
         arg_count: str = try_get(message_text, 1)
         if not arg_count:
             arg_count: int = 5
-        if arg_count == 0:
-            return await message.reply_text(
-                "/unleash requires count > 0, use /leash to set to 0 & turn off unleash mode"
-            )
+        unleash_ex = "e.g. /unleash 10 allows me to response every 10th message"
+        unleash_disable = "to disable unleash mode, use /leash"
+        if arg_count < 0:
+            core_msg = "/unleash requires a positive integer for the count argument"
+            reply_msg = f"{core_msg} {unleash_ex} {unleash_disable}"
+            return await message.reply_text(reply_msg)
+        elif arg_count == 0:
+            core_msg = "/unleash requires count arg > 0"
+            reply_msg = f"{core_msg} {unleash_ex} {unleash_disable}"
+            return await message.reply_text(reply_msg)
 
         chat_id_filter = {"id": chat_id}
         group: TelegramGroup = mongo_abbot.find_one_group(chat_id_filter)
@@ -1066,7 +1072,11 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
 
         debug_bot.log(log_name, f"group={group}")
 
-        await message.reply_text(answer)
+        if "`" in answer:
+            answer = f"`{answer}`"
+            await message.reply_text(answer, parse_mode=MARKDOWN_V2, disable_web_page_preview=True)
+        else:
+            await message.reply_text(answer)
     except AbbotException as abbot_exception:
         await bot_squawk(f"{log_name}: {abbot_exception}", context)
 
@@ -1229,6 +1239,10 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 },
             )
             debug_bot.log(log_name, f"group={group}")
+        if "`" in answer:
+            answer = f"`{answer}`"
+            await message.reply_text(answer, parse_mode=MARKDOWN_V2, disable_web_page_preview=True)
+        else:
             await message.reply_text(answer)
     except AbbotException as abbot_exception:
         await bot_squawk(f"{log_name}: {abbot_exception}", context)
@@ -1461,7 +1475,11 @@ async def handle_group_default(update: Update, context: ContextTypes.DEFAULT_TYP
                     },
                 )
                 debug_bot.log(log_name, f"group={group}")
-                await message.reply_text(answer)
+                if "`" in answer:
+                    answer = f"`{answer}`"
+                    await message.reply_text(answer, parse_mode=MARKDOWN_V2, disable_web_page_preview=True)
+                else:
+                    await message.reply_text(answer)
     except AbbotException as abbot_exception:
         await bot_squawk(f"{log_name}: {abbot_exception}", context)
 

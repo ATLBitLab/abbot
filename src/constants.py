@@ -17,8 +17,10 @@ HELP_MENU = f"""You can interact with me by sending these commands\:
 /rules{BOT_TELEGRAM_HANDLE_MD} \- returns rules list for how to interact with Abbot
 
 *Manage Me*
-/start{BOT_TELEGRAM_HANDLE_MD} \- starts Abbot in a group chat
-/stop{BOT_TELEGRAM_HANDLE_MD} \- stops Abbot in group chat
+/start{BOT_TELEGRAM_HANDLE_MD} \- starts me in a group chat
+/stop{BOT_TELEGRAM_HANDLE_MD} \- stops me in group chat
+/unleash{BOT_TELEGRAM_HANDLE_MD} \- enables auto-response every N messages (default: 5)
+/leash{BOT_TELEGRAM_HANDLE_MD} \- disables auto-response every N messages (default: 0)
 
 *Pay Me*
 /balance{BOT_TELEGRAM_HANDLE_MD} \- request group chat balance in USD & SATs
@@ -29,9 +31,11 @@ RULES: str = """To get me to respond to your messages, you must have a positive 
 🤖 Tag my handle \@atl\_bitlab\_bot in your group message
 🤖 Reply directly to my group message
 🤖 Slide into my DMs to chat directly
-⚡️ Will work for SATs\! New groups get 50k *_FREE_* sats
+🤖 Use /unleash to let me auto\-respond
+⚡️ Will work for SATs\! New groups get 5k *_FREE_* sats
 ⚡️ To check your balance\, run /balance at any time
 ⚡️ Keep your SATs above 0 using /fund
+⚡️ Make your group more entertaining using /unleash
 
 Checkout my website for more details visit my [website](https\:\/\/abbot\.atlbitlab\.com\/)
 """
