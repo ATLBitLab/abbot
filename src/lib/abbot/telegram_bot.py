@@ -466,7 +466,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
             debug_bot.log(log_name, f"sats_remaining={sats_remaining}")
 
-            assistant_history_update = { "role": "assistant", "content": answer}
+            assistant_history_update = {"role": "assistant", "content": answer}
             group_history = abbot.get_history()
             token_count: int = calculate_tokens(group_history)
             group: TelegramGroup = mongo_abbot.find_one_group_and_update(
@@ -1207,16 +1207,18 @@ async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         dm_history: List = try_get(dm, "history")
         abbot = Abbot(chat_id, "dm", dm_history)
-        answer, input_tokens, output_tokens, total_tokens = abbot.chat_completion()
+        answer, _, _, _ = abbot.chat_completion()
 
         dm_history = abbot.get_history()
-        # calculate_tokens(dm_history)
         dm: TelegramDM = mongo_abbot.find_one_dm_and_update(
             chat_id_filter,
             {"$set": {"tokens": abbot.history_tokens}, "$push": {"history": {"role": "assistant", "content": answer}}},
         )
         if "`" in answer:
-            await message.reply_text(f"`{answer}`", parse_mode=MARKDOWN_V2, disable_web_page_preview=True)
+            answer = f"`{answer}`"
+            await message.reply_text(answer, parse_mode=MARKDOWN_V2, disable_web_page_preview=True)
+        else:
+            await message.reply_text(answer)
     except AbbotException as abbot_exception:
         await bot_squawk(f"{log_name}: {abbot_exception}", context)
 
