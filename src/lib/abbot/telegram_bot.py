@@ -638,12 +638,12 @@ async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
         group_config: Dict = mongo_abbot.get_group_config(chat_id_filter)
         unleashed: bool = try_get(group_config, "unleashed")
         count: bool = try_get(group_config, "count")
-        if unleashed and count != arg_count:
+        if not unleashed:
             group: TelegramGroup = mongo_abbot.find_one_group_and_update(
-                chat_id_filter, {"$set": {"config.count": arg_count}}
+                chat_id_filter, {"$set": {"config.unleashed": True, "config.count": arg_count}}
             )
 
-        await message.reply_text(f"Abbot has been unleashed to respond every {arg_count}")
+        await message.reply_text(f"Abbot has been unleashed to respond every {arg_count} messages")
     except AbbotException as abbot_exception:
         await bot_squawk(f"{log_name}: {abbot_exception}", context)
 
@@ -668,6 +668,14 @@ async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
         group: TelegramGroup = mongo_abbot.find_one_group(chat_id_filter)
         if not group:
             return await message.reply_text(f"{no_group_error} - Did you run /start{BOT_TELEGRAM_HANDLE}?")
+        group_config: Dict = mongo_abbot.get_group_config(chat_id_filter)
+        unleashed: bool = try_get(group_config, "unleashed")
+        if unleashed:
+            group: TelegramGroup = mongo_abbot.find_one_group_and_update(
+                chat_id_filter, {"$set": {"config.unleashed": False, "config.count": 0}}
+            )
+
+        await message.reply_text(f"Abbot has been leashed to not respond on message count")
     except AbbotException as abbot_exception:
         await bot_squawk(f"{log_name}: {abbot_exception}", context)
 
