@@ -56,6 +56,7 @@ BOT_DIRECTIVE = try_get(BOT_SYSTEM, "directive")
 BOT_NAME = f"t{BOT_NAME}" if TEST_MODE or DEV_MODE else BOT_NAME
 BOT_TELEGRAM_USERNAME = f"test_{BOT_TELEGRAM_USERNAME}" if TEST_MODE or DEV_MODE else BOT_TELEGRAM_USERNAME
 BOT_TELEGRAM_HANDLE = f"@{BOT_TELEGRAM_USERNAME}"
+BOT_TELEGRAM_HANDLE_MD = f"\@{BOT_TELEGRAM_USERNAME}"
 BOT_TELEGRAM_TOKEN = TEST_BOT_TELEGRAM_HANDLE if TEST_MODE or DEV_MODE else BOT_TELEGRAM_TOKEN
 
 BOT_INTRO = f"Your name is {BOT_NAME}, which is short for {BOT_SHORT_FOR}, your telegram handle is {BOT_TELEGRAM_HANDLE}. You answer to Abbot. You are part of {ORG_NAME} - {ORG_DESCRIPTION} and you are an expert in all things {ORG_LOCATION}, {ORG_NAME} and Bitcoin and Lightning Network. {BOT_DIRECTIVE}"
@@ -64,7 +65,7 @@ BOT_SYSTEM_CORE_GROUPS = f"{BOT_SYSTEM_GROUP}. {BOT_INTRO}. {BOT_SYSTEM_CORE}"
 
 BOT_SYSTEM_OBJECT_GROUPS = {"role": "system", "content": BOT_SYSTEM_CORE_GROUPS}
 BOT_SYSTEM_OBJECT_DMS = {"role": "system", "content": BOT_SYSTEM_CORE_DMS}
-BOT_GROUP_CONFIG_DEFAULT = {"started": False, "introduced": False, "unleashed": False, "count": None}
-BOT_GROUP_CONFIG_STARTED = {"started": True, "introduced": True, "unleashed": False, "count": None}
-BOT_GROUP_CONFIG_STOPPED = {"started": False, "introduced": True, "unleashed": False, "count": None}
-BOT_GROUP_CONFIG_UNLEASHED = {"started": True, "introduced": True, "unleashed": True, "count": 5}
+BOT_GROUP_CONFIG_DEFAULT = {"started": False, "introduced": False, "unleashed": False, "count": 0}
+BOT_GROUP_CONFIG_STARTED = {"started": True, "introduced": True, "unleashed": False, "count": 0}
+BOT_GROUP_CONFIG_STOPPED = {"started": False, "introduced": True, "unleashed": False, "count": 0}
+BOT_GROUP_CONFIG_STARTED_UNLEASHED = {"started": True, "introduced": True, "unleashed": True, "count": 5}

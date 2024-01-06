@@ -42,6 +42,7 @@ from constants import (
 from ..abbot.config import (
     BOT_GROUP_CONFIG_DEFAULT,
     BOT_GROUP_CONFIG_STARTED,
+    BOT_GROUP_CONFIG_STARTED_UNLEASHED,
     BOT_GROUP_CONFIG_STOPPED,
     BOT_LIGHTNING_ADDRESS,
     BOT_SYSTEM_OBJECT_GROUPS,
@@ -374,7 +375,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if chat_type == "private":
             return await message.reply_text("/start is disabled in DMs. Feel free to chat at will!")
         user: User = try_get(update_data, "user")
-        user_id, username, first_name = parse_user_data(user)
+        _, username, _ = parse_user_data(user)
 
         if chat_type in ("group", "supergroup", "channel"):
             admins: Any = [admin.to_dict() for admin in await chat.get_administrators()] or []
@@ -397,7 +398,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     "balance": 5000,
                     "messages": [new_message_dict],
                     "history": [BOT_SYSTEM_OBJECT_GROUPS, intro_history_dict, new_history_dict],
-                    "config": BOT_GROUP_CONFIG_STARTED,
+                    "config": BOT_GROUP_CONFIG_STARTED_UNLEASHED,
                 }
             }
             group: TelegramGroup = mongo_abbot.find_one_group_and_update(chat_id_filter, group_update)
@@ -409,7 +410,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     "id": chat_id,
                     "type": chat_type,
                     "admins": admins,
-                    "config": BOT_GROUP_CONFIG_STARTED,
+                    "config": BOT_GROUP_CONFIG_STARTED_UNLEASHED,
                 },
                 "$push": {
                     "messages": new_message_dict,
@@ -589,6 +590,78 @@ async def balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
         usd_balance_msg = f"💰 *USD Balance*\: {usd_balance} USD 💰"
         balance_msg = f"{group_msg}\n{sats_balance_msg}\n{usd_balance_msg}".replace(".", "\.")
         return await message.reply_markdown_v2(balance_msg)
+    except AbbotException as abbot_exception:
+        await bot_squawk(f"{log_name}: {abbot_exception}", context)
+
+
+async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        log_name: str = f"{FILE_NAME}: unleash"
+        response: Dict = await parse_update_data(update, context)
+        if not successful(response):
+            debug_bot.log(log_name, f"Failed to parse_update_data response={response}")
+
+        update_data: Dict = try_get(response, "data")
+        debug_bot.log(log_name, f"update_data={update_data}")
+
+        message: Message = try_get(update_data, "message")
+        message_text, message_date = parse_message_data(message)
+        debug_bot.log(log_name, f"message_text={message_text} message_date={message_date}")
+        message_text: str = message_text.split()
+
+        chat: Chat = try_get(update_data, "chat")
+        chat_id, _, chat_type = parse_group_chat_data(chat)
+        if chat_type == "private":
+            return await message.reply_text("/unleash is disabled in DMs. Feel free to chat at will!")
+
+        arg_count: str = try_get(message_text, 1)
+        if not arg_count:
+            arg_count: int = 5
+        if arg_count == 0:
+            return await message.reply_text(
+                "/unleash requires count > 0, use /leash to set to 0 & turn off unleash mode"
+            )
+
+        chat_id_filter = {"id": chat_id}
+        group: TelegramGroup = mongo_abbot.find_one_group(chat_id_filter)
+        if not group:
+            return await message.reply_text(f"{no_group_error} - Did you run /start{BOT_TELEGRAM_HANDLE}?")
+        current_sats: int = try_get(group, "balance")
+        if current_sats == 0:
+            return await message.reply_text(f"You group SAT balance is 0. Please run /fund to topup.")
+        group_config: Dict = mongo_abbot.get_group_config(chat_id_filter)
+        unleashed: bool = try_get(group_config, "unleashed")
+        count: bool = try_get(group_config, "count")
+        if unleashed and count != arg_count:
+            group: TelegramGroup = mongo_abbot.find_one_group_and_update(
+                chat_id_filter, {"$set": {"config.count": arg_count}}
+            )
+
+        await message.reply_text(f"Abbot has been unleashed to respond every {arg_count}")
+    except AbbotException as abbot_exception:
+        await bot_squawk(f"{log_name}: {abbot_exception}", context)
+
+
+async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        log_name: str = f"{FILE_NAME}: leash"
+        response: Dict = await parse_update_data(update, context)
+        if not successful(response):
+            debug_bot.log(log_name, f"Failed to parse_update_data response={response}")
+
+        update_data: Dict = try_get(response, "data")
+        debug_bot.log(log_name, f"update_data={update_data}")
+
+        message: Message = try_get(update_data, "message")
+        chat: Chat = try_get(update_data, "chat")
+        chat_id, _, chat_type = parse_group_chat_data(chat)
+        if chat_type == "private":
+            return await message.reply_text("/leash is disabled in DMs. Feel free to chat at will!")
+
+        chat_id_filter = {"id": chat_id}
+        group: TelegramGroup = mongo_abbot.find_one_group(chat_id_filter)
+        if not group:
+            return await message.reply_text(f"{no_group_error} - Did you run /start{BOT_TELEGRAM_HANDLE}?")
     except AbbotException as abbot_exception:
         await bot_squawk(f"{log_name}: {abbot_exception}", context)
 
@@ -1342,7 +1415,53 @@ async def handle_group_default(update: Update, context: ContextTypes.DEFAULT_TYP
         group_id: int = try_get(group, "id")
         group_title: str = try_get(group, "title")
         msg = f"Existing group updated:\n\ngroup_id={group_id}\ngroup_title={group_title}"
-        return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=msg)
+        await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=msg)
+
+        group_config: Dict = try_get(group, "config")
+        unleashed: Dict = try_get(group_config, "unleashed")
+        count: Dict = try_get(group_config, "count")
+        if unleashed and count > 0:
+            abbot = Abbot(chat_id, chat_type, group_history)
+            if abbot.history_len % count == 0:
+                current_sats: TelegramGroup = mongo_abbot.get_group_balance(chat_id_filter)
+                if current_sats == 0:
+                    return
+                debug_bot.log(log_name, f"current_sats={current_sats}")
+
+                answer, input_tokens, output_tokens, _ = abbot.chat_completion()
+
+                response: Dict = await recalc_balance_sats(input_tokens, output_tokens, current_sats, context.bot)
+                sats_remaining: int = try_get(response, "data")
+                if not successful(response):
+                    sub_log_name = f"{log_name}: recalc_balance_sats"
+                    error_bot.log(log_name, f"response={response}")
+                    msg = f"{sub_log_name}: Failed to calculate remaining sats"
+                    error_bot.log(log_name, msg)
+                    error_bot.log(log_name, f"current_sats={current_sats}\nresponse={response}")
+                    error_bot.log(log_name, f"chat_id={chat_id}\nchat_title={chat_title}")
+                    await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=msg)
+
+                if not sats_remaining and current_sats > 0:
+                    sats_remaining = current_sats - 250
+                else:
+                    sats_remaining = 0
+                    abbot_squawk = f"Group balance: {current_sats}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
+                    answer = f"{answer}\n\n Note: You group is now out of SATs. Please run /fund to topup."
+                    debug_bot.log(log_name, abbot_squawk)
+                    await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
+                debug_bot.log(log_name, f"sats_remaining={sats_remaining}")
+
+                token_count: int = abbot.calculate_history_tokens()
+                assistant_history_update = {"role": "assistant", "content": answer}
+                group: TelegramGroup = mongo_abbot.find_one_group_and_update(
+                    chat_id_filter,
+                    {
+                        "$set": {"balance": sats_remaining, "tokens": token_count},
+                        "$push": {"history": assistant_history_update},
+                    },
+                )
+                debug_bot.log(log_name, f"group={group}")
+                await message.reply_text(answer)
     except AbbotException as abbot_exception:
         await bot_squawk(f"{log_name}: {abbot_exception}", context)
 
@@ -1388,6 +1507,8 @@ class TelegramBotBuilder:
                 CommandHandler("rules", rules),
                 CommandHandler("start", start),
                 CommandHandler("stop", stop),
+                CommandHandler("unleash", unleash),
+                CommandHandler("leash", leash),
                 CommandHandler("status", status),
                 CommandHandler("balance", balance),
                 CommandHandler("fund", fund),

@@ -1,6 +1,8 @@
 from typing import List
 from os.path import abspath
 
+from lib.abbot.config import BOT_TELEGRAM_HANDLE_MD
+
 CONFIG_JSON_FILEPATH: str = "src/data/config.json"
 OPENAI_MODEL: str = "gpt-4-1106-preview"
 THE_ARCHITECT_ID: int = 1711738045
@@ -8,19 +10,19 @@ THE_ARCHITECT_USERNAME: str = "nonni_io"
 THE_ARCHITECT_HANDLE: str = f"@{THE_ARCHITECT_USERNAME}"
 ABBOT_SQUAWKS: int = -1002139786317
 SATOSHIS_PER_BTC: int = 100000000
-HELP_MENU = """You can interact with me by sending these commands\:
+HELP_MENU = f"""You can interact with me by sending these commands\:
 
 *About Me*
-/help \- returns detailed command list and how to use them
-/rules \- returns rules list for how to interact with Abbot
+/help{BOT_TELEGRAM_HANDLE_MD} \- returns detailed command list and how to use them
+/rules{BOT_TELEGRAM_HANDLE_MD} \- returns rules list for how to interact with Abbot
 
 *Manage Me*
-/start \- starts Abbot in a group chat
-/stop \- stops Abbot in group chat
+/start{BOT_TELEGRAM_HANDLE_MD} \- starts Abbot in a group chat
+/stop{BOT_TELEGRAM_HANDLE_MD} \- stops Abbot in group chat
 
 *Pay Me*
-/balance \- request group chat balance in USD & SATs
-/fund \- request invoice to topup group chat balance ⚡️\n"""
+/balance{BOT_TELEGRAM_HANDLE_MD} \- request group chat balance in USD & SATs
+/fund{BOT_TELEGRAM_HANDLE_MD} \- request invoice to topup group chat balance ⚡️\n"""
 
 RULES: str = """To get me to respond to your messages, you must have a positive SAT balance \& take one of these actions
 
