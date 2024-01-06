@@ -1239,11 +1239,11 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 },
             )
             debug_bot.log(log_name, f"group={group}")
-        if "`" in answer:
-            answer = f"`{answer}`"
-            await message.reply_text(answer, parse_mode=MARKDOWN_V2, disable_web_page_preview=True)
-        else:
-            await message.reply_text(answer)
+            if "`" in answer:
+                answer = f"`{answer}`"
+                await message.reply_text(answer, parse_mode=MARKDOWN_V2, disable_web_page_preview=True)
+            else:
+                await message.reply_text(answer)
     except AbbotException as abbot_exception:
         await bot_squawk(f"{log_name}: {abbot_exception}", context)
 
