@@ -371,51 +371,93 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message_text, _ = parse_message_data(message)
         chat: Chat = try_get(update_data, "chat")
         chat_id, chat_title, chat_type = parse_group_chat_data(chat)
-        if chat_type == "private":
-            return await message.reply_text("/start is disabled in DMs. Feel free to chat at will!")
         user: User = try_get(update_data, "user")
-        _, username, _ = parse_user_data(user)
-
-        if chat_type in ("group", "supergroup", "channel"):
-            admins: Any = [admin.to_dict() for admin in await chat.get_administrators()] or []
-            debug_bot.log(log_name, f"admins={admins}")
-
-        chat_id_filter = {"id": chat_id}
+        user_id, username, first_name = parse_user_data(user)
+        username: str = username or first_name or user_id
         new_message_dict = message.to_dict()
         intro_history_dict = {"role": "assistant", "content": INTRODUCTION}
-        new_history_dict = {"role": "user", "content": f"@{username} said: {message_text}"}
-        group_exists: bool = mongo_abbot.group_does_exist(chat_id_filter)
-        debug_bot.log(log_name, f"group_exists={group_exists}")
-        if not group_exists:
-            group_update = {
-                "$set": {
-                    "created_at": datetime.now().isoformat(),
-                    "title": chat_title,
-                    "id": chat_id,
-                    "type": chat_type,
-                    "admins": admins,
-                    "balance": 5000,
-                    "messages": [new_message_dict],
-                    "history": [BOT_SYSTEM_OBJECT_GROUPS, intro_history_dict, new_history_dict],
-                    "config": BOT_GROUP_CONFIG_STARTED_UNLEASHED,
-                }
+        if not message_text:
+            message_text_err = f"{log_name}: No message text: message={message} update={update}"
+            return await context.bot.send_message(chat_id=THE_ARCHITECT_ID, text=message_text_err)
+        if not username:
+            new_history_dict = {"role": "user", "content": f"someone said: {message_text}"}
+        else:
+            new_history_dict = {"role": "user", "content": f"@{username} said: {message_text}"}
+        is_group_chat = chat_type in ("group", "supergroup", "channel")
+        chat_id_filter = {"id": chat_id}
+        
+        '''
+            {
+                'message': Message(channel_chat_created=False,chat=Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'), date=datetime.datetime(2024, 1, 5, 21, 1, 22, tzinfo=<UTC>), delete_chat_photo=False, from_user=User(first_name='bryan', id=1711738045, is_bot=False, is_premium=True, language_code='en', username='nonni_io'), group_chat_created=False, message_id=2016, supergroup_chat_created=False, text='Thanks! how do i determine the number of new outputs created by block number 123,456'),
+                'chat': Chat(first_name='bryan', id=1711738045, type=<ChatType.PRIVATE>, username='nonni_io'),
+                'user': User(first_name='bryan', id=1711738045, is_bot=False, is_premium=True, language_code='en', username='nonni_io')
             }
+        '''
+        if is_group_chat:
+            group_exists: bool = mongo_abbot.group_does_exist(chat_id_filter)
+            debug_bot.log(log_name, f"group_exists={group_exists}")
+            admins: Any = [admin.to_dict() for admin in await chat.get_administrators()] or []
+            debug_bot.log(log_name, f"admins={admins}")
+            if not group_exists:
+                group_update = {
+                    "$set": {
+                        "created_at": datetime.now().isoformat(),
+                        "title": chat_title,
+                        "id": chat_id,
+                        "type": chat_type,
+                        "admins": admins,
+                        "balance": 5000,
+                        "messages": [new_message_dict],
+                        "history": [BOT_SYSTEM_OBJECT_GROUPS, intro_history_dict, new_history_dict],
+                        "config": BOT_GROUP_CONFIG_STARTED,
+                    }
+                }
+            else:
+                group_update = {
+                    "$set": {
+                        "title": chat_title,
+                        "id": chat_id,
+                        "type": chat_type,
+                        "admins": admins,
+                        "config": BOT_GROUP_CONFIG_STARTED,
+                    },
+                    "$push": {
+                        "messages": new_message_dict,
+                        "history": new_history_dict,
+                    },
+                }
             group: TelegramGroup = mongo_abbot.find_one_group_and_update(chat_id_filter, group_update)
             debug_bot.log(log_name, f"group={group}")
-        else:
-            group_update = {
-                "$set": {
-                    "title": chat_title,
-                    "id": chat_id,
-                    "type": chat_type,
-                    "admins": admins,
-                    "config": BOT_GROUP_CONFIG_STARTED_UNLEASHED,
-                },
-                "$push": {
-                    "messages": new_message_dict,
-                    "history": new_history_dict,
-                },
-            }
+        elif chat_type == "private":
+            dm_exists: bool = mongo_abbot.dm_does_exist(chat_id_filter)
+            debug_bot.log(log_name, f"dm_exists={dm_exists}")
+            if not group_exists:
+                dm_update = {
+                    "$set": {
+                        "created_at": datetime.now().isoformat(),
+                        "id": chat_id,
+                        "username": username,
+                        "type": chat_type,
+                        "balance": 5000,
+                        "messages": [new_message_dict],
+                        "history": [BOT_SYSTEM_OBJECT_DMS, intro_history_dict, new_history_dict],
+                    }
+                }
+            else:
+                dm_update = {
+                    "$set": {
+                        "id": chat_id,
+                        "username": username
+                    },
+                    "$push": {
+                        "messages": new_message_dict,
+                        "history": new_history_dict,
+                    },
+                }
+            group: TelegramGroup = mongo_abbot.find_one_group_and_update(chat_id_filter, group_update)
+            debug_bot.log(log_name, f"group={group}")
+
+        
 
         group_config: Dict = mongo_abbot.get_group_config(chat_id_filter)
         debug_bot.log(log_name, f"group_config={group_config}")
