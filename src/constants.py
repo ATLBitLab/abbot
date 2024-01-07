@@ -9,8 +9,11 @@ THE_ARCHITECT_HANDLE: str = f"@{THE_ARCHITECT_USERNAME}"
 ABBOT_SQUAWKS: int = -1002139786317
 SATOSHIS_PER_BTC: int = 100000000
 HELP_MENU = f"""
-A bitcoin-only, AI assistant stacking sats to help organizers, answer questions and entertain
-Brought to you with 🧡 by @atlbitlab. 🧱 Est block [#797812](https://mempool.space/block/797812)
+Hello world 🤖
+
+My name is Abbot. I am a bitcoin-only, AI assistant focused on bitcoin communities around the world!
+
+My goals are simple: reduce work for bitcoin community organizers, answer bitcoin questions and entertain your community!
 
 *About Me*
 /help 📖 Read this help
@@ -19,14 +22,18 @@ Brought to you with 🧡 by @atlbitlab. 🧱 Est block [#797812](https://mempool
 *Manage Me*
 /start 🏁 Start letting me chat
 /stop 🛑 Stop letting me chat
-/unleash 🐕‍🦺 Enable cadenced responses: `/unleash 10`
+/unleash 🐕 Enable cadenced responses: `/unleash 10`
 /leash 🐕 Disable cadenced responses: `/leash`
 
 *Pay Me*
 /balance ⚖️ View your balance in usd and sats
-/fund 💰⚡️ Refill your SATs: `/fund 1000 sats`
+/fund ⚡️ Refill your SATs: `/fund 1000 sats`
 
-**Note: Abbot is not a wallet and does not store funds. Invoices are payment to @atlbitlab for usage**
+Abbot is not a wallet and does not store funds
+Invoices help @atlbitlab pay the bills for using Abbot
+
+Built with ☕️, 🧡 & ₿ by @atlbitlab
+Est block #797812
 """
 
 RULES: str = """To get me to respond to your messages, you must have a positive SAT balance \& take one of these actions
