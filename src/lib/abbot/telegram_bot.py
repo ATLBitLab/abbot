@@ -159,7 +159,7 @@ async def sat_to_usd(sats_amount: int) -> int:
     return amount
 
 
-async def recalc_balance_sats(in_token_count: int, out_token_count: int, current_balance: int, bot: Bot):
+async def recalc_balance_sats(in_token_count: int, out_token_count: int):
     try:
         log_name: str = f"{FILE_NAME}: recalc_balance_sats"
         btcusd_doc = mongo_abbot.find_prices()[-1]
@@ -441,7 +441,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             abbot = Abbot(chat_id, "group", group_history)
             answer, input_tokens, output_tokens, _ = abbot.chat_completion()
 
-            response: Dict = await recalc_balance_sats(input_tokens, output_tokens, current_sats, context.bot)
+            response: Dict = await recalc_balance_sats(input_tokens, output_tokens)
             sats_remaining: int = try_get(response, "data")
             if not successful(response):
                 sub_log_name = f"{log_name}: recalc_balance_sats"
@@ -677,13 +677,10 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         response: Dict = await parse_update_data(update, context)
         if not successful(response):
             debug_bot.log(log_name, f"Failed to parse_update_data response={response}")
-
         update_data: Dict = try_get(response, "data")
         debug_bot.log(log_name, f"update_data={update_data}")
-
         message: Message = try_get(update_data, "message")
         debug_bot.log(log_name, f"message={message}")
-
         chat: Chat = try_get(update_data, "chat")
         debug_bot.log(log_name, f"chat={chat}")
         chat_id, chat_title, chat_type = parse_group_chat_data(chat)
@@ -715,6 +712,40 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         full_msg = sanitize_md_v2(f"{group_msg}\n{started}\n{introduced}\n{unleashed}\n{count}")
         await message.reply_markdown_v2(full_msg)
 
+    except AbbotException as abbot_exception:
+        await bot_squawk(f"{log_name}: {abbot_exception}", context)
+
+
+async def count(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    try:
+        log_name: str = f"{FILE_NAME}: count"
+        response: Dict = await parse_update_data(update, context)
+        if not successful(response):
+            debug_bot.log(log_name, f"Failed to parse_update_data response={response}")
+        update_data: Dict = try_get(response, "data")
+        debug_bot.log(log_name, f"update_data={update_data}")
+        message: Message = try_get(update_data, "message")
+        debug_bot.log(log_name, f"message={message}")
+        chat: Chat = try_get(update_data, "chat")
+        debug_bot.log(log_name, f"chat={chat}")
+        chat_id, chat_title, chat_type = parse_group_chat_data(chat)
+        chat_id_filter = {"id": chat_id}
+        group_history: Dict = mongo_abbot.get_group_history(chat_id_filter)
+        group_config: Dict = mongo_abbot.get_group_config(chat_id_filter)
+        if not group_history or not group_config:
+            abbot_squawk = f"{log_name}: {no_group_config_error}:"
+            error_msg = f"id={chat_id}, title={chat_title}, group_history={group_history}"
+            abbot_squawk = f"{abbot_squawk}\n\n{error_msg}"
+            reply_text_err = f"Failed to get group history count. Please contact {THE_ARCHITECT_HANDLE} for assistance."
+            error_bot.log(log_name, abbot_squawk)
+            await bot_squawk(abbot_squawk, context)
+            return await message.reply_text(reply_text_err)
+        unleashed_count: int = try_get(group_config, "count", default=0)
+        history_count: int = len(group_history)
+        counts_msg = f"🧛‍♀️ *Unleashed Count*: {unleashed_count}\n💬 *History Count*: {history_count}"
+        remaining = unleashed_count - (history_count % unleashed_count)
+        full_msg = sanitize_md_v2(f"{counts_msg}\n\n🤖 Abbot responds in {remaining}")
+        await message.reply_markdown_v2(full_msg)
     except AbbotException as abbot_exception:
         await bot_squawk(f"{log_name}: {abbot_exception}", context)
 
@@ -1000,7 +1031,7 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
             return await message.reply_text(group_no_sats_msg)
         abbot = Abbot(chat_id, "group", group_history)
         answer, input_tokens, output_tokens, _ = abbot.chat_completion()
-        response: Dict = await recalc_balance_sats(input_tokens, output_tokens, current_sats, context.bot)
+        response: Dict = await recalc_balance_sats(input_tokens, output_tokens)
         if not successful(response):
             sub_log_name = f"{log_name}: recalc_balance_sats"
             error_bot.log(log_name, f"response={response}")
@@ -1147,7 +1178,7 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
             abbot = Abbot(chat_id, "group", group_history)
             answer, input_tokens, output_tokens, _ = abbot.chat_completion()
 
-            response: Dict = await recalc_balance_sats(input_tokens, output_tokens, current_sats, context.bot)
+            response: Dict = await recalc_balance_sats(input_tokens, output_tokens)
             sats_remaining: int = try_get(response, "data")
             cost_sats: int = try_get(response, "cost_sats")
             debug_bot.log(log_name, f"sats_remaining={sats_remaining}")
@@ -1322,14 +1353,17 @@ async def handle_group_default(update: Update, context: ContextTypes.DEFAULT_TYP
         username: str = username or first_name or user_id
         debug_bot.log(log_name, f"username={username}")
         if chat_type not in ("group", "supergroup", "channel"):
-            return
+            debug_bot.log(log_name, f"not group: {chat_type}")
+            return await context.bot.send_message(
+                chat_id=ABBOT_SQUAWKS, text=f"Not group! {chat_title} {chat_id} {chat_type}"
+            )
         admins: Any = [admin.to_dict() for admin in await chat.get_administrators()]
         debug_bot.log(log_name, f"admins={admins}")
         chat_id_filter = {"id": chat_id}
         new_message_dict = message.to_dict()
         new_history_dict = {"role": "user", "content": f"@{username} said: {message_text}"}
-        group_exists: bool = mongo_abbot.group_does_exist(chat_id_filter)
-        if group_exists:
+        group: TelegramGroup = mongo_abbot.find_one_group(chat_id_filter)
+        if group:
             group_history: List = try_get(group, "history")
             group_history = [*group_history, new_history_dict]
             token_count: int = calculate_tokens(group_history)
@@ -1371,13 +1405,18 @@ async def handle_group_default(update: Update, context: ContextTypes.DEFAULT_TYP
         count: Dict = try_get(group_config, "count")
         if unleashed and count > 0:
             abbot = Abbot(chat_id, chat_type, group_history)
+            debug_bot.log(f"abbot.history_len={abbot.history_len}")
+            debug_bot.log(f"count={count}")
             if abbot.history_len % count == 0:
                 current_sats: TelegramGroup = mongo_abbot.get_group_balance(chat_id_filter)
                 if current_sats == 0:
                     # DM an admin?
                     # send message, and set unleashed = False and count = 0? or set started = False?
                     # fund_msg = "No SATs available! Please run /fund to topup (e.g. /fund 5 usd or /fund 5000 sats)."
-                    return
+                    debug_bot.log(log_name, f"current_sats={current_sats}")
+                    return await context.bot.send_message(
+                        chat_id=ABBOT_SQUAWKS, text=f"No SATS! {chat_title} {chat_id} {chat_type}"
+                    )
                 debug_bot.log(log_name, f"current_sats={current_sats}")
                 answer, input_tokens, output_tokens, _ = abbot.chat_completion()
                 response: Dict = await recalc_balance_sats(input_tokens, output_tokens)
@@ -1451,6 +1490,7 @@ class TelegramBotBuilder:
                 CommandHandler("stop", stop),
                 CommandHandler("unleash", unleash),
                 CommandHandler("leash", leash),
+                CommandHandler("count", count),
                 CommandHandler("status", status),
                 CommandHandler("balance", balance),
                 CommandHandler("fund", fund),
