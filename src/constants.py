@@ -1,6 +1,6 @@
 from typing import List
 from os.path import abspath
-from lib.abbot.config import BOT_TELEGRAM_HANDLE_MD
+
 
 OPENAI_MODEL: str = "gpt-4-1106-preview"
 THE_ARCHITECT_ID: int = 1711738045
@@ -8,21 +8,26 @@ THE_ARCHITECT_USERNAME: str = "nonni_io"
 THE_ARCHITECT_HANDLE: str = f"@{THE_ARCHITECT_USERNAME}"
 ABBOT_SQUAWKS: int = -1002139786317
 SATOSHIS_PER_BTC: int = 100000000
-HELP_MENU = f"""You can interact with me by sending these commands\:
+HELP_MENU = f"""
+A bitcoin-only, AI assistant stacking sats to help organizers, answer questions and entertain
+Brought to you with 🧡 by @atlbitlab. 🧱 Est block [#797812](https://mempool.space/block/797812)
 
 *About Me*
-/help{BOT_TELEGRAM_HANDLE_MD} \- returns detailed command list and how to use them
-/rules{BOT_TELEGRAM_HANDLE_MD} \- returns rules list for how to interact with Abbot
+/help 📖 Read this help
+/rules 📜 How to interact
 
 *Manage Me*
-/start{BOT_TELEGRAM_HANDLE_MD} \- starts me in a group chat
-/stop{BOT_TELEGRAM_HANDLE_MD} \- stops me in group chat
-/unleash{BOT_TELEGRAM_HANDLE_MD} \- enables auto-response every N messages (default: 5)
-/leash{BOT_TELEGRAM_HANDLE_MD} \- disables auto-response every N messages (default: 0)
+/start 🏁 Start letting me chat
+/stop 🛑 Stop letting me chat
+/unleash 🐕‍🦺 Enable cadenced responses: `/unleash 10`
+/leash 🐕 Disable cadenced responses: `/leash`
 
 *Pay Me*
-/balance{BOT_TELEGRAM_HANDLE_MD} \- request group chat balance in USD & SATs
-/fund{BOT_TELEGRAM_HANDLE_MD} \- request invoice to topup group chat balance ⚡️\n"""
+/balance ⚖️ View your balance in usd and sats
+/fund 💰⚡️ Refill your SATs: `/fund 1000 sats`
+
+**Note: Abbot is not a wallet and does not store funds. Invoices are payment to @atlbitlab for usage**
+"""
 
 RULES: str = """To get me to respond to your messages, you must have a positive SAT balance \& take one of these actions
 
@@ -52,4 +57,4 @@ RELAYS: List[str] = [
 RAW_MESSAGE_JL_FILE = abspath("src/data/raw_messages.jsonl")
 MATRIX_IMG_FILEPATH = abspath("src/assets/unplugging_matrix.jpg")
 KOOLAID_GIF_FILEPATH = abspath("src/assets/koolaid.gif")
-ESCAPE_MARKDOWN_V2_CHARS = "_*[]()~`>#+-=|{}.!"
+ESCAPE_MARKDOWN_V2_CHARS = "_*()~`>+-=|{}.!"

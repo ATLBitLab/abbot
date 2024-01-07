@@ -93,6 +93,7 @@ class TelegramDM:
         self.id: int = message.chat.id
         self.username: str = message.from_user.username
         self.type: str = message.chat.type
+        self.balance: int = 5000
         self.messages = [message.to_dict()]
         self.history = [BOT_SYSTEM_OBJECT_DMS]
 

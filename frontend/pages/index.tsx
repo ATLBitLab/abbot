@@ -171,9 +171,6 @@ export default function Abbot() {
             <li>
               <a target="_blank" rel="noreferrer" href="https://primal.net/p/npub1agq3p0xznd07eactnzv2lur7nd62uaj0vuar328et3u0kzjprzxqxcqvrk">🟣</a>
             </li>
-            {/* <li>
-              <a target="_blank" rel="noreferrer" href="abbot@atlbitlab.com">⚡️</a>
-            </li> */}
             <li>
               <a target="_blank" rel="noreferrer" href="mailto:abbot@atlbitlab.com">📧</a>
             </li>
