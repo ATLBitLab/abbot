@@ -191,7 +191,7 @@ def error(msg: str = "", **kwargs) -> Dict:
     return dict(status="error", msg=msg, **kwargs)
 
 
-def success(msg: str = "", **kwargs) -> Dict:
+def success(msg: str = "", **kwargs):
     return dict(status="success", msg=msg, **kwargs)
 
 

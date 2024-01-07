@@ -1,4 +1,3 @@
-from re import L
 from typing import Dict, List, Optional
 
 import tiktoken
@@ -6,7 +5,7 @@ from json import dumps
 from telegram.ext import ContextTypes
 from telegram import Message, Update, Chat, User
 
-from constants import ABBOT_SQUAWKS, OPENAI_MODEL, THE_ARCHITECT_ID
+from constants import ABBOT_SQUAWKS, OPENAI_MODEL, THE_ARCHITECT_HANDLE, THE_ARCHITECT_ID
 
 from ..utils import success, successful, try_get, error
 from ..logger import debug_bot, error_bot
@@ -37,7 +36,7 @@ def parse_message_data(message: Message) -> Dict:
     message_text = try_get(message, "text")
     message_date = try_get(message, "date")
     debug_bot.log(f"{log_name}: text={message_text}, date={message_date}")
-    return message_text, message_date
+    return success(data=(message_text, message_date))
 
 
 def parse_message_data_keys(message, keys):
@@ -151,10 +150,11 @@ async def bot_squawk_architect(error_message: str, context: ContextTypes.DEFAULT
     return await context.bot.send_message(chat_id=THE_ARCHITECT_ID, text=error_message)
 
 
-async def bot_squawk(abbot_squawk: str, context: ContextTypes.DEFAULT_TYPE) -> Message:
+async def bot_squawk(location: str, squawk: str, context: ContextTypes.DEFAULT_TYPE) -> Message:
     log_name: str = f"{FILE_NAME}: bot_squawk"
-    error_bot.log(f"{log_name}: {abbot_squawk}")
-    await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
+    error_bot.log(f"{log_name}: {squawk}")
+    final_squawk = f"{THE_ARCHITECT_HANDLE} Abbot Error\n\nLocation\n{location}\n\nException\n{squawk}"
+    await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=final_squawk)
 
 
 def calculate_tokens(history: List) -> int:

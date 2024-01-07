@@ -70,7 +70,7 @@ REGEX_BOT_TELEGRAM_HANDLE = Regex(BOT_TELEGRAM_HANDLE)
 FILTER_MENTION_ABBOT = Mention(BOT_TELEGRAM_HANDLE)
 ENTITY_MENTION = Entity(MENTION)
 ENTITY_REPLY = Entity(REPLY)
-REGEX_MARKDOWN_REPLY = Regex("markdown")
+REGEX_MARKDOWN_REPLY = Regex("markdown") & REPLY
 MESSAGE_OR_EDITED = UpdateType.MESSAGES
 
 # local
@@ -83,6 +83,7 @@ from ..abbot.utils import (
     calculate_tokens,
     parse_group_chat_data,
     parse_dm_chat_data,
+    parse_message,
     parse_message_data,
     parse_message_data_keys,
     parse_user_data,
@@ -209,23 +210,16 @@ async def handle_group_adds_abbot(update: Update, context: ContextTypes.DEFAULT_
         response: Dict = await parse_update_data(update, context)
         if not successful(response):
             debug_bot.log(log_name, f"Failed to parse_update_data response={response}")
-
         update_data: Dict = try_get(response, "data")
         debug_bot.log(log_name, f"update_data={update_data}")
-
         message: Message = try_get(update_data, "message")
-        # message_text, message_date = parse_message_data(message)
-
         message_data: Dict = parse_message_data_keys(message, keys=["group_chat_created", "new_chat_members"])
         group_chat_created = message_data.get("group_chat_created", None)
         new_chat_members = message_data.get("new_chat_members", None)
-
         chat: Chat = try_get(update_data, "chat")
         chat_id, chat_title, chat_type = parse_group_chat_data(chat)
-
         group_admins: Any = [admin.to_dict() for admin in await chat.get_administrators()]
         debug_bot.log(log_name, f"group_admins={group_admins}")
-
         if not group_chat_created and new_chat_members:
             if BOT_TELEGRAM_HANDLE not in [username for username in new_chat_members]:
                 return debug_bot.log(log_name, "Abbot not added to group")
@@ -263,62 +257,33 @@ async def handle_group_message_edit(update: Update, context: ContextTypes.DEFAUL
     pass
 
 
-async def reply_markdown(update, context):
-    try:
-        log_name: str = f"{FILE_NAME}: handle_markdown_request"
-        response: Dict = await parse_update_data(update, context)
-        if not successful(response):
-            debug_bot.log(log_name, f"Failed to parse_update_data response={response}")
-
-        update_data: Dict = try_get(response, "data")
-        debug_bot.log(log_name, f"update_data={update_data}")
-
-        message: Message = try_get(update_data, "message")
-        debug_bot.log(log_name, f"message={message}")
-
-        message_text, message_date = parse_message_data(message)
-        debug_bot.log(log_name, f"message_text={message_text} message_date={message_date}")
-        await message.reply_markdown_v2("sanitized_text")
-    except AbbotException as abbot_exception:
-        await bot_squawk(f"{log_name}: {abbot_exception}", context)
-
-
 async def handle_markdown_request(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         log_name: str = f"{FILE_NAME}: handle_markdown_request"
         response: Dict = await parse_update_data(update, context)
         if not successful(response):
             debug_bot.log(log_name, f"Failed to parse_update_data response={response}")
-
         update_data: Dict = try_get(response, "data")
         debug_bot.log(log_name, f"update_data={update_data}")
-
         message: Message = try_get(update_data, "message")
         debug_bot.log(log_name, f"message={message}")
-
         message_text, message_date = parse_message_data(message)
         debug_bot.log(log_name, f"message_text={message_text} message_date={message_date}")
-
         reply_to_message: Optional[Message] = try_get(message, "reply_to_message")
         debug_bot.log(log_name, f"reply_to_message={reply_to_message.__str__()}")
         reply_to_message_text = try_get(reply_to_message, "text")
         debug_bot.log(log_name, f"reply_to_message_text={reply_to_message_text}")
-
         chat: Chat = try_get(update_data, "chat")
         debug_bot.log(log_name, f"chat={chat}")
         chat_id, chat_title, chat_type = parse_group_chat_data(chat)
         debug_bot.log(log_name, f"chat_id={chat_id} chat_title={chat_title} chat_type={chat_type}")
-
         user: User = try_get(update_data, "user")
         debug_bot.log(log_name, f"user={user}")
-
         reply_to_message_from_user: Optional[User] = try_get(reply_to_message, "from_user")
         replied_to_bot = try_get(reply_to_message_from_user, "is_bot")
         debug_bot.log(log_name, f"replied_to_bot={replied_to_bot}")
-
         replied_to_abbot = try_get(reply_to_message_from_user, "username") == BOT_TELEGRAM_USERNAME
         debug_bot.log(log_name, f"replied_to_abbot={replied_to_abbot}")
-
         if replied_to_bot and replied_to_abbot and reply_to_message_text != None:
             sanitized_text = sanitize_md_v2(reply_to_message_text)
             await message.reply_markdown_v2(sanitized_text)
@@ -358,24 +323,20 @@ async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         log_name: str = f"{FILE_NAME}: start"
-        response: Dict = await parse_update_data(update, context)
-        if not successful(response):
-            debug_bot.log(log_name, f"Failed to parse_update_data response={response}")
-        update_data: Dict = try_get(response, "data")
-        debug_bot.log(log_name, f"update_data={update_data}")
-        message: Message = try_get(update_data, "message")
-        message_text, _ = parse_message_data(message)
-        chat: Chat = try_get(update_data, "chat")
+        parse_response: Message = parse_message(update)
+        if not successful(parse_response):
+            debug_bot.log(log_name, f"Failed to parse_message parse_response={parse_response}")
+        debug_bot.log(log_name, f"parse_response={parse_response}")
+        message: Message = try_get(parse_response, "message")
+        debug_bot.log(log_name, f"message={message}")
+        message_text, message_date = parse_message_data(message)
+        chat: Chat = try_get(message, "chat")
         chat_id, chat_title, chat_type = parse_group_chat_data(chat)
-        if chat_type == "private":
-            return await message.reply_text("/start is disabled in DMs. Feel free to chat at will!")
-        user: User = try_get(update_data, "user")
-        _, username, _ = parse_user_data(user)
-
+        user: User = try_get(message, "user")
+        user_id, username, first_name = parse_user_data(user)
         if chat_type in ("group", "supergroup", "channel"):
             admins: Any = [admin.to_dict() for admin in await chat.get_administrators()] or []
             debug_bot.log(log_name, f"admins={admins}")
-
         chat_id_filter = {"id": chat_id}
         new_message_dict = message.to_dict()
         intro_history_dict = {"role": "assistant", "content": INTRODUCTION}
@@ -398,32 +359,29 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             }
             group: TelegramGroup = mongo_abbot.find_one_group_and_update(chat_id_filter, group_update)
             debug_bot.log(log_name, f"group={group}")
-        else:
-            group_update = {
-                "$set": {
-                    "title": chat_title,
-                    "id": chat_id,
-                    "type": chat_type,
-                    "admins": admins,
-                    "config": BOT_GROUP_CONFIG_STARTED_UNLEASHED,
-                },
-                "$push": {
-                    "messages": new_message_dict,
-                    "history": new_history_dict,
-                },
-            }
+            await message.reply_photo(MATRIX_IMG_FILEPATH, f"Please wait while {BOT_NAME} is unplugged from the Matrix")
+            time.sleep(3)
+            return await message.reply_markdown_v2(INTRODUCTION, disable_web_page_preview=True)
 
         group_config: Dict = mongo_abbot.get_group_config(chat_id_filter)
         debug_bot.log(log_name, f"group_config={group_config}")
         started: Dict = try_get(group_config, "started")
+        introduced: Dict = try_get(group_config, "introduced")
         if started:
             already_started = f"Hey\! I'm already started and ready to rock and roll 🪨🤘🎸"
             already_started = f"{already_started}\n\nFeel free to run /rules or /help for more information"
             debug_bot.log(log_name, f"already_started={already_started}")
             await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=f"{log_name}: {already_started}")
             return await message.reply_markdown_v2(already_started, disable_web_page_preview=True)
-        debug_bot.log(log_name, f"started={started}")
 
+        debug_bot.log(log_name, f"started={started}")
+        group_update = {
+            "$set": {"title": chat_title, "id": chat_id, "type": chat_type, "admins": admins, "config.started": True},
+            "$push": {
+                "messages": new_message_dict,
+                "history": new_history_dict,
+            },
+        }
         current_sats: TelegramGroup = mongo_abbot.get_group_balance(chat_id_filter)
         if current_sats == 0:
             group_msg = f"⚡️ Group: {chat_title} ⚡️ "
@@ -431,7 +389,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             usd_balance = await sat_to_usd(current_sats)
             usd_balance_msg = f"💰 USD Balance: {usd_balance} 💰"
             fund_msg = "No SATs available! Please run /fund to topup (e.g. /fund 5 usd or /fund 5000 sats)."
-            await message.reply_text(f"{group_msg} \n {sats_balance_msg} \n {usd_balance_msg} \n {fund_msg}")
+            # reuse buttons to ask if they want an invoice
+            return await message.reply_text(f"{group_msg} \n {sats_balance_msg} \n {usd_balance_msg} \n {fund_msg}")
         debug_bot.log(log_name, f"current_sats={current_sats}")
 
         introduced: Dict = try_get(group_config, "introduced")
@@ -473,13 +432,15 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 },
             )
             debug_bot.log(log_name, f"group={group}")
-            await message.reply_text(answer)
-
-        await message.reply_photo(MATRIX_IMG_FILEPATH, f"Please wait while {BOT_NAME} is unplugged from the Matrix")
-        time.sleep(3)
+            if "`" in answer:
+                answer = sanitize_md_v2(f"`{answer}`")
+                mode = MARKDOWN_V2
+            else:
+                mode = None
+            return await message.reply_text(answer, parse_mode=mode, disable_web_page_preview=True)
         await message.reply_markdown_v2(INTRODUCTION, disable_web_page_preview=True)
     except AbbotException as abbot_exception:
-        await bot_squawk(f"{log_name}: {abbot_exception}", context)
+        await bot_squawk(log_name, abbot_exception, context)
 
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -911,50 +872,6 @@ async def fund_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await bot_squawk(f"{log_name}: {abbot_exception}", context)
 
 
-"""
-async def fund_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    try:
-        log_name: str = f"{FILE_NAME}: fund_cancel"
-
-        response: Dict = await parse_update_data(update, context)
-        if not successful(response):
-            debug_bot.log(log_name, f"Failed to parse_update_data response={response}")
-
-        update_data: Dict = try_get(response, "data")
-        debug_bot.log(log_name, f"update_data={update_data}")
-
-        message: Message = try_get(update_data, "message")
-        message_text: str = message.text
-        debug_bot.log(log_name, f"message_text={message_text}")
-        args = message_text.split()
-        debug_bot.log(log_name, f"args={args}")
-
-        chat: Chat = try_get(update_data, "chat")
-        chat_id, chat_title, chat_type = parse_group_chat_data(chat)
-        if chat_type == "private":
-            return await message.reply_text("/cancel is disabled in DMs. Feel free to chat at will!")
-
-        invoice_id = try_get(args, 1) or payment_processor.CHAT_ID_INVOICE_ID_MAP.get(chat_id, None)
-        if not invoice_id:
-            return await message.reply_text("Invoice not found")
-        debug_bot.log(log_name, f"invoice_id={invoice_id}")
-
-        await message.reply_text("Attempting to cancel your invoice, please wait ...")
-        debug_bot.log(log_name, f"payment_processor={payment_processor.to_dict()}")
-
-        cancel_squawk = f"Failed to cancel invoice: chat_id={chat_id}, chat_title={chat_title}, invoice_id={invoice_id}"
-        cancel_fail = f"Failed to cancel invoice. Try again or pay abbot@atlbitlab.com & contact {THE_ARCHITECT_HANDLE} for confirmation"
-        cancelled = await payment_processor.expire_invoice(invoice_id)
-        if not cancelled:
-            await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=cancel_squawk)
-            return await message.reply_text(cancel_fail)
-
-        await message.reply_text(f"Invoice id {invoice_id} successfully cancelled for {chat_title}")
-    except AbbotException as abbot_exception:
-        await bot_squawk(f"{log_name}: {abbot_exception}", context)
-"""
-
-
 async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         log_name: str = f"{FILE_NAME}: handle_group_mention"
@@ -1068,7 +985,7 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
         )
         debug_bot.log(log_name, f"group={group}")
         if "`" in answer:
-            answer = f"`{answer}`"
+            answer = sanitize_md_v2(f"`{answer}`")
             mode = MARKDOWN_V2
         else:
             mode = None
@@ -1217,7 +1134,7 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
             )
             debug_bot.log(log_name, f"group={group}")
             if "`" in answer:
-                answer = f"`{answer}`"
+                answer = f"`{sanitize_md_v2(answer)}`"
                 mode = MARKDOWN_V2
             else:
                 mode = None
@@ -1274,7 +1191,7 @@ async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
             {"$set": {"tokens": abbot.history_tokens}, "$push": {"history": {"role": "assistant", "content": answer}}},
         )
         if "`" in answer:
-            answer = f"`{answer}`"
+            answer = sanitize_md_v2(f"`{answer}`")
             mode = MARKDOWN_V2
         else:
             mode = None
@@ -1395,10 +1312,9 @@ async def handle_group_default(update: Update, context: ContextTypes.DEFAULT_TYP
                 }
             }
         group: TelegramGroup = mongo_abbot.find_one_group_and_update(chat_id_filter, group_update)
-
-        group_details: str = f"chat_id={chat_id}\nchat_title={chat_title}"
-        await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=f"Existing group updated:\n\n{group_details}")
-
+        group_detail_msg: str = f"chat_id={chat_id}\nchat_title={chat_title}"
+        await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=f"Existing group updated:\n\n{group_detail_msg}")
+        group_balance: int = try_get(group, "balance")
         group_history: List = try_get(group, "history")
         group_config: Dict = try_get(group, "config")
         unleashed: Dict = try_get(group_config, "unleashed")
@@ -1421,12 +1337,11 @@ async def handle_group_default(update: Update, context: ContextTypes.DEFAULT_TYP
                 answer, input_tokens, output_tokens, _ = abbot.chat_completion()
                 response: Dict = await recalc_balance_sats(input_tokens, output_tokens)
                 cost_sats: int = try_get(response, "data", "cost_sats")
-                group_balance: int = try_get(group, "balance")
                 group_balance = 0 if group_balance < 0 else group_balance - cost_sats
                 debug_bot.log(log_name, f"group_balance={group_balance}")
                 if group_balance == 0:
                     abbot_squawk = f"Group balance: {current_sats}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
-                    answer = f"{answer}\n\n Note: You group is now out of SATs. Please run /fund to continue to chat."
+                    answer = f"{answer}\n\n Note: You group SATs balance is now 0. Please run /fund to continue to chat."
                     debug_bot.log(log_name, abbot_squawk)
                     await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
                 group: TelegramGroup = mongo_abbot.find_one_group_and_update(
@@ -1438,7 +1353,7 @@ async def handle_group_default(update: Update, context: ContextTypes.DEFAULT_TYP
                 )
                 debug_bot.log(log_name, f"group={group}")
                 if "`" in answer:
-                    answer = f"`{answer}`"
+                    answer = sanitize_md_v2(f"`{answer}`")
                     mode = MARKDOWN_V2
                 else:
                     mode = None
@@ -1477,34 +1392,32 @@ class TelegramBotBuilder:
         telegram_bot.add_handlers(
             handlers=[
                 MessageHandler(CHAT_TYPE_GROUPS & (NEW_CHAT_MEMBERS | CHAT_CREATED), handle_group_adds_abbot),
-                # MessageHandler(UpdateFilter(CHAT_TYPE_GROUPS & MESSAGE_OR_EDITED), handle_group_message_edit),
+                MessageHandler(UpdateFilter(CHAT_TYPE_GROUPS & MESSAGE_OR_EDITED), handle_group_message_edit),
                 MessageHandler(REGEX_MARKDOWN_REPLY, handle_markdown_request),
             ]
         )
 
         telegram_bot.add_handlers(
             handlers=[
+                MessageHandler(CHAT_TYPE_PRIVATE, handle_dm),
                 CommandHandler("help", help),
                 CommandHandler("rules", rules),
-                CommandHandler("start", start),
-                CommandHandler("stop", stop),
-                CommandHandler("unleash", unleash),
-                CommandHandler("leash", leash),
-                CommandHandler("count", count),
-                CommandHandler("status", status),
-                CommandHandler("balance", balance),
-                CommandHandler("fund", fund),
+                CommandHandler("start", start, CHAT_TYPE_GROUPS),
+                CommandHandler("stop", stop, CHAT_TYPE_GROUPS),
+                CommandHandler("unleash", unleash, CHAT_TYPE_GROUPS),
+                CommandHandler("leash", leash, CHAT_TYPE_GROUPS),
+                CommandHandler("count", count, CHAT_TYPE_GROUPS),
+                CommandHandler("status", status, CHAT_TYPE_GROUPS),
+                CommandHandler("balance", balance, CHAT_TYPE_GROUPS),
+                CommandHandler("fund", fund, CHAT_TYPE_GROUPS),
                 CallbackQueryHandler(fund_button),
-                # CommandHandler("cancel", fund_cancel),
-                CommandHandler("markdown", reply_markdown),
             ]
         )
 
         telegram_bot.add_handlers(
             handlers=[
-                MessageHandler(CHAT_TYPE_PRIVATE, handle_dm),
-                MessageHandler(CHAT_TYPE_GROUPS & FILTER_MENTION_ABBOT, handle_group_mention),
                 MessageHandler(CHAT_TYPE_GROUPS & REPLY, handle_group_reply),
+                MessageHandler(CHAT_TYPE_GROUPS & FILTER_MENTION_ABBOT, handle_group_mention),
                 MessageHandler(CHAT_TYPE_GROUPS & LEFT_CHAT_MEMEBERS, handle_group_kicks_bot),
                 MessageHandler(CHAT_TYPE_GROUPS, handle_group_default),
             ]
