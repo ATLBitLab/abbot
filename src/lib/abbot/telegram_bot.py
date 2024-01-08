@@ -434,12 +434,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             debug_bot.log(log_name, f"group={group}")
             if "`" in answer:
-                answer = sanitize_md_v2(f"`{answer}`")
-                mode = MARKDOWN_V2
-            else:
-                mode = None
-            return await message.reply_text(answer, parse_mode=mode, disable_web_page_preview=True)
-        await message.reply_markdown_v2(INTRODUCTION, disable_web_page_preview=True)
+                return await message.reply_markdown_v2(sanitize_md_v2(answer), disable_web_page_preview=True)
+            return await message.reply_text(answer, disable_web_page_preview=True)
     except AbbotException as abbot_exception:
         await bot_squawk(log_name, abbot_exception, context)
 
@@ -450,28 +446,22 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
         response: Dict = await parse_update_data(update, context)
         if not successful(response):
             debug_bot.log(log_name, f"Failed to parse_update_data response={response}")
-
         update_data: Dict = try_get(response, "data")
         debug_bot.log(log_name, f"update_data={update_data}")
-
         message: Message = try_get(update_data, "message")
         message_text, _ = parse_message_data(message)
         debug_bot.log(log_name, f"message={message}")
-
         chat: Chat = try_get(update_data, "chat")
         chat_id, chat_title, chat_type = parse_group_chat_data(chat)
         debug_bot.log(log_name, f"chat={chat}")
-
         if chat_type in ("group", "supergroup", "channel"):
             admins: Any = [admin.to_dict() for admin in await chat.get_administrators()] or []
             debug_bot.log(log_name, f"admins={admins}")
         else:
             return await message.reply_text("/stop is disabled in DMs. Feel free to chat at will!")
-
         user: User = try_get(update_data, "user")
         user_id, username, first_name = parse_user_data(user)
         debug_bot.log(log_name, f"user={user}")
-
         chat_id_filter = {"id": chat_id}
         new_message_dict = message.to_dict()
         new_history_dict = {"role": "user", "content": f"@{username} said: {message_text}"}
@@ -483,7 +473,6 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
             abbot_squawk = f"{group_dne_err}\n\nchat_id={chat_id}, chat_title={chat_title}"
             return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=group_dne_err)
         debug_bot.log(log_name, f"group_exists={group_exists}")
-
         group: TelegramGroup = mongo_abbot.find_one_group_and_update(
             chat_id_filter,
             {
@@ -500,7 +489,6 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
             },
         )
         debug_bot.log(log_name, f"group={group}")
-
         still_running: bool = try_get(group, "config", "started")
         if still_running:
             reply_text_err = f"Failed to stop {BOT_NAME}. Please try again or contact {THE_ARCHITECT_HANDLE} for help"
@@ -508,7 +496,6 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
             error_bot.log(log_name, abbot_squawk)
             await message.reply_text(reply_text_err)
             return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
-
         await message.reply_text(f"Thanks for using {BOT_NAME}! Come back soon!")
         abbot_squawk = f"{BOT_NAME} stopped\n\nchat_id={chat_id}, chat_title={chat_title}"
         await bot_squawk(log_name, abbot_squawk, context)
@@ -944,11 +931,8 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
         )
         debug_bot.log(log_name, f"group={group}")
         if "`" in answer:
-            answer = sanitize_md_v2(f"`{answer}`")
-            mode = MARKDOWN_V2
-        else:
-            mode = None
-        await message.reply_text(answer, parse_mode=mode, disable_web_page_preview=True)
+            return await message.reply_markdown_v2(sanitize_md_v2(answer), disable_web_page_preview=True)
+        return await message.reply_text(answer, disable_web_page_preview=True)
     except AbbotException as abbot_exception:
         await bot_squawk(log_name, abbot_exception, context)
 
@@ -1093,11 +1077,8 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
             )
             debug_bot.log(log_name, f"group={group}")
             if "`" in answer:
-                answer = f"`{sanitize_md_v2(answer)}`"
-                mode = MARKDOWN_V2
-            else:
-                mode = None
-            await message.reply_text(answer, parse_mode=mode, disable_web_page_preview=True)
+                return await message.reply_markdown_v2(sanitize_md_v2(answer), disable_web_page_preview=True)
+            return await message.reply_text(answer, disable_web_page_preview=True)
     except AbbotException as abbot_exception:
         await bot_squawk(log_name, abbot_exception, context)
 
@@ -1150,11 +1131,8 @@ async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
             {"$set": {"tokens": abbot.history_tokens}, "$push": {"history": {"role": "assistant", "content": answer}}},
         )
         if "`" in answer:
-            answer = sanitize_md_v2(f"`{answer}`")
-            mode = MARKDOWN_V2
-        else:
-            mode = None
-        await message.reply_text(answer, parse_mode=mode, disable_web_page_preview=True)
+            return await message.reply_markdown_v2(sanitize_md_v2(answer), disable_web_page_preview=True)
+        return await message.reply_text(answer, disable_web_page_preview=True)
     except AbbotException as abbot_exception:
         await bot_squawk(log_name, abbot_exception, context)
 
@@ -1314,11 +1292,8 @@ async def handle_group_default(update: Update, context: ContextTypes.DEFAULT_TYP
                 )
                 debug_bot.log(log_name, f"group={group}")
                 if "`" in answer:
-                    answer = sanitize_md_v2(f"`{answer}`")
-                    mode = MARKDOWN_V2
-                else:
-                    mode = None
-                await message.reply_text(answer, parse_mode=mode, disable_web_page_preview=True)
+                    return await message.reply_markdown_v2(sanitize_md_v2(answer), disable_web_page_preview=True)
+                return await message.reply_text(answer, disable_web_page_preview=True)
     except AbbotException as abbot_exception:
         await bot_squawk(log_name, abbot_exception, context)
 
