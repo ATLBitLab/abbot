@@ -329,6 +329,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             debug_bot.log(log_name, f"Failed to parse_message parse_response={parse_response}")
         debug_bot.log(log_name, f"parse_response={parse_response}")
         message: Message = try_get(parse_response, "message")
+        if not message:
+            await bot_squawk(log_name, f"No message object: update={update} parse_response={parse_response}", context)
         debug_bot.log(log_name, f"message={message}")
         message_text, message_date = parse_message_data(message)
         chat: Chat = try_get(message, "chat")
@@ -372,7 +374,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             already_started = f"Hey\! I'm already started and ready to rock and roll 🪨🤘🎸"
             already_started = f"{already_started}\n\nFeel free to run /rules or /help for more information"
             debug_bot.log(log_name, f"already_started={already_started}")
-            await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=f"{log_name}: {already_started}")
+            await bot_squawk(log_name, already_started, context)
             return await message.reply_markdown_v2(already_started, disable_web_page_preview=True)
 
         debug_bot.log(log_name, f"started={started}")
@@ -624,7 +626,7 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
             abbot_squawk = f"{abbot_squawk}\n\n{error_msg}"
             reply_text_err = f"Failed to get group status. Please contact {THE_ARCHITECT_HANDLE} for assistance."
             error_bot.log(log_name, abbot_squawk)
-            await bot_squawk(abbot_squawk, context)
+            await bot_squawk(log_name, abbot_squawk, context)
             return await message.reply_text(reply_text_err)
         debug_bot.log(log_name, f"group_config={group_config}")
         group_started: bool = try_get(group_config, "started")
@@ -665,7 +667,7 @@ async def count(update: Update, context: ContextTypes.DEFAULT_TYPE):
             abbot_squawk = f"{abbot_squawk}\n\n{error_msg}"
             reply_text_err = f"Failed to get group history count. Please contact {THE_ARCHITECT_HANDLE} for assistance."
             error_bot.log(log_name, abbot_squawk)
-            await bot_squawk(abbot_squawk, context)
+            await bot_squawk(log_name, abbot_squawk, context)
             return await message.reply_text(reply_text_err)
         unleashed_count: int = try_get(group_config, "count", default=0)
         history_count: int = len(group_history)
