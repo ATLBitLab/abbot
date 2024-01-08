@@ -36,7 +36,7 @@ def parse_message_data(message: Message) -> Dict:
     message_text = try_get(message, "text")
     message_date = try_get(message, "date")
     debug_bot.log(f"{log_name}: text={message_text}, date={message_date}")
-    return success(data=(message_text, message_date))
+    return message_text, message_date
 
 
 def parse_message_data_keys(message, keys):

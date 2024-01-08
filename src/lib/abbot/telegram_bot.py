@@ -1341,7 +1341,9 @@ async def handle_group_default(update: Update, context: ContextTypes.DEFAULT_TYP
                 debug_bot.log(log_name, f"group_balance={group_balance}")
                 if group_balance == 0:
                     abbot_squawk = f"Group balance: {current_sats}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
-                    answer = f"{answer}\n\n Note: You group SATs balance is now 0. Please run /fund to continue to chat."
+                    answer = (
+                        f"{answer}\n\n Note: You group SATs balance is now 0. Please run /fund to continue to chat."
+                    )
                     debug_bot.log(log_name, abbot_squawk)
                     await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
                 group: TelegramGroup = mongo_abbot.find_one_group_and_update(
