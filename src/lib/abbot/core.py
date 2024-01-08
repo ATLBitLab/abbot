@@ -141,7 +141,11 @@ class Abbot(GroupConfig):
         self.update_history_tokens(content)
 
     def chat_completion(self) -> str:
-        response = self.client.chat.completions.create(messages=self.history, model=OPENAI_MODEL)
+        """
+        if self.
+        """
+        messages_history = self.history[self.history_len :] if self.history_tokens >= 90000 else self.history
+        response = self.client.chat.completions.create(messages=messages_history, model=OPENAI_MODEL)
         answer = try_get(response, "choices", 0, "message", "content")
         input_tokens = try_get(response, "usage", "prompt_tokens")
         output_tokens = try_get(response, "usage", "completion_tokens")
