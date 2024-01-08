@@ -88,6 +88,7 @@ from ..abbot.utils import (
     parse_message_data_keys,
     parse_user_data,
     parse_update_data,
+    to_int,
 )
 from ..payments import Coinbase, CoinbasePrice, init_payment_processor, init_price_provider
 from ..abbot.exceptions.exception import AbbotException
@@ -249,7 +250,7 @@ async def handle_group_adds_abbot(update: Update, context: ContextTypes.DEFAULT_
             chat_id=ABBOT_SQUAWKS, text=f"{log_name}: Abbot added to new group: title={chat_title}, id={chat_id})"
         )
     except AbbotException as abbot_exception:
-        await bot_squawk(f"{log_name}: {abbot_exception}", context)
+        await bot_squawk(log_name, abbot_exception, context)
 
 
 async def handle_group_message_edit(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -288,7 +289,7 @@ async def handle_markdown_request(update: Update, context: ContextTypes.DEFAULT_
             sanitized_text = sanitize_md_v2(reply_to_message_text)
             await message.reply_markdown_v2(sanitized_text)
     except AbbotException as abbot_exception:
-        await bot_squawk(f"{log_name}: {abbot_exception}", context)
+        await bot_squawk(log_name, abbot_exception, context)
 
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -303,7 +304,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         sanitized_text = sanitize_md_v2(HELP_MENU)
         await message.reply_markdown_v2(sanitized_text, disable_web_page_preview=True)
     except AbbotException as abbot_exception:
-        await bot_squawk(f"{log_name}: {abbot_exception}", context)
+        await bot_squawk(log_name, abbot_exception, context)
 
 
 async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -317,7 +318,7 @@ async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message: Message = try_get(update_data, "message")
         await message.reply_markdown_v2(RULES, disable_web_page_preview=True)
     except AbbotException as abbot_exception:
-        await bot_squawk(f"{log_name}: {abbot_exception}", context)
+        await bot_squawk(log_name, abbot_exception, context)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -510,9 +511,9 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         await message.reply_text(f"Thanks for using {BOT_NAME}! Come back soon!")
         abbot_squawk = f"{BOT_NAME} stopped\n\nchat_id={chat_id}, chat_title={chat_title}"
-        await bot_squawk(abbot_squawk, context)
+        await bot_squawk(log_name, abbot_squawk, context)
     except AbbotException as abbot_exception:
-        await bot_squawk(f"{log_name}: {abbot_exception}", context)
+        await bot_squawk(log_name, abbot_exception, context)
 
 
 async def balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -547,7 +548,7 @@ async def balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
         balance_msg = f"{group_msg}\n{sats_balance_msg}\n{usd_balance_msg}".replace(".", "\.")
         return await message.reply_markdown_v2(balance_msg)
     except AbbotException as abbot_exception:
-        await bot_squawk(f"{log_name}: {abbot_exception}", context)
+        await bot_squawk(log_name, abbot_exception, context)
 
 
 async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -556,34 +557,20 @@ async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
         response: Dict = await parse_update_data(update, context)
         if not successful(response):
             debug_bot.log(log_name, f"Failed to parse_update_data response={response}")
-
         update_data: Dict = try_get(response, "data")
         debug_bot.log(log_name, f"update_data={update_data}")
-
         message: Message = try_get(update_data, "message")
         message_text, message_date = parse_message_data(message)
         debug_bot.log(log_name, f"message_text={message_text} message_date={message_date}")
         message_text: str = message_text.split()
-
         chat: Chat = try_get(update_data, "chat")
         chat_id, _, chat_type = parse_group_chat_data(chat)
         if chat_type == "private":
             return await message.reply_text("/unleash is disabled in DMs. Feel free to chat at will!")
-
-        arg_count: str = try_get(message_text, 1)
-        if not arg_count:
-            arg_count: int = 5
-        unleash_ex = "e.g. /unleash 10 allows me to response every 10th message"
-        unleash_disable = "to disable unleash mode, use /leash"
-        if arg_count < 0:
-            core_msg = "/unleash requires a positive integer for the count argument"
-            reply_msg = f"{core_msg} {unleash_ex} {unleash_disable}"
-            return await message.reply_text(reply_msg)
-        elif arg_count == 0:
-            core_msg = "/unleash requires count arg > 0"
-            reply_msg = f"{core_msg} {unleash_ex} {unleash_disable}"
-            return await message.reply_text(reply_msg)
-
+        new_count: str = try_get(message_text, 1)
+        new_count: Optional[int] = to_int(new_count)
+        if not new_count or not new_count or new_count <= 0:
+            new_count: int = 5
         chat_id_filter = {"id": chat_id}
         group: TelegramGroup = mongo_abbot.find_one_group(chat_id_filter)
         if not group:
@@ -592,12 +579,11 @@ async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if current_sats == 0:
             return await message.reply_text(f"You group SAT balance is 0. Please run /fund to refill.")
         group: TelegramGroup = mongo_abbot.find_one_group_and_update(
-            chat_id_filter, {"$set": {"config.unleashed": True, "config.count": arg_count}}
+            chat_id_filter, {"$set": {"config.unleashed": True, "config.count": new_count}}
         )
-
-        await message.reply_text(f"Abbot has been unleashed to respond every {arg_count} messages")
+        await message.reply_text(f"Abbot has been unleashed to respond every {new_count} messages")
     except AbbotException as abbot_exception:
-        await bot_squawk(f"{log_name}: {abbot_exception}", context)
+        await bot_squawk(log_name, abbot_exception, context)
 
 
 async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -606,16 +592,13 @@ async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
         response: Dict = await parse_update_data(update, context)
         if not successful(response):
             debug_bot.log(log_name, f"Failed to parse_update_data response={response}")
-
         update_data: Dict = try_get(response, "data")
         debug_bot.log(log_name, f"update_data={update_data}")
-
         message: Message = try_get(update_data, "message")
         chat: Chat = try_get(update_data, "chat")
         chat_id, _, chat_type = parse_group_chat_data(chat)
         if chat_type == "private":
             return await message.reply_text("/leash is disabled in DMs. Feel free to chat at will!")
-
         chat_id_filter = {"id": chat_id}
         group: TelegramGroup = mongo_abbot.find_one_group(chat_id_filter)
         if not group:
@@ -624,12 +607,11 @@ async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
         unleashed: bool = try_get(group_config, "unleashed")
         if unleashed:
             group: TelegramGroup = mongo_abbot.find_one_group_and_update(
-                chat_id_filter, {"$set": {"config.unleashed": False, "config.count": 0}}
+                chat_id_filter, {"$set": {"config.unleashed": False}}
             )
-
         await message.reply_text(f"Abbot has been leashed to not respond on message count")
     except AbbotException as abbot_exception:
-        await bot_squawk(f"{log_name}: {abbot_exception}", context)
+        await bot_squawk(log_name, abbot_exception, context)
 
 
 async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -647,7 +629,6 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id, chat_title, chat_type = parse_group_chat_data(chat)
         if chat_type == "private":
             return await message.reply_text("/status is disabled in DMs. Feel free to chat at will!")
-
         chat_id_filter = {"id": chat_id}
         group_config: Dict = mongo_abbot.get_group_config(chat_id_filter)
         if not group_config:
@@ -658,7 +639,6 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
             error_bot.log(log_name, abbot_squawk)
             await bot_squawk(abbot_squawk, context)
             return await message.reply_text(reply_text_err)
-
         debug_bot.log(log_name, f"group_config={group_config}")
         group_started: bool = try_get(group_config, "started")
         group_introduced: bool = try_get(group_config, "introduced")
@@ -672,9 +652,8 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         count = f"🧛‍♀️ *Count*: {group_count} 🧛‍♀️"
         full_msg = sanitize_md_v2(f"{group_msg}\n{started}\n{introduced}\n{unleashed}\n{count}")
         await message.reply_markdown_v2(full_msg)
-
     except AbbotException as abbot_exception:
-        await bot_squawk(f"{log_name}: {abbot_exception}", context)
+        await bot_squawk(log_name, abbot_exception, context)
 
 
 async def count(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -708,62 +687,50 @@ async def count(update: Update, context: ContextTypes.DEFAULT_TYPE):
         full_msg = sanitize_md_v2(f"{counts_msg}\n\n🤖 Abbot responds in {remaining}")
         await message.reply_markdown_v2(full_msg)
     except AbbotException as abbot_exception:
-        await bot_squawk(f"{log_name}: {abbot_exception}", context)
+        await bot_squawk(log_name, abbot_exception, context)
 
 
 async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         log_name: str = f"{FILE_NAME}: fund"
-
         response: Dict = await parse_update_data(update, context)
         if not successful(response):
             debug_bot.log(log_name, f"Failed to parse_update_data response={response}")
-
         update_data: Dict = try_get(response, "data")
         debug_bot.log(log_name, f"update_data={update_data}")
-
         message: Message = try_get(update_data, "message")
         message_text: str = try_get(message, "text")
         debug_bot.log(log_name, f"message_text={message_text}")
-
         chat: Chat = try_get(update_data, "chat")
         debug_bot.log(log_name, f"chat={chat}")
         chat_id, chat_title, chat_type = parse_group_chat_data(chat)
         chat_type: str = chat_type.capitalize()
         if chat_type == "Private":
             return await message.reply_text("/fund is disabled in DMs. Feel free to chat at will!")
-
         user: User = try_get(update_data, "user")
         debug_bot.log(log_name, f"user={user}")
         user_id, username, first_name = parse_user_data(user)
         username: str = username or first_name or chat_id or user_id
-
         topup_for: str = chat_title
         topup_by: str = username
-
         args = message_text.split()
         args_len = len(args)
         debug_bot.log(log_name, f"args={args}")
-
         if args_len < 2:
             return await message.reply_text(f"{invoice_error_args}\n{sats_example}\n{usd_example}")
         elif args_len < 3:
             return await message.reply_text(f"{invoice_error_args}\n{sats_example}\n{usd_example}")
-
-        amount: int | float = try_get(args, 1)
+        amount: str = try_get(args, 1)
         if "." in amount:
             amount: float = float(try_get(args, 1))
         else:
             amount: int = int(try_get(args, 1))
-
         if amount < 0.01:
             return await message.reply_text("Amount too low. Must be at least 0.01")
         debug_bot.log(log_name, f"amount={amount}")
-
         currency_unit: str = try_get(args, 2, default="sats")
         currency_unit = currency_unit.lower()
         debug_bot.log(log_name, f"currency_unit={currency_unit}")
-
         if currency_unit == "sats":
             currency_unit = "SATS"
             emoji = "⚡️"
@@ -778,12 +745,10 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
             balance = await usd_to_sat(amount)
         else:
             return await message.reply_text(f"{invoice_error_unit}\n\n{sats_example}\n\n{usd_example}")
-
         await message.reply_text("Creating your invoice, please wait ...")
         debug_bot.log(log_name, f"payment_processor={payment_processor}")
         debug_bot.log(log_name, f"amount={amount}")
         debug_bot.log(log_name, f"invoice_amount={invoice_amount}")
-
         group_msg = f"💬 *Group*: {topup_for}\n\n"
         sender_msg = f"✉️ *Requested by*: @{topup_by}\n\n"
         amount_msg = f"{emoji} *Amount*: {symbol}{amount} {currency_unit}\n\n"
@@ -791,15 +756,12 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
         invoiceid_msg = f"🧾 *Invoice ID*:\n{cid}"
         description = f"{group_msg}{sender_msg}{amount_msg}{invoiceid_msg}"
         debug_bot.log(log_name, f"description={description}")
-
         response = await payment_processor.get_invoice(cid, description, invoice_amount, chat_id)
         debug_bot.log(log_name, f"response={response}")
-
         create_squawk = f"Failed to create strike invoice: {json.dumps(response)}"
         if not successful(response):
             await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=f"{create_squawk}: not successful()")
             return await message.reply_text(create_fail)
-
         invoice_id = try_get(response, "invoice_id")
         invoice = try_get(response, "ln_invoice")
         expiration_in_sec = try_get(response, "expiration_in_sec")
@@ -811,7 +773,6 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
         description = f"{description}\n{expires_msg}"
         await message.reply_photo(photo=qr_code(invoice), caption=sanitize_md_v2(description), parse_mode=MARKDOWN_V2)
         await message.reply_markdown_v2(f"`{invoice}`")
-
         cancel_squawk = f"{cancel_fail_msg}: description={description}, invoice_id={invoice_id}"
         is_paid = False
         while expiration_in_sec >= 0 and not is_paid:
@@ -832,7 +793,6 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
             if expiration_in_sec % 10 == 0:
                 await message.reply_text(f"🕰️ Invoice expires in: {expiration_in_sec} seconds\n")
             time.sleep(1)
-
         if is_paid:
             group: TelegramGroup = mongo_abbot.find_one_group_and_update(
                 {"id": chat.id}, {"$inc": {"balance": balance}}
@@ -848,13 +808,12 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
             keyboard_markup = InlineKeyboardMarkup(keyboard)
             await message.reply_text(f"Invoice expired! Try again?", reply_markup=keyboard_markup)
     except AbbotException as abbot_exception:
-        await bot_squawk(f"{log_name}: {abbot_exception}", context)
+        await bot_squawk(log_name, abbot_exception, context)
 
 
 async def fund_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         log_name: str = f"{FILE_NAME}: fund_button"
-
         query: Optional[CallbackQuery] = try_get(update, "callback_query")
         update_id: int = try_get(update, "update_id")
         await query.answer()
@@ -869,7 +828,7 @@ async def fund_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_msg = f"{np} 👍 {ln_addr} ⚡️ {contact}"
             await query.edit_message_text(reply_msg)
     except AbbotException as abbot_exception:
-        await bot_squawk(f"{log_name}: {abbot_exception}", context)
+        await bot_squawk(log_name, abbot_exception, context)
 
 
 async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -991,7 +950,7 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
             mode = None
         await message.reply_text(answer, parse_mode=mode, disable_web_page_preview=True)
     except AbbotException as abbot_exception:
-        await bot_squawk(f"{log_name}: {abbot_exception}", context)
+        await bot_squawk(log_name, abbot_exception, context)
 
 
 async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1140,7 +1099,7 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 mode = None
             await message.reply_text(answer, parse_mode=mode, disable_web_page_preview=True)
     except AbbotException as abbot_exception:
-        await bot_squawk(f"{log_name}: {abbot_exception}", context)
+        await bot_squawk(log_name, abbot_exception, context)
 
 
 async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1197,7 +1156,7 @@ async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
             mode = None
         await message.reply_text(answer, parse_mode=mode, disable_web_page_preview=True)
     except AbbotException as abbot_exception:
-        await bot_squawk(f"{log_name}: {abbot_exception}", context)
+        await bot_squawk(log_name, abbot_exception, context)
 
 
 async def handle_group_kicks_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1220,7 +1179,7 @@ async def handle_group_kicks_bot(update: Update, context: ContextTypes.DEFAULT_T
                 chat_id=THE_ARCHITECT_ID, text=f"Bot kicked from group:\n\ntitle={chat.title}\nid={chat.id}"
             )
     except AbbotException as abbot_exception:
-        await bot_squawk(f"{log_name}: {abbot_exception}", context)
+        await bot_squawk(log_name, abbot_exception, context)
 
 
 """
@@ -1361,7 +1320,7 @@ async def handle_group_default(update: Update, context: ContextTypes.DEFAULT_TYP
                     mode = None
                 await message.reply_text(answer, parse_mode=mode, disable_web_page_preview=True)
     except AbbotException as abbot_exception:
-        await bot_squawk(f"{log_name}: {abbot_exception}", context)
+        await bot_squawk(log_name, abbot_exception, context)
 
 
 async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

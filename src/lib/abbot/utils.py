@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 import tiktoken
 from json import dumps
@@ -165,3 +165,10 @@ def calculate_tokens(history: List) -> int:
             continue
         total += len(encoding.encode(content, allowed_special="all"))
     return total
+
+
+def to_int(x: Any) -> int:
+    try:
+        return int(x)
+    except ValueError:
+        return None
