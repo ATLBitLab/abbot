@@ -420,14 +420,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         }
 
         if group_balance == 0:
-            group_msg = f"⚡️ Group: {chat_title} ⚡️ "
-            sats_balance_msg = f"⚡️ SATs Balance: {group_balance} ⚡️"
-            usd_balance = await sat_to_usd(group_balance)
-            usd_balance_msg = f"💰 USD Balance: {usd_balance} 💰"
-            fund_msg = "No SATs available! Please run /fund to topup (e.g. /fund 5 usd or /fund 5000 sats)."
+            group_msg = f"⚡️ Group Name: {chat_title} ⚡️"
+            sats_balance_msg = f"⚖️ Balance in Satoshis: {group_balance} sats ⚡️"
+            usd_balance_msg = f"⚖️ Balance in Fiat: 0 usd 💰"
+            fund_msg = "No sats left\n\nPlease run /fund to topup\n\nExamples:\n\n/fund 5 usd\n\n/fund 5000 sats"
             # reuse buttons to ask if they want an invoice
             # or send an invoice
-            return await message.reply_text(f"{group_msg} \n {sats_balance_msg} \n {usd_balance_msg} \n {fund_msg}")
+            return await message.reply_text(f"{group_msg}\n{sats_balance_msg}\n{usd_balance_msg}\n{fund_msg}")
 
         if introduced:
             abbot = Abbot(chat_id, "group", group_history)
