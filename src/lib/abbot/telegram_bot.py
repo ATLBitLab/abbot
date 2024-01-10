@@ -324,17 +324,17 @@ async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         log_name: str = f"{FILE_NAME}: start"
-        parse_response: Message = parse_message(update)
-        if not successful(parse_response):
-            debug_bot.log(log_name, f"Failed to parse_message parse_response={parse_response}")
-        debug_bot.log(log_name, f"parse_response={parse_response}")
-        response_data: Message = try_get(parse_response, "data")
-        if not response_data:
-            return await bot_squawk(
-                log_name, f"No message object: update={update} parse_response={parse_response}", context
-            )
-        debug_bot.log(log_name, f"response_data={response_data}")
-        message: Message = try_get(response_data, "message")
+
+        response: Dict = parse_message(update)
+        if not successful(response):
+            debug_bot.log(log_name, f"Failed to parse_message response={response}")
+        debug_bot.log(log_name, f"response={response}")
+
+        message: Message = try_get(response, "data")
+        if not message:
+            squawk_msg = f"No message object: update={update} response={response} message={message}"
+            return await bot_squawk(log_name, squawk_msg, context)
+        debug_bot.log(log_name, f"message={message}")
         message_text, _ = parse_message_data(message)
 
         chat: Chat = try_get(message, "chat")
@@ -432,16 +432,22 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if introduced:
             abbot = Abbot(chat_id, "group", group_history)
             answer, input_tokens, output_tokens, _ = abbot.chat_completion()
-            balance_response: Dict = await recalc_balance_sats(input_tokens, output_tokens)
-            if not successful(balance_response):
+            response: Dict = await recalc_balance_sats(input_tokens, output_tokens)
+            if not successful(response):
                 err_msg = f"{log_name}: recalc_balance_sats: not successful"
                 bal_msg = f"group_balance={group_balance}"
-                res_msg = f"balance_response={balance_response}"
+                res_msg = f"response={response}"
                 chat_msg = f"chat_id={chat_id}\nchat_title={chat_title}"
                 squawk_msg = f"{err_msg}: {bal_msg} {res_msg} {chat_msg}"
                 await bot_squawk(log_name, squawk_msg, context)
 
-            cost_sats = try_get(balance_response, "cost_sats", default=100)
+            cost_sats: int = try_get(response, "cost_sats", default=100)
+            group_balance = 0 if group_balance < 0 else group_balance - cost_sats
+            if group_balance == 0:
+                abbot_squawk = f"Group balance: {group_balance}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
+                answer = f"{answer}\n\n Note: You group is now out of SATs. Please run /fund to continue to chat."
+                debug_bot.log(log_name, abbot_squawk)
+                await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
             group_balance -= cost_sats
             if group_balance <= 0:
                 group_balance = 0
@@ -938,7 +944,7 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
             msg = f"{msg}: group_balance={group_balance}\nresponse={response}\nchat=(id={chat_id}\ntitle=({chat_title})"
             error_bot.log(log_name, msg)
             await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=msg)
-        cost_sats: int = try_get(response, "cost_sats")
+        cost_sats: int = try_get(response, "cost_sats", default=100)
         group_balance = 0 if group_balance < 0 else group_balance - cost_sats
         if group_balance == 0:
             abbot_squawk = f"Group balance: {group_balance}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
@@ -1300,11 +1306,18 @@ async def handle_group_default(update: Update, context: ContextTypes.DEFAULT_TYP
                     },
                 )
                 response: Dict = await recalc_balance_sats(input_tokens, output_tokens)
-                cost_sats: int = try_get(response, "cost_sats")
+                if not successful(response):
+                    sub_log_name = f"{log_name}: recalc_balance_sats"
+                    error_bot.log(log_name, f"response={response}")
+                    msg = f"{sub_log_name}: Failed to calculate remaining sats"
+                    msg = f"{msg}: group_balance={group_balance}\nresponse={response}\nchat=(id={chat_id}\ntitle=({chat_title})"
+                    error_bot.log(log_name, msg)
+                    await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=msg)
+                cost_sats: int = try_get(response, "cost_sats", default=100)
                 group_balance = 0 if group_balance < 0 else group_balance - cost_sats
                 if group_balance == 0:
-                    abbot_squawk = f"group_balance={group_balance}\n\nchat_id={chat_id}\nchat_title={chat_title}"
-                    answer = f"{answer}\n\n Note: SATs balance is now 0, please run /fund to refill"
+                    abbot_squawk = f"Group balance: {group_balance}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
+                    answer = f"{answer}\n\n Note: You group is now out of SATs. Please run /fund to continue to chat."
                     debug_bot.log(log_name, abbot_squawk)
                     await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
                 debug_bot.log(log_name, f"group_balance={group_balance}")
