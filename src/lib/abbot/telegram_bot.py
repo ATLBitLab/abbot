@@ -143,10 +143,8 @@ async def usd_to_sat(usd_amount: int) -> int:
             btc_price_usd: int = int(btc_price_usd)
     else:
         btc_price_usd: int = await get_live_price()
-    amount = int((usd_amount / int(btc_price_usd)) * SATOSHIS_PER_BTC)
-    if amount <= 0:
-        amount = 2500
-    return amount
+    amount_calculation = int((usd_amount / int(btc_price_usd)) * SATOSHIS_PER_BTC)
+    return amount_calculation if amount_calculation > 0 else 0
 
 
 async def sat_to_usd(sats_amount: int) -> int:
@@ -157,10 +155,8 @@ async def sat_to_usd(sats_amount: int) -> int:
             btc_price_usd: int = int(btc_price_usd)
     else:
         btc_price_usd: int = await get_live_price()
-    amount = round(float((sats_amount / SATOSHIS_PER_BTC) * int(btc_price_usd)), 2)
-    if amount <= 0:
-        amount = 1
-    return amount
+    amount_calculation = round(float((sats_amount / SATOSHIS_PER_BTC) * int(btc_price_usd)), 2)
+    return amount_calculation if amount_calculation > 0 else 0
 
 
 async def recalc_balance_sats(in_token_count: int, out_token_count: int):
@@ -181,7 +177,7 @@ async def recalc_balance_sats(in_token_count: int, out_token_count: int):
         cost_input_tokens = (in_token_count / ORG_PER_TOKEN_COST_DIV) * (ORG_INPUT_TOKEN_COST * ORG_TOKEN_COST_MULT)
         cost_output_tokens = (out_token_count / ORG_PER_TOKEN_COST_DIV) * (ORG_OUTPUT_TOKEN_COST * ORG_TOKEN_COST_MULT)
         total_token_cost_usd = cost_input_tokens + cost_output_tokens
-        total_token_cost_sats = (total_token_cost_usd / btcusd_price) * SATOSHIS_PER_BTC
+        total_token_cost_sats = round((total_token_cost_usd / btcusd_price) * SATOSHIS_PER_BTC, 2)
 
         return success(cost_usd=total_token_cost_usd, cost_sats=int(total_token_cost_sats))
     except AbbotException as abbot_exception:
@@ -201,12 +197,14 @@ def sanitize_md_v2(text):
         "\\" + char if char in escape_chars else char for char in text if not (0xD800 <= ord(char) <= 0xDFFF)
     )
 
+
 def get_zero_balance_msg(chat_title, sat_balance, usd_balance):
     group = f"💬 *{chat_title}* 💬"
     satoshis = f"⚖️ *Balance in Satoshis* {sat_balance} sats ⚡️"
     fiat = f"⚖️ *Balance in Fiat* {usd_balance} usd 💰"
-    no_sats = f"No sats left! Please run /fund to topup{dub_nl}*Examples*{nl}/fund 5 usd{nl}/fund 5000 sats"
+    no_sats = f"No sats left 😢 Please run /fund to topup{dub_nl}*Examples*{nl}/fund 5 usd{nl}/fund 5000 sats"
     return f"{group}{dub_nl}{satoshis}{dub_nl}{fiat}{dub_nl}{no_sats}"
+
 
 # ---------------------------------------------------------------------------------------
 # --                      Core Telegram Handler Functions                              --
@@ -262,8 +260,11 @@ async def handle_group_adds_abbot(update: Update, context: ContextTypes.DEFAULT_
 
 
 async def handle_group_message_edit(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # TODO: handle message edited
-    pass
+    try:
+        log_name: str = f"{FILE_NAME}: handle_group_message_edit"
+        debug_bot.log(log_name, f"update={update}")
+    except AbbotException as abbot_exception:
+        await bot_squawk(log_name, abbot_exception, context)
 
 
 async def handle_markdown_request(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -442,7 +443,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 squawk_msg = f"{err_msg}: {bal_msg} {res_msg} {chat_msg}"
                 await bot_squawk(log_name, squawk_msg, context)
 
-            cost_sats: int = try_get(response, "cost_sats", default=100)
+            cost_sats: int = try_get(response, "cost_sats", default=500)
             group_balance = 0 if group_balance < 0 else group_balance - cost_sats
             if group_balance == 0:
                 abbot_squawk = f"Group balance: {group_balance}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
@@ -927,7 +928,7 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
         debug_bot.log(log_name, f"group={group}")
         debug_bot.log(log_name, f"group_config={group_config}")
         if group_balance == 0:
-            group_no_sats_msg = f" No sats left 😢 Run /fund to refill your sats and continue chatting"
+            group_no_sats_msg = f"No sats left 😢 Run /fund to refill your sats and continue chatting"
             abbot_squawk = f"Group balance: {group_balance}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
             await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
             return await message.reply_text(group_no_sats_msg)
@@ -941,11 +942,11 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
             msg = f"{msg}: group_balance={group_balance}\nresponse={response}\nchat=(id={chat_id}\ntitle=({chat_title})"
             error_bot.log(log_name, msg)
             await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=msg)
-        cost_sats: int = try_get(response, "cost_sats", default=100)
+        cost_sats: int = try_get(response, "cost_sats", default=500)
         group_balance = 0 if group_balance < 0 else group_balance - cost_sats
         if group_balance == 0:
             abbot_squawk = f"Group balance: {group_balance}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
-            answer = f"{answer}\n\n Note: No sats left sad 😢 Please run /fund to continue chatting"
+            answer = f"{answer}\n\n Note: No sats left 😢 Please run /fund to continue chatting"
             debug_bot.log(log_name, abbot_squawk)
             await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
         debug_bot.log(log_name, f"group_balance={group_balance}")
@@ -1013,6 +1014,7 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
             group_history: List[Dict] = try_get(group, "history")
             group_config: Dict = try_get(group, "config")
             started: bool = try_get(group_config, "started")
+            debug_bot.log(log_name, f"group_config={group_config}")
             debug_bot.log(log_name, f"started={started}")
             if not group or not group_config:
                 abbot_squawk = f"{log_name}: {no_group_error}: id={chat_id}, title={chat_title}"
@@ -1062,10 +1064,14 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 abbot_squawk = f"{abbot_squawk}\n\n{error_msg}"
                 error_bot.log(log_name, abbot_squawk)
                 return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
-            debug_bot.log(log_name, f"new group={group}")
-            debug_bot.log(log_name, f"new group_config={group_config}")
+            group_id: str = try_get(group, "id")
+            group_title: str = try_get(group, "title")
+            group_created_at: str = try_get(group, "created_at")
+            debug_bot.log(
+                log_name, f"group_id={group_id} group_title={group_title} group_created_at={group_created_at}"
+            )
             if group_balance == 0:
-                group_no_sats_msg = f"Your group is out of SATs. To continue using {BOT_NAME}, topup using /fund"
+                group_no_sats_msg = f"No sats left 😢 Run /fund to continue chatting"
                 abbot_squawk = f"Group balance: {group_balance}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
                 await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
                 return await message.reply_text(group_no_sats_msg)
@@ -1081,7 +1087,7 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 error_bot.log(log_name, abbot_squawk)
                 await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
             debug_bot.log(log_name, f"response={response}")
-            cost_sats: int = try_get(response, "cost_sats", default=100)
+            cost_sats: int = try_get(response, "cost_sats", default=500)
             group_balance = 0 if group_balance < 0 else group_balance - cost_sats
             if group_balance == 0:
                 abbot_squawk = f"Group balance: {group_balance}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
@@ -1310,7 +1316,7 @@ async def handle_group_default(update: Update, context: ContextTypes.DEFAULT_TYP
                     msg = f"{msg}: group_balance={group_balance}\nresponse={response}\nchat=(id={chat_id}\ntitle=({chat_title})"
                     error_bot.log(log_name, msg)
                     await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=msg)
-                cost_sats: int = try_get(response, "cost_sats", default=100)
+                cost_sats: int = try_get(response, "cost_sats", default=500)
                 group_balance = 0 if group_balance < 0 else group_balance - cost_sats
                 if group_balance == 0:
                     abbot_squawk = f"Group balance: {group_balance}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
