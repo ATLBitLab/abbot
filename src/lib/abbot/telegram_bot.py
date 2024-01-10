@@ -113,6 +113,8 @@ create_fail_msg = f"Failed to create invoice. Please try again"
 create_fail_lnaddr = f"or pay to {BOT_LIGHTNING_ADDRESS} and contact @{BOT_TELEGRAM_SUPPORT_CONTACT}"
 create_fail = f"{create_fail_msg} {create_fail_lnaddr}"
 cancel_fail_msg = "Failed to cancel invoice"
+nl = "\n"
+dub_nl = "\n\n"
 # ---------------------------------------------------------------------------------------
 # --                      Telegram Handlers Helper Functions                           --
 # ---------------------------------------------------------------------------------------
@@ -199,6 +201,12 @@ def sanitize_md_v2(text):
         "\\" + char if char in escape_chars else char for char in text if not (0xD800 <= ord(char) <= 0xDFFF)
     )
 
+def get_zero_balance_msg(chat_title, sat_balance, usd_balance):
+    group = f"💬 *{chat_title}* 💬"
+    satoshis = f"⚖️ *Balance in Satoshis* {sat_balance} sats ⚡️"
+    fiat = f"⚖️ *Balance in Fiat* {usd_balance} usd 💰"
+    no_sats = f"No sats left! Please run /fund to topup{dub_nl}*Examples*{nl}/fund 5 usd{nl}/fund 5000 sats"
+    return f"{group}{dub_nl}{satoshis}{dub_nl}{fiat}{dub_nl}{no_sats}"
 
 # ---------------------------------------------------------------------------------------
 # --                      Core Telegram Handler Functions                              --
@@ -404,7 +412,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             debug_bot.log(log_name, f"already_started={already_started}")
             await bot_squawk(log_name, already_started, context)
             return await message.reply_markdown_v2(already_started, disable_web_page_preview=True)
-
         token_count: int = calculate_tokens(group_history)
         {
             "$set": {
@@ -418,16 +425,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 "history": new_history_dict,
             },
         }
-
         if group_balance == 0:
-            group_msg = f"⚡️ Group Name: {chat_title} ⚡️"
-            sats_balance_msg = f"⚖️ Balance in Satoshis: {group_balance} sats ⚡️"
-            usd_balance_msg = f"⚖️ Balance in Fiat: 0 usd 💰"
-            fund_msg = "No sats left\n\nPlease run /fund to topup\n\nExamples:\n\n/fund 5 usd\n\n/fund 5000 sats"
+            zero_balance_message: str = sanitize_md_v2(get_zero_balance_msg(chat_title, group_balance))
             # reuse buttons to ask if they want an invoice
             # or send an invoice
-            return await message.reply_text(f"{group_msg}\n{sats_balance_msg}\n{usd_balance_msg}\n{fund_msg}")
-
+            return await message.reply_markdown_v2(zero_balance_message)
         if introduced:
             abbot = Abbot(chat_id, "group", group_history)
             answer, input_tokens, output_tokens, _ = abbot.chat_completion()
@@ -570,11 +572,8 @@ async def balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             group_balance = try_get(group, "balance", default=0)
         usd_balance = await sat_to_usd(group_balance)
-        group_msg = f" 💬 *Group*\: {chat_title} 💬"
-        sats_balance_msg = f"⚡️ *SAT Balance*\: {group_balance} SAT ⚡️"
-        usd_balance_msg = f"💰 *USD Balance*\: {usd_balance} USD 💰"
-        balance_msg = f"{group_msg}\n{sats_balance_msg}\n{usd_balance_msg}".replace(".", "\.")
-        return await message.reply_markdown_v2(balance_msg)
+        zero_balance_message: str = sanitize_md_v2(get_zero_balance_msg(chat_title, group_balance, usd_balance))
+        return await message.reply_markdown_v2(zero_balance_message)
     except AbbotException as abbot_exception:
         await bot_squawk(log_name, abbot_exception, context)
 
@@ -777,12 +776,11 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
         debug_bot.log(log_name, f"payment_processor={payment_processor}")
         debug_bot.log(log_name, f"amount={amount}")
         debug_bot.log(log_name, f"invoice_amount={invoice_amount}")
-        group_msg = f"💬 *Group*: {topup_for}\n\n"
-        sender_msg = f"✉️ *Requested by*: @{topup_by}\n\n"
-        amount_msg = f"{emoji} *Amount*: {symbol}{amount} {currency_unit}\n\n"
+        group_msg = f"💬 *Group* 💬\n{topup_for}\n\n"
+        sender_msg = f"✉️ *Requested by* ✉️\n@{topup_by}\n\n"
+        amount_msg = f"{emoji} *Amount* {emoji}\n{symbol}{amount} {currency_unit}\n\n"
         cid = str(uuid.uuid1())
-        invoiceid_msg = f"🧾 *Invoice ID*:\n{cid}"
-        description = f"{group_msg}{sender_msg}{amount_msg}{invoiceid_msg}"
+        description = f"{group_msg}{sender_msg}{amount_msg}"
         debug_bot.log(log_name, f"description={description}")
         response = await payment_processor.get_invoice(cid, description, invoice_amount, chat_id)
         debug_bot.log(log_name, f"response={response}")
@@ -929,7 +927,7 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
         debug_bot.log(log_name, f"group={group}")
         debug_bot.log(log_name, f"group_config={group_config}")
         if group_balance == 0:
-            group_no_sats_msg = f"Group SATs balance = 0 😢 Run /fund to refill your sats and continue chatting"
+            group_no_sats_msg = f" No sats left 😢 Run /fund to refill your sats and continue chatting"
             abbot_squawk = f"Group balance: {group_balance}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
             await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
             return await message.reply_text(group_no_sats_msg)
@@ -947,7 +945,7 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
         group_balance = 0 if group_balance < 0 else group_balance - cost_sats
         if group_balance == 0:
             abbot_squawk = f"Group balance: {group_balance}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
-            answer = f"{answer}\n\n Note: You group is now out of SATs. Please run /fund to continue to chat."
+            answer = f"{answer}\n\n Note: No sats left sad 😢 Please run /fund to continue chatting"
             debug_bot.log(log_name, abbot_squawk)
             await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
         debug_bot.log(log_name, f"group_balance={group_balance}")
