@@ -23,6 +23,7 @@ TELEGRAM_MESSAGE_FIELDS = [
     "video_note",
     "caption",
 ]
+FILE_NAME = __name__
 
 
 def try_set(obj, value, *keys, **kwargs):
@@ -118,9 +119,9 @@ def qr_code(data):
 
 
 def opt_in(context: str, chat_id: int) -> bool:
-    fn = "opt_in:"
+    log_name = f"{FILE_NAME}: opt_in"
     config_file_name = f"src/data/chat/{context}/config/{chat_id}.json"
-    debug_bot.log(f"{fn} config_file_name={config_file_name}")
+    debug_bot.log(log_name, f"config_file_name={config_file_name}")
     config_file_path = abspath(config_file_name)
     with open(config_file_path, "w") as config:
         json.dump({"started": True, "sent_intro": False}, config)
@@ -128,9 +129,9 @@ def opt_in(context: str, chat_id: int) -> bool:
 
 
 def opt_out(context: str, chat_id: int) -> bool:
-    fn = "opt_out:"
+    log_name = f"{FILE_NAME}: opt_out"
     config_file_name = f"src/data/chat/{context}/config/{chat_id}.json"
-    debug_bot.log(f"{fn} config_file_name={config_file_name}")
+    debug_bot.log(log_name, f"config_file_name={config_file_name}")
     config_file_path = abspath(config_file_name)
     with open(config_file_path, "w") as config:
         json.dump({"started": False, "sent_intro": True}, config)

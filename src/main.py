@@ -5,6 +5,8 @@ from lib.logger import debug_bot
 # from lib.abbot.nostr_bot import NostrBotBuilder
 from lib.abbot.telegram_bot import TelegramBotBuilder
 
+FILE_NAME = __name__
+
 if __name__ == "__main__":
     try:
         # if not DEV_MODE and not TEST_MODE:
@@ -21,6 +23,6 @@ if __name__ == "__main__":
         # else:
         #     raise AbbotException("Must specify platform: python src/main.py [--telegram | --nostr] [--dev | --test]")
     except KeyboardInterrupt:
-        debug_bot.log(__name__, "Interrupt received, shutting down.")
-        debug_bot.log(__name__, "Shutting down...")
-        debug_bot.log(__name__, "Shutdown complete.")
+        debug_bot.log(FILE_NAME, "Interrupt received, shutting down.")
+        debug_bot.log(FILE_NAME, "Shutting down...")
+        debug_bot.log(FILE_NAME, "Shutdown complete.")

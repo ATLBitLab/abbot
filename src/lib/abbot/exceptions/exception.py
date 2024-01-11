@@ -2,6 +2,8 @@ from functools import wraps
 from lib.logger import error_bot, debug_bot
 from traceback import format_exc, format_tb
 
+FILE_NAME = __name__
+
 
 class NostrEventNotFoundError(Exception):
     def __init__(self, kind=None, message="Nostr event not found", formatted_traceback=None, custom_stack=None):
@@ -20,27 +22,30 @@ class AbbotException(Exception):
 
 
 def try_except(fn):
-    @wraps(fn)
-    def wrapper(*args, **kwargs):
-        try:
-            return fn(*args, **kwargs)
-        except Exception as exception:
-            except_msg = f"{__name__}: {exception}"
-            abbot_exception = AbbotException(except_msg, format_exc(), format_tb(exception.__traceback__)[:-1])
-            error_bot.log(__name__, abbot_exception)
-            pass
+    log_name = f"{FILE_NAME}: try_except"
 
-    return wrapper
-
-
-def try_except_raise(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
         try:
             return fn(*args, **kwargs)
         except Exception as exception:
             abbot_exception = AbbotException(exception, format_exc(), format_tb(exception.__traceback__)[:-1])
-            error_bot.log(f"try_except: {abbot_exception}")
+            error_bot.log(log_name, abbot_exception)
+            pass
+
+    return wrapper
+
+
+def try_except_raise(fn):
+    log_name = f"{FILE_NAME}: try_except_raise"
+
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        try:
+            return fn(*args, **kwargs)
+        except Exception as exception:
+            abbot_exception = AbbotException(exception, format_exc(), format_tb(exception.__traceback__)[:-1])
+            error_bot.log(log_name, f"try_except: {abbot_exception}")
             return abbot_exception
 
     return wrapper
@@ -51,12 +56,14 @@ def log_me(fn):
 
 
 def log_me_if(predicate):
+    log_name = f"{FILE_NAME}: log_me_if"
+
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
             r = func(*args, **kwargs)
             if predicate(r):
-                debug_bot.log()
+                debug_bot.log(log_name, r)
             return r
 
         return wrapper

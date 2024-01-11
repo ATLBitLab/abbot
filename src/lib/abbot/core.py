@@ -121,9 +121,10 @@ class Abbot(GroupConfig):
         return total
 
     def update_db(self, update: Dict) -> Dict | UpdateResult:
+        log_name: str = f"{FILE_NAME}: calculate_history_tokens"
         result: UpdateResult = mongo_abbot.update_one(self.bot_type, {"id": self.id}, update)
         if not successful_update_one(result):
-            error_bot.log(f"update_db failed: {update}")
+            error_bot.log(log_name, f"update_db failed: {update}")
             return error("update_db => update_one_channel failed")
         upsert_id = try_get(result, "upserted_id")
         return success(upsert_id)

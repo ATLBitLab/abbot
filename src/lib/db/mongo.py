@@ -30,7 +30,8 @@ else:
     telegram_db_name = "telegram"
     nostr_db_name = "nostr"
 
-debug_bot.log(__name__, f"telegram_db_name={telegram_db_name}")
+FILE_NAME = __name__
+debug_bot.log(FILE_NAME, f"telegram_db_name={telegram_db_name}")
 
 nostr_db = client.get_database(nostr_db_name)
 nostr_channels = nostr_db.get_collection("channel")

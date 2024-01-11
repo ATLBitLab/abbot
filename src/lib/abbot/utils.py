@@ -22,12 +22,12 @@ def parse_message(update: Update) -> Dict:
     effective_message: Optional[Message] = try_get(update, "_effective_message")
     message: Optional[Message] = message_update or edited_message or effective_message
     if not message:
-        error_message = f"{log_name}: No message, edited_message or effective_message"
+        error_message = f"No message, edited_message or effective_message"
         error_bot.log(log_name, error_message)
         update_dict = update.to_json()
         error_bot.log(log_name, f"update={dumps(update_dict, indent=4)}")
         return error(error_message, data=update_dict)
-    debug_bot.log(f"{log_name} message{message}")
+    debug_bot.log(log_name, f"message{message}")
     return success(data=message)
 
 
@@ -35,7 +35,7 @@ def parse_message_data(message: Message) -> Dict:
     log_name: str = f"{FILE_NAME}: parse_message_data"
     message_text = try_get(message, "text")
     message_date = try_get(message, "date")
-    debug_bot.log(f"{log_name}: text={message_text}, date={message_date}")
+    debug_bot.log(log_name, f"text={message_text}, date={message_date}")
     return message_text, message_date
 
 
@@ -52,10 +52,10 @@ def parse_chat(message: Message, update: Update) -> Dict:
     effective_chat: Optional[Chat] = try_get(update, "_effective_chat")
     chat: Optional[Chat] = chat_update or effective_chat
     if not chat:
-        error_message = f"{log_name}: No chat or effective_chat data"
+        error_message = log_name, f"No chat or effective_chat data"
         error_bot.log(log_name, error_message)
         return error(error_message, data=message.to_json())
-    debug_bot.log(f"{log_name}: chat={chat}")
+    debug_bot.log(log_name, f"chat={chat}")
     return success(data=chat)
 
 
@@ -64,7 +64,7 @@ def parse_group_chat_data(chat: Chat) -> Dict:
     chat_id: int = try_get(chat, "id")
     chat_title: str = try_get(chat, "title")
     chat_type: str = try_get(chat, "type")
-    debug_bot.log(f"{log_name}: chat_id={chat_id} chat_title={chat_title} chat_type={chat_type}")
+    debug_bot.log(log_name, log_name, f"chat_id={chat_id} chat_title={chat_title} chat_type={chat_type}")
     return chat_id, chat_title, chat_type
 
 
@@ -73,7 +73,7 @@ def parse_dm_chat_data(chat: Chat) -> Dict:
     dm_user_id: int = try_get(chat, "id")
     dm_username: str = try_get(chat, "username")
     dm_first_name: str = try_get(chat, "first_name")
-    debug_bot.log(f"{log_name}: dm_user_id={dm_user_id} dm_username={dm_username} dm_first_name={dm_first_name}")
+    debug_bot.log(log_name, f"dm_user_id={dm_user_id} dm_username={dm_username} dm_first_name={dm_first_name}")
     return dm_user_id, dm_username, dm_first_name
 
 
@@ -83,10 +83,10 @@ def parse_user(message: Message, update: Update) -> Dict:
     effective_user: Optional[User] = try_get(update, "_effective_user")
     user: Optional[User] = user_update or effective_user
     if not user:
-        error_message = f"{log_name}: No user or effective_user data"
+        error_message = log_name, f"No user or effective_user data"
         error_bot.log(log_name, error_message)
         return error(error_message, data=message.to_json())
-    debug_bot.log(f"{log_name}: {user}")
+    debug_bot.log(log_name, f"{user}")
     return success(data=user)
 
 
@@ -96,7 +96,7 @@ def parse_user_data(user: User) -> Dict:
     username: int = try_get(user, "username")
     first_name: int = try_get(user, "first_name")
 
-    debug_bot.log(f"{log_name}: user_id={user_id} username={username} first_name={first_name}")
+    debug_bot.log(log_name, f"user_id={user_id} username={username} first_name={first_name}")
     return user_id, username, first_name
 
 
@@ -140,19 +140,19 @@ async def get_chat_admins(chat_id: int, context: ContextTypes.DEFAULT_TYPE) -> D
     admin_ids = [try_get(admin, "user", "id") for admin in chat_admins]
     admin_usernames = [try_get(admin, "user", "username") for admin in chat_admins]
     chat_admin_data = dict(ids=admin_ids, usernames=admin_usernames)
-    debug_bot.log(f"{log_name}: chat_admin_data={chat_admin_data}")
+    debug_bot.log(log_name, f"chat_admin_data={chat_admin_data}")
     return chat_admin_data
 
 
 async def bot_squawk_architect(error_message: str, context: ContextTypes.DEFAULT_TYPE) -> Message:
     log_name: str = f"{FILE_NAME}: bot_squawk"
-    error_bot.log(f"{log_name}: {error_message}")
+    error_bot.log(log_name, f"{error_message}")
     return await context.bot.send_message(chat_id=THE_ARCHITECT_ID, text=error_message)
 
 
 async def bot_squawk(location: str, squawk: str, context: ContextTypes.DEFAULT_TYPE) -> Message:
     log_name: str = f"{FILE_NAME}: bot_squawk"
-    error_bot.log(f"{log_name}: {squawk}")
+    error_bot.log(log_name, f"{squawk}")
     final_squawk = f"{THE_ARCHITECT_HANDLE} Abbot Error\n\nLocation\n{location}\n\nException\n{squawk}"
     await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=final_squawk)
 

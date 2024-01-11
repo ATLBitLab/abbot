@@ -12,6 +12,8 @@ from lib.db.utils import successful_insert_one
 from lib.abbot.env import PAYMENT_PROCESSOR_KIND, PRICE_PROVIDER_KIND, LNBITS_BASE_URL
 from lib.utils import error, success, successful_response, try_get
 
+FILE_NAME = FILE_NAME
+
 
 class PaymentProcessor(ABC):
     """
@@ -54,6 +56,7 @@ class Strike(PaymentProcessor):
         return vars(self)
 
     async def get_invoice(self, correlation_id, description, amount, chat_id):
+        log_name: str = f"{FILE_NAME}: Strike.get_invoice()"
         invoice_resp: Response = await self._client.post(
             "/invoices",
             json={
@@ -63,17 +66,17 @@ class Strike(PaymentProcessor):
             },
         )
         invoice_data: Dict = invoice_resp.json()
-        debug_bot.log(__name__, f"strike => get_invoice => invoice_resp={invoice_resp.text}")
+        debug_bot.log(log_name, f"strike => get_invoice => invoice_resp={invoice_resp.text}")
 
         invoice_id = try_get(invoice_data, "invoiceId")
         self.CHAT_ID_INVOICE_ID_MAP[chat_id] = invoice_id
-        debug_bot.log(__name__, f"strike => get_invoice => invoice_id={invoice_id}")
+        debug_bot.log(log_name, f"strike => get_invoice => invoice_id={invoice_id}")
 
         quote_resp = await self._client.post(f"/invoices/{invoice_id}/quote")
-        debug_bot.log(__name__, f"strike => get_invoice => quote_resp={quote_resp.text}")
+        debug_bot.log(log_name, f"strike => get_invoice => quote_resp={quote_resp.text}")
 
         quote_data: Dict = quote_resp.json()
-        debug_bot.log(__name__, f"strike => get_invoice => quote_data={quote_data}")
+        debug_bot.log(log_name, f"strike => get_invoice => quote_data={quote_data}")
 
         return success(
             "Invoice created",
@@ -242,7 +245,7 @@ class Coinbase(Provider):
         )
 
     async def get_bitcoin_price(self):
-        log_name: str = f"{__name__}: get_bitcoin_price"
+        log_name: str = f"{FILE_NAME}: get_bitcoin_price"
         response: Response = await self._client.get("/prices/BTC-USD/spot")
         if not successful_response(response):
             return error("Failed to get bitcoin price", data=response)

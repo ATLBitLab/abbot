@@ -501,7 +501,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
             admins: Any = [admin.to_dict() for admin in await chat.get_administrators()] or []
             debug_bot.log(log_name, f"admins={admins}")
         else:
-            return await message.reply_text(f"{stop_command} is disabled in DMs. Feel free to chat at will!")
+            return await message.reply_text(f"{BOT_STOP_COMMAND} is disabled in DMs. Feel free to chat at will!")
         user: User = try_get(update_data, "user")
         user_id, username, first_name = parse_user_data(user)
         debug_bot.log(log_name, f"user={user}")
