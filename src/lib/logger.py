@@ -42,6 +42,7 @@ error_console_handler.setFormatter(error_formatter)
 
 error_log.addHandler(error_file_handler)
 error_log.addHandler(error_console_handler)
+FILE_NAME = __name__
 
 
 class BotLogger:
@@ -50,20 +51,18 @@ class BotLogger:
         self.toggle = toggle
 
     def log(self, fn_name: Optional[str] = None, message: str = None):
+        message = f"{fn_name} {message}" if fn_name and message else None
         if not message:
+            self._error(f"{FILE_NAME}: No message passed to BotLogger.log")
             return
-        message = f"{fn_name} {message}" if fn_name else message
-
-        if self.toggle:
-            print()
-            if self.level == "error":
-                self._error(message)
-            else:
-                self._debug(message)
+        if self.level == "error":
+            self._error(message)
+        else:
+            self._debug(message)
 
     def _error(self, message: str):
         error_log.error(message)
-        debug_log.debug(message)
+        debug_log.debug(f"~~~~~~~~~~~~ERROR~~~~~~~~~~~~: {message}")
 
     def _debug(self, message: str):
         debug_log.debug(message)

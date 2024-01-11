@@ -1,13 +1,12 @@
-from datetime import datetime
 import time
 import tiktoken
-from openai import OpenAI
+from openai import OpenAI, Stream
+from openai.types.chat import ChatCompletionChunk
 from abc import abstractmethod
 from typing import List, Dict
 
 from constants import OPENAI_MODEL
 from ..db.utils import successful_update_one
-from ..abbot.config import BOT_TELEGRAM_HANDLE
 from ..utils import error, success, to_dict, try_get
 from ..db.mongo import GroupConfig, UpdateResult, mongo_abbot
 
@@ -141,22 +140,20 @@ class Abbot(GroupConfig):
         self.update_history_tokens(content)
 
     def chat_completion(self) -> str:
-        """
-        if self.
-        """
+        log_name: str = f"{FILE_NAME}: chat_completion"
         messages_history = self.history[self.history_len :] if self.history_tokens >= 90000 else self.history
-        response = self.client.chat.completions.create(messages=messages_history, model=OPENAI_MODEL)
+        response: Stream[ChatCompletionChunk] = self.client.chat.completions.create(
+            messages=messages_history, model=OPENAI_MODEL
+        )
         answer = try_get(response, "choices", 0, "message", "content")
         input_tokens = try_get(response, "usage", "prompt_tokens")
         output_tokens = try_get(response, "usage", "completion_tokens")
         total_tokens = try_get(response, "usage", "total_tokens")
         self.history_tokens += total_tokens
-        assistant_update = {
-            "role": "assistant",
-            "content": f"{BOT_TELEGRAM_HANDLE} said: {answer} on {datetime.now().isoformat()}",
-        }
+        assistant_update = {"role": "assistant", "content": answer}
         self.update_history(assistant_update)
         if not answer:
-            debug_bot.log(__name__, f"chat_completion => response={response}")
-            error_bot.log(__name__, f"chat_completion => answer={answer}")
+            debug_bot.log(log_name, f"chat_completion response={response}")
+            error_bot.log(log_name, f"chat_completion answer={answer}")
+            error(response)
         return answer, input_tokens, output_tokens, total_tokens
