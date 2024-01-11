@@ -141,7 +141,9 @@ class Abbot(GroupConfig):
 
     def chat_completion(self) -> str:
         log_name: str = f"{FILE_NAME}: chat_completion"
-        messages_history = self.history[self.history_len :] if self.history_tokens >= 90000 else self.history
+        messages_history = self.history
+        if self.history_tokens >= 90000:
+            messages_history = self.history[self.history_len - 100 : self.history_len]
         response: Stream[ChatCompletionChunk] = self.client.chat.completions.create(
             messages=messages_history, model=OPENAI_MODEL
         )
@@ -154,6 +156,6 @@ class Abbot(GroupConfig):
         self.update_history(assistant_update)
         if not answer:
             debug_bot.log(log_name, f"chat_completion response={response}")
-            error_bot.log(log_name, f"chat_completion answer={answer}")
+            error_bot.log(log_name, f"chat_completion => answer={answer}")
             error(response)
         return answer, input_tokens, output_tokens, total_tokens
