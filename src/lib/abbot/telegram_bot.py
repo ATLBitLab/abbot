@@ -333,25 +333,21 @@ async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         log_name: str = f"{FILE_NAME}: start"
-
         response: Dict = parse_message(update)
         if not successful(response):
             debug_bot.log(log_name, f"Failed to parse_message response={response}")
         debug_bot.log(log_name, f"response={response}")
-
         message: Message = try_get(response, "data")
         if not message:
             squawk_msg = f"No message object: update={update} response={response} message={message}"
             return await bot_squawk(log_name, squawk_msg, context)
         debug_bot.log(log_name, f"message={message}")
         message_text, _ = parse_message_data(message)
-
         chat: Chat = try_get(message, "chat")
         chat_id, chat_title, chat_type = parse_group_chat_data(chat)
         chat_user_firstname = try_get(chat, "first_name")
         chat_user_id = try_get(chat, "id")
         chat_user_handle = try_get(chat, "username")
-
         user: User = try_get(message, "user")
         user_id, username, first_name = parse_user_data(user)
         username: str = username or chat_user_handle
@@ -362,7 +358,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not username:
             username = user_id or chat_user_id
             is_handle = False
-
         if chat_type in ("group", "supergroup", "channel"):
             admins: Any = [admin.to_dict() for admin in await chat.get_administrators()] or []
             debug_bot.log(log_name, f"admins={admins}")
@@ -388,7 +383,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         "balance": 5000,
                         "messages": [new_message_dict],
                         "history": [BOT_SYSTEM_OBJECT_GROUPS, intro_history_dict, new_history_dict],
-                        "config": BOT_GROUP_CONFIG_STARTED_UNLEASHED,
+                        "config": BOT_GROUP_CONFIG_STARTED,
                     }
                 },
             )
