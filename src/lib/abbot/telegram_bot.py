@@ -187,12 +187,15 @@ def sanitize_md_v2(text):
     )
 
 
-def get_zero_balance_msg(chat_title, sat_balance, usd_balance):
+def get_balance_message(chat_title, sat_balance, usd_balance):
     group = f"💬 *{chat_title}* 💬"
     satoshis = f"⚖️ *Balance in Satoshis* {sat_balance} sats ⚡️"
     fiat = f"⚖️ *Balance in Fiat* {usd_balance} usd 💰"
-    no_sats = f"No sats left 😢 Please run /fund to topup{dub_nl}*Examples*{nl}/fund 5 usd{nl}/fund 5000 sats"
-    return f"{group}{dub_nl}{satoshis}{dub_nl}{fiat}{dub_nl}{no_sats}"
+    balance_message = f"{group}{dub_nl}{satoshis}{dub_nl}{fiat}{dub_nl}"
+    if 0 in (sat_balance, usd_balance):
+        no_sats = f"No sats left 😢 Please run /fund to topup{dub_nl}*Examples*{nl}/fund 5 usd{nl}/fund 5000 sats"
+        balance_message = f"{balance_message}{no_sats}"
+    return balance_message
 
 
 def format_naked_bot_command(command):
@@ -426,10 +429,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             },
         }
         if group_balance == 0:
-            zero_balance_message: str = sanitize_md_v2(get_zero_balance_msg(chat_title, group_balance))
+            balance_message: str = sanitize_md_v2(get_balance_message(chat_title, group_balance, 0))
             # reuse buttons to ask if they want an invoice
             # or send an invoice
-            return await message.reply_markdown_v2(zero_balance_message)
+            return await message.reply_markdown_v2(balance_message)
         if introduced:
             abbot = Abbot(chat_id, "group", group_history)
             answer, input_tokens, output_tokens, _ = abbot.chat_completion()
@@ -572,8 +575,8 @@ async def balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             group_balance = try_get(group, "balance", default=0)
         usd_balance = await sat_to_usd(group_balance)
-        zero_balance_message: str = sanitize_md_v2(get_zero_balance_msg(chat_title, group_balance, usd_balance))
-        return await message.reply_markdown_v2(zero_balance_message)
+        balance_message: str = sanitize_md_v2(get_balance_message(chat_title, group_balance, usd_balance))
+        return await message.reply_markdown_v2(balance_message)
     except AbbotException as abbot_exception:
         await bot_squawk(log_name, abbot_exception, context)
 
