@@ -1340,24 +1340,20 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     log_name: str = f"{FILE_NAME}: error_handler"
     exception = context.error
     formatted_traceback = "".join(traceback.format_exception(None, exception, exception.__traceback__))
-    base_message = "Exception while handling Telegram update"
-    base_message = f"{base_message}\n\tUpdate={update.to_dict()}\n\tContext={context}"
-    base_message = f"{base_message}\n\n\tException: {exception}\n\n\tTraceback: {formatted_traceback}"
-
     update_dict = update.to_dict()
-    error_bot.log(log_name, "Exception while handling update")
-    error_bot.log(log_name, f"Update={json.dumps(update_dict, indent=4)}")
-    error_bot.log(log_name, f"Exception: {exception}")
-    error_bot.log(log_name, f"Traceback: {formatted_traceback}")
-
-    await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=f"{log_name}: {base_message}")
+    error_msg = "Exception while handling Telegram update"
+    error_msg = f"{error_msg}\n\tupdate={json.dumps(update_dict, indent=4)}\n\tontext={context}"
+    error_msg = f"{error_msg}\n\n\tException: {exception}\n\n\tTraceback: {formatted_traceback}"
+    error_msg = f"{log_name}: {error_msg}"
+    error_bot.log(log_name, error_msg)
+    await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=error_msg)
 
 
 class TelegramBotBuilder:
     from lib.abbot.config import BOT_TELEGRAM_TOKEN
 
     def __init__(self):
-        log_name: str = f"{FILE_NAME}: TelegramBotBuilder()"
+        log_name: str = f"{FILE_NAME}: TelegramBotBuilder.__init__()"
         debug_bot.log(log_name, f"Telegram abbot initializing: name={BOT_NAME} handle={BOT_TELEGRAM_HANDLE}")
         telegram_bot = ApplicationBuilder().token(self.BOT_TELEGRAM_TOKEN).build()
         debug_bot.log(log_name, f"Telegram abbot initialized")
@@ -1366,6 +1362,7 @@ class TelegramBotBuilder:
         telegram_bot.add_handlers(
             handlers=[
                 MessageHandler(CHAT_TYPE_GROUPS & (NEW_CHAT_MEMBERS | CHAT_CREATED), handle_group_adds_abbot),
+                MessageHandler(CHAT_TYPE_GROUPS & LEFT_CHAT_MEMEBERS, handle_group_kicks_bot),
                 MessageHandler(UpdateFilter(CHAT_TYPE_GROUPS & MESSAGE_OR_EDITED), handle_group_message_edit),
                 MessageHandler(REGEX_MARKDOWN_REPLY, handle_markdown_request),
             ]
@@ -1390,14 +1387,12 @@ class TelegramBotBuilder:
 
         telegram_bot.add_handlers(
             handlers=[
-                MessageHandler(CHAT_TYPE_GROUPS & REPLY, handle_group_reply),
                 MessageHandler(CHAT_TYPE_GROUPS & FILTER_MENTION_ABBOT, handle_group_mention),
-                MessageHandler(CHAT_TYPE_GROUPS & LEFT_CHAT_MEMEBERS, handle_group_kicks_bot),
+                MessageHandler(CHAT_TYPE_GROUPS & REPLY, handle_group_reply),
                 MessageHandler(CHAT_TYPE_GROUPS, handle_group_default),
             ]
         )
         telegram_bot.add_error_handler(error_handler)
-
         self.telegram_bot = telegram_bot
 
     def run(self):
