@@ -64,7 +64,7 @@ def parse_group_chat_data(chat: Chat) -> Dict:
     chat_id: int = try_get(chat, "id")
     chat_title: str = try_get(chat, "title")
     chat_type: str = try_get(chat, "type")
-    debug_bot.log(log_name, log_name, f"chat_id={chat_id} chat_title={chat_title} chat_type={chat_type}")
+    debug_bot.log(log_name, f"chat_id={chat_id} chat_title={chat_title} chat_type={chat_type}")
     return chat_id, chat_title, chat_type
 
 
