@@ -1,6 +1,7 @@
-from functools import wraps
 import json
-from typing import Any, Callable, Dict, Optional
+
+from functools import wraps
+from typing import Dict
 from httpx import Response
 
 from qrcode import make
@@ -10,7 +11,6 @@ from requests import request
 
 from telegram.ext import ContextTypes
 from lib.logger import debug_bot
-
 
 TELEGRAM_MESSAGE_FIELDS = [
     "audio",

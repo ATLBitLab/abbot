@@ -28,7 +28,6 @@ Reply = filters.REPLY
 
 from constants import (
     ABBOT_SQUAWKS,
-    ESCAPE_MARKDOWN_V2_CHARS,
     HELP_MENU,
     INTRODUCTION,
     MATRIX_IMG_FILEPATH,
@@ -37,13 +36,10 @@ from constants import (
     SATOSHIS_PER_BTC,
     THE_ARCHITECT_ID,
     THE_ARCHITECT_HANDLE,
-    THE_ARCHITECT_USERNAME,
 )
 from ..abbot.config import (
     BOT_GROUP_CONFIG_DEFAULT,
     BOT_GROUP_CONFIG_STARTED,
-    BOT_GROUP_CONFIG_STARTED_UNLEASHED,
-    BOT_GROUP_CONFIG_STOPPED,
     BOT_LIGHTNING_ADDRESS,
     BOT_SYSTEM_OBJECT_GROUPS,
     BOT_NAME,
@@ -75,7 +71,7 @@ MESSAGE_OR_EDITED = UpdateType.MESSAGES
 
 # local
 from ..logger import debug_bot, error_bot
-from ..utils import error, qr_code, success, try_get, successful
+from ..utils import error, qr_code, try_get, successful
 from ..db.mongo import TelegramDM, TelegramGroup, mongo_abbot
 from ..abbot.core import Abbot
 from ..abbot.utils import (
@@ -184,15 +180,8 @@ async def recalc_balance_sats(in_token_count: int, out_token_count: int):
         raise abbot_exception
 
 
-# def escape_markdown_v2(text):
-#     return "".join("\\" + char if char in ESCAPE_MARKDOWN_V2_CHARS else char for char in text)
-
-
 def sanitize_md_v2(text):
-    # Characters to be escaped in Telegram Markdown V2
     escape_chars = "_[]()~>#+-=|{}.!^@$%&;:?/<,"
-
-    # Remove surrogates and escape Markdown V2 characters
     return "".join(
         "\\" + char if char in escape_chars else char for char in text if not (0xD800 <= ord(char) <= 0xDFFF)
     )
@@ -206,6 +195,20 @@ def get_zero_balance_msg(chat_title, sat_balance, usd_balance):
     return f"{group}{dub_nl}{satoshis}{dub_nl}{fiat}{dub_nl}{no_sats}"
 
 
+def format_naked_bot_command(command):
+    return f"/{command}{BOT_TELEGRAM_HANDLE}"
+
+
+BOT_HELP_COMMAND = format_naked_bot_command("help")
+BOT_RULES_COMMAND = format_naked_bot_command("rules")
+BOT_START_COMMAND = format_naked_bot_command("start")
+BOT_STOP_COMMAND = format_naked_bot_command("stop")
+BOT_UNLEASH_COMMAND = format_naked_bot_command("unleash")
+BOT_LEASH_COMMAND = format_naked_bot_command("leash")
+BOT_BALANCE_COMMAND = format_naked_bot_command("balance")
+BOT_FUND_COMMAND = format_naked_bot_command("fund")
+BOT_STATUS_COMMAND = format_naked_bot_command("status")
+BOT_COUNT_COMMAND = format_naked_bot_command("count")
 # ---------------------------------------------------------------------------------------
 # --                      Core Telegram Handler Functions                              --
 # ---------------------------------------------------------------------------------------
@@ -252,9 +255,10 @@ async def handle_group_adds_abbot(update: Update, context: ContextTypes.DEFAULT_
             group_update = {"$set": {"title": chat_title, "id": chat_id, "type": chat_type, "admins": group_admins}}
         group: TelegramGroup = mongo_abbot.find_one_group_and_update(chat_id_filter, group_update)
         debug_bot.log(log_name, f"group={group}")
-        await context.bot.send_message(
-            chat_id=ABBOT_SQUAWKS, text=f"{log_name}: Abbot added to new group: title={chat_title}, id={chat_id})"
+        squawk_msg = (
+            f"{log_name}: {THE_ARCHITECT_HANDLE} New group added Abbot!\n\ntitle={chat_title}\nchat_id={chat_id}"
         )
+        await bot_squawk(log_name, squawk_msg, context)
     except AbbotException as abbot_exception:
         await bot_squawk(log_name, abbot_exception, context)
 
@@ -444,7 +448,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 abbot_squawk = f"Group balance: {group_balance}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
                 answer = f"{answer}\n\n Note: You group is now out of SATs. Please run /fund to continue to chat."
                 debug_bot.log(log_name, abbot_squawk)
-                await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
+                await bot_squawk(log_name, abbot_squawk, context)
             group_balance -= cost_sats
             if group_balance <= 0:
                 group_balance = 0
@@ -497,7 +501,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
             admins: Any = [admin.to_dict() for admin in await chat.get_administrators()] or []
             debug_bot.log(log_name, f"admins={admins}")
         else:
-            return await message.reply_text("/stop is disabled in DMs. Feel free to chat at will!")
+            return await message.reply_text(f"{stop_command} is disabled in DMs. Feel free to chat at will!")
         user: User = try_get(update_data, "user")
         user_id, username, first_name = parse_user_data(user)
         debug_bot.log(log_name, f"user={user}")
@@ -506,11 +510,11 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
         new_history_dict = {"role": "user", "content": f"@{username} said: {message_text}"}
         group_exists: bool = mongo_abbot.group_does_exist(chat_id_filter)
         if not group_exists:
-            group_dne_err = f"Group chat not onboarded"
-            reply_msg = f"Did you run /start?"
+            squawk = f"Chat does not exist"
+            reply_msg = "Hmmm, something went wrong. Did you run /start{} first?"
             await message.reply_text(reply_msg)
-            abbot_squawk = f"{group_dne_err}\n\nchat_id={chat_id}, chat_title={chat_title}"
-            return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=group_dne_err)
+            abbot_squawk = f"{squawk}\n\nchat_id={chat_id}, chat_title={chat_title}"
+            return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=squawk)
         debug_bot.log(log_name, f"group_exists={group_exists}")
         group: TelegramGroup = mongo_abbot.find_one_group_and_update(
             chat_id_filter,
@@ -534,7 +538,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
             abbot_squawk = f"{log_name}: {reply_text_err} => chat_id={chat_id}, chat_title={chat_title}"
             error_bot.log(log_name, abbot_squawk)
             await message.reply_text(reply_text_err)
-            return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
+            return await bot_squawk(log_name, abbot_squawk, context)
         await message.reply_text(f"Thanks for using {BOT_NAME}! Come back soon!")
         abbot_squawk = f"{BOT_NAME} stopped\n\nchat_id={chat_id}, chat_title={chat_title}"
         await bot_squawk(log_name, abbot_squawk, context)
@@ -891,7 +895,7 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
             error_msg = f"{no_group_error}: group={group} group_config={group_config}"
             abbot_squawk = f"{abbot_squawk}\n\n{error_msg}"
             error_bot.log(log_name, abbot_squawk)
-            await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
+            await bot_squawk(log_name, abbot_squawk, context)
             return await message.reply_text(stopped_err)
         debug_bot.log(log_name, f"group={group}")
         debug_bot.log(log_name, f"group_config={group_config}")
@@ -900,7 +904,7 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
         if not started:
             abbot_squawk = f"{log_name}: {stopped_err}: id={chat_id}, title={chat_title}"
             error_bot.log(log_name, abbot_squawk)
-            await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
+            await bot_squawk(log_name, abbot_squawk, context)
             return await message.reply_text(stopped_err)
         new_history_dict = {"role": "user", "content": f"@{username} said: {message_text}"}
         if not message_text:
@@ -921,13 +925,13 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
             abbot_squawk = f"{abbot_squawk}\n\n{error_msg}"
             error_bot.log(log_name, abbot_squawk)
             await message.reply_text(stopped_err)
-            return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
+            return await bot_squawk(log_name, abbot_squawk, context)
         debug_bot.log(log_name, f"group={group}")
         debug_bot.log(log_name, f"group_config={group_config}")
         if group_balance == 0:
             group_no_sats_msg = f"No sats left 😢 Run /fund to refill your sats and continue chatting"
             abbot_squawk = f"Group balance: {group_balance}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
-            await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
+            await bot_squawk(log_name, abbot_squawk, context)
             return await message.reply_text(group_no_sats_msg)
         abbot = Abbot(chat_id, "group", group_history)
         answer, input_tokens, output_tokens, _ = abbot.chat_completion()
@@ -938,14 +942,14 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
             msg = f"{sub_log_name}: Failed to calculate remaining sats"
             msg = f"{msg}: group_balance={group_balance}\nresponse={response}\nchat=(id={chat_id}\ntitle=({chat_title})"
             error_bot.log(log_name, msg)
-            await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=msg)
+            await bot_squawk(log_name, msg, context)
         cost_sats: int = try_get(response, "cost_sats", default=500)
         group_balance = 0 if group_balance < 0 else group_balance - cost_sats
         if group_balance == 0:
             abbot_squawk = f"Group balance: {group_balance}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
             answer = f"{answer}\n\n Note: No sats left 😢 Please run /fund to continue chatting"
             debug_bot.log(log_name, abbot_squawk)
-            await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
+            await bot_squawk(log_name, abbot_squawk, context)
         debug_bot.log(log_name, f"group_balance={group_balance}")
         assistant_history_update = {"role": "assistant", "content": answer}
         group_history = abbot.get_history()
@@ -1018,12 +1022,12 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 reply_msg = f"{no_group_error} - Did you run /start{BOT_TELEGRAM_HANDLE}?"
                 abbot_squawk = f"{abbot_squawk}\n\n{reply_msg}"
                 error_bot.log(log_name, abbot_squawk)
-                await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
+                await bot_squawk(log_name, abbot_squawk, context)
                 return await message.reply_text(reply_msg)
             elif not started:
                 abbot_squawk = f"{log_name}: {stopped_err}: id={chat_id}, title={chat_title}"
                 error_bot.log(log_name, abbot_squawk)
-                await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
+                await bot_squawk(log_name, abbot_squawk, context)
                 return await message.reply_text(stopped_err)
             debug_bot.log(log_name, f"group={group}")
             debug_bot.log(log_name, f"group_config={group_config}")
@@ -1060,7 +1064,7 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 error_msg = f"{no_group_error}: group={group} group_config={group_config}"
                 abbot_squawk = f"{abbot_squawk}\n\n{error_msg}"
                 error_bot.log(log_name, abbot_squawk)
-                return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
+                return await bot_squawk(log_name, abbot_squawk, context)
             group_id: str = try_get(group, "id")
             group_title: str = try_get(group, "title")
             group_created_at: str = try_get(group, "created_at")
@@ -1070,7 +1074,7 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
             if group_balance == 0:
                 group_no_sats_msg = f"No sats left 😢 Run /fund to continue chatting"
                 abbot_squawk = f"Group balance: {group_balance}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
-                await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
+                await bot_squawk(log_name, abbot_squawk, context)
                 return await message.reply_text(group_no_sats_msg)
             abbot = Abbot(chat_id, "group", group_history)
             answer, input_tokens, output_tokens, _ = abbot.chat_completion()
@@ -1082,7 +1086,7 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 abbot_squawk = f"{calc_failed_msg}: group_id={chat_id}\ngroup_title=({chat_title})"
                 abbot_squawk = f"{abbot_squawk}: group_balance={group_balance}\nresponse={response}\n"
                 error_bot.log(log_name, abbot_squawk)
-                await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
+                await bot_squawk(log_name, abbot_squawk, context)
             debug_bot.log(log_name, f"response={response}")
             cost_sats: int = try_get(response, "cost_sats", default=500)
             group_balance = 0 if group_balance < 0 else group_balance - cost_sats
@@ -1090,7 +1094,7 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 abbot_squawk = f"Group balance: {group_balance}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
                 answer = f"{answer}\n\n Note: You group is now out of SATs. Please run /fund to topup."
                 debug_bot.log(log_name, abbot_squawk)
-                await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
+                await bot_squawk(log_name, abbot_squawk, context)
             debug_bot.log(log_name, f"cost_sats={cost_sats}")
             debug_bot.log(log_name, f"group_balance={group_balance}")
             assistant_history_update = {"role": "assistant", "content": answer}
@@ -1188,33 +1192,6 @@ async def handle_group_kicks_bot(update: Update, context: ContextTypes.DEFAULT_T
         await bot_squawk(log_name, abbot_exception, context)
 
 
-"""
-async def handle_chat_migrated():
-        => check for old chat doc
-        => update old id -> new id
-"""
-"""
-def handle_missing_username(message, username):
-    log_name: str = f"{FILE_NAME}: handle_group_default"
-    message_text = try_get(message, "text")
-    
-    if not message_text:
-        return error(f"{log_name}: No message text: message={message}")
-    
-    new_history_dict = {"role": "user", "content": f"@{username} said: {message_text}"}
-    if not username:
-        new_history_dict = {"role": "user", "content": f"{message_text}"}
-    elif username:
-        new_history_dict = {"role": "user", "content": f"@{username} said: {message_text}"}
-    elif not username:
-        new_history_dict = {"role": "user", "content": f"{message_text}"}
-    elif username:
-        new_history_dict = {"role": "user", "content": f"@{username} said: {message_text}"}
-
-    return new_history_dict
-"""
-
-
 async def handle_group_default(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         log_name: str = f"{FILE_NAME}: handle_group_default"
@@ -1309,17 +1286,17 @@ async def handle_group_default(update: Update, context: ContextTypes.DEFAULT_TYP
                 if not successful(response):
                     sub_log_name = f"{log_name}: recalc_balance_sats"
                     error_bot.log(log_name, f"response={response}")
-                    msg = f"{sub_log_name}: Failed to calculate remaining sats"
-                    msg = f"{msg}: group_balance={group_balance}\nresponse={response}\nchat=(id={chat_id}\ntitle=({chat_title})"
-                    error_bot.log(log_name, msg)
-                    await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=msg)
+                    abbot_squawk = f"{sub_log_name}: Failed to calculate remaining sats"
+                    abbot_squawk = f"{abbot_squawk}: group_balance={group_balance}\nresponse={response}\nchat=(id={chat_id}\ntitle=({chat_title})"
+                    error_bot.log(log_name, abbot_squawk)
+                    await bot_squawk(log_name, abbot_squawk, context)
                 cost_sats: int = try_get(response, "cost_sats", default=500)
                 group_balance = 0 if group_balance < 0 else group_balance - cost_sats
                 if group_balance == 0:
                     abbot_squawk = f"Group balance: {group_balance}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
                     answer = f"{answer}\n\n Note: You group is now out of SATs. Please run /fund to continue to chat."
                     debug_bot.log(log_name, abbot_squawk)
-                    await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=abbot_squawk)
+                    await bot_squawk(log_name, abbot_squawk, context)
                 debug_bot.log(log_name, f"group_balance={group_balance}")
                 group: TelegramGroup = mongo_abbot.find_one_group_and_update(
                     chat_id_filter,
@@ -1343,7 +1320,7 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     error_msg = f"{error_msg}\n\n\tException: {exception}\n\n\tTraceback: {formatted_traceback}"
     error_msg = f"{log_name}: {error_msg}"
     error_bot.log(log_name, error_msg)
-    await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=error_msg)
+    await bot_squawk(log_name, error_msg, context)
 
 
 class TelegramBotBuilder:
@@ -1374,10 +1351,10 @@ class TelegramBotBuilder:
                 CommandHandler("stop", stop, CHAT_TYPE_GROUPS),
                 CommandHandler("unleash", unleash, CHAT_TYPE_GROUPS),
                 CommandHandler("leash", leash, CHAT_TYPE_GROUPS),
-                CommandHandler("count", count, CHAT_TYPE_GROUPS),
-                CommandHandler("status", status, CHAT_TYPE_GROUPS),
                 CommandHandler("balance", balance, CHAT_TYPE_GROUPS),
                 CommandHandler("fund", fund, CHAT_TYPE_GROUPS),
+                CommandHandler("count", count, CHAT_TYPE_GROUPS),
+                CommandHandler("status", status, CHAT_TYPE_GROUPS),
                 CallbackQueryHandler(fund_button),
             ]
         )
@@ -1385,7 +1362,7 @@ class TelegramBotBuilder:
         telegram_bot.add_handlers(
             handlers=[
                 MessageHandler(CHAT_TYPE_GROUPS & FILTER_MENTION_ABBOT, handle_group_mention),
-                MessageHandler(CHAT_TYPE_GROUPS & REPLY, handle_group_reply),
+                MessageHandler(CHAT_TYPE_GROUPS & FilterAbbotReply(), handle_group_reply),
                 MessageHandler(CHAT_TYPE_GROUPS, handle_group_default),
             ]
         )

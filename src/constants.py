@@ -1,6 +1,8 @@
 from typing import List
 from os.path import abspath
 
+from lib.abbot.config import BOT_TELEGRAM_HANDLE
+
 
 OPENAI_MODEL: str = "gpt-4-1106-preview"
 THE_ARCHITECT_ID: int = 1711738045
@@ -8,6 +10,7 @@ THE_ARCHITECT_USERNAME: str = "nonni_io"
 THE_ARCHITECT_HANDLE: str = f"@{THE_ARCHITECT_USERNAME}"
 ABBOT_SQUAWKS: int = -1002139786317
 SATOSHIS_PER_BTC: int = 100000000
+NAKED_COMMANDS = ["help", "rules", "start", "stop", "unleash", "leash", "balance", "fund", "count", "status"]
 HELP_MENU = f"""
 Hello world 🤖
 
@@ -29,10 +32,14 @@ My goals are simple: reduce work for bitcoin community organizers, answer bitcoi
 /balance ⚖️ View your balance in usd and sats
 /fund ⚡️ Refill your SATs: `/fund 1000 sats`
 
+*About Us*
+/status 📊 View info about started & unleashed
+/count 🔢 View info about unleash cadence
+
 Abbot is not a wallet and does not store funds
 Invoices help @atlbitlab pay the bills for using Abbot
 
-Built with ☕️, 🧡 & ₿ by @atlbitlab
+Built with ☕️🧡₿ by @atlbitlab
 Est block #797812
 """
 
