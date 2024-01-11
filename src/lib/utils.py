@@ -162,7 +162,7 @@ def to_dict(cls):
     print("to_dict")
     cls_name = f"{cls.__name__}: @to_dict: "
     if hasattr(cls, "to_dict"):
-        error_bot.log(f"{cls_name}", f"already has method 'to_dict'")
+        error_bot.log("", f"{cls_name}", f"already has method 'to_dict'")
         return
 
     def to_dict(self):

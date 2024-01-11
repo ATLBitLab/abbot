@@ -50,11 +50,11 @@ class BotLogger:
         self.level = level
         self.toggle = toggle
 
-    def log(self, fn_name: Optional[str] = None, message: str = None):
-        message = f"{fn_name} {message}" if fn_name and message else None
+    def log(self, fn_name: str = FILE_NAME, message: Optional[str] = None):
         if not message:
-            self._error(f"{FILE_NAME}: No message passed to BotLogger.log")
-            return
+            self._error(f"{FILE_NAME}: No message passed to BotLogger.log()")
+            message = fn_name
+        message = f"{fn_name} {message}"
         if self.level == "error":
             self._error(message)
         else:

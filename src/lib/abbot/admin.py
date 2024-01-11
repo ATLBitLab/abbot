@@ -64,5 +64,5 @@ async def admin_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
     abbot: Abbot = Abbot(chat_id)
     status_data = json.dumps(abbot.get_config(), indent=4)
-    debug_bot.log(f"statuses => {abbot} status_data={status_data}")
+    debug_bot.log("", f"statuses => {abbot} status_data={status_data}")
     await message.reply_text(status_data)

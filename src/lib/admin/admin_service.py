@@ -39,12 +39,12 @@ class AdminService:
             fn = "start_service:"
             service = BOT_NAME.lower()
             completed_process = run(["sudo", "systemctl", "start", service], check=True)
-            debug_bot.log(f"{fn} Successfully started {service}")
+            debug_bot.log("", f"{fn} Successfully started {service}")
             self.status_code = try_get(completed_process, "returncode")
             self.status = try_get(SERVICE_STATUSES, self.status_code, default=-1)
             return True
         except CalledProcessError as exception:
-            error_bot.log(f"Error stopping {service}: {exception}")
+            error_bot.log("", f"Error stopping {service}: {exception}")
             raise exception
 
     @try_except
@@ -53,18 +53,18 @@ class AdminService:
             fn = "stop_abbot_process:"
             service = BOT_NAME.lower()
             run(["sudo", "systemctl", "stop", service], check=True)
-            debug_bot.log(f"{fn} Successfully stopped {service}")
+            debug_bot.log("", f"{fn} Successfully stopped {service}")
             self.status = "stopped"
             return True
         except CalledProcessError as exception:
-            error_bot.log(f"Error stopping {service}: {exception}")
+            error_bot.log("", f"Error stopping {service}: {exception}")
             raise exception
 
     @try_except
     def kill_service(self) -> Exception:
         fn = "kill_service:"
         exception = Exception("Plugging Abbot back into the matrix!")
-        error_bot.log(f"{fn} => raising exception={exception}")
+        error_bot.log("", f"{fn} => raising exception={exception}")
         raise exception
 
     @try_except

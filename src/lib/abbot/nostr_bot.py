@@ -161,7 +161,7 @@ class NostrBotBuilder:
                             debug_bot.log(fn, f"result {result}")
                             dm: Dict = mongo_nostr.find_one_dm({"id": event.pubkey()})
                             if not successful_insert_one(result):
-                                error_bot.log(f"insert_dm failed: {event_json}")
+                                error_bot.log("", f"insert_dm failed: {event_json}")
                                 time.sleep(1)
                         # IPython.embed()
                         self.handle_dm(event)
@@ -183,7 +183,7 @@ class NostrBotBuilder:
             abbot_exception = AbbotException(
                 abbot_exception, format_exc(), format_tb(abbot_exception.__traceback__)[:-1]
             )
-            error_bot.log(f"Main Loop Error: {abbot_exception}")
+            error_bot.log("", f"Main Loop Error: {abbot_exception}")
             time.sleep(5)
 
     @try_except
