@@ -12,7 +12,7 @@ from lib.db.utils import successful_insert_one
 from lib.abbot.env import PAYMENT_PROCESSOR_KIND, PRICE_PROVIDER_KIND, LNBITS_BASE_URL
 from lib.utils import error, success, successful_response, try_get
 
-FILE_NAME = FILE_NAME
+FILE_NAME = __name__
 
 
 class PaymentProcessor(ABC):

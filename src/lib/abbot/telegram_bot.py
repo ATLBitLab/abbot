@@ -1344,23 +1344,23 @@ class TelegramBotBuilder:
 
         telegram_bot.add_handlers(
             handlers=[
-                MessageHandler(CHAT_TYPE_PRIVATE, handle_dm),
                 CommandHandler("help", help),
                 CommandHandler("rules", rules),
                 CommandHandler("start", start),
-                CommandHandler("stop", stop, CHAT_TYPE_GROUPS),
-                CommandHandler("unleash", unleash, CHAT_TYPE_GROUPS),
-                CommandHandler("leash", leash, CHAT_TYPE_GROUPS),
-                CommandHandler("balance", balance, CHAT_TYPE_GROUPS),
-                CommandHandler("fund", fund, CHAT_TYPE_GROUPS),
-                CommandHandler("count", count, CHAT_TYPE_GROUPS),
-                CommandHandler("status", status, CHAT_TYPE_GROUPS),
+                CommandHandler("stop", stop),
+                CommandHandler("unleash", unleash),
+                CommandHandler("leash", leash),
+                CommandHandler("balance", balance),
+                CommandHandler("fund", fund),
+                CommandHandler("count", count),
+                CommandHandler("status", status),
                 CallbackQueryHandler(fund_button),
             ]
         )
 
         telegram_bot.add_handlers(
             handlers=[
+                MessageHandler(CHAT_TYPE_PRIVATE, handle_dm),
                 MessageHandler(CHAT_TYPE_GROUPS & FILTER_MENTION_ABBOT, handle_group_mention),
                 MessageHandler(CHAT_TYPE_GROUPS & FilterAbbotReply(), handle_group_reply),
                 MessageHandler(CHAT_TYPE_GROUPS, handle_group_default),
