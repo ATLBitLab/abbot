@@ -177,9 +177,9 @@ async def recalc_balance_sats(in_token_count: int, out_token_count: int):
         cost_input_tokens = (in_token_count / ORG_PER_TOKEN_COST_DIV) * (ORG_INPUT_TOKEN_COST * ORG_TOKEN_COST_MULT)
         cost_output_tokens = (out_token_count / ORG_PER_TOKEN_COST_DIV) * (ORG_OUTPUT_TOKEN_COST * ORG_TOKEN_COST_MULT)
         total_token_cost_usd = cost_input_tokens + cost_output_tokens
-        total_token_cost_sats = round((total_token_cost_usd / btcusd_price) * SATOSHIS_PER_BTC, 2)
+        total_token_cost_sats = int((total_token_cost_usd / btcusd_price) * SATOSHIS_PER_BTC)
 
-        return success(cost_usd=total_token_cost_usd, cost_sats=int(total_token_cost_sats))
+        return dict(status="success", cost_usd=total_token_cost_usd, cost_sats=total_token_cost_sats)
     except AbbotException as abbot_exception:
         raise abbot_exception
 
@@ -753,8 +753,9 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
             amount: float = float(try_get(args, 1))
         else:
             amount: int = int(try_get(args, 1))
-        if amount < 0.01:
-            return await message.reply_text("Amount too low. Must be at least 0.01")
+        if amount < 1:
+            one_usd_in_sats: int = await usd_to_sat(1)
+            return await message.reply_text(f"Amount too low. Must be at least 1 usd or {one_usd_in_sats} sats")
         debug_bot.log(log_name, f"amount={amount}")
         currency_unit: str = try_get(args, 2, default="sats")
         currency_unit = currency_unit.lower()
@@ -804,21 +805,22 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
         is_paid = False
         while expiration_in_sec >= 0 and not is_paid:
             debug_bot.log(log_name, f"expiration_in_sec={expiration_in_sec}")
+            is_paid = await payment_processor.invoice_is_paid(invoice_id)
+            debug_bot.log(log_name, f"is_paid={is_paid}")
+            expiration_in_sec -= 1
+            if expiration_in_sec % 10 == 0:
+                query: Optional[CallbackQuery] = try_get(update, "callback_query")
+                await message.edit_text(f"🕰️ Invoice expires in: {expiration_in_sec} seconds\n")
             if expiration_in_sec == 0:
                 debug_bot.log(log_name, f"expiration_in_sec == 0, cancelling invoice_id={invoice_id}")
                 cancelled = await payment_processor.expire_invoice(invoice_id)
                 debug_bot.log(log_name, f"cancelled={cancelled}")
                 if not cancelled:
-                    cancel_reply = (
-                        f"{cancel_fail_msg}: Try again or pay to abbot@atlbitlab.com and contact {THE_ARCHITECT_HANDLE}"
-                    )
+                    try_again = "Try again or pay to"
+                    pay_to_lnaddr = f"abbot@atlbitlab.com and contact {THE_ARCHITECT_HANDLE}"
+                    cancel_reply = f"{cancel_fail_msg}: {try_again} {pay_to_lnaddr}"
                     await context.bot.send_message(chat_id=THE_ARCHITECT_ID, text=cancel_squawk)
                     return await message.reply_text(cancel_reply)
-            is_paid = await payment_processor.invoice_is_paid(invoice_id)
-            debug_bot.log(log_name, f"is_paid={is_paid}")
-            expiration_in_sec -= 1
-            if expiration_in_sec % 10 == 0:
-                await message.reply_text(f"🕰️ Invoice expires in: {expiration_in_sec} seconds\n")
             time.sleep(1)
         if is_paid:
             group: TelegramGroup = mongo_abbot.find_one_group_and_update(
@@ -1152,7 +1154,7 @@ async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 },
             }
         dm: TelegramDM = mongo_abbot.find_one_dm_and_update(chat_id_filter, dm_update)
-        debug_bot.log(log_name, f"dm={dm}")
+        debug_bot.log(log_name, f"chat_id={chat_id}")
         dm_history: List = try_get(dm, "history")
         abbot = Abbot(chat_id, "dm", dm_history)
         answer, _, _, _ = abbot.chat_completion()
@@ -1288,8 +1290,8 @@ async def handle_group_default(update: Update, context: ContextTypes.DEFAULT_TYP
         count: Dict = try_get(group_config, "count")
         if unleashed and count > 0:
             abbot = Abbot(chat_id, chat_type, group_history)
-            debug_bot.log(f"abbot.history_len={abbot.history_len}")
-            debug_bot.log(f"count={count}")
+            debug_bot.log(log_name, f"abbot.history_len={abbot.history_len}")
+            debug_bot.log(log_name, f"count={count}")
             if abbot.history_len % count == 0:
                 if group_balance == 0:
                     # DM an admin?
