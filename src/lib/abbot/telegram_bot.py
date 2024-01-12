@@ -78,6 +78,7 @@ from ..db.mongo import TelegramDM, TelegramGroup, mongo_abbot
 from ..abbot.core import Abbot
 from ..abbot.utils import (
     bot_squawk,
+    bot_squawk_error,
     calculate_tokens,
     parse_group_chat_data,
     parse_dm_chat_data,
@@ -179,7 +180,7 @@ async def recalc_balance_sats(in_token_count: int, out_token_count: int):
 
         return dict(status="success", cost_usd=total_token_cost_usd, cost_sats=total_token_cost_sats)
     except AbbotException as abbot_exception:
-        raise abbot_exception
+        raise dict(status="error", data=abbot_exception)
 
 
 def sanitize_md_v2(text):
@@ -259,13 +260,12 @@ async def handle_group_adds_abbot(update: Update, context: ContextTypes.DEFAULT_
         if group:
             group_update = {"$set": {"title": chat_title, "id": chat_id, "type": chat_type, "admins": group_admins}}
         group: TelegramGroup = mongo_abbot.find_one_group_and_update(chat_id_filter, group_update)
-        debug_bot.log(log_name, f"group={group}")
         squawk_msg = (
             f"{log_name}: {THE_ARCHITECT_HANDLE} New group added Abbot!\n\ntitle={chat_title}\nchat_id={chat_id}"
         )
         await bot_squawk(log_name, squawk_msg, context)
     except AbbotException as abbot_exception:
-        await bot_squawk(log_name, abbot_exception, context)
+        await bot_squawk_error(log_name, abbot_exception, context)
 
 
 async def handle_group_message_edit(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -273,7 +273,7 @@ async def handle_group_message_edit(update: Update, context: ContextTypes.DEFAUL
         log_name: str = f"{FILE_NAME}: handle_group_message_edit"
         debug_bot.log(log_name, f"update={update}")
     except AbbotException as abbot_exception:
-        await bot_squawk(log_name, abbot_exception, context)
+        await bot_squawk_error(log_name, abbot_exception, context)
 
 
 async def handle_markdown_request(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -307,7 +307,7 @@ async def handle_markdown_request(update: Update, context: ContextTypes.DEFAULT_
             sanitized_text = sanitize_md_v2(reply_to_message_text)
             await message.reply_markdown_v2(sanitized_text)
     except AbbotException as abbot_exception:
-        await bot_squawk(log_name, abbot_exception, context)
+        await bot_squawk_error(log_name, abbot_exception, context)
 
 
 async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -322,7 +322,7 @@ async def help(update: Update, context: ContextTypes.DEFAULT_TYPE):
         sanitized_text = sanitize_md_v2(HELP_MENU)
         await message.reply_markdown_v2(sanitized_text, disable_web_page_preview=True)
     except AbbotException as abbot_exception:
-        await bot_squawk(log_name, abbot_exception, context)
+        await bot_squawk_error(log_name, abbot_exception, context)
 
 
 async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -336,7 +336,7 @@ async def rules(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message: Message = try_get(update_data, "message")
         await message.reply_markdown_v2(RULES, disable_web_page_preview=True)
     except AbbotException as abbot_exception:
-        await bot_squawk(log_name, abbot_exception, context)
+        await bot_squawk_error(log_name, abbot_exception, context)
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -367,19 +367,21 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not username:
             username = user_id or chat_user_id
             is_handle = False
-        if chat_type in ("group", "supergroup", "channel"):
-            admins: Any = [admin.to_dict() for admin in await chat.get_administrators()] or []
-            debug_bot.log(log_name, f"admins={admins}")
-        chat_id_filter = {"id": chat_id}
-        new_message_dict = message.to_dict()
         intro_history_dict = {"role": "assistant", "content": INTRODUCTION}
         new_history_dict = {"role": "user", "content": f"@{username} said: {message_text}"}
         if not username:
             new_history_dict = {"role": "user", "content": f"someone said: {message_text}"}
         elif not is_handle:
             new_history_dict = {"role": "user", "content": f"{username} said: {message_text}"}
+        if chat_type in ("group", "supergroup", "channel"):
+            admins: Any = [admin.to_dict() for admin in await chat.get_administrators()] or []
+            debug_bot.log(log_name, f"admins={admins}")
+        chat_id_filter = {"id": chat_id}
+        new_message_dict = message.to_dict()
         group: TelegramGroup = mongo_abbot.find_one_group(chat_id_filter)
         if not group:
+            debug_bot.log(log_name, f"no group found chat_id={chat_id} chat_title={chat_title}")
+            await bot_squawk(log_name, f"no group found chat_id={chat_id} chat_title={chat_title}", context)
             group: TelegramGroup = mongo_abbot.find_one_group_and_update(
                 chat_id_filter,
                 {
@@ -396,11 +398,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     }
                 },
             )
-            debug_bot.log(log_name, f"group={group}")
             await message.reply_photo(MATRIX_IMG_FILEPATH, f"Please wait while {BOT_NAME} is unplugged from the Matrix")
             time.sleep(3)
             return await message.reply_markdown_v2(INTRODUCTION, disable_web_page_preview=True)
-        debug_bot.log(log_name, f"group={group}")
         group_history: List = try_get(group, "history")
         group_history = [*group_history, new_history_dict]
         group_config: Dict = try_get(group, "config")
@@ -480,12 +480,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     },
                 },
             )
-            debug_bot.log(log_name, f"group={group}")
             if "`" in answer:
                 return await message.reply_markdown_v2(sanitize_md_v2(answer), disable_web_page_preview=True)
             return await message.reply_text(answer, disable_web_page_preview=True)
     except AbbotException as abbot_exception:
-        await bot_squawk(log_name, abbot_exception, context)
+        await bot_squawk_error(log_name, abbot_exception, context)
 
 
 async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -536,7 +535,6 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 },
             },
         )
-        debug_bot.log(log_name, f"group={group}")
         still_running: bool = try_get(group, "config", "started")
         if still_running:
             reply_text_err = f"Failed to stop {BOT_NAME}. Please try again or contact {THE_ARCHITECT_HANDLE} for help"
@@ -548,7 +546,7 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
         abbot_squawk = f"{BOT_NAME} stopped\n\nchat_id={chat_id}, chat_title={chat_title}"
         await bot_squawk(log_name, abbot_squawk, context)
     except AbbotException as abbot_exception:
-        await bot_squawk(log_name, abbot_exception, context)
+        await bot_squawk_error(log_name, abbot_exception, context)
 
 
 async def balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -580,7 +578,7 @@ async def balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
         balance_message: str = sanitize_md_v2(get_balance_message(chat_title, group_balance, usd_balance))
         return await message.reply_markdown_v2(balance_message)
     except AbbotException as abbot_exception:
-        await bot_squawk(log_name, abbot_exception, context)
+        await bot_squawk_error(log_name, abbot_exception, context)
 
 
 async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -615,7 +613,7 @@ async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         await message.reply_text(f"Abbot has been unleashed to respond every {new_count} messages")
     except AbbotException as abbot_exception:
-        await bot_squawk(log_name, abbot_exception, context)
+        await bot_squawk_error(log_name, abbot_exception, context)
 
 
 async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -643,7 +641,7 @@ async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
         await message.reply_text(f"Abbot has been leashed to not respond on message count")
     except AbbotException as abbot_exception:
-        await bot_squawk(log_name, abbot_exception, context)
+        await bot_squawk_error(log_name, abbot_exception, context)
 
 
 async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -685,7 +683,7 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         full_msg = sanitize_md_v2(f"{group_msg}\n{started}\n{introduced}\n{unleashed}\n{count}")
         await message.reply_markdown_v2(full_msg)
     except AbbotException as abbot_exception:
-        await bot_squawk(log_name, abbot_exception, context)
+        await bot_squawk_error(log_name, abbot_exception, context)
 
 
 async def count(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -719,7 +717,7 @@ async def count(update: Update, context: ContextTypes.DEFAULT_TYPE):
         full_msg = sanitize_md_v2(f"{counts_msg}\n\n🤖 Abbot responds in {remaining}")
         await message.reply_markdown_v2(full_msg)
     except AbbotException as abbot_exception:
-        await bot_squawk(log_name, abbot_exception, context)
+        await bot_squawk_error(log_name, abbot_exception, context)
 
 
 async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -841,7 +839,7 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
             keyboard_markup = InlineKeyboardMarkup(keyboard)
             await message.reply_text(f"Invoice expired! Try again?", reply_markup=keyboard_markup)
     except AbbotException as abbot_exception:
-        await bot_squawk(log_name, abbot_exception, context)
+        await bot_squawk_error(log_name, abbot_exception, context)
 
 
 async def fund_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -861,7 +859,7 @@ async def fund_button(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_msg = f"{np} 👍 {ln_addr} ⚡️ {contact}"
             await query.edit_message_text(reply_msg)
     except AbbotException as abbot_exception:
-        await bot_squawk(log_name, abbot_exception, context)
+        await bot_squawk_error(log_name, abbot_exception, context)
 
 
 async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -902,7 +900,6 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
             error_bot.log(log_name, abbot_squawk)
             await bot_squawk(log_name, abbot_squawk, context)
             return await message.reply_text(stopped_err)
-        debug_bot.log(log_name, f"group={group}")
         debug_bot.log(log_name, f"group_config={group_config}")
         started: bool = try_get(group_config, "started")
         debug_bot.log(log_name, f"started={started}")
@@ -915,13 +912,9 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
         if not message_text:
             message_text_err = f"{log_name}: No message text: message={message} update={update}"
             return await context.bot.send_message(chat_id=THE_ARCHITECT_ID, text=message_text_err)
-        if not username and not message_date:
+        if not username:
             new_history_dict = {"role": "user", "content": f"someone said: {message_text}"}
-        elif username and message_date:
-            new_history_dict = {"role": "user", "content": f"@{username} said: {message_text}"}
-        elif not username and message_date:
-            new_history_dict = {"role": "user", "content": f"someone said: {message_text}"}
-        elif username and not message_date:
+        else:
             new_history_dict = {"role": "user", "content": f"@{username} said: {message_text}"}
         group_history: List[Dict] = [*try_get(group, "history", default=[]), new_history_dict]
         if not group or not group_history:
@@ -931,7 +924,6 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
             error_bot.log(log_name, abbot_squawk)
             await message.reply_text(stopped_err)
             return await bot_squawk(log_name, abbot_squawk, context)
-        debug_bot.log(log_name, f"group={group}")
         debug_bot.log(log_name, f"group_config={group_config}")
         if group_balance == 0:
             group_no_sats_msg = f"No sats left 😢 Run /fund to refill your sats and continue chatting"
@@ -972,12 +964,11 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
                 "$push": {"messages": new_message_dict, "history": assistant_history_update},
             },
         )
-        debug_bot.log(log_name, f"group={group}")
         if "`" in answer:
             return await message.reply_markdown_v2(sanitize_md_v2(answer), disable_web_page_preview=True)
         return await message.reply_text(answer, disable_web_page_preview=True)
     except AbbotException as abbot_exception:
-        await bot_squawk(log_name, abbot_exception, context)
+        await bot_squawk_error(log_name, abbot_exception, context)
 
 
 async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1034,19 +1025,14 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 error_bot.log(log_name, abbot_squawk)
                 await bot_squawk(log_name, abbot_squawk, context)
                 return await message.reply_text(stopped_err)
-            debug_bot.log(log_name, f"group={group}")
             debug_bot.log(log_name, f"group_config={group_config}")
             new_history_dict = {"role": "user", "content": f"@{username} said: {message_text}"}
             if not message_text:
                 message_text_err = f"{log_name}: No message text: message={message} update={update}"
                 return await context.bot.send_message(chat_id=THE_ARCHITECT_ID, text=message_text_err)
-            if not username and not message_date:
+            if not username:
                 new_history_dict = {"role": "user", "content": f"someone said: {message_text}"}
-            elif username and message_date:
-                new_history_dict = {"role": "user", "content": f"@{username} said: {message_text}"}
-            elif not username and message_date:
-                new_history_dict = {"role": "user", "content": f"someone said: {message_text}"}
-            elif username and not message_date:
+            else:
                 new_history_dict = {"role": "user", "content": f"@{username} said: {message_text}"}
             new_message_dict = message.to_dict()
             group: TelegramGroup = mongo_abbot.find_one_group_and_update(
@@ -1112,12 +1098,11 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
                     "$push": {"history": assistant_history_update},
                 },
             )
-            debug_bot.log(log_name, f"group={group}")
             if "`" in answer:
                 return await message.reply_markdown_v2(sanitize_md_v2(answer), disable_web_page_preview=True)
             return await message.reply_text(answer, disable_web_page_preview=True)
     except AbbotException as abbot_exception:
-        await bot_squawk(log_name, abbot_exception, context)
+        await bot_squawk_error(log_name, abbot_exception, context)
 
 
 async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1171,7 +1156,7 @@ async def handle_dm(update: Update, context: ContextTypes.DEFAULT_TYPE):
             return await message.reply_markdown_v2(sanitize_md_v2(answer), disable_web_page_preview=True)
         return await message.reply_text(answer, disable_web_page_preview=True)
     except AbbotException as abbot_exception:
-        await bot_squawk(log_name, abbot_exception, context)
+        await bot_squawk_error(log_name, abbot_exception, context)
 
 
 async def handle_group_kicks_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1194,7 +1179,7 @@ async def handle_group_kicks_bot(update: Update, context: ContextTypes.DEFAULT_T
                 chat_id=THE_ARCHITECT_ID, text=f"Bot kicked from group:\n\ntitle={chat.title}\nid={chat.id}"
             )
     except AbbotException as abbot_exception:
-        await bot_squawk(log_name, abbot_exception, context)
+        await bot_squawk_error(log_name, abbot_exception, context)
 
 
 async def handle_group_default(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -1307,12 +1292,11 @@ async def handle_group_default(update: Update, context: ContextTypes.DEFAULT_TYP
                     chat_id_filter,
                     {"$set": {"balance": group_balance}},
                 )
-                debug_bot.log(log_name, f"group={group}")
                 if "`" in answer:
                     return await message.reply_markdown_v2(sanitize_md_v2(answer), disable_web_page_preview=True)
                 return await message.reply_text(answer, disable_web_page_preview=True)
     except AbbotException as abbot_exception:
-        await bot_squawk(log_name, abbot_exception, context)
+        await bot_squawk_error(log_name, abbot_exception, context)
 
 
 async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:

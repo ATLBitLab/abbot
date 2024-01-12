@@ -153,7 +153,14 @@ async def bot_squawk_architect(error_message: str, context: ContextTypes.DEFAULT
 async def bot_squawk(location: str, squawk: str, context: ContextTypes.DEFAULT_TYPE) -> Message:
     log_name: str = f"{FILE_NAME}: bot_squawk"
     error_bot.log(log_name, f"{squawk}")
-    final_squawk = f"{THE_ARCHITECT_HANDLE} Abbot Error\n\nLocation\n{location}\n\nException\n{squawk}"
+    final_squawk = f"SQUAWK\n\nLocation\n{location}\n\nException\n{squawk}"
+    await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=final_squawk)
+
+
+async def bot_squawk_error(location: str, squawk: str, context: ContextTypes.DEFAULT_TYPE) -> Message:
+    log_name: str = f"{FILE_NAME}: bot_squawk"
+    error_bot.log(log_name, f"{squawk}")
+    final_squawk = f"{THE_ARCHITECT_HANDLE} ERROR\n\nLocation\n{location}\n\nException\n{squawk}"
     await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=final_squawk)
 
 
