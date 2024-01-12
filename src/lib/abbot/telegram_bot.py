@@ -2,16 +2,18 @@
 import json
 import time
 import uuid
+import tiktoken
 import traceback
 
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
+
 # packages
-from telegram import Bot, CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Update, Message, Chat, User
 from telegram.constants import MessageEntityType, ParseMode
+from telegram import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Update, Message, Chat, User
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, CallbackQueryHandler
-from telegram.ext.filters import ChatType, StatusUpdate, Regex, Entity, Mention, UpdateFilter, UpdateType, REPLY, TEXT
+from telegram.ext.filters import ChatType, StatusUpdate, Regex, Entity, Mention, UpdateFilter, UpdateType, REPLY
 
 """
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, filters
@@ -93,24 +95,24 @@ from ..abbot.telegram.filter_abbot_reply import FilterAbbotReply
 payment_processor = init_payment_processor()
 price_provider: Coinbase = init_price_provider()
 
-import tiktoken
-
 encoding = tiktoken.encoding_for_model(OPENAI_MODEL)
-FILE_NAME = __name__
-no_group_error = "No group or group config"
-no_group_config_error = "No group config"
-no_group_or_config_err = f"{no_group_error} or {no_group_config_error}"
 
-sats_example = "For sats: /fund 5000 sats"
-usd_example = "For usd: /fund 10 usd"
-invoice_error_args = "Missing amount and currency unit. Did you pass an amount and a currency unit?"
-invoice_error_unit = "Unrecognized currency unit. Did you pass one of usd or sats?"
-create_fail_msg = f"Failed to create invoice. Please try again"
-create_fail_lnaddr = f"or pay to {BOT_LIGHTNING_ADDRESS} and contact @{BOT_TELEGRAM_SUPPORT_CONTACT}"
-create_fail = f"{create_fail_msg} {create_fail_lnaddr}"
-cancel_fail_msg = "Failed to cancel invoice"
-nl = "\n"
-dub_nl = "\n\n"
+FILE_NAME = __name__
+NL = "\n"
+DNL = "\n\n"
+USD_EG = "For usd: /fund 10 usd"
+SATS_EG = "For sats: /fund 5000 sats"
+
+ERR_NO_GROUP = "No group or group config"
+ERR_NO_GROUP_CONF = "No group config"
+ERR_NO_GROUP_OR_CONF = f"{ERR_NO_GROUP} or {ERR_NO_GROUP_CONF}"
+ERR_INV_UNIT = "Unrecognized currency unit. Did you pass one of usd or sats?"
+ERR_INV_ARGS = "Missing amount and currency unit. Did you pass an amount and a currency unit?"
+ERR_INV_CREATE = f"Failed to create invoice. Please try again"
+ERR_INV_CREATE_LNADDR = f"or pay to {BOT_LIGHTNING_ADDRESS} and contact @{BOT_TELEGRAM_SUPPORT_CONTACT}"
+ERR_INV_CREATE = f"{ERR_INV_CREATE} {ERR_INV_CREATE_LNADDR}"
+ERR_INV_CANCEL = "Failed to cancel invoice"
+WARN_GROUP_NOSATS = "WARNING: Your group balance is 0 😢 Please run /fund to continue to chat"
 # ---------------------------------------------------------------------------------------
 # --                      Telegram Handlers Helper Functions                           --
 # ---------------------------------------------------------------------------------------
@@ -191,9 +193,9 @@ def get_balance_message(chat_title, sat_balance, usd_balance):
     group = f"💬 *{chat_title}* 💬"
     satoshis = f"⚖️ *Balance in Satoshis* {sat_balance} sats ⚡️"
     fiat = f"⚖️ *Balance in Fiat* {usd_balance} usd 💰"
-    balance_message = f"{group}{dub_nl}{satoshis}{dub_nl}{fiat}{dub_nl}"
+    balance_message = f"{group}{DNL}{satoshis}{DNL}{fiat}{DNL}"
     if 0 in (sat_balance, usd_balance):
-        no_sats = f"No sats left 😢 Please run /fund to topup{dub_nl}*Examples*{nl}/fund 5 usd{nl}/fund 5000 sats"
+        no_sats = f"No sats left 😢 Please run /fund to topup{DNL}*Examples*{NL}/fund 5 usd{NL}/fund 5000 sats"
         balance_message = f"{balance_message}{no_sats}"
     return balance_message
 
@@ -449,14 +451,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             group_balance = 0 if group_balance < 0 else group_balance - cost_sats
             if group_balance == 0:
                 abbot_squawk = f"Group balance: {group_balance}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
-                answer = f"{answer}\n\n Note: You group is now out of SATs. Please run /fund to continue to chat."
+                answer = f"{answer}\n\n{WARN_GROUP_NOSATS}"
                 debug_bot.log(log_name, abbot_squawk)
                 await bot_squawk(log_name, abbot_squawk, context)
             group_balance -= cost_sats
             if group_balance <= 0:
                 group_balance = 0
                 squawk_msg = f"Group balance: {group_balance}\n\chat_id={chat_id}\chat_title={chat_title}"
-                answer = f"{answer}\n\n Note: You group is now out of SATs. Please run /fund to continue to chat."
+                answer = f"{answer}\n\n{WARN_GROUP_NOSATS}"
                 debug_bot.log(log_name, squawk_msg)
                 await bot_squawk(log_name, squawk_msg, context)
             debug_bot.log(log_name, f"group_balance={group_balance}")
@@ -604,7 +606,7 @@ async def unleash(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id_filter = {"id": chat_id}
         group: TelegramGroup = mongo_abbot.find_one_group(chat_id_filter)
         if not group:
-            return await message.reply_text(f"{no_group_error} - Did you run /start{BOT_TELEGRAM_HANDLE}?")
+            return await message.reply_text(f"{ERR_NO_GROUP} - Did you run /start{BOT_TELEGRAM_HANDLE}?")
         current_sats: int = try_get(group, "balance")
         if current_sats == 0:
             return await message.reply_text(f"You group SAT balance is 0. Please run /fund to refill.")
@@ -632,7 +634,7 @@ async def leash(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id_filter = {"id": chat_id}
         group: TelegramGroup = mongo_abbot.find_one_group(chat_id_filter)
         if not group:
-            return await message.reply_text(f"{no_group_error} - Did you run /start{BOT_TELEGRAM_HANDLE}?")
+            return await message.reply_text(f"{ERR_NO_GROUP} - Did you run /start{BOT_TELEGRAM_HANDLE}?")
         group_config: Dict = mongo_abbot.get_group_config(chat_id_filter)
         unleashed: bool = try_get(group_config, "unleashed")
         if unleashed:
@@ -662,7 +664,7 @@ async def status(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id_filter = {"id": chat_id}
         group_config: Dict = mongo_abbot.get_group_config(chat_id_filter)
         if not group_config:
-            abbot_squawk = f"{log_name}: {no_group_config_error}:"
+            abbot_squawk = f"{log_name}: {ERR_NO_GROUP_CONF}:"
             error_msg = f"id={chat_id}, title={chat_title}, group_config={group_config}"
             abbot_squawk = f"{abbot_squawk}\n\n{error_msg}"
             reply_text_err = f"Failed to get group status. Please contact {THE_ARCHITECT_HANDLE} for assistance."
@@ -703,7 +705,7 @@ async def count(update: Update, context: ContextTypes.DEFAULT_TYPE):
         group_history: Dict = mongo_abbot.get_group_history(chat_id_filter)
         group_config: Dict = mongo_abbot.get_group_config(chat_id_filter)
         if not group_history or not group_config:
-            abbot_squawk = f"{log_name}: {no_group_config_error}:"
+            abbot_squawk = f"{log_name}: {ERR_NO_GROUP_CONF}:"
             error_msg = f"id={chat_id}, title={chat_title}, group_history={group_history}"
             abbot_squawk = f"{abbot_squawk}\n\n{error_msg}"
             reply_text_err = f"Failed to get group history count. Please contact {THE_ARCHITECT_HANDLE} for assistance."
@@ -747,9 +749,9 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
         args_len = len(args)
         debug_bot.log(log_name, f"args={args}")
         if args_len < 2:
-            return await message.reply_text(f"{invoice_error_args}\n{sats_example}\n{usd_example}")
+            return await message.reply_text(f"{ERR_INV_ARGS}\n{SATS_EG}\n{USD_EG}")
         elif args_len < 3:
-            return await message.reply_text(f"{invoice_error_args}\n{sats_example}\n{usd_example}")
+            return await message.reply_text(f"{ERR_INV_ARGS}\n{SATS_EG}\n{USD_EG}")
         amount: str = try_get(args, 1)
         if "." in amount:
             amount: float = float(try_get(args, 1))
@@ -775,7 +777,7 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
             invoice_amount = amount
             balance = await usd_to_sat(amount)
         else:
-            return await message.reply_text(f"{invoice_error_unit}\n\n{sats_example}\n\n{usd_example}")
+            return await message.reply_text(f"{ERR_INV_UNIT}\n\n{SATS_EG}\n\n{USD_EG}")
         await message.reply_text("Creating your invoice, please wait ...")
         debug_bot.log(log_name, f"payment_processor={payment_processor}")
         debug_bot.log(log_name, f"amount={amount}")
@@ -791,19 +793,19 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
         create_squawk = f"Failed to create strike invoice: {json.dumps(response)}"
         if not successful(response):
             await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=f"{create_squawk}: not successful()")
-            return await message.reply_text(create_fail)
+            return await message.reply_text(ERR_INV_CREATE)
         invoice_id = try_get(response, "invoice_id")
         invoice = try_get(response, "ln_invoice")
         expiration_in_sec = try_get(response, "expiration_in_sec")
-        payment_processor.CHAT_ID_INVOICE_ID_MAP[chat_id] = invoice_id
+        payment_processor.CHAT_ID_INV_ID_MAP[chat_id] = invoice_id
         if None in (invoice_id, invoice, expiration_in_sec):
             await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=create_squawk)
-            return await message.reply_text(create_fail)
+            return await message.reply_text(ERR_INV_CREATE)
         expires_msg = f"🕰️ Expires in: {expiration_in_sec} seconds\n"
         description = f"{description}\n{expires_msg}"
         await message.reply_photo(photo=qr_code(invoice), caption=sanitize_md_v2(description), parse_mode=MARKDOWN_V2)
         await message.reply_markdown_v2(f"`{invoice}`")
-        cancel_squawk = f"{cancel_fail_msg}: description={description}, invoice_id={invoice_id}"
+        cancel_squawk = f"{ERR_INV_CANCEL}: description={description}, invoice_id={invoice_id}"
         is_paid = False
         while expiration_in_sec >= 0 and not is_paid:
             debug_bot.log(log_name, f"expiration_in_sec={expiration_in_sec}")
@@ -820,7 +822,7 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 if not cancelled:
                     try_again = "Try again or pay to"
                     pay_to_lnaddr = f"abbot@atlbitlab.com and contact {THE_ARCHITECT_HANDLE}"
-                    cancel_reply = f"{cancel_fail_msg}: {try_again} {pay_to_lnaddr}"
+                    cancel_reply = f"{ERR_INV_CANCEL}: {try_again} {pay_to_lnaddr}"
                     await context.bot.send_message(chat_id=THE_ARCHITECT_ID, text=cancel_squawk)
                     return await message.reply_text(cancel_reply)
             time.sleep(1)
@@ -894,8 +896,8 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
         group_config: Dict = try_get(group, "config")
         group_balance: int = try_get(group, "balance")
         if not group or not group_config:
-            abbot_squawk = f"{log_name}: {no_group_error}: id={chat_id}, title={chat_title}"
-            error_msg = f"{no_group_error}: group={group} group_config={group_config}"
+            abbot_squawk = f"{log_name}: {ERR_NO_GROUP}: id={chat_id}, title={chat_title}"
+            error_msg = f"{ERR_NO_GROUP}: group={group} group_config={group_config}"
             abbot_squawk = f"{abbot_squawk}\n\n{error_msg}"
             error_bot.log(log_name, abbot_squawk)
             await bot_squawk(log_name, abbot_squawk, context)
@@ -923,8 +925,8 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
             new_history_dict = {"role": "user", "content": f"@{username} said: {message_text}"}
         group_history: List[Dict] = [*try_get(group, "history", default=[]), new_history_dict]
         if not group or not group_history:
-            abbot_squawk = f"{log_name}: {no_group_error}: id={chat_id}, title={chat_title}"
-            error_msg = f"{no_group_error}: group={group} group_config={group_config}"
+            abbot_squawk = f"{log_name}: {ERR_NO_GROUP}: id={chat_id}, title={chat_title}"
+            error_msg = f"{ERR_NO_GROUP}: group={group} group_config={group_config}"
             abbot_squawk = f"{abbot_squawk}\n\n{error_msg}"
             error_bot.log(log_name, abbot_squawk)
             await message.reply_text(stopped_err)
@@ -950,7 +952,7 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
         group_balance = 0 if group_balance < 0 else group_balance - cost_sats
         if group_balance == 0:
             abbot_squawk = f"Group balance: {group_balance}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
-            answer = f"{answer}\n\n Note: No sats left 😢 Please run /fund to continue chatting"
+            answer = f"{answer}\n\n{WARN_GROUP_NOSATS}"
             debug_bot.log(log_name, abbot_squawk)
             await bot_squawk(log_name, abbot_squawk, context)
         debug_bot.log(log_name, f"group_balance={group_balance}")
@@ -1021,8 +1023,8 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
             debug_bot.log(log_name, f"group_config={group_config}")
             debug_bot.log(log_name, f"started={started}")
             if not group or not group_config:
-                abbot_squawk = f"{log_name}: {no_group_error}: id={chat_id}, title={chat_title}"
-                reply_msg = f"{no_group_error} - Did you run /start{BOT_TELEGRAM_HANDLE}?"
+                abbot_squawk = f"{log_name}: {ERR_NO_GROUP}: id={chat_id}, title={chat_title}"
+                reply_msg = f"{ERR_NO_GROUP} - Did you run /start{BOT_TELEGRAM_HANDLE}?"
                 abbot_squawk = f"{abbot_squawk}\n\n{reply_msg}"
                 error_bot.log(log_name, abbot_squawk)
                 await bot_squawk(log_name, abbot_squawk, context)
@@ -1063,8 +1065,8 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 },
             )
             if not group or not group_history:
-                abbot_squawk = f"{log_name}: {no_group_error}: id={chat_id}, title={chat_title}"
-                error_msg = f"{no_group_error}: group={group} group_config={group_config}"
+                abbot_squawk = f"{log_name}: {ERR_NO_GROUP}: id={chat_id}, title={chat_title}"
+                error_msg = f"{ERR_NO_GROUP}: group={group} group_config={group_config}"
                 abbot_squawk = f"{abbot_squawk}\n\n{error_msg}"
                 error_bot.log(log_name, abbot_squawk)
                 return await bot_squawk(log_name, abbot_squawk, context)
@@ -1095,7 +1097,7 @@ async def handle_group_reply(update: Update, context: ContextTypes.DEFAULT_TYPE)
             group_balance = 0 if group_balance < 0 else group_balance - cost_sats
             if group_balance == 0:
                 abbot_squawk = f"Group balance: {group_balance}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
-                answer = f"{answer}\n\n Note: You group is now out of SATs. Please run /fund to topup."
+                answer = f"{answer}\n\n{WARN_GROUP_NOSATS}"
                 debug_bot.log(log_name, abbot_squawk)
                 await bot_squawk(log_name, abbot_squawk, context)
             debug_bot.log(log_name, f"cost_sats={cost_sats}")
@@ -1297,7 +1299,7 @@ async def handle_group_default(update: Update, context: ContextTypes.DEFAULT_TYP
                 group_balance = 0 if group_balance < 0 else group_balance - cost_sats
                 if group_balance == 0:
                     abbot_squawk = f"Group balance: {group_balance}\n\ngroup_id={chat_id}\ngroup_title={chat_title}"
-                    answer = f"{answer}\n\n Note: You group is now out of SATs. Please run /fund to continue to chat."
+                    answer = f"{answer}\n\n{WARN_GROUP_NOSATS}"
                     debug_bot.log(log_name, abbot_squawk)
                     await bot_squawk(log_name, abbot_squawk, context)
                 debug_bot.log(log_name, f"group_balance={group_balance}")
