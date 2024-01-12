@@ -354,18 +354,18 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message_text, _ = parse_message_data(message)
         chat: Chat = try_get(message, "chat")
         chat_id, chat_title, chat_type = parse_group_chat_data(chat)
-        chat_user_firstname = try_get(chat, "first_name")
-        chat_user_id = try_get(chat, "id")
-        chat_user_handle = try_get(chat, "username")
-        user: User = try_get(message, "user")
+        # chat_user_firstname = try_get(chat, "first_name")
+        # chat_user_id = try_get(chat, "id")
+        # chat_user_handle = try_get(chat, "username")
+        user: User = try_get(message, "from_user")
         user_id, username, first_name = parse_user_data(user)
-        username: str = username or chat_user_handle
+        # username: str = username
         is_handle = True
         if not username:
-            username = first_name or chat_user_firstname
+            username = first_name
             is_handle = False
         if not username:
-            username = user_id or chat_user_id
+            username = user_id
             is_handle = False
         intro_history_dict = {"role": "assistant", "content": INTRODUCTION}
         new_history_dict = {"role": "user", "content": f"@{username} said: {message_text}"}
