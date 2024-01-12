@@ -50,6 +50,7 @@ BOT_NOSTR_NPUB = try_get(BOT_NOSTR, "npub")
 BOT_SYSTEM = try_get(BOT_CONFIG, "system")
 BOT_SYSTEM_DM = try_get(BOT_SYSTEM, "dm")
 BOT_SYSTEM_GROUP = try_get(BOT_SYSTEM, "group")
+BOT_SYSTEM_BLIXT = try_get(BOT_SYSTEM, "blixt ")
 BOT_SYSTEM_CORE = try_get(BOT_SYSTEM, "core")
 BOT_DIRECTIVE = try_get(BOT_SYSTEM, "directive")
 
@@ -61,6 +62,7 @@ BOT_TELEGRAM_TOKEN = TEST_BOT_TELEGRAM_HANDLE if TEST_MODE or DEV_MODE else BOT_
 BOT_INTRO = f"Your name is {BOT_NAME}, which is short for {BOT_SHORT_FOR}, your telegram handle is {BOT_TELEGRAM_HANDLE}. You answer to Abbot. You are part of {ORG_NAME} - {ORG_DESCRIPTION} and you are an expert in all things {ORG_LOCATION}, {ORG_NAME} and Bitcoin and Lightning Network. {BOT_DIRECTIVE}"
 BOT_SYSTEM_CORE_DMS = f"{BOT_SYSTEM_DM}. {BOT_INTRO}. {BOT_SYSTEM_CORE}"
 BOT_SYSTEM_CORE_GROUPS = f"{BOT_SYSTEM_GROUP}. {BOT_INTRO}. {BOT_SYSTEM_CORE}"
+BOT_SYSTEM_CORE_BLIXT = f"{BOT_SYSTEM_BLIXT}. {BOT_INTRO}. {BOT_SYSTEM_CORE}"
 
 BOT_SYSTEM_OBJECT_GROUPS = {"role": "system", "content": BOT_SYSTEM_CORE_GROUPS}
 BOT_SYSTEM_OBJECT_DMS = {"role": "system", "content": BOT_SYSTEM_CORE_DMS}
