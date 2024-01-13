@@ -813,7 +813,7 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
         invoice_id = try_get(response, "invoice_id")
         invoice = try_get(response, "ln_invoice")
         expiration_in_sec = try_get(response, "expiration_in_sec")
-        payment_processor.CHAT_ID_INV_ID_MAP[chat_id] = invoice_id
+        payment_processor.CHAT_ID_INVOICE_ID_MAP[chat_id] = invoice_id
         if None in (invoice_id, invoice, expiration_in_sec):
             await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=create_squawk)
             return await message.reply_text(ERR_INV_CREATE)
@@ -829,8 +829,7 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
             debug_bot.log(log_name, f"is_paid={is_paid}")
             expiration_in_sec -= 1
             if expiration_in_sec % 10 == 0:
-                query: Optional[CallbackQuery] = try_get(update, "callback_query")
-                await message.edit_text(f"🕰️ Invoice expires in: {expiration_in_sec} seconds\n")
+                await message.reply_text(f"🕰️ Invoice expires in: {expiration_in_sec} seconds\n")
             if expiration_in_sec == 0:
                 debug_bot.log(log_name, f"expiration_in_sec == 0, cancelling invoice_id={invoice_id}")
                 cancelled = await payment_processor.expire_invoice(invoice_id)
@@ -839,7 +838,7 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     try_again = "Try again or pay to"
                     pay_to_lnaddr = f"abbot@atlbitlab.com and contact {THE_ARCHITECT_HANDLE}"
                     cancel_reply = f"{ERR_INV_CANCEL}: {try_again} {pay_to_lnaddr}"
-                    await context.bot.send_message(chat_id=THE_ARCHITECT_ID, text=cancel_squawk)
+                    await bot_squawk(log_name, cancel_squawk, context)
                     return await message.reply_text(cancel_reply)
             time.sleep(1)
         if is_paid:
@@ -848,12 +847,12 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
             if not group:
                 error_bot.log(log_name, f"not group")
-                return await context.bot.send_message(chat_id=ABBOT_SQUAWKS, text=group)
+                return await bot_squawk(log_name, group, context)
             balance: int = try_get(group, "balance", default=amount)
             await message.reply_text(f"Invoice Paid! ⚡️ {chat_title} balance: {balance} sats ⚡️")
         else:
             keyboard = [[InlineKeyboardButton("Yes", callback_data="1"), InlineKeyboardButton("No", callback_data="2")]]
-            await context.bot.send_message(chat_id=THE_ARCHITECT_ID, text=cancel_squawk)
+            await bot_squawk(log_name, cancel_squawk, context)
             keyboard_markup = InlineKeyboardMarkup(keyboard)
             await message.reply_text(f"Invoice expired! Try again?", reply_markup=keyboard_markup)
     except AbbotException as abbot_exception:
