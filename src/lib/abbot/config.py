@@ -50,7 +50,7 @@ BOT_NOSTR_NPUB = try_get(BOT_NOSTR, "npub")
 BOT_SYSTEM = try_get(BOT_CONFIG, "system")
 BOT_SYSTEM_DM = try_get(BOT_SYSTEM, "dm")
 BOT_SYSTEM_GROUP = try_get(BOT_SYSTEM, "group")
-BOT_SYSTEM_BLIXT = try_get(BOT_SYSTEM, "blixt ")
+BOT_SYSTEM_BLIXT = try_get(BOT_SYSTEM, "blixt")
 BOT_SYSTEM_CORE = try_get(BOT_SYSTEM, "core")
 BOT_DIRECTIVE = try_get(BOT_SYSTEM, "directive")
 
@@ -66,6 +66,7 @@ BOT_SYSTEM_CORE_BLIXT = f"{BOT_SYSTEM_BLIXT}. {BOT_INTRO}. {BOT_SYSTEM_CORE}"
 
 BOT_SYSTEM_OBJECT_GROUPS = {"role": "system", "content": BOT_SYSTEM_CORE_GROUPS}
 BOT_SYSTEM_OBJECT_DMS = {"role": "system", "content": BOT_SYSTEM_CORE_DMS}
+BOT_SYSTEM_OBJECT_BLIXT = {"role": "system", "content": BOT_SYSTEM_CORE_BLIXT}
 BOT_GROUP_CONFIG_DEFAULT = {"started": False, "introduced": False, "unleashed": False, "count": 0}
 BOT_GROUP_CONFIG_STARTED = {"started": True, "introduced": True, "unleashed": False, "count": 0}
 BOT_GROUP_CONFIG_STOPPED = {"started": False, "introduced": True, "unleashed": False, "count": 0}

@@ -398,19 +398,19 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     }
                 },
             )
-        
+
         group_history: List = try_get(group, "history")
         group_history = [*group_history, new_history_dict]
-        
+
         group_config: Dict = try_get(group, "config")
         debug_bot.log(log_name, f"group_config={group_config}")
-        
+
         started: Dict = try_get(group_config, "started")
         debug_bot.log(log_name, f"started={started}")
-        
+
         introduced: Dict = try_get(group_config, "introduced")
         debug_bot.log(log_name, f"introduced={introduced}")
-        
+
         group_balance: int = try_get(group, "balance")
         debug_bot.log(log_name, f"group_balance={group_balance}")
 
@@ -421,13 +421,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             debug_bot.log(log_name, f"already_started={already_started}")
             await bot_squawk(log_name, already_started, context)
             return await message.reply_markdown_v2(already_started, disable_web_page_preview=True)
-        
+
         if group_balance == 0:
             balance_message: str = sanitize_md_v2(get_balance_message(chat_title, group_balance, 0))
             # reuse buttons to ask if they want an invoice
             # or send an invoice
             return await message.reply_markdown_v2(balance_message)
-        
+
         if introduced:
             abbot = Abbot(chat_id, "group", group_history)
             answer, input_tokens, output_tokens, _ = abbot.chat_completion(chat_title)
@@ -448,7 +448,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 answer = f"{answer}\n\n{WARN_GROUP_NOSATS}"
                 debug_bot.log(log_name, abbot_squawk)
                 await bot_squawk(log_name, abbot_squawk, context)
-            
+
             group_balance -= cost_sats
             if group_balance <= 0:
                 group_balance = 0
@@ -456,10 +456,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 answer = f"{answer}\n\n{WARN_GROUP_NOSATS}"
                 debug_bot.log(log_name, squawk_msg)
                 await bot_squawk(log_name, squawk_msg, context)
-            
+
             debug_bot.log(log_name, f"group_balance={group_balance}")
             group_history = abbot.get_history()
-            
+
             group: TelegramGroup = mongo_abbot.find_one_group_and_update(
                 chat_id_filter,
                 {
@@ -469,7 +469,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         "admins": admins,
                         "balance": group_balance,
                         "tokens": abbot.history_tokens,
-                        "config.started": True
+                        "config.started": True,
                     },
                     "$push": {
                         "messages": new_message_dict,
@@ -949,7 +949,8 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
             await bot_squawk(log_name, abbot_squawk, context)
             return await message.reply_text(group_no_sats_msg)
         abbot = Abbot(chat_id, "group", group_history)
-        answer, input_tokens, output_tokens, _ = abbot.chat_completion(chat_title)
+        answer, input_tokens, output_tokens, total_tokens = abbot.chat_completion(chat_title)
+        await bot_squawk(log_name, f"chat_id={chat_id} chat_title={chat_title} total_tokens={total_tokens}")
         response: Dict = await recalc_balance_sats(input_tokens, output_tokens)
         if not successful(response):
             sub_log_name = f"{log_name}: recalc_balance_sats"
@@ -982,7 +983,7 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
                 "$push": {"messages": new_message_dict, "history": assistant_history_update},
             },
         )
-        if "`" in answer:
+        if "`" in answer or "**" in answer:
             return await message.reply_markdown_v2(sanitize_md_v2(answer), disable_web_page_preview=True)
         return await message.reply_text(answer, disable_web_page_preview=True)
     except AbbotException as abbot_exception:

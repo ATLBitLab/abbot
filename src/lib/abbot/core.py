@@ -7,7 +7,7 @@ from typing import List, Dict
 
 from constants import OPENAI_MODEL
 from ..db.utils import successful_update_one
-from ..abbot.config import BOT_SYSTEM_CORE_BLIXT, BOT_SYSTEM_OBJECT_GROUPS
+from ..abbot.config import BOT_SYSTEM_OBJECT_BLIXT, BOT_SYSTEM_OBJECT_GROUPS
 from ..utils import error, success, to_dict, try_get
 from ..db.mongo import GroupConfig, UpdateResult, mongo_abbot
 
@@ -25,7 +25,6 @@ class Abbot(GroupConfig):
 
     def __init__(self, id: str, bot_type: str, history: List):
         log_name: str = f"{__name__}: Abbot.__init__():"
-        debug_bot.log(log_name, f"history={history}")
         self.id: str = id
         self.bot_type: str = bot_type
         self.history: List = history
@@ -110,7 +109,6 @@ class Abbot(GroupConfig):
 
     def calculate_history_tokens(self, history=None) -> int:
         log_name: str = f"{FILE_NAME}: calculate_history_tokens"
-        debug_bot.log(log_name, f"history={history}")
         total = 0
         if not history:
             history = self.history
@@ -147,7 +145,7 @@ class Abbot(GroupConfig):
         if self.history_tokens >= 90000:
             messages_history = self.history[self.history_len - 500 : self.history_len]
             if chat_title and "blixt" in chat_title.lower():
-                messages_history = [BOT_SYSTEM_CORE_BLIXT, *messages_history]
+                messages_history = [BOT_SYSTEM_OBJECT_BLIXT, *messages_history]
             else:
                 messages_history = [BOT_SYSTEM_OBJECT_GROUPS, *messages_history]
         response: Stream[ChatCompletionChunk] = self.client.chat.completions.create(
