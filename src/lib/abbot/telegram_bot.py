@@ -950,7 +950,7 @@ async def handle_group_mention(update: Update, context: ContextTypes.DEFAULT_TYP
             return await message.reply_text(group_no_sats_msg)
         abbot = Abbot(chat_id, "group", group_history)
         answer, input_tokens, output_tokens, total_tokens = abbot.chat_completion(chat_title)
-        await bot_squawk(log_name, f"chat_id={chat_id} chat_title={chat_title} total_tokens={total_tokens}")
+        await bot_squawk(log_name, f"chat_id={chat_id} chat_title={chat_title} total_tokens={total_tokens}", context)
         response: Dict = await recalc_balance_sats(input_tokens, output_tokens)
         if not successful(response):
             sub_log_name = f"{log_name}: recalc_balance_sats"
