@@ -24,7 +24,7 @@ class Abbot(GroupConfig):
     client: OpenAI = OpenAI(organization=OPENAI_ORG_ID, api_key=OPENAI_API_KEY)
 
     def __init__(self, id: str, bot_type: str, history: List):
-        log_name: str = f"{__name__}: Abbot.__init__():"
+        log_name: str = f"{FILE_NAME}: Abbot.__init__():"
         debug_bot.log(log_name, f"history={history}")
         self.id: str = id
         self.bot_type: str = bot_type

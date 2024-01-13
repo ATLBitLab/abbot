@@ -1223,7 +1223,7 @@ async def handle_group_default(update: Update, context: ContextTypes.DEFAULT_TYP
         if chat_type not in ("group", "supergroup", "channel"):
             debug_bot.log(log_name, f"not group: {chat_type}")
             chat_details = f"{chat_title}\n{chat_id}\n{chat_type}"
-            return await bot_squawk(log_name, f"Not group\n\nChat Details\n{chat_details}\n\nUpdate\n{update}")
+            return await bot_squawk(log_name, f"Not group\n\nChat Details\n{chat_details}\n\nUpdate\n{update}", context)
         admins: Any = [admin.to_dict() for admin in await chat.get_administrators()]
         debug_bot.log(log_name, f"admins={admins}")
         chat_id_filter = {"id": chat_id}
