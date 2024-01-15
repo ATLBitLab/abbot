@@ -376,6 +376,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if chat_type in ("group", "supergroup", "channel"):
             admins: Any = [admin.to_dict() for admin in await chat.get_administrators()] or []
             debug_bot.log(log_name, f"admins={admins}")
+        else:
+            return await message.reply_text(f"{BOT_START_COMMAND} is disabled in DMs. Feel free to chat at will!")
         chat_id_filter = {"id": chat_id}
         new_message_dict = message.to_dict()
         group: TelegramGroup = mongo_abbot.find_one_group(chat_id_filter)
