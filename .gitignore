@@ -17,6 +17,7 @@ ignore/
 # logs and tarballs
 *.log
 *.gz
+src/data/logs/*
 
 # chat data
 src/data/chat/group/content/*.json
