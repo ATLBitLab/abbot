@@ -62,7 +62,7 @@ class BotLogger:
 
     def _error(self, message: str):
         error_log.error(message)
-        debug_log.debug(f"~~~~~~~~~~~~ERROR~~~~~~~~~~~~: {message}")
+        debug_log.debug(message)
 
     def _debug(self, message: str):
         debug_log.debug(message)
