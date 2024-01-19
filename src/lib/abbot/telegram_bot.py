@@ -798,9 +798,9 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
         debug_bot.log(log_name, f"payment_processor={payment_processor}")
         debug_bot.log(log_name, f"amount={amount}")
         debug_bot.log(log_name, f"invoice_amount={invoice_amount}")
-        group_msg = f"💬 *Group* 💬\n{topup_for}\n\n"
-        sender_msg = f"✉️ *Requested by* ✉️\n@{topup_by}\n\n"
-        amount_msg = f"{emoji} *Amount* {emoji}\n{symbol}{amount} {currency_unit}\n\n"
+        group_msg = f"💬 *Group* 💬\n{topup_for}\n"
+        sender_msg = f"✉️ *Requested by* ✉️\n@{topup_by}\n"
+        amount_msg = f"{emoji} *Amount* {emoji}\n{symbol}{amount} {currency_unit}\n"
         cid = str(uuid.uuid1())
         description = f"{group_msg}{sender_msg}{amount_msg}"
         debug_bot.log(log_name, f"description={description}")
@@ -1264,12 +1264,6 @@ async def handle_group_default(update: Update, context: ContextTypes.DEFAULT_TYP
             debug_bot.log(log_name, f"abbot.history_len={abbot.history_len}")
             debug_bot.log(log_name, f"count={count}")
             if abbot.history_len % count == 0:
-                if group_balance == 0:
-                    # DM an admin?
-                    # send message, and set unleashed = False and count = 0? or set started = False?
-                    # fund_msg = "No SATs available! Please run /fund to topup (e.g. /fund 5 usd or /fund 5000 sats)."
-                    debug_bot.log(log_name, f"group_balance={group_balance}")
-                    await bot_squawk(log_name, f"No SATS! {chat_title} {chat_id} {chat_type}", context)
                 debug_bot.log(log_name, f"group_balance={group_balance}")
                 chat_title_completion: str = chat_title.lower()
                 answer, input_tokens, output_tokens, _ = abbot.chat_completion(chat_title_completion)
@@ -1300,6 +1294,12 @@ async def handle_group_default(update: Update, context: ContextTypes.DEFAULT_TYP
                     chat_id_filter,
                     {"$set": {"balance": group_balance}},
                 )
+                if group_balance == 0:
+                    # DM an admin?
+                    # send message, and set unleashed = False and count = 0? or set started = False?
+                    # fund_msg = "No SATs available! Please run /fund to topup (e.g. /fund 5 usd or /fund 5000 sats)."
+                    debug_bot.log(log_name, f"group_balance={group_balance}")
+                    return await bot_squawk(log_name, f"No SATS! {chat_title} {chat_id} {chat_type}", context)
                 if "`" in answer or "**" in answer:
                     return await message.reply_markdown_v2(sanitize_md_v2(answer), disable_web_page_preview=True)
                 return await message.reply_text(answer, disable_web_page_preview=True)
