@@ -13,7 +13,19 @@ from typing import Any, Dict, List, Optional
 from telegram.constants import MessageEntityType, ParseMode
 from telegram import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Update, Message, Chat, User
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, CallbackQueryHandler
-from telegram.ext.filters import ChatType, StatusUpdate, Regex, Entity, Mention, UpdateFilter, UpdateType, REPLY
+from telegram.ext.filters import (
+    ChatType,
+    StatusUpdate,
+    Regex,
+    Entity,
+    Mention,
+    UpdateFilter,
+    UpdateType,
+    Document,
+    REPLY,
+    VIDEO,
+    PHOTO,
+)
 
 """
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler, MessageHandler, filters
@@ -29,14 +41,12 @@ Reply = filters.REPLY
 """
 
 from constants import (
-    ABBOT_SQUAWKS,
     HELP_MENU,
     INTRODUCTION,
     MATRIX_IMG_FILEPATH,
     OPENAI_MODEL,
     RULES,
     SATOSHIS_PER_BTC,
-    THE_ARCHITECT_ID,
     THE_ARCHITECT_HANDLE,
 )
 from ..abbot.config import (
@@ -69,7 +79,8 @@ FILTER_MENTION_ABBOT = Mention(BOT_TELEGRAM_HANDLE)
 ENTITY_MENTION = Entity(MENTION)
 ENTITY_REPLY = Entity(REPLY)
 REGEX_MARKDOWN_REPLY = Regex("markdown") & REPLY
-MESSAGE_OR_EDITED = UpdateType.MESSAGES
+MESSAGE_EDITED = UpdateType.EDITED_MESSAGE
+MEDIA = VIDEO | PHOTO | Document.ALL
 
 # local
 from ..logger import debug_bot, error_bot
@@ -261,9 +272,7 @@ async def handle_group_adds_abbot(update: Update, context: ContextTypes.DEFAULT_
         if group:
             group_update = {"$set": {"title": chat_title, "id": chat_id, "type": chat_type, "admins": admins}}
         group: TelegramGroup = mongo_abbot.find_one_group_and_update(chat_id_filter, group_update)
-        squawk_msg = (
-            f"{log_name}: {THE_ARCHITECT_HANDLE} New group added Abbot!\n\ntitle={chat_title}\nchat_id={chat_id}"
-        )
+        squawk_msg = f"{THE_ARCHITECT_HANDLE} New group added Abbot!\n\ntitle={chat_title}\nchat_id={chat_id}"
         await bot_squawk(log_name, squawk_msg, context)
     except AbbotException as abbot_exception:
         await bot_squawk_error(log_name, abbot_exception, context)
@@ -736,13 +745,13 @@ async def fund(update: Update, context: ContextTypes.DEFAULT_TYPE):
         update_data: Dict = try_get(response, "data")
         debug_bot.log(log_name, f"update_data={update_data}")
         message: Message = try_get(update_data, "message")
-        if payment_processor.CHAT_ID_INVOICE_ID_MAP.get(chat_id, None):
-            return await message.reply_text("Active invoice already issued")
         message_text: str = try_get(message, "text")
         debug_bot.log(log_name, f"message_text={message_text}")
         chat: Chat = try_get(update_data, "chat")
         debug_bot.log(log_name, f"chat={chat}")
         chat_id, chat_title, chat_type = parse_group_chat_data(chat)
+        if payment_processor.CHAT_ID_INVOICE_ID_MAP.get(chat_id, None):
+            return await message.reply_text("Active invoice already issued")
         chat_type: str = chat_type.capitalize()
         if chat_type == "Private":
             return await message.reply_text("/fund is disabled in DMs. Feel free to chat at will!")
@@ -1210,7 +1219,7 @@ async def handle_group_default(update: Update, context: ContextTypes.DEFAULT_TYP
         if chat_type not in ("group", "supergroup", "channel"):
             debug_bot.log(log_name, f"not group: {chat_type}")
             chat_details = f"{chat_title}\n{chat_id}\n{chat_type}"
-            return await bot_squawk(log_name, f"Not group\n\nChat Details\n{chat_details}\n\nUpdate\n{update}", context)
+            await bot_squawk(log_name, f"Not group\n\nChat Details\n{chat_details}\n\nUpdate\n{update}", context)
         chat_title: str = chat_title
         user: User = try_get(update_data, "user")
         debug_bot.log(log_name, f"user={user}")
@@ -1331,7 +1340,7 @@ class TelegramBotBuilder:
             handlers=[
                 MessageHandler(CHAT_TYPE_GROUPS & (NEW_CHAT_MEMBERS | CHAT_CREATED), handle_group_adds_abbot),
                 MessageHandler(CHAT_TYPE_GROUPS & LEFT_CHAT_MEMEBERS, handle_group_kicks_bot),
-                MessageHandler(UpdateFilter(CHAT_TYPE_GROUPS & MESSAGE_OR_EDITED), handle_group_message_edit),
+                MessageHandler(UpdateFilter(CHAT_TYPE_GROUPS & MESSAGE_EDITED), handle_group_message_edit),
                 MessageHandler(REGEX_MARKDOWN_REPLY, handle_markdown_request),
             ]
         )
@@ -1357,6 +1366,7 @@ class TelegramBotBuilder:
                 MessageHandler(CHAT_TYPE_PRIVATE, handle_dm),
                 MessageHandler(CHAT_TYPE_GROUPS & FILTER_MENTION_ABBOT, handle_group_mention),
                 MessageHandler(CHAT_TYPE_GROUPS & FilterAbbotReply(), handle_group_reply),
+                # MessageHandler(CHAT_TYPE_GROUPS & MEDIA, handle_group_media),
                 MessageHandler(CHAT_TYPE_GROUPS, handle_group_default),
             ]
         )
