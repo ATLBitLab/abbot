@@ -144,7 +144,7 @@ class Abbot(GroupConfig):
         messages_history = self.history
         if self.history_tokens >= 90000:
             messages_history = self.history[self.history_len - 500 : self.history_len]
-            if chat_title and "blixt" in chat_title.lower():
+            if "blixt" in chat_title:
                 messages_history = [BOT_SYSTEM_OBJECT_BLIXT, *messages_history]
             else:
                 messages_history = [BOT_SYSTEM_OBJECT_GROUPS, *messages_history]
