@@ -1,3 +1,5 @@
+**This project is not actively maintained and is archived for posterity.**
+
 [![Netlify Status](https://api.netlify.com/api/v1/badges/1db6e002-0e3c-4dfb-9a57-8d7c39109fd1/deploy-status)](https://app.netlify.com/sites/atlbitlab/deploys)
 
 # Abbot
